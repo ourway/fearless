@@ -15,4 +15,7 @@ build:
 
 update:
 	@pyenv/bin/pip install -U -r requirements
-	
+
+install:
+	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fateam.template > $(CURDIR)/config/supervisor/fateam.conf
+	@find $(CURDIR)/config/supervisor -name *.conf | xargs ln -f -s -t /etc/supervisor/conf.d

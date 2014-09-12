@@ -1,0 +1,7 @@
+[program:fa-team-api]
+command={dir}/pyenv/bin/uwsgi --http :5005 --chdir src/app --wsgi-file app.py --enable-threads --thunder-lock --callable app --touch-reload app.py --optimize 2
+autostart=true
+directory={dir}
+stopsignal=TERM
+stdout_logfile={dir}/logs/uwsgi_access.log
+stderr_logfile={dir}/logs/uwsgi_error.log
