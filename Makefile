@@ -3,10 +3,16 @@
 # @author: Farsheed Ashouri
 # #/**************************************************************/
 
-PYV=$(shell python -c "import sys;t='{v[0]}.{v[1]}'.format(v=list(sys.version_info[:2]));sys.stdout.write(t)");
 PYENVDIR="pyenv"
 
 build:
-	@ if test ! -d $(PYENVDIR); then virtualenv $(PYENVDIR); fi
-	@ pyenv/bin/pip install -U -r requirements
+	@python src/etc/ez_setup.py
+	@python -m easy_install pip
+	@python -m pip install -U setuptools
+	@python -m pip install -U virtualenv
+	@if test ! -d $(PYENVDIR); then python -m virtualenv $(PYENVDIR) ;fi
+	@pyenv/bin/pip install -r requirements
+
+update:
+	@pyenv/bin/pip install -U -r requirements
 	

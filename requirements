@@ -1,3 +1,4 @@
+setuptools
 Cython
 redis
 celery
@@ -7,3 +8,4 @@ gevent
 ujson
 uwsgi
 riak
+jsonschema
