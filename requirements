@@ -1,0 +1,9 @@
+Cython
+redis
+celery
+requests
+falcon
+gevent
+ujson
+uwsgi
+riak

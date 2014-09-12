@@ -1,0 +1,10 @@
+#!/bin/bash
+
+source pyenv/bin/activate
+#uwsgi --emperor config
+uwsgi --http :5005 --chdir src/app --wsgi-file app.py --enable-threads --callable app --touch-reload app.py --touch-reload api.py --optimize 2
+
+
+
+
+
