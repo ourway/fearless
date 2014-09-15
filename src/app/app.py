@@ -22,7 +22,7 @@ class home_route(object):
     #@falcon.before(check_api_version)
     def on_get(self, req, resp, **kw):
         """Handles GET requests"""
-        data = {'body': 'This is a test home page'}
+        data = {'body': 'This is a great home page'}
         resp.body = ujson.encode(data)
 
 
