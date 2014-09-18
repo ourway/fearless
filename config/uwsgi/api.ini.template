@@ -1,0 +1,27 @@
+# CTC {version}
+[uwsgi]
+chdir={dir}/src/controllers
+module=app
+callable=app
+master=True
+vacuum=True
+enable-threads=True
+touch-reload=app.py
+
+harakiri=60
+cpu-affinity=1
+workers=4
+threads=20
+disable-logging=False
+listen=128
+optimize=1
+cache2=True,name=ctc_internal_cache,items=200
+#thunder-lock=True
+max-requests=256
+#limit-as=256
+reload-mercy=8
+chmod-socket    = 666
+#daemonize=/home/project/log
+#http=0.0.0.0:5005
+socket=/tmp/fa_team_api.socket
+stats=/tmp/statsockt

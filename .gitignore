@@ -56,3 +56,5 @@ target/
 # virtualenv
 pyenv/
 config/supervisor/*.conf
+config/nginx/*.conf
+config/uwsgi/*.ini

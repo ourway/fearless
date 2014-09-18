@@ -1,5 +1,5 @@
 [program:fa-team-api]
-command={dir}/pyenv/bin/uwsgi --http :5005 --chdir src/controllers --wsgi-file app.py --enable-threads --thunder-lock --callable app --touch-reload app.py --optimize 2
+command={dir}/pyenv/bin/uwsgi --emperor config/uwsgi
 autostart=true
 directory={dir}
 stopsignal=TERM

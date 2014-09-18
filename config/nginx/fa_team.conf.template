@@ -1,0 +1,21 @@
+server {
+    listen 5000;
+    server_name localhost;
+    server_tokens off;
+    more_set_headers 'Server: FA-TEAM Server';
+     location /app {
+        alias {dir}/src/views;    # your cache path
+        gzip_vary on;
+        gzip_http_version 1.1;
+        #expires max;
+        add_header Cache-Control public;
+        #error_page 404 /404;
+        #error_page 403 /403;
+    }
+
+     location /api {
+        uwsgi_pass unix:///tmp/fa_team_api.socket;
+        include uwsgi_params; 
+        }
+
+}

@@ -30,5 +30,5 @@ class home_route(object):
 app = falcon.API()
 home = home_route()
 
-app.add_route('/home/', home)
+app.add_route('/api/', home)
 
