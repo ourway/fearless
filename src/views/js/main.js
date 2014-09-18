@@ -1,4 +1,4 @@
-var fateamApp = angular.module('fateamApp', ['ngRoute']);
+var fateamApp = angular.module('fateamApp', ['ngRoute', 'ngResource']);
 
 	fateamApp.config(function($routeProvider, $locationProvider) {
 		$routeProvider
@@ -16,24 +16,29 @@ var fateamApp = angular.module('fateamApp', ['ngRoute']);
 			})
 
 
-		$locationProvider.html5Mode(true);
+		//$locationProvider.html5Mode(true);
 
 	})
 
 	// create the controller and inject Angular's $scope
-	fateamApp.controller('mainController', function($scope) {
+	fateamApp.controller('mainController', function($scope, $rootScope) {
 		// create a message to display in our view
-		$scope.message = 'fa-team, A Revolutionary Animation Production Management System!';
+        $rootScope.title = "Welcome to fa-team!";
+		$scope.appName = 'APMS';
+		$scope.message = $scope.appName + ', A Revolutionary Animation Production Management System!';
 	});
 
 	fateamApp.controller('aboutController', function($scope) {
-		$scope.message = 'Look! I am an about page.';
+		$scope.message = $scope.appName + '! I am an about page.';
 	});
 
 
 
 
+fateamApp.controller('titleCtrl', function ($scope, $http, $location) {
+    console.log
 
+});
 
 
 

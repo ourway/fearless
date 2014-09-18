@@ -2,13 +2,13 @@
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" ng-app="fateamApp"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" ng-app="fateamApp"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9" ng-app="fateamApp"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" ng-app="fateamApp"> <!--<![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" ng-app="fateamApp" > <!--<![endif]-->
     <head>
         <meta charset="utf-8">
 	<base href="/app/">
         
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title></title>
+        <title ng-bind="title"></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -38,7 +38,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#"><span>fa-team</span> Animation Production Management System</a>
+          <a class="navbar-brand" href="#"><span ng-cloak>{{appName}}&trade;</span></a>
         </div>
         <div class="navbar-collapse collapse">
           <form class="navbar-form navbar-right" role="form">
@@ -70,6 +70,7 @@
         <script src="js/vendor/bootstrap.min.js"></script>
         <script src="js/vendor/angular.min.js"></script>
         <script src="js/vendor/angular-route.min.js"></script>
+        <script src="js/vendor/angular-resource.min.js"></script>
 
 
         <script src="js/main.js"></script>
