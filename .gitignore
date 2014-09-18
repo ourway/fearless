@@ -58,3 +58,5 @@ pyenv/
 config/supervisor/*.conf
 config/nginx/*.conf
 config/uwsgi/*.ini
+bin/
+*.xz
