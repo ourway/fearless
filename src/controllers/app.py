@@ -20,10 +20,10 @@ from opensource.contenttype import contenttype
 class home_route(object):
     '''A very basic search function for DPM'''
     #@falcon.before(check_api_version)
-    def on_get(self, req, resp, **kw):
+    def on_post(self, req, resp, **kw):
         """Handles GET requests"""
-        data = {'body': 'This is a great home page'}
-        resp.body = ujson.encode(data)
+        data = {'body': 'This is a great api page'}
+        resp.body = ujson.dumps(data)
 
 
 
