@@ -8,5 +8,8 @@ gevent
 ujson
 uwsgi
 riak
+eventlet
 jsonschema
 psycopg2
+ipython
+sqlalchemy

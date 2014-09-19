@@ -5,3 +5,13 @@ directory={dir}
 stopsignal=TERM
 stdout_logfile={dir}/logs/uwsgi_access.log
 stderr_logfile={dir}/logs/uwsgi_error.log
+
+
+[program:fa-team-celery]
+command={dir}/pyenv/bin/celery -A tasks worker -P eventlet -c 10 -l info
+autostart=true
+directory={dir}/src/api
+stopsignal=TERM
+user=farsheed
+stdout_logfile={dir}/logs/celery.log
+stderr_logfile={dir}/logs/celery_error.log

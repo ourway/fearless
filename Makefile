@@ -37,6 +37,7 @@ install:
 	@service nginx restart
 	@supervisorctl update
 	@supervisorctl restart fa-team-api
+	@supervisorctl restart fa-team-celery
 	#sudo -u postgres createuser -PE vserver
 	#sudo -u postgres createdb -O vserver -E UTF8 vserver
 
