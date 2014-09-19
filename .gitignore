@@ -59,7 +59,7 @@ config/supervisor/*.conf
 config/nginx/*.conf
 config/uwsgi/*.ini
 bin/
-src/controllers/opensource/*.py
-src/controllers/opensource/*.py[cod]
+src/api/opensource/*.py
+src/api/opensource/*.py[cod]
 *.sqlite
 *.xz

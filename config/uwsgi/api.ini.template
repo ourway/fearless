@@ -1,6 +1,6 @@
 # CTC {version}
 [uwsgi]
-chdir={dir}/src/controllers
+chdir={dir}/src/api
 module=app
 callable=app
 master=True

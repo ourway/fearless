@@ -26,8 +26,6 @@ class home_route(object):
         data = {'body': 'This is a great api page', 'info':db}
         resp.body = ujson.dumps(data)
 
-
-
 app = falcon.API()
 home = home_route()
 

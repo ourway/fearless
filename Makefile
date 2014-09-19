@@ -5,7 +5,7 @@
 
 PYENVDIR="pyenv"
 FFMPEG="2.4"
-OPENSOURCE="src/controllers/opensource"
+OPENSOURCE="src/api/opensource"
 
 build:
 	@if test ! -d $(PYENVDIR); then python2.7 -m virtualenv $(PYENVDIR) ;fi
