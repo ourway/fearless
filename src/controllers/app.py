@@ -15,14 +15,15 @@ Clean code is much better than Cleaner comments!
 import falcon
 import ujson
 import uwsgi
+from model import db
 from opensource.contenttype import contenttype
 
 class home_route(object):
     '''A very basic search function for DPM'''
     #@falcon.before(check_api_version)
-    def on_post(self, req, resp, **kw):
+    def on_get(self, req, resp, **kw):
         """Handles GET requests"""
-        data = {'body': 'This is a great api page'}
+        data = {'body': 'This is a great api page', 'info':db}
         resp.body = ujson.dumps(data)
 
 

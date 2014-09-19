@@ -5,6 +5,7 @@
 
 PYENVDIR="pyenv"
 FFMPEG="2.4"
+OPENSOURCE="src/controllers/opensource"
 
 build:
 	@if test ! -d $(PYENVDIR); then python2.7 -m virtualenv $(PYENVDIR) ;fi
@@ -13,6 +14,9 @@ build:
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fateam.template > $(CURDIR)/config/supervisor/fateam.conf
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/uwsgi/api.ini.template > $(CURDIR)/config/uwsgi/api.ini
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/nginx/fa_team.conf.template > $(CURDIR)/config/nginx/fa_team.conf
+	@wget -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/dal.py
+	@wget -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/reserved_sql_keywords.py
+	@wget -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/contenttype.py
 	@wget -c http://johnvansickle.com/ffmpeg/releases/ffmpeg-$(FFMPEG)-64bit-static.tar.xz
 	@if test ! -d bin; then mkdir bin; fi
 	@tar xvfJ ffmpeg-$(FFMPEG)-64bit-static.tar.xz
@@ -33,3 +37,6 @@ install:
 	@service nginx restart
 	@supervisorctl update
 	@supervisorctl restart fa-team-api
+	#sudo -u postgres createuser -PE vserver
+	#sudo -u postgres createdb -O vserver -E UTF8 vserver
+

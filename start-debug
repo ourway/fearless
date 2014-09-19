@@ -2,7 +2,7 @@
 
 source pyenv/bin/activate
 #uwsgi --emperor config
-uwsgi --emperor config/uwsgi/
+uwsgi --http :5005 --chdir src/controllers --wsgi-file app.py --enable-threads --callable app --touch-reload app.py --touch-reload model.py --optimize 2
 
 
 
