@@ -16,8 +16,9 @@ import falcon
 import ujson
 import uwsgi
 from opensource.contenttype import contenttype
-from utils.departement import Departement
-from utils.download import Download
+from utils.departements import Departements
+from utils.downloads import Downloads
+from utils.assets import Assets
 
 class home_route(object):
     '''A very basic search function for DPM'''
@@ -32,6 +33,7 @@ app = falcon.API()
 home = home_route()
 
 app.add_route('/api/', home)
-app.add_route('/api/departement/{name}/', Departement())
-app.add_route('/api/download/', Download())
+app.add_route('/api/departement/{name}/', Departements())
+app.add_route('/api/download/', Downloads())
+app.add_route('/api/asset/', Assets())
 

@@ -9,7 +9,9 @@ enable-threads=True
 
 touch-reload=app.py
 touch-reload=model.py
-touch-reload=utils/departement.py
+touch-reload=tasks.py
+touch-reload=utils/departements.py
+touch-reload=utils/downloads.py
 touch-reload=utils/users.py
 touch-reload=utils/files.py
 touch-reload=utils/rules.py

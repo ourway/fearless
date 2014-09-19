@@ -17,6 +17,16 @@ Clean code is much better than Cleaner comments!
 from opensource.dal import *
 from uuid import uuid4
 import datetime
+
+#############
+##########
+from riak import RiakClient
+TeamClient = RiakClient(pb_port=8087, protocol='pbc')
+print "Creating riak connection on port 8087"
+file_bucket = TeamClient.bucket('team_files')
+file_bucket.enable_search()
+##########
+##############
 now = datetime.datetime.utcnow
 
 

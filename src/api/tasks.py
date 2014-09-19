@@ -28,9 +28,8 @@ import utils
 import sys
 import os
 import ujson
-import model
+from model import file_bucket  ## riak bucket for our files
 
-db = model.getdb()
 
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 
@@ -58,6 +57,18 @@ def download(url):
     else:
         data = {'message':'ERROR'}
     return ujson.dumps(data)
-        
 
+
+@app.task
+def add_asset(name, b64):
+    if not file_bucket.get(name).data:
+        new = file_bucket.new(key=name, data={'base64':b64})
+        new.store()
+        print 'File {name} added to riak db'.format(name=name)
+    else:
+        print 'File {name} is already available'.format(name=name)
+        
+@app.task
+def remove_asset(name):
+    pass
 
