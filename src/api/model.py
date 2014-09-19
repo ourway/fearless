@@ -14,4 +14,19 @@ Clean code is much better than Cleaner comments!
 
 from opensource.dal import *
 db = DAL('sqlite://storage.sqlite', check_reserved=['all'], folder="database")
+from uuid import uuid4
+import datetime
+now = datetime.datetime.utcnow
+
+db.define_table('auth_user',
+    Field('datetime', 'datetime', default=now()),
+    Field('uuid', 'string', default=uuid4()),
+    Field('name', 'string', required=True, notnull=True, unique=True),
+    Field('first_name', 'string', required=True, notnull=True),
+    Field('last_name', 'string', required=True, notnull=True),
+    Field('email', 'string', required=True, notnull=True, unique=True),
+    Field('pswd', 'password', required=True),
+    Field('avatar', 'string', default='default_avatar.png'),
+    Field('last_login', 'datetime'),
+                )
 

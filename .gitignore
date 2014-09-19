@@ -62,4 +62,5 @@ bin/
 src/api/opensource/*.py
 src/api/opensource/*.py[cod]
 *.sqlite
+*.table
 *.xz
