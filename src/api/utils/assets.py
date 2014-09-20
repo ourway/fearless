@@ -24,6 +24,7 @@ import base64
 import hashlib
 from opensource.contenttype import contenttype
 from model import file_bucket  ## riak bucket for our files
+from riak import RiakObject  ## riak bucket for our files
 
 class Assets(object):
     #@falcon.after(clean)

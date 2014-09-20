@@ -12,4 +12,4 @@ eventlet
 jsonschema
 psycopg2
 ipython
-sqlalchemy
+sh
