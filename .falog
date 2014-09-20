@@ -5,3 +5,4 @@
 2014.09.12 18:37:26  pypy src/etc/ez_setup.py
 2014.09.12 18:38:54  pypy -m easy_install pip
 2014.09.12 18:43:18  pypy -m pip install virtualenv
+2014.09.21 02:44:20  inotify is better than watchdog

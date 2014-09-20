@@ -8,6 +8,7 @@ gevent
 ujson
 uwsgi
 riak
+pyinotify
 eventlet
 jsonschema
 psycopg2
