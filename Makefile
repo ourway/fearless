@@ -27,14 +27,14 @@ update:
 	@pyenv/bin/pip install -U -r requirements
 
 install:
-	@yum install gcc libffi-devel python-devel openssl-devel
+	#@yum install gcc libffi-devel python-devel openssl-devel
 	@pip install supervisor
-	@ln -f -s  $(CURDIR)/config/supervisord /etc/rc.d/init.d/supervisord
-	@chmod +x /etc/rc.d/init.d/supervisord
-	@chkconfig --add supervisord
-	@chkconfig supervisord on
-	@ln -f -s  $(CURDIR)/config/supervisord.conf /etc/supervisord.conf
-	@service supervisord start
+	#@if test -d /etc/rc.d/init.d; then ln -f -s  $(CURDIR)/config/supervisord /etc/rc.d/init.d/supervisord;else ln -f -s  $(CURDIR)/config/supervisord /etc/init.d/supervisord; fi
+	#@if test -d /etc/rc.d/init.d; then chmod +x /etc/rc.d/init.d/supervisord; else chmod +x /etc/init.d/supervisord; fi
+	#@if test -f /sbin/insserv; then chkconfig --add supervisord; fi
+	#@if test -f /sbin/insserv; then chkconfig supervisord on; fi
+	#@ln -f -s  $(CURDIR)/config/supervisord.conf /etc/supervisord.conf
+	#@service supervisord start
 	#@python2.7 etc/ez_setup.py
 	#@python2.7 -m easy_install pip
 	#@python2.7 -m pip install -U setuptools
