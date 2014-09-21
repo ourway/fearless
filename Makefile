@@ -8,15 +8,15 @@ FFMPEG="2.4"
 OPENSOURCE="src/api/opensource"
 
 build:
-	@if test ! -d $(PYENVDIR); then python2.7 -m virtualenv $(PYENVDIR) ;fi
+	@if test ! -d $(PYENVDIR); then python2.7 -m virtualenv $(PYENVDIR); fi
 	@pyenv/bin/pip install -U setuptools
 	@pyenv/bin/pip install -r requirements
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fateam.template > $(CURDIR)/config/supervisor/fateam.conf
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/uwsgi/api.ini.template > $(CURDIR)/config/uwsgi/api.ini
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/nginx/fa_team.conf.template > $(CURDIR)/config/nginx/fa_team.conf
-	@wget -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/dal.py
-	@wget -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/reserved_sql_keywords.py
-	@wget -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/contenttype.py
+	@if test ! -f $(OPENSOURCE)/dal.py; then wget -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/dal.py; fi
+	@if test ! -f $(OPENSOURCE)/reserved_sql_keywords.py;then wget -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/reserved_sql_keywords.py; fi
+	@if test ! -f $(OPENSOURCE)/contenttype.py; then wget -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/contenttype.py; fi
 	@wget -c http://johnvansickle.com/ffmpeg/releases/ffmpeg-$(FFMPEG)-64bit-static.tar.xz
 	@if test ! -d bin; then mkdir bin; fi
 	@tar xvfJ ffmpeg-$(FFMPEG)-64bit-static.tar.xz
