@@ -28,10 +28,14 @@ import utils
 import sys
 import os
 import ujson
-from model import file_bucket  ## riak bucket for our files
+import hashlib
+import base64
+from model import file_bucket, TeamClient  ## riak bucket for our files
+from riak import RiakObject
 
 
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+BACKEND_URL = 'amqp://guest:guest@localhost:5672//'
 
 
 #BROKER_URL = 'redis://localhost:6379/0'
@@ -40,7 +44,7 @@ from celery import Celery
 
 app = Celery('tasks',
                 broker=BROKER_URL,
-                backend='amqp',
+                backend=BACKEND_URL,
                 include=[])
 
 
@@ -60,13 +64,24 @@ def download(url):
 
 
 @app.task
-def add_asset(name, b64):
-    if not file_bucket.get(name).data:
-        new = file_bucket.new(key=name, data={'base64':b64})
-        new.store()
-        print 'File {name} added to riak db'.format(name=name)
-    else:
+def add_asset(b64=None, path=None):
+    if b64:
+        name = hashlib.md5(b64).hexdigest()
+    elif path:
+        with open(path, 'rb') as f:
+            b64 = base64.encodestring(f.read())
+            name = path
+    if b64 and not file_bucket.get(name).exists: ##TODO fixme 
+        obj = RiakObject(TeamClient, file_bucket, name)
+        obj.content_type = 'application/json'
+        data = {'base64':b64, 'path':path}
+        obj.data = ujson.dumps(data)
+        obj.store()
+        print '\nFile {name} added to riak db\n'.format(name=name)
+        return name
+    elif file_bucket.get(name).exists:
         print 'File {name} is already available'.format(name=name)
+        return name
         
 @app.task
 def remove_asset(name):

@@ -29,12 +29,12 @@ update:
 install:
 	#@yum install gcc libffi-devel python-devel openssl-devel
 	@pip install supervisor
-	#@if test -d /etc/rc.d/init.d; then ln -f -s  $(CURDIR)/config/supervisord /etc/rc.d/init.d/supervisord;else ln -f -s  $(CURDIR)/config/supervisord /etc/init.d/supervisord; fi
-	#@if test -d /etc/rc.d/init.d; then chmod +x /etc/rc.d/init.d/supervisord; else chmod +x /etc/init.d/supervisord; fi
-	#@if test -f /sbin/insserv; then chkconfig --add supervisord; fi
-	#@if test -f /sbin/insserv; then chkconfig supervisord on; fi
-	#@ln -f -s  $(CURDIR)/config/supervisord.conf /etc/supervisord.conf
-	#@service supervisord start
+	@if test -d /etc/rc.d/init.d; then ln -f -s  $(CURDIR)/config/supervisord /etc/rc.d/init.d/supervisord;else ln -f -s  $(CURDIR)/config/supervisord /etc/init.d/supervisord; fi
+	@if test -d /etc/rc.d/init.d; then chmod +x /etc/rc.d/init.d/supervisord; else chmod +x /etc/init.d/supervisord; fi
+	@if test -f /sbin/insserv; then chkconfig --add supervisord; fi
+	@if test -f /sbin/insserv; then chkconfig supervisord on; fi
+	@ln -f -s  $(CURDIR)/config/supervisord.conf /etc/supervisord.conf
+	@service supervisord start
 	#@python2.7 etc/ez_setup.py
 	#@python2.7 -m easy_install pip
 	#@python2.7 -m pip install -U setuptools
@@ -48,6 +48,6 @@ install:
 	@riak-admin bucket-type create siblings_allowed '{"props":{"allow_mult":true}}'
 	@riak-admin bucket-type activate siblings_allowed
 	@riak-admin bucket-type status siblings_allowed
-	#sudo -u postgres createuser -PE vserver
-	#sudo -u postgres createdb -O vserver -E UTF8 vserver
+	sudo -u postgres createuser -PE vserver
+	sudo -u postgres createdb -O vserver -E UTF8 vserver
 

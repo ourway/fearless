@@ -21,6 +21,7 @@ import datetime
 #############
 ##########
 from riak import RiakClient
+from riak import RiakObject
 TeamClient = RiakClient(pb_port=8087, protocol='pbc')
 print "Creating riak connection on port 8087"
 TeamClient.create_search_index('fateam_assets')

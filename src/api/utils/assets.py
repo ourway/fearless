@@ -20,6 +20,7 @@ import os
 from model import getdb
 from tasks import add_asset
 from tasks import remove_asset
+from celery.result import AsyncResult
 import base64
 import hashlib
 from opensource.contenttype import contenttype
@@ -30,19 +31,19 @@ class Assets(object):
     #@falcon.after(clean)
     def on_put(self, req, resp, **kw):
         '''Register an asset'''
+
         b64 = req.get_param('b64')
         path = req.get_param('path')
+        if path or b64:
+            x = add_asset.delay(b64=b64, path=path)
 
-        if path:  #NOTE overwrites b64 param
-            with open(path, 'rb') as f:
-                b64 = base64.encodestring(f.read())
-
-        name = '{path}@{md5}'.format(path=path,
-                    md5=hashlib.md5(b64).hexdigest())
-        add_asset.delay(name, b64)
-        data = {'message':'OK', 'info':'file {name} queued.'.format(name=name)}
-        resp.body = ujson.dumps(data)
-
+            data = {'message':'OK', 'info':'file queued.', 
+                    'task_id':x.task_id}
+            resp.body = ujson.dumps(data)
+        else:
+            resp.status = falcon.HTTP_400
+            data = {'message':'ERROR', 'info':'path or b64 parameter not found!'}
+            resp.body = ujson.dumps(data)
 
     #@falcon.after(clean)
     def on_delete(self, req, resp, **kw):
@@ -54,18 +55,21 @@ class Assets(object):
     def on_get(self, req, resp, **kw):
         '''delete a departement'''
         path = req.get_param('path')
+        id = req.get_param('id')
+        if id:
+            result = AsyncResult(id)
+            print result.get()
         if path:
-            fpath, md5 = path.split('@')
-            asset = file_bucket.get(path).data
+            asset = file_bucket.get(path)
             if asset:
-                resp.content_type = contenttype(fpath)
-                basename = os.path.basename(fpath)
+                resp.content_type = contenttype(path)
+                basename = os.path.basename(path)
                 resp.set_header('Content-Disposition', 
                         '''Attachment; filename*= UTF-8''{basename}'''.format(basename=basename))
-                resp.body = base64.decodestring(asset.get('base64'))
+                resp.body = base64.decodestring(asset.data)
             else:
         
                 resp.status = falcon.HTTP_404
                 resp.body = 'File Not Available'
         else:
-            resp.status = falcon.HTTP_400
+            resp.status = falcon.HTTP_404
