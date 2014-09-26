@@ -25,32 +25,86 @@
 
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
     </head>
-    <body ng-controller="mainController">
+    <body ng-cloak ng-controller="mainController">
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
     <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#"><span ng-cloak>{{appName}}&trade;</span></a>
+          <div class="navbar-header">
+
+          <a class="navbar-brand" href="#"><span>{{appName}}&trade;</span></a>
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#projects">Projects</a></li>
+            <li><a href="#client_reports">Reports</a></li>
+            <li><a href="#monitoring">Monitoring</a></li>
+            <li class="dropdown">
+              <a href="" class="dropdown-toggle" data-toggle="dropdown">Crew<span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li class="dropdown-header">Logging and reports</li>
+                <li><a href="#report">Report</a></li>
+                <li><a href="#rnd">RnD</a></li>
+                <li><a href="#contact">Stay in touch with managers</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Utilities</li>
+                <li><a href="#download_for_me">Download requests</a></li>
+                <li><a href="#"></a></li>
+              </ul>
+              </li>
+
+            <li class="dropdown">
+              <a href="" class="dropdown-toggle" data-toggle="dropdown">Clients<span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li class="dropdown-header">Monitoring</li>
+                <li><a href="#health">System health check</a></li>
+                <li><a href="#status">Project Status</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Reports</li>
+                <li><a href="#client_reports">Crew reports</a></li>
+                <li><a href="#"></a></li>
+              </ul>
+            </li>
+
+
+
+          </ul>
+
+
+
         </div>
-        <div class="navbar-collapse collapse">
-          <form class="navbar-form navbar-right" role="form">
-            <div class="form-group">
-              <input type="text" placeholder="Email" class="form-control">
+
+
+
+
+
+        <div class="navbar-collapse collapse" ng-init="is_logged_in()">
+            <form class="navbar-form navbar-right" role="form" ng-submit="doLogin()"
+                ng-show="!userInfo.logged_in" name="login_form">
+            <div class="form-group" >
+              <input type="email" placeholder="Email" class="form-control" ng-model="loginInfo.email" required>
             </div>
-            <div class="form-group">
-              <input type="password" placeholder="Password" class="form-control">
+            <div class="form-group" ng-init="loginInfo.action='login'">
+              <input type="password" placeholder="Password" ng-model="loginInfo.password" class="form-control" required>
             </div>
-            <button type="submit" class="btn btn-success">Sign in</button>
-          </form>
-        </div><!--/.navbar-collapse -->
+            <button class="btn" 
+                ng-class="{'btn-primary':login_mode!='Sign in', 'btn-success':login_mode=='Sign in'}" ng-init="login_mode='Sign in'">{{login_mode}}</button>
+            <button ng-show="login_mode!='Sign in'" ng-click="loginInfo.action='recover'" class="btn btn-warning">Password Recovery</button>
+        </form>
+
+        <form class="navbar-form navbar-right" role="form"  ng-submit="doLogout()"
+            ng-show="userInfo.logged_in" name="profile_form">
+              <button class="btn btn-default"><a href="#profile"><strong>{{userInfo.user_name}}</a></strong></button>
+            <button type="submit" class="btn btn-warning">Logout</button>
+        </form>
+
+
+
+
+      </div><!--/.navbar-collapse -->
+
+
+
+
       </div>
     </div>
 	<div id="main" style="min-height:600px">
@@ -71,6 +125,7 @@
         <script src="js/vendor/angular.min.js"></script>
         <script src="js/vendor/angular-route.min.js"></script>
         <script src="js/vendor/angular-resource.min.js"></script>
+        <script src="js/vendor/angular-cookies.min.js"></script>
 
 
         <script src="js/main.js"></script>

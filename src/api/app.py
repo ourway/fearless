@@ -19,6 +19,7 @@ from opensource.contenttype import contenttype
 from utils.departements import Departements
 from utils.downloads import Downloads
 from utils.assets import Assets
+from utils.users import Login, Register, Recover
 
 class home_route(object):
     '''A very basic search function for DPM'''
@@ -35,9 +36,13 @@ home = home_route()
 app.add_route('/api/', home)
 app.add_route('/api/departement/{name}/', Departements())
 app.add_route('/api/download/', Downloads())
+app.add_route('/api/users/login', Login())
+app.add_route('/api/users/register', Register())
+app.add_route('/api/users/recover', Recover())
 
 
 #wget 127.0.0.1:5000/api/asset?path=/home/farsheed/Public/1bbd9cfd81be34cecd34681b0e744ce4.jpg@20f569287a087e3aec82e806cd8d9840
+
 
 app.add_route('/api/asset/', Assets())
 
