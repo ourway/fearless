@@ -45,6 +45,7 @@ app.add_route('/api/users/recover', Recover())
 #wget 127.0.0.1:5000/api/asset?path=/home/farsheed/Public/1bbd9cfd81be34cecd34681b0e744ce4.jpg@20f569287a087e3aec82e806cd8d9840
 
 
+
 app.add_route('/api/asset/', Assets())
 app.add_route('/api/reports/mail', Mailer())
 
