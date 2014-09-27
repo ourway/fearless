@@ -4,7 +4,7 @@
 # #/**************************************************************/
 
 PYENVDIR="pyenv"
-FFMPEG="2.4"
+FFMPEG="2.4.1"
 OPENSOURCE="src/api/opensource"
 
 build:

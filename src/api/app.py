@@ -20,6 +20,7 @@ from utils.departements import Departements
 from utils.downloads import Downloads
 from utils.assets import Assets
 from utils.users import Login, Register, Recover
+from utils.reports import Mailer
 
 class home_route(object):
     '''A very basic search function for DPM'''
@@ -45,4 +46,5 @@ app.add_route('/api/users/recover', Recover())
 
 
 app.add_route('/api/asset/', Assets())
+app.add_route('/api/reports/mail', Mailer())
 

@@ -14,3 +14,4 @@ jsonschema
 psycopg2
 ipython
 sh
+envelopes
