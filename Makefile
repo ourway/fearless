@@ -8,7 +8,7 @@ FFMPEG="2.4"
 OPENSOURCE="src/api/opensource"
 
 build:
-	@if test ! -d $(PYENVDIR); then python2.7 -m virtualenv $(PYENVDIR); fi
+	@if test ! -d $(PYENVDIR); then python -m virtualenv $(PYENVDIR); fi
 	@pyenv/bin/pip install -U setuptools
 	@pyenv/bin/pip install -r requirements
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fateam.template > $(CURDIR)/config/supervisor/fateam.conf
@@ -27,8 +27,7 @@ update:
 	@pyenv/bin/pip install -U -r requirements
 
 install:
-	#@yum install gcc libffi-devel python-devel openssl-devel
-	@pip install supervisor
+	#
 	@if test -d /etc/rc.d/init.d; then ln -f -s  $(CURDIR)/config/supervisord /etc/rc.d/init.d/supervisord;else ln -f -s  $(CURDIR)/config/supervisord /etc/init.d/supervisord; fi
 	@if test -d /etc/rc.d/init.d; then chmod +x /etc/rc.d/init.d/supervisord; else chmod +x /etc/init.d/supervisord; fi
 	@if test -f /sbin/insserv; then chkconfig --add supervisord; fi
@@ -50,4 +49,10 @@ install:
 	@riak-admin bucket-type status siblings_allowed
 	sudo -u postgres createuser -PE vserver
 	sudo -u postgres createdb -O vserver -E UTF8 vserver
+
+prepare:
+	@yum install gcc libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv
+	@pip install -U setuptools
+	@pip install -U pip virtualenv
+	@pip install supervisor
 
