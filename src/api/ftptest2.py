@@ -1,6 +1,9 @@
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
+#from pyftpdlib.servers import MultiprocessFTPServer
 from pyftpdlib.authorizers import DummyAuthorizer
+from pyftpdlib.authorizers import UnixAuthorizer
+from pyftpdlib.filesystems import UnixFilesystem
 
 
 class MyHandler(FTPHandler):
@@ -40,13 +43,20 @@ class MyHandler(FTPHandler):
 
 
 def main():
-    authorizer = DummyAuthorizer()
-    authorizer.add_user('user', '12345', homedir='.', perm='elradfmw')
-    authorizer.add_anonymous(homedir='.', perm='elradfmw')
+    #authorizer = DummyAuthorizer()
+    authorizer = UnixAuthorizer(rejected_users=["root"], 
+                require_valid_shell=False)
+
+    authorizer.override_user('bijan', homedir='/home/share')
+    authorizer.override_user('yazdani', homedir='/home/share',  perm='elradfmw')
+    #authorizer.add_anonymous(homedir='/share/public')
 
     handler = MyHandler
     handler.authorizer = authorizer
+    handler.use_send_file=True
+    #handler.abstracted_fs = UnixFilesystem
     server = FTPServer(('', 2121), handler)
+    #server = MultiprocessFTPServer(('', 2121), handler)
     server.serve_forever()
 
 if __name__ == "__main__":

@@ -16,3 +16,5 @@ ipython
 sh
 envelopes
 pyftpdlib
+fabric
+pysendfile
