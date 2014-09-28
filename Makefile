@@ -14,9 +14,9 @@ build:
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fateam.template > $(CURDIR)/config/supervisor/fateam.conf
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/uwsgi/api.ini.template > $(CURDIR)/config/uwsgi/api.ini
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/nginx/fa_team.conf.template > $(CURDIR)/config/nginx/fa_team.conf
-	@if test ! -f $(OPENSOURCE)/dal.py; then wget -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/dal.py; fi
-	@if test ! -f $(OPENSOURCE)/reserved_sql_keywords.py;then wget -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/reserved_sql_keywords.py; fi
-	@if test ! -f $(OPENSOURCE)/contenttype.py; then wget -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/contenttype.py; fi
+	@if test ! -f $(OPENSOURCE)/dal.py; then wget --no-check-certificate -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/dal.py; fi
+	@if test ! -f $(OPENSOURCE)/reserved_sql_keywords.py;then wget --no-check-certificate -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/reserved_sql_keywords.py; fi
+	@if test ! -f $(OPENSOURCE)/contenttype.py; then wget --no-check-certificate  -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/master/gluon/contenttype.py; fi
 	@wget -c http://johnvansickle.com/ffmpeg/releases/ffmpeg-$(FFMPEG)-64bit-static.tar.xz
 	@if test ! -d bin; then mkdir bin; fi
 	@tar xvfJ ffmpeg-$(FFMPEG)-64bit-static.tar.xz
