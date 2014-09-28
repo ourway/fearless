@@ -1,6 +1,6 @@
 server {
-    listen 5000;
-    server_name localhost;
+    listen 80;
+    server_name _;
     server_tokens off;
     more_set_headers 'Server: FA-TEAM Server';
      location /app {
