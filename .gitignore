@@ -67,3 +67,4 @@ src/api/opensource/*.py[cod]
 *.xz
 cache/
 REPO/
+STATIC/

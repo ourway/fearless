@@ -24,7 +24,7 @@ import sh
 
 
 class GIT(object):
-    def __init__(self, filepath):
+    def __init__(self, filepath, wt=None):
 
         gitdir = os.path.abspath('../../REPO')
         if not os.path.isdir(gitdir):
@@ -32,11 +32,11 @@ class GIT(object):
         self.filepath = filepath
         self.basename = os.path.basename(filepath)
         git = sh.git
-        wt = os.path.dirname(self.filepath)
-        self.git = git.bake(_cwd=wt, 
-                            #_piped="err",
+        self.wt = os.path.dirname(self.filepath)
+        self.git = git.bake(_cwd=self.wt, 
+                            _piped="err",
                             git_dir=gitdir,
-                            work_tree=wt)
+                            work_tree=self.wt)
         self.git.init()
     
     def add(self):

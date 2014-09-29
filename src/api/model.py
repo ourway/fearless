@@ -25,7 +25,7 @@ from riak import RiakObject
 TeamClient = RiakClient(pb_port=8087, protocol='pbc')
 print "Creating riak connection on port 8087"
 #TeamClient.create_search_index('fateam_assets')
-file_bucket = TeamClient.bucket('animation_assets')
+file_bucket = TeamClient.bucket('AssetDB01')
 #file_bucket.enable_search()
 ##########
 ##############

@@ -36,7 +36,7 @@ from model import file_bucket, TeamClient  ## riak bucket for our files
 from riak import RiakObject
 import shutil
 from utils.fagit import GIT
-
+from datetime import datetime
 
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 #BACKEND_URL = 'amqp'
@@ -52,7 +52,7 @@ app = Celery('tasks',
                 backend=BACKEND_URL,
                 include=[])
 
-storage = '../views/cache'
+storage = '../../STATIC'
 if not os.path.isdir(storage):
     os.makedirs(storage)
 STORAGE = os.path.abspath(storage)
@@ -72,7 +72,7 @@ def download(url):
 
 
 @app.task
-def add_asset(b64=None, ext='json', path=None):
+def add_asset(user, reponame, b64=None, ext='json', path=None):
     '''Add asset to database'''
     if not (b64 or path):
         return 'Not b64 or path'
@@ -80,34 +80,39 @@ def add_asset(b64=None, ext='json', path=None):
     name = None
     content_type = contenttype('.%s' % ext)
     if b64:
-        name = hashlib.md5(b64).hexdigest() + '.' + ext
+        name = hashlib.md5(user+reponame+b64).hexdigest() + '.' + ext
     #################### riak part ################################
     if path and os.path.isfile(path):
         exts = path.split('.')
         if len(exts)>1:
             ext= exts[-1]
-        name = hashlib.md5(path).hexdigest() + '.' + ext
+        name = hashlib.md5(user+reponame+path).hexdigest() + '.' + ext
         content_type = contenttype(path)
-        if os.path.getsize(path)<5*1024:
-            with open(path, 'rb') as f:
-                b64 = base64.encodestring(f.read())
-                name = hashlib.md5(b64).hexdigest() + '.' + ext
+#        if os.path.getsize(path)<5*1024:
+#            with open(path, 'rb') as f:
+#                b64 = base64.encodestring(f.read())
+#                name = hashlib.md5(b64).hexdigest() + '.' + ext
 
-    if b64 and not file_bucket.get(name).exists and sys.getsizeof(b64)<5*1024:
-         
+
+    if name and not file_bucket.get(name).exists:
         obj = RiakObject(TeamClient, file_bucket, name)
         obj.content_type = 'application/json'
-        data = {'base64':b64, 'path':path, 'content_type':content_type, 'ext':ext}
+        data = {'path':path, 
+                'content_type':content_type,
+                'ext':ext,
+                'user':user,
+                'repo':reponame,
+                'datetime':datetime.utcnow()}
         obj.data = ujson.dumps(data)
         obj.store()
-        print '\nFile {name} added to riak db\n'.format(name=name)
+        print '\Info for {name} added to riak db\n'.format(name=name)
 
     elif name and file_bucket.get(name).exists:
         print 'File {name} is already available'.format(name=name)
 
     
     if name:
-        file_path = os.path.join(STORAGE, name)
+        file_path = os.path.join(STORAGE, user, reponame, name)
 
         if not os.path.isfile(file_path):
             if not os.path.isdir(os.path.dirname(file_path)):

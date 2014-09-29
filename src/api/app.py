@@ -46,6 +46,6 @@ app.add_route('/api/users/recover', Recover())
 
 
 
-app.add_route('/api/asset/', Assets())
+app.add_route('/api/asset/{user}/{reponame}', Assets())
 app.add_route('/api/reports/mail', Mailer())
 
