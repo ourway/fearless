@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-_copyright = 'Chista Co.'
 '''
    ___              _                   _
   / __\_ _ _ __ ___| |__   ___  ___  __| |
@@ -32,9 +31,11 @@ import hashlib
 import base64
 from envelopes import Envelope, GMailSMTP
 from utils.validators import email_validator
-
+from opensource.contenttype import contenttype
 from model import file_bucket, TeamClient  ## riak bucket for our files
 from riak import RiakObject
+import shutil
+from utils.fagit import GIT
 
 
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'
@@ -71,38 +72,59 @@ def download(url):
 
 
 @app.task
-def add_asset(b64=None, path=None):
-    name = None
-    if b64:
-        name = hashlib.md5(b64).hexdigest()
-    elif path:
-        with open(path, 'rb') as f:
-            b64 = base64.encodestring(f.read())
-            name = hashlib.md5(b64).hexdigest()
+def add_asset(b64=None, ext='json', path=None):
+    '''Add asset to database'''
+    if not (b64 or path):
+        return 'Not b64 or path'
 
-    if b64 and not file_bucket.get(name).exists:
+    name = None
+    content_type = contenttype('.%s' % ext)
+    if b64:
+        name = hashlib.md5(b64).hexdigest() + '.' + ext
+    #################### riak part ################################
+    if path and os.path.isfile(path):
+        exts = path.split('.')
+        if len(exts)>1:
+            ext= exts[-1]
+        name = hashlib.md5(path).hexdigest() + '.' + ext
+        content_type = contenttype(path)
+        if os.path.getsize(path)<5*1024:
+            with open(path, 'rb') as f:
+                b64 = base64.encodestring(f.read())
+                name = hashlib.md5(b64).hexdigest() + '.' + ext
+
+    if b64 and not file_bucket.get(name).exists and sys.getsizeof(b64)<5*1024:
          
         obj = RiakObject(TeamClient, file_bucket, name)
         obj.content_type = 'application/json'
-        data = {'base64':b64, 'path':path}
+        data = {'base64':b64, 'path':path, 'content_type':content_type, 'ext':ext}
         obj.data = ujson.dumps(data)
         obj.store()
         print '\nFile {name} added to riak db\n'.format(name=name)
 
-    elif file_bucket.get(name).exists:
+    elif name and file_bucket.get(name).exists:
         print 'File {name} is already available'.format(name=name)
 
-    file_path = os.path.join(STORAGE, name)
-    if not os.path.isfile(file_path):
-        if not os.path.isdir(os.path.dirname(file_path)):
-            os.makedirs(os.path.dirname(file_path))
-        with open(file_path, 'wb') as f:
-                f.write(base64.decodestring(b64))
-        print '\nFile {name} added to cache\n'.format(name=file_path)
-    else:
-        print '\nFile {name} was available\n'.format(name=file_path)
+    
+    if name:
+        file_path = os.path.join(STORAGE, name)
 
-    return name
+        if not os.path.isfile(file_path):
+            if not os.path.isdir(os.path.dirname(file_path)):
+                os.makedirs(os.path.dirname(file_path))
+            if b64:
+                with open(file_path, 'wb') as f:
+                    f.write(base64.decodestring(b64))
+            elif path and os.path.isfile(path):
+                shutil.copyfile(path, file_path)
+
+            print '\nFile {name} added to cache\n'.format(name=file_path)
+        else:
+            print '\nFile {name} was available\n'.format(name=file_path)
+
+        repo = GIT(file_path)  ## do git operations
+        repo.add()
+        return name
         
 @app.task
 def remove_asset(name):

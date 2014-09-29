@@ -24,9 +24,9 @@ from riak import RiakClient
 from riak import RiakObject
 TeamClient = RiakClient(pb_port=8087, protocol='pbc')
 print "Creating riak connection on port 8087"
-TeamClient.create_search_index('fateam_assets')
-file_bucket = TeamClient.bucket_type('siblings_allowed').bucket('fateam_assets')
-file_bucket.enable_search()
+#TeamClient.create_search_index('fateam_assets')
+file_bucket = TeamClient.bucket('animation_assets')
+#file_bucket.enable_search()
 ##########
 ##############
 now = datetime.datetime.utcnow

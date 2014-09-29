@@ -36,11 +36,13 @@ class Mailer(object):
     def on_post(self, req, resp, **kw):
         '''send an email'''
         data = {'message':'Error'}
-        to = req.get_param('to')
-        subject = req.get_param('subject')
-        message = req.get_param('message')
-        attach = req.get_param('attach')
-        print dir(req)
+        stream = req.stream.read()
+        if stream:
+            stream = ujson.loads(stream)
+        to = stream.get('to')
+        subject = stream.get('subject')
+        message = stream.get('message')
+        attach = stream.get('attach')
         if subject and to and message:
             mail = send_envelope.delay(to, subject, message, attach)
             data = {'message':'ok', 'task_id':mail.task_id}

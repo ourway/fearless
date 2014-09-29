@@ -16,17 +16,23 @@ Clean code is much better than Cleaner comments!
 import falcon
 import ujson
 import uwsgi
-import os, sys
+import os, sys, time
 from model import getdb
 from tasks import add_asset
 from tasks import remove_asset
 from tasks import STORAGE
+from utils.fagit import GIT
 #from celery.result import AsyncResult
+
 import base64
 import hashlib
 from opensource.contenttype import contenttype
 from model import file_bucket  ## riak bucket for our files
 from riak import RiakObject  ## riak bucket for our files
+
+
+def _generate_id():
+    return os.urandom(2).encode('hex') + hex(int(time.time() * 10))[5:]
 
 class Assets(object):
     #@falcon.after(clean)
@@ -56,42 +62,59 @@ class Assets(object):
  
     def on_get(self, req, resp, **kw):
         '''delete a departement'''
-        path = req.get_param('path')
         id = req.get_param('id')
-        if id:
-            #print dir(add_asset)
+        info = req.get_param('info')
+        key = req.get_param('key')
+
+        if id and key:
+            resp.status = falcon.HTTP_400
+            resp.body=ujson.dumps({'message':'ERROR', 
+                'info':'key and is conflict.  Use only one of them!'})
+            return
+
+        elif not (id or key):
+            resp.status = falcon.HTTP_400
+            resp.body=ujson.dumps({'message':'ERROR', 
+                'info':'key or id missing!'})
+            return
+
+
+        elif id:
             result = add_asset.AsyncResult(id)
             if result.successful():
-                path = result.get()
-                print path
-                
+                key = result.get()
+                ############## Get key info ##############
+                if info:
+                    resp.body=ujson.dumps({'message':'OK', 
+                        'key':key})
+                    return
             else:
-                resp.status = falcon.HTTP_404
                 data = {'message':result.status}
                 resp.body = ujson.dumps(data)
                 return
-        if path:
-            asset = file_bucket.stream_keys()
-            print asset
-            file_path = os.path.join(STORAGE, path)
-            if os.path.isfile(file_path):
-                print file_path, path
-                #resp.location = 'cache/{path}'.format(path=file_path)
-                #if not asset:
-                #    x = add_asset.delay(path=file_path)
 
-            elif asset:
-                data =  ujson.loads(asset.data)
-                data = data.get('base64')
-                if data:
-                    resp.content_type = contenttype(path)
-                    basename = os.path.basename(path)
-                    resp.set_header('Content-Disposition', 
-                            '''Attachment; filename*= UTF-8''{basename}'''.format(basename=basename))
-                    result = base64.decodestring(data)
-                    resp.body = result
-            else:
-                resp.status = falcon.HTTP_404
-                resp.body = 'File Not Available'
-        else:
-            resp.status = falcon.HTTP_404
+                
+        resp.content_type = contenttype(key)
+        resp.status = falcon.HTTP_307
+        file_path = os.path.join(STORAGE, key)
+        location = '/app/cache/{path}'.format(path=key)
+        if not os.path.isfile(file_path):
+            print 'recovering asset ...'
+            repo = GIT(file_path)
+            repo.recover()
+
+        resp.location = location
+#            asset = file_bucket.get(key)
+#            if asset.exists: ## Aset is available
+#                data = ujson.loads(asset.data)
+#                b64 = data.get('base64')
+#                ext = data.get('ext')
+#                x = add_asset.delay(b64=b64, ext=ext)
+#                x.wait()
+#                location = '/api/asset?id={id}&v={rnd}'.format(id=id, rnd=_generate_id())
+#                resp.location = location
+#
+#            else:
+#                resp.status = falcon.HTTP_404
+#                return
+

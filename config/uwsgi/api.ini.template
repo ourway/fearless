@@ -15,6 +15,8 @@ touch-reload=utils/downloads.py
 touch-reload=utils/users.py
 touch-reload=utils/files.py
 touch-reload=utils/rules.py
+touch-reload=utils/fagit.py
+touch-reload=utils/validators.py
 touch-reload=utils/permissions.py
 touch-reload=utils/reports.py
 touch-reload=utils/logs.py
@@ -32,7 +34,7 @@ touch-reload=utils/messages.py
 touch-reload=utils/visitors.py
 
 
-harakiri=60
+harakiri=300
 cpu-affinity=1
 workers=4
 threads=20
