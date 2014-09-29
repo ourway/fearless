@@ -34,14 +34,14 @@ class GIT(object):
         git = sh.git
         wt = os.path.dirname(self.filepath)
         self.git = git.bake(_cwd=wt, 
-                            _piped="err",
+                            #_piped="err",
                             git_dir=gitdir,
                             work_tree=wt)
         self.git.init()
-        
+    
     def add(self):
         self.git.add(self.basename)
-        self.git.commit(m='Added {f} to repository'.format(f=self.basename))
+        self.git.commit(m='"Added {f} to repository"'.format(f=self.basename))
 
     def recover(self):
         self.git.checkout(self.basename, f=True)
