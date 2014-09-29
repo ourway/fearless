@@ -45,6 +45,7 @@ max-requests=256
 #limit-as=256
 reload-mercy=8
 chmod-socket    = 666
+chmod-socket    = 666
 #daemonize=/home/project/log
 #http=0.0.0.0:5005
 socket=/tmp/fa_team_api.socket

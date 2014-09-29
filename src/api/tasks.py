@@ -38,7 +38,8 @@ from riak import RiakObject
 
 
 BROKER_URL = 'amqp://guest:guest@localhost:5672//'
-BACKEND_URL = 'amqp://guest:guest@localhost:5672//'
+#BACKEND_URL = 'amqp'
+BACKEND_URL = 'redis://localhost:6379/0'
 
 
 #BROKER_URL = 'redis://localhost:6379/0'
@@ -50,7 +51,10 @@ app = Celery('tasks',
                 backend=BACKEND_URL,
                 include=[])
 
-
+storage = '../views/cache'
+if not os.path.isdir(storage):
+    os.makedirs(storage)
+STORAGE = os.path.abspath(storage)
 
 @app.task
 def download(url):
@@ -68,23 +72,37 @@ def download(url):
 
 @app.task
 def add_asset(b64=None, path=None):
+    name = None
     if b64:
         name = hashlib.md5(b64).hexdigest()
     elif path:
         with open(path, 'rb') as f:
             b64 = base64.encodestring(f.read())
-            name = path
-    if b64 and not file_bucket.get(name).exists: ##TODO fixme 
+            name = hashlib.md5(b64).hexdigest()
+
+    if b64 and not file_bucket.get(name).exists:
+         
         obj = RiakObject(TeamClient, file_bucket, name)
         obj.content_type = 'application/json'
         data = {'base64':b64, 'path':path}
         obj.data = ujson.dumps(data)
         obj.store()
         print '\nFile {name} added to riak db\n'.format(name=name)
-        return name
+
     elif file_bucket.get(name).exists:
         print 'File {name} is already available'.format(name=name)
-        return name
+
+    file_path = os.path.join(STORAGE, name)
+    if not os.path.isfile(file_path):
+        if not os.path.isdir(os.path.dirname(file_path)):
+            os.makedirs(os.path.dirname(file_path))
+        with open(file_path, 'wb') as f:
+                f.write(base64.decodestring(b64))
+        print '\nFile {name} added to cache\n'.format(name=file_path)
+    else:
+        print '\nFile {name} was available\n'.format(name=file_path)
+
+    return name
         
 @app.task
 def remove_asset(name):

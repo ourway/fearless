@@ -40,6 +40,7 @@ class Mailer(object):
         subject = req.get_param('subject')
         message = req.get_param('message')
         attach = req.get_param('attach')
+        print dir(req)
         if subject and to and message:
             mail = send_envelope.delay(to, subject, message, attach)
             data = {'message':'ok', 'task_id':mail.task_id}

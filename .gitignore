@@ -65,3 +65,4 @@ src/api/opensource/*.py[cod]
 *.sqlite
 *.table
 *.xz
+cache/
