@@ -38,10 +38,18 @@ class Assets(object):
     #@falcon.after(clean)
     def on_put(self, req, resp, user, reponame,  **kw):
         '''Register an asset'''
-
-        b64 = req.get_param('b64')
-        ext = req.get_param('ext')
-        path = req.get_param('path')
+        stream = req.stream.read()
+        import cgi
+        params = cgi.parse_qs(stream)
+        b64 = params.get('b64')
+        if b64: b64=b64[0]
+        path = params.get('path')
+        if path: path=path[0]
+        ext = params.get('ext')
+        if ext: ext=ext[0]
+        name = params.get('name')
+        if name: name=name[0]
+        print ext
         if path or b64:
             x = add_asset.delay(user, reponame,
                     b64=b64, path=path, ext=ext)
