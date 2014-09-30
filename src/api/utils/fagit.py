@@ -29,10 +29,13 @@ class GIT(object):
         gitdir = os.path.abspath('../../REPO')
         if not os.path.isdir(gitdir):
             os.makedirs(gitdir)
+
         self.filepath = filepath
         self.basename = os.path.basename(filepath)
         git = sh.git
         self.wt = os.path.dirname(self.filepath)
+        if not os.path.isdir(self.wt):
+            os.makedirs(self.wt)
         self.git = git.bake(_cwd=self.wt, 
                             _piped="err",
                             git_dir=gitdir,

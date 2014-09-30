@@ -40,9 +40,11 @@ class Assets(object):
         '''Register an asset'''
 
         b64 = req.get_param('b64')
+        ext = req.get_param('ext')
         path = req.get_param('path')
         if path or b64:
-            x = add_asset.delay(user, reponame, b64=b64, path=path)
+            x = add_asset.delay(user, reponame,
+                    b64=b64, path=path, ext=ext)
 
             data = {'message':'OK', 'info':'file queued.', 
                     'task_id':x.task_id}
@@ -103,7 +105,6 @@ class Assets(object):
         file_path = os.path.join(STORAGE, file_user, file_repo, key)
         location = '/static/{u}/{r}/{path}'.format(path=key,
                         u=file_user, r=file_repo)
-        print file_path
         if not os.path.isfile(file_path):
             print 'recovering asset ...'
             repo = GIT(file_path)

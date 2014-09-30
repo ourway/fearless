@@ -3,6 +3,7 @@ command={dir}/pyenv/bin/uwsgi --emperor config/uwsgi
 autostart=true
 directory={dir}
 stopsignal=TERM
+user=farsheed
 stdout_logfile={dir}/logs/uwsgi_access.log
 stderr_logfile={dir}/logs/uwsgi_error.log
 
