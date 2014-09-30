@@ -26,6 +26,7 @@ server {
      location /api {
         uwsgi_pass unix:///tmp/fa_team_api.socket;
         include uwsgi_params; 
+        client_max_body_size 2000M;
         }
 
 }

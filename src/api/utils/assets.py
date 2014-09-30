@@ -16,6 +16,7 @@ Clean code is much better than Cleaner comments!
 import falcon
 import ujson
 import uwsgi
+import cgi
 import os, sys, time
 from model import getdb
 from tasks import add_asset
@@ -38,9 +39,17 @@ class Assets(object):
     #@falcon.after(clean)
     def on_put(self, req, resp, user, reponame,  **kw):
         '''Register an asset'''
-        stream = req.stream.read()
-        import cgi
-        params = cgi.parse_qs(stream)
+        stream = req.stream
+        if not req.content_type:
+            if req.content_length:
+                print 'I got a file'
+                '''
+                with open('/home/farsheed/Public/110427_034.jpg', 'rb') as f:
+                    requests.put(url, data = f)
+                '''
+                ### Now we should send req.stream to celery
+
+        params = cgi.parse_qs(stream.read())
         b64 = params.get('b64')
         if b64: b64=b64[0]
         path = params.get('path')
@@ -48,8 +57,9 @@ class Assets(object):
         ext = params.get('ext')
         if ext: ext=ext[0]
         name = params.get('name')
+
+
         if name: name=name[0]
-        print ext
         if path or b64:
             x = add_asset.delay(user, reponame,
                     b64=b64, path=path, ext=ext)
