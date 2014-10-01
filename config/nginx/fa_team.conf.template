@@ -3,6 +3,11 @@ server {
     server_name _;
     server_tokens off;
     #more_set_headers 'Server: FA-TEAM Server';
+
+     location / {
+        rewrite .*/ /app;
+     }
+
      location /app {
         alias {dir}/src/views;    # your cache path
         gzip_vary on;
