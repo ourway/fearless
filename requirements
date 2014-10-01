@@ -18,3 +18,4 @@ envelopes
 pyftpdlib
 fabric
 pysendfile
+werkzeug

@@ -10,8 +10,9 @@ Installaion
 Use the following commands:
 
 ```bash
+sudo make prepare
 make
-./start-debug
+sudo make install
 ```
 
-Now you can visit [Home page](http://127.0.0.1:5005)
+Now you can visit [Home page](http://127.0.0.1/app)

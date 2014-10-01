@@ -65,6 +65,7 @@ src/api/opensource/*.py[cod]
 *.sqlite
 *.table
 *.xz
+*.gz
 cache/
 REPO/
 STATIC/
