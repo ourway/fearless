@@ -19,3 +19,4 @@ pyftpdlib
 fabric
 pysendfile
 werkzeug
+bottle

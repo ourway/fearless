@@ -63,7 +63,7 @@ install:
 	#@sudo -u postgres createdb -O vserver -E UTF8 vserver
 
 prepare:
-	@yum install gcc libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv -y
+	@yum install gcc libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel -y
 	@pip install -U setuptools
 	@pip install -U pip virtualenv
 	@pip install supervisor
