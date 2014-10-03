@@ -14,7 +14,6 @@ Clean code is much better than Cleaner comments!
 
 import falcon
 import ujson
-import uwsgi
 from model import getdb
 from opensource.contenttype import contenttype
 db=getdb()

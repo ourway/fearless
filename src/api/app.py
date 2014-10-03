@@ -14,7 +14,6 @@ Clean code is much better than Cleaner comments!
 
 import falcon
 import ujson
-import uwsgi
 from opensource.contenttype import contenttype
 from utils.departements import Departements
 from utils.downloads import Downloads

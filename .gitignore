@@ -69,3 +69,4 @@ src/api/opensource/*.py[cod]
 cache/
 REPO/
 STATIC/
+.idea

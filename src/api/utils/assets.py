@@ -15,7 +15,6 @@ Clean code is much better than Cleaner comments!
 
 import falcon
 import ujson
-import uwsgi
 import cgi
 import os, sys, time
 from model import getdb

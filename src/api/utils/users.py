@@ -16,7 +16,6 @@ Clean code is much better than Cleaner comments!
 
 import falcon
 import ujson
-import uwsgi
 import hashlib
 from validators import email_validator
 from model import getdb
