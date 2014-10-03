@@ -46,6 +46,7 @@ BACKEND_URL = 'redis://localhost:6379/0'
 #BROKER_URL = 'redis://localhost:6379/0'
 #BACKEND_URL = 'redis://localhost:6379/1'
 from celery import Celery
+from utils.validators import checkPath
 
 app = Celery('tasks',
                 broker=BROKER_URL,
@@ -53,9 +54,8 @@ app = Celery('tasks',
                 include=[])
 
 storage = '../../STATIC'
-if not os.path.isdir(storage):
-    os.makedirs(storage)
-STORAGE = os.path.abspath(storage)
+STORAGE = checkPath(storage)
+
 
 @app.task
 def download(url):
@@ -72,7 +72,7 @@ def download(url):
 
 
 @app.task
-def add_asset(user, reponame, b64=None, ext='json', path=None):
+def add_asset(user, reponame, filepath):
     '''Add asset to database'''
     if not (b64 or path):
         return 'Not b64 or path'

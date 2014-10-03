@@ -13,9 +13,21 @@ Clean code is much better than Cleaner comments!
 '''
 
 import re
+import os
+from os import path
 
 def email_validator(email):
     pat = '^(([^<>()[\\]\\\\.,;:\\s@\\"]+(\\.[^<>()[\\]\\\\.,;:\\s@\\"]+)*)|(\\".+\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$'
     if re.match(re.compile(pat), email):
         return True
+
+def checkPath(thepath):
+    '''Checks is a directory is available, If not creates it'''
+    targetPath = path.abspath(thepath)
+    if path.isfile(thepath):
+        targetPath = path.abspath(path.dirname(thepath))
+    if not path.isdir(targetPath):
+        os.makedirs(targetPath)
+    return targetPath
+
 
