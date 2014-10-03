@@ -20,6 +20,7 @@ from os import path
 from model import getdb
 from tasks import add_asset
 from tasks import remove_asset
+from tasks import show_secrets
 from tasks import STORAGE
 from utils.fagit import GIT
 from utils.validators import checkPath
@@ -43,11 +44,28 @@ This is a funtion that lets api to get a big/small file from user.
 '''
 
 
-@asset_api.post('/asset/<user>/<repo>/<assetName>')
-def addNewAsset(user, repo, assetName):
-    targetNewFilePath = path.abspath(path.join(STORAGE, user, repo, assetName))
-    checkPath(path.dirname(targetNewFilePath))
+@asset_api.post('/save/<user>/<repo>')
+@asset_api.post('/save/<user>/<repo>/')
+def addNewAsset(user, repo):
+    '''Get data based on a file object or b64 data, save and commit it'''
     uploadByFileMethod = bottle.request.files.get('asset')
     if uploadByFileMethod:
+        targetNewFilePath = path.abspath(path.join(STORAGE,
+                        user, repo, uploadByFileMethod.filename))
+        checkPath(path.dirname(targetNewFilePath))
         uploadByFileMethod.save(targetNewFilePath, overwrite=True) # appends upload.filename automatically
-    return 'OK'
+        newAsset = add_asset.delay(user, repo, uploadedFilePath=targetNewFilePath)
+        return '<a href="/asset/get/{id}">Click to download</a>'.format(id=newAsset.task_id)
+
+
+@asset_api.get('/get/<key>')
+def serveAsset(key):
+    '''Serve asset based on a key (riak key for finding path'''
+    assetRiakObject = file_bucket.get(key)  ## key is the task_id! :)
+    if assetRiakObject:
+        bottle.response.content_type = 'application/json'
+        assetInfo = ujson.loads(assetRiakObject.data)
+        return bottle.static_file(assetInfo.get('path'), root='/')
+    else:
+        taskResult = add_asset.AsyncResult(key)
+        return taskResult

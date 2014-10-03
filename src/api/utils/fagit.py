@@ -42,9 +42,10 @@ class GIT(object):
                             work_tree=self.wt)
         self.git.init()
     
-    def add(self):
+    def add(self, message=''):
         self.git.add(self.basename)
-        self.git.commit(m='"Added {f} to repository"'.format(f=self.basename))
+        self.git.commit(m='"{message} | Added {f} to repository"'.format(
+            message=message, f=self.basename))
 
     def recover(self):
         self.git.checkout(self.basename, f=True)
