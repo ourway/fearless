@@ -62,10 +62,17 @@ def addNewAsset(user, repo):
 def serveAsset(key):
     '''Serve asset based on a key (riak key for finding path'''
     assetRiakObject = file_bucket.get(key)  ## key is the task_id! :)
-    if assetRiakObject:
+    if assetRiakObject.exists:
         bottle.response.content_type = 'application/json'
         assetInfo = ujson.loads(assetRiakObject.data)
-        return bottle.static_file(assetInfo.get('path'), root='/')
+        bottle.response.add_header('Expires', 'Thu, 01 Dec 1994 16:00:00 GMT')
+        noDownloadDialogFormats = ['m4v', 'jpg', 'png', 'gif', 'txt']
+        downloadDialogFileName = None
+        if not assetInfo.get('ext').lower() in noDownloadDialogFormats:
+            downloadDialogFileName = assetInfo.get('originalName')
+        return bottle.static_file(assetInfo.get('path'),
+                root='/', download= downloadDialogFileName)
     else:
         taskResult = add_asset.AsyncResult(key)
-        return taskResult
+        bottle.response.status = '404 Not Found'
+        return taskResult.status
