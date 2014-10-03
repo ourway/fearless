@@ -63,16 +63,38 @@ def serveAsset(key):
     '''Serve asset based on a key (riak key for finding path'''
     assetRiakObject = file_bucket.get(key)  ## key is the task_id! :)
     if assetRiakObject.exists:
-        bottle.response.content_type = 'application/json'
         assetInfo = ujson.loads(assetRiakObject.data)
-        bottle.response.add_header('Expires', 'Thu, 01 Dec 1994 16:00:00 GMT')
         noDownloadDialogFormats = ['m4v', 'jpg', 'png', 'gif', 'txt']
         downloadDialogFileName = None
+        staticFilePath = assetInfo.get('path')
         if not assetInfo.get('ext').lower() in noDownloadDialogFormats:
             downloadDialogFileName = assetInfo.get('originalName')
-        return bottle.static_file(assetInfo.get('path'),
+        return bottle.static_file(staticFilePath,
                 root='/', download= downloadDialogFileName)
     else:
         taskResult = add_asset.AsyncResult(key)
         bottle.response.status = '404 Not Found'
         return taskResult.status
+
+
+def fileGenerator(staticFilePath):
+    with open(staticFilePath, 'rb') as targetStaticFile:
+        while True:
+            chunk = targetStaticFile.read(2**20)
+            if not chunk:
+                break
+            yield chunk
+
+@asset_api.get('/stream/<key>')
+def serveAsset(key):
+    '''Serve asset based on a key (riak key for finding path'''
+    assetRiakObject = file_bucket.get(key)  ## key is the task_id! :)
+    if assetRiakObject.exists:
+        assetInfo = ujson.loads(assetRiakObject.data)
+        downloadDialogFileName = None
+        staticFilePath = assetInfo.get('path')
+        bottle.response.add_header("Transfer-Encoding", "chunked")
+        #return 'asdsa'
+        return bottle.response()
+
+
