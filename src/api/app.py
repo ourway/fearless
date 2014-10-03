@@ -28,8 +28,10 @@ def test():
     return 'ok'
 
 
+
 if __name__ == '__main__':
     # port = int(os.environ.get('PORT', 8080))
-    bottle.run(app, debug=True, port=5005)
+    bottle.run(app, host='0.0.0.0', reloader=True,
+               debug=True, port=5005)
     # from werkzeug import run_simple
     # run_simple('0.0.0.0', 5005, app, use_debugger=True, use_reloader=True)

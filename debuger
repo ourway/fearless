@@ -1,0 +1,6 @@
+#!/bin/bash
+
+source pyenv/bin/activate
+cd src/api
+python app.py
+
