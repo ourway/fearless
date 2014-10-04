@@ -3,13 +3,11 @@ Cython
 redis
 celery
 requests
-falcon
 gevent
 ujson
 uwsgi
 riak
 pyinotify
-eventlet
 jsonschema
 psycopg2
 ipython
@@ -20,3 +18,4 @@ fabric
 pysendfile
 werkzeug
 bottle
+elasticsearch

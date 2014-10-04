@@ -30,8 +30,7 @@ import os
 from envelopes import Envelope, GMailSMTP
 from utils.validators import email_validator
 from opensource.contenttype import contenttype
-from model import file_bucket, TeamClient  # # riak bucket for our files
-from riak import RiakObject
+from model import file_bucket, TeamClient, ES, RiakObject # # riak bucket for our files
 from utils.fagit import GIT
 
 
@@ -43,7 +42,9 @@ BACKEND_URL = 'redis://localhost:6379/0'
 # BROKER_URL = 'redis://localhost:6379/0'
 #BACKEND_URL = 'redis://localhost:6379/1'
 from celery import Celery
+
 from utils.validators import checkPath, md5_for_file
+
 
 app = Celery('tasks',
              broker=BROKER_URL,
@@ -104,12 +105,15 @@ def add_asset(userName, repositoryName, b64Data=None,
         data = {'path': newFilePath,
                 'content_type': content_type,
                 'ext': ext,
+                'size':os.path.getsize(uploadedFilePath),
                 'originalName': originalName,
                 'md5': dataMD5,
+                'key': task_id,
                 'user': userName,
                 'repo': repositoryName,
                 'datetime': datetime.utcnow()}
         obj.data = ujson.dumps(data)
+        ES.create(index='assets', doc_type='info', body=obj.data, id=dataMD5)
         obj.store()
         print '\Info for {name} added to riak db\n'.format(name=newFileName)
 
@@ -118,19 +122,20 @@ def add_asset(userName, repositoryName, b64Data=None,
 
 
     checkPath(os.path.abspath(os.path.dirname(newFilePath)))
-    if b64Data:
-        with open(newFileName, 'wb') as f:
-            f.write(base64.decodestring(b64Data))
-    elif uploadedFilePath and os.path.isfile(uploadedFilePath):
-        shutil.copyfile(uploadedFilePath, newFilePath)
+    if not os.path.isfile(newFilePath):
+        if b64Data:
+            with open(newFileName, 'wb') as f:
+                f.write(base64.decodestring(b64Data))
+        elif uploadedFilePath and os.path.isfile(uploadedFilePath):
+            shutil.copyfile(uploadedFilePath, newFilePath)
 
-    print '\nFile {name} added to cache\n'.format(name=newFilePath)
+        print '\nFile {name} added to cache\n'.format(name=newFilePath)
 
-    repo = GIT(newFilePath)  ## do git operations
-    repo.add('{user}->{repo}->{originalName}' \
-             .format(user=userName,
-                     repo=repositoryName,
-                     originalName=originalName))
+        repo = GIT(newFilePath)  ## do git operations
+        repo.add('{user}->{repo}->{originalName}' \
+                 .format(user=userName,
+                         repo=repositoryName,
+                         originalName=originalName))
 
     if newFilePath != uploadedFilePath:
         os.remove(uploadedFilePath)

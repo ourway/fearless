@@ -21,6 +21,9 @@ import datetime
 #############
 ##########
 from riak import RiakClient
+from elasticsearch import Elasticsearch
+ES = Elasticsearch()
+
 from riak import RiakObject
 TeamClient = RiakClient(pb_port=8087, protocol='pbc')
 print "Creating riak connection on port 8087"
