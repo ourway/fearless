@@ -72,41 +72,24 @@ def download(url):
 
 @app.task
 def add_asset(userName, repositoryName, b64Data=None,
-              ext='json', uploadedFilePath=None):
+              uploadedFilePath=None, dataMD5=None):
     '''Add asset to database'''
     if not (b64Data or uploadedFilePath):
         return 'Not b64 or path'
 
     task_id = add_asset.request.id
-    newFileName = None
-    content_type = contenttype('.%s' % ext)
-    if b64Data:
-        dataMD5 = hashlib.md5(b64Data).hexdigest()
-        newFileName = dataMD5 + '.' + ext
-    #################### riak part ################################
-    if uploadedFilePath and os.path.isfile(uploadedFilePath):
-        exts = uploadedFilePath.split('.')
-        if len(exts) > 1:
-            ext = exts[-1]
-        dataMD5 = md5_for_file(open(uploadedFilePath, 'rb'))
-        newFileName = dataMD5 + '.' + ext
-        content_type = contenttype(uploadedFilePath)
-    #        if os.path.getsize(path)<5*1024:
-    #            with open(path, 'rb') as f:
-    #                b64 = base64.encodestring(f.read())
-    #                newFileName = hashlib.md5(b64).hexdigest() + '.' + ext
-
-
-    newFilePath = os.path.join(STORAGE, userName, repositoryName, newFileName)
     originalName = os.path.basename(uploadedFilePath) or 'Base64 Data'
+    ext = originalName.split('.')[-1]
+    content_type = contenttype('.%s' % ext)
+    content_type = contenttype(uploadedFilePath)
+    
 
-    if newFileName and not file_bucket.get(newFileName).exists:
+    if not file_bucket.get(task_id).exists:
         obj = RiakObject(TeamClient, file_bucket, task_id)
         obj.content_type = 'application/json'
-        data = {'path': newFilePath,
+        data = {'path': uploadedFilePath,
                 'content_type': content_type,
                 'ext': ext,
-                'size': os.path.getsize(uploadedFilePath),
                 'originalName': originalName,
                 'md5': dataMD5,
                 'key': task_id,
@@ -120,30 +103,19 @@ def add_asset(userName, repositoryName, b64Data=None,
             pass
 
         obj.store()
-        print '\Info for {name} added to riak db\n'.format(name=newFileName)
+        print '\Info for {name} added to riak db\n'.format(name=originalName)
 
-    elif newFileName and file_bucket.get(newFileName).exists:
-        print 'File {name} is already available'.format(name=newFileName)
+    else:
+        print 'File {name} is already available'.format(name=originalName)
 
-    checkPath(os.path.abspath(os.path.dirname(newFilePath)))
-    if not os.path.isfile(newFilePath):
-        if b64Data:
-            with open(newFileName, 'wb') as f:
-                f.write(base64.decodestring(b64Data))
-        elif uploadedFilePath and os.path.isfile(uploadedFilePath):
-            shutil.copyfile(uploadedFilePath, newFilePath)
-
-        print '\nFile {name} added to cache\n'.format(name=newFilePath)
-
-        #repo = GIT(newFilePath)  ## do git operations
+    #repo = GIT(uploadedFilePath)  ## do git operations
         #repo.add('{user}->{repo}->{originalName}' \
         #         .format(user=userName,
         #                 repo=repositoryName,
         #                 originalName=originalName))
 
-    if newFilePath != uploadedFilePath:
-        os.remove(uploadedFilePath)
-    return newFileName
+
+    return originalName
 
 
 @app.task

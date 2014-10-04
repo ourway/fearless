@@ -16,6 +16,7 @@ import ujson
 import time
 import hashlib
 import bottle
+import os
 from os import path
 from tasks import add_asset
 from tasks import STORAGE
@@ -42,20 +43,46 @@ This is a funtion that lets api to get a big/small file from user.
 @asset_api.post('/save/<user>/<repo>')
 def addNewAsset(user, repo):
     '''Get data based on a file object or b64 data, save and commit it'''
-    assetsList = list()
     fileNames = bottle.request.files.keys()
     for key in fileNames:
         uploadByFileMethod = bottle.request.files.get(key)
         targetNewFilePath = path.abspath(path.join(STORAGE,
                                                    user, repo, uploadByFileMethod.filename))
         checkPath(path.dirname(targetNewFilePath))
-        uploadByFileMethod.save(targetNewFilePath, overwrite=True)  # appends upload.filename automatically
-        newAsset = add_asset.delay(user, repo, uploadedFilePath=targetNewFilePath)
-        assetsList.append(newAsset.task_id)
+        bodyMd5 = safeCopyAndMd5(uploadByFileMethod.file, targetNewFilePath)
+        #uploadByFileMethod.save(targetNewFilePath, overwrite=True)  # appends upload.filename automatically
+        newAsset = add_asset.delay(user, repo, uploadedFilePath=targetNewFilePath, dataMD5=bodyMd5)
         yield '<a href="/api/asset/get/{id}">Click to download</a><br/>'.format(id=newAsset.task_id)
     else:
         bottle.response.status = '400 Bad Request'
-        yield "No file found"
+
+
+
+def safeCopyAndMd5(fileobj, destinationPath):
+    '''copy a file in chunked mode safely'''
+    destDir = path.dirname(destinationPath)
+    ext = destinationPath.split('.')[-1]
+    checkPath(destDir)
+    if path.isfile(destinationPath):
+        os.remove(destinationPath)
+    f = open(destinationPath, 'wb')
+    md5 = hashlib.md5()
+    while True:
+        chunk = fileobj.read(1024)
+        if not chunk:
+            break
+            md5.update(chunk)
+        f.write(chunk)
+    f.close()
+    dataMd5 = md5.hexdigest()
+    newAssetName = '%s.%s' % (dataMd5, ext)
+    finalStoragePath = path.join(destDir, newAssetName)
+    if not path.isfile(finalStoragePath):
+        os.rename(destinationPath, finalStoragePath)
+    else:
+        os.remove(destinationPath)
+    os.symlink(newAssetName, destinationPath)
+    return dataMd5
 
 
 @asset_api.put('/save/<user>/<repo>')
@@ -63,23 +90,13 @@ def putLargeNewAsset(user, repo):
     '''Get data based on a file object or b64 data, save and commit it'''
     params = bottle.request.params
     name = params.get('name') or 'undefined.data'
-    ext = name.split('.')[-1]
     body = bottle.request.body
-    md5 = hashlib.md5()
     tempraryStoragePath = path.join(STORAGE, user, repo, name)
     checkPath(path.dirname(tempraryStoragePath))
-    while True:
-        with open(tempraryStoragePath, 'wb') as f:
-            chunk = body.read(1024)
-            print chunk
-            if not chunk:
-                break
-            md5.update(chunk)
-            f.write(chunk)
-
-            
-    return 'ok, iam in put mode'
-
+    #shutil.copyfileobj(body, open(tempraryStoragePath, 'wb'))
+    bodyMd5 = safeCopyAndMd5(body, tempraryStoragePath)
+    newAsset = add_asset.delay(user, repo, uploadedFilePath=tempraryStoragePath, dataMD5=bodyMd5)
+    return newAsset.task_id
 
 def getAssetInfo(key):
     '''Get asset Info based on key or md5'''

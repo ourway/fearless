@@ -34,7 +34,7 @@ touch-reload=utils/messages.py
 touch-reload=utils/visitors.py
 
 
-harakiri=300
+harakiri=60
 cpu-affinity=1
 workers=4
 threads=20
