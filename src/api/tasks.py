@@ -25,12 +25,13 @@ import base64
 import shutil
 from datetime import datetime
 
+import elasticsearch
 import requests
 import os
 from envelopes import Envelope, GMailSMTP
 from utils.validators import email_validator
 from opensource.contenttype import contenttype
-from model import file_bucket, TeamClient, ES, RiakObject # # riak bucket for our files
+from model import file_bucket, TeamClient, ES, RiakObject  # # riak bucket for our files
 from utils.fagit import GIT
 
 
@@ -40,7 +41,7 @@ BACKEND_URL = 'redis://localhost:6379/0'
 
 
 # BROKER_URL = 'redis://localhost:6379/0'
-#BACKEND_URL = 'redis://localhost:6379/1'
+# BACKEND_URL = 'redis://localhost:6379/1'
 from celery import Celery
 
 from utils.validators import checkPath, md5_for_file
@@ -105,7 +106,7 @@ def add_asset(userName, repositoryName, b64Data=None,
         data = {'path': newFilePath,
                 'content_type': content_type,
                 'ext': ext,
-                'size':os.path.getsize(uploadedFilePath),
+                'size': os.path.getsize(uploadedFilePath),
                 'originalName': originalName,
                 'md5': dataMD5,
                 'key': task_id,
@@ -113,13 +114,16 @@ def add_asset(userName, repositoryName, b64Data=None,
                 'repo': repositoryName,
                 'datetime': datetime.utcnow()}
         obj.data = ujson.dumps(data)
-        ES.create(index='assets', doc_type='info', body=obj.data, id=dataMD5)
+        try:
+            ES.create(index='assets', doc_type='info', body=obj.data, id=dataMD5)
+        except elasticsearch.ConflictError:
+            pass
+
         obj.store()
         print '\Info for {name} added to riak db\n'.format(name=newFileName)
 
     elif newFileName and file_bucket.get(newFileName).exists:
         print 'File {name} is already available'.format(name=newFileName)
-
 
     checkPath(os.path.abspath(os.path.dirname(newFilePath)))
     if not os.path.isfile(newFilePath):
@@ -131,11 +135,11 @@ def add_asset(userName, repositoryName, b64Data=None,
 
         print '\nFile {name} added to cache\n'.format(name=newFilePath)
 
-        repo = GIT(newFilePath)  ## do git operations
-        repo.add('{user}->{repo}->{originalName}' \
-                 .format(user=userName,
-                         repo=repositoryName,
-                         originalName=originalName))
+        #repo = GIT(newFilePath)  ## do git operations
+        #repo.add('{user}->{repo}->{originalName}' \
+        #         .format(user=userName,
+        #                 repo=repositoryName,
+        #                 originalName=originalName))
 
     if newFilePath != uploadedFilePath:
         os.remove(uploadedFilePath)

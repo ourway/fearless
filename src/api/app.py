@@ -20,10 +20,10 @@ from opensource.contenttype import contenttype
 from utils.assets import asset_api
 
 app = bottle.Bottle()
-app.mount('/asset', asset_api)
+app.mount('/api/asset', asset_api)
 
 
-@app.route('/')
+@app.route('/api')
 def test():
     return 'ok'
 

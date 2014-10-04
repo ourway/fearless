@@ -12,31 +12,26 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
-
-import bottle
 import ujson
-import sys, time
-from os import path
-from model import getdb
-from tasks import add_asset
-from tasks import remove_asset
-from tasks import show_secrets
-from tasks import STORAGE
-from utils.fagit import GIT
-from utils.validators import checkPath
-#from celery.result import AsyncResult
-
-import base64
+import time
 import hashlib
-from opensource.contenttype import contenttype
+import bottle
+from os import path
+from tasks import add_asset
+from tasks import STORAGE
+from utils.validators import checkPath
+
+# from celery.result import AsyncResult
+
 from model import file_bucket, ES  ## riak bucket for our files
-from riak import RiakObject  ## riak bucket for our files
 
 
 asset_api = bottle.Bottle()
 
+
 def _generate_id():
     return os.urandom(2).encode('hex') + hex(int(time.time() * 10))[5:]
+
 
 '''
 This is a funtion that lets api to get a big/small file from user.
@@ -45,29 +40,55 @@ This is a funtion that lets api to get a big/small file from user.
 
 
 @asset_api.post('/save/<user>/<repo>')
-@asset_api.post('/save/<user>/<repo>/')
 def addNewAsset(user, repo):
     '''Get data based on a file object or b64 data, save and commit it'''
     assetsList = list()
-    for key in bottle.request.files.keys():
+    fileNames = bottle.request.files.keys()
+    for key in fileNames:
         uploadByFileMethod = bottle.request.files.get(key)
         targetNewFilePath = path.abspath(path.join(STORAGE,
-                        user, repo, uploadByFileMethod.filename))
+                                                   user, repo, uploadByFileMethod.filename))
         checkPath(path.dirname(targetNewFilePath))
-        uploadByFileMethod.save(targetNewFilePath, overwrite=True) # appends upload.filename automatically
+        uploadByFileMethod.save(targetNewFilePath, overwrite=True)  # appends upload.filename automatically
         newAsset = add_asset.delay(user, repo, uploadedFilePath=targetNewFilePath)
         assetsList.append(newAsset.task_id)
-        yield '<a href="/asset/get/{id}">Click to download</a><br/>'.format(id=newAsset.task_id)
+        yield '<a href="/api/asset/get/{id}">Click to download</a><br/>'.format(id=newAsset.task_id)
+    else:
+        bottle.response.status = '400 Bad Request'
+        yield "No file found"
 
 
-@asset_api.get('/get/<key>')
-def serveAsset(key):
-    '''Serve asset based on a key (riak key for finding path'''
+@asset_api.put('/save/<user>/<repo>')
+def putLargeNewAsset(user, repo):
+    '''Get data based on a file object or b64 data, save and commit it'''
+    params = bottle.request.params
+    name = params.get('name') or 'undefined.data'
+    ext = name.split('.')[-1]
+    body = bottle.request.body
+    md5 = hashlib.md5()
+    tempraryStoragePath = path.join(STORAGE, user, repo, name)
+    checkPath(path.dirname(tempraryStoragePath))
+    while True:
+        with open(tempraryStoragePath, 'wb') as f:
+            chunk = body.read(1024)
+            print chunk
+            if not chunk:
+                break
+            md5.update(chunk)
+            f.write(chunk)
+
+            
+    return 'ok, iam in put mode'
+
+
+def getAssetInfo(key):
+    '''Get asset Info based on key or md5'''
 
     assetInfo = None
     if not '-' in key:  ## it might not be a MD5!! Lets find:
         queryDSL = {
-            "fields": ['path', 'ext', 'originalName'],
+            "fields": ['path', 'ext', 'originalName',
+                       'content_type', 'repo', 'user', 'md5'],
             "query": {
                 "bool": {
                     "must": [
@@ -87,34 +108,54 @@ def serveAsset(key):
             assetOriginalName = assetHitInfo['fields'].get('originalName')
             assetFilePath = assetHitInfo['fields'].get('path')
             assetFileExtension = assetHitInfo['fields'].get('ext')
+            assetContentType = assetHitInfo['fields'].get('cont')
+            assetOwner = assetHitInfo['fields'].get('user')
+            assetRepositoryName = assetHitInfo['fields'].get('repo')
+            assetMd5 = assetHitInfo['fields'].get('md5')
 
             assetInfo = {
                 'originalName': assetOriginalName,
                 'path': assetFilePath,
-                'ext': assetFileExtension
+                'ext': assetFileExtension,
+                'content_type': assetContentType,
+                'user': assetOwner,
+                'repo': assetRepositoryName,
+                'md5': assetMd5
             }
 
             for key in assetInfo:
                 keydata = assetInfo.get(key)
-                if keydata: ## if key is there
+                if keydata:  ## if key is there
                     assetInfo[key] = keydata[0]
-
     else:
         assetRiakObject = file_bucket.get(key)  ## key is the task_id! :)
         if assetRiakObject.exists:
             assetInfo = ujson.loads(assetRiakObject.data)
+    return assetInfo
 
 
-
+@asset_api.get('/get/<key>')
+def serveAsset(key):
+    '''Serve asset based on a key (riak key for finding path'''
+    assetInfo = getAssetInfo(key)
     if assetInfo:
         noDownloadDialogFormats = ['m4v', 'mp4', 'json',
-                'pdf', 'svg', 'jpg', 'png', 'gif', 'txt']
+                                   'pdf', 'svg', 'jpg', 'png', 'gif', 'txt']
         downloadDialogFileName = None
         staticFilePath = assetInfo.get('path')
         if not assetInfo.get('ext').lower() in noDownloadDialogFormats:
             downloadDialogFileName = assetInfo.get('originalName')
-        return bottle.static_file(staticFilePath,
-                root='/', download= downloadDialogFileName)
+        bottle.response.content_type = assetInfo.get('content_type')
+        assetStatisPath = '{user}/{repo}/{md5}.{ext}'.format(
+            user=assetInfo.get('user'),
+            repo=assetInfo.get('repo'),
+            md5=assetInfo.get('md5'),
+            ext=assetInfo.get('ext'),
+        )
+        assetStaticUrl = '/static/%s' % assetStatisPath
+        bottle.redirect(assetStaticUrl)
+        #return bottle.static_file(staticFilePath,
+        #                          root='/', download=downloadDialogFileName)
     else:
         taskResult = add_asset.AsyncResult(key)
         bottle.response.status = '404 Not Found'
@@ -124,24 +165,10 @@ def serveAsset(key):
 def fileGenerator(staticFilePath):
     with open(staticFilePath, 'rb') as targetStaticFile:
         while True:
-            chunk = targetStaticFile.read(2**20)
+            chunk = targetStaticFile.read(2 ** 20)
             if not chunk:
                 break
             yield chunk
-
-
-@asset_api.get('/stream/<key>')
-def serveAsset(key):
-    '''Serve asset based on a key (riak key for finding path'''
-    assetRiakObject = file_bucket.get(key)  ## key is the task_id! :)
-    if assetRiakObject.exists:
-        assetInfo = ujson.loads(assetRiakObject.data)
-        downloadDialogFileName = None
-        staticFilePath = assetInfo.get('path')
-        bottle.response.add_header("Transfer-Encoding", "chunked")
-        #return 'asdsa'
-        return bottle.response()
-
 
 
 @asset_api.get('/list')
@@ -163,38 +190,38 @@ def listAssets():
         "fields": ["user", "size", "originalName", "path",
                    "content_type", "key"],
         "size": limit,
-        "from": (page-1)*limit,
-         "query": {
-                "bool": {
-                    "must": [
-                        {
-                            "query_string": {
-                                "query": "user:%s" % userName
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "content_type:%s" % content_type
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "repo:%s" % repositoryName
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "originalName:%s" % originalName
-                            }
-                        },
-                        {
-                            "query_string": {
-                                "query": "ext:%s" % extension
-                            }
+        "from": (page - 1) * limit,
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "query_string": {
+                            "query": "user:%s" % userName
                         }
-                    ]
-                }
+                    },
+                    {
+                        "query_string": {
+                            "query": "content_type:%s" % content_type
+                        }
+                    },
+                    {
+                        "query_string": {
+                            "query": "repo:%s" % repositoryName
+                        }
+                    },
+                    {
+                        "query_string": {
+                            "query": "originalName:%s" % originalName
+                        }
+                    },
+                    {
+                        "query_string": {
+                            "query": "ext:%s" % extension
+                        }
+                    }
+                ]
             }
+        }
     }
     raw = ES.search(index='assets', doc_type='info', body=queryDSL).get('hits')
     hitsCount = raw.get('total')
@@ -216,8 +243,8 @@ def listAssets():
         }
         for key in assetExtractedData:
             keydata = assetExtractedData.get(key)
-            if keydata: ## if key is there
-                assetExtractedData[key] =  keydata[0]
+            if keydata:  ## if key is there
+                assetExtractedData[key] = keydata[0]
         results.append(assetExtractedData)
 
     bottle.response.content_type = 'application/json'
