@@ -12,6 +12,9 @@ build:
 	@if test ! -d $(PYENVDIR); then python2.7 -m virtualenv $(PYENVDIR); fi
 	@pyenv/bin/pip install -U setuptools
 	@pyenv/bin/pip install -r requirements
+	@git clone git@github.com:ourway/multipart-python.git
+	@cd multipart-python; ../pyenv/bin/python setup.py install
+	@rm -rf multipart-python
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fateam.template > $(CURDIR)/config/supervisor/fateam.conf
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/uwsgi/api.ini.template > $(CURDIR)/config/uwsgi/api.ini
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/nginx/fa_team.conf.template > $(CURDIR)/config/nginx/fa_team.conf

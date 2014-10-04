@@ -2,36 +2,38 @@
 # -*- coding: utf-8 -*-
 _author = 'Farsheed Ashouri'
 '''
-   ___              _                   _ 
+   ___              _                   _
   / __\_ _ _ __ ___| |__   ___  ___  __| |
  / _\/ _` | '__/ __| '_ \ / _ \/ _ \/ _` |
 / / | (_| | |  \__ \ | | |  __/  __/ (_| |
 \/   \__,_|_|  |___/_| |_|\___|\___|\__,_|
 
-Just remember: Each comment is like an appology! 
+Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
 
-import bottle
-bottle.BaseRequest.MEMFILE_MAX = 2**31 # (or 2G)
-import ujson
-from opensource.contenttype import contenttype
-from utils.assets import asset_api
+import falcon
+from utils.assets import AssetSave
 
-app = bottle.Bottle()
-app.mount('/api/asset', asset_api)
+class ThingsResource:
+    def on_get(self, req, resp):
+        """Handles GET requests"""
+        resp.status = falcon.HTTP_200  # This is the default status
+        resp.body = "ok"
 
 
-@app.route('/api')
-def test():
-    return 'ok'
+# falcon.API instances are callable WSGI apps
+app = falcon.API()
 
+# Resources are represented by long-lived class instances
+things = ThingsResource()
+
+# things will handle all requests to the '/things' URL path
+app.add_route('/things', things)
+app.add_route('/api/asset/save/{user}/{repo}', AssetSave())
 
 
 if __name__ == '__main__':
-    # port = int(os.environ.get('PORT', 8080))
-    bottle.run(app, host='0.0.0.0', reloader=True,
-               debug=True, port=5005)
-    # from werkzeug import run_simple
-    # run_simple('0.0.0.0', 5005, app, use_debugger=True, use_reloader=True)
+    from werkzeug import run_simple
+    run_simple('0.0.0.0', 5005, app, use_debugger=True, use_reloader=True)
