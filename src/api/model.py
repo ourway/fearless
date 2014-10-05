@@ -13,10 +13,9 @@ Clean code is much better than Cleaner comments!
 '''
 
 
-
-from opensource.dal import *
+from pony.orm import *
 from uuid import uuid4
-import datetime
+from datetime import datetime
 
 #############
 ##########
@@ -32,82 +31,66 @@ file_bucket = TeamClient.bucket('AssetDB01')
 #file_bucket.enable_search()
 ##########
 ##############
-now = datetime.datetime.utcnow
+db = Database('sqlite', 'database/database.sqlite', create_db=True)
+now = datetime.utcnow
 
 
 
-def getdb():
-    db = DAL('sqlite://storage.sqlite', 
-             check_reserved=['all'], 
-             folder="database", pool_size=0, lazy_tables = True)
+def getUUID():
+    return str(uuid4())
+
+############################################################
+###########################################################
+
+class Person(db.Entity):
+    name = Required(unicode, unique=True)
+    email = Required(str, unique=True)
+    password = Required(str)
+    token = Required(str, default=getUUID())
+    created_on = Required(datetime, default=now())
+    modified_on = Optional(datetime, default=now())
+    first_name = Optional(unicode)
+    last_name = Optional(unicode)
+    reports = Set("Report")
+    groups = Set("Group")
 
 
-    db.define_table('auth_user',
-        Field('datetime', 'datetime', default=now()),
-        Field('uuid', 'string', default=uuid4()),
-        Field('name', 'string', required=True, notnull=True, unique=True),
-        Field('first_name', 'string', required=True, notnull=True),
-        Field('last_name', 'string', required=True, notnull=True),
-        Field('email', 'string', required=True, notnull=True, unique=True),
-        Field('pswd', 'password', required=True),
-        Field('avatar', 'string', default='default_avatar.png'),
-        Field('last_login', 'datetime'),
-                    )
+class Report(db.Entity):
+    created_on = Required(datetime, default=now())
+    body = Required(LongStr)
+    person = Required(Person)
 
 
-    db.define_table('departement',
-        Field('datetime', 'datetime', default=now()),
-        Field('uuid', 'string', default=uuid4()),
-        Field('name', 'string', required=True, notnull=True, unique=True),
-        Field('icon', 'string', default='default_avatar.png'),
-                    )
+class Rule(db.Entity):
+    name = Required(unicode, unique=True)
+    groups = Set("Group")
 
 
-    db.define_table('prefs',
-        Field('datetime', 'datetime', default=now()),
-        Field('name', length=32),
-        Field('value', length=356),
-        Field('person', db.auth_user),
-        )
+class Group(db.Entity):
+    name = Required(unicode, unique=True)
+    persons =  Set(Person)
+    rule =  Required(Rule)
 
 
-    db.define_table('process',
-        Field('uuid', length=64, default=uuid4()),
-        Field('name','string'),
-        Field('islocked','boolean',default=False),
-        Field('isfinished','boolean',default=False),
-        Field('isreported','boolean',default=False),
-        )
+############################################################
+###########################################################
+## generate mapping
+db.generate_mapping(create_tables=True)
 
-    db.define_table('download',
-        Field('uuid', length=64, default=uuid4()),
-        Field('url','string'),
-        Field('islocked','boolean',default=False),
-        Field('isfinished','boolean',default=False),
-        Field('isreported','boolean',default=False),
-        Field('length','integer',default=0),
-        Field('person', db.auth_user),
-        )
-
-
-    db.define_table('item',
-        Field('uuid', length=64, default=uuid4()),
-        Field('creation_date', 'datetime', default=now()),
-        Field('owner', db.auth_user),
-        Field('pid',  length=256),
-        Field('type', length=32),
-        Field('likes', 'list:reference auth_user', default=[]),
-        Field('shared_with', 'list:reference auth_user', default=[]),
-        Field('publish_code', length=64, default=uuid4()),
-        Field('description','text'),
-        Field('vfiles', 'list:reference vfile', default=[]),
-        Field('type', length=64)
-        )
+## Lets create some defualt rules
+default_rules = ['admin', 'user', 'guest', 'manager']
+with db_session:
+    for rulename in default_rules:
+        if not Rule.get(name=rulename):
+            newrule = Rule(name = rulename)
+    commit()
 
 
 
-    return db
+
+
+
 
 if __name__ == '__main__':
-    db = getdb()
+    pass
 

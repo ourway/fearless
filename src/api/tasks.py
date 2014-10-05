@@ -82,7 +82,6 @@ def add_asset(userName, repositoryName, b64Data=None,
     ext = originalName.split('.')[-1]
     content_type = contenttype('.%s' % ext)
     content_type = contenttype(uploadedFilePath)
-    
 
     if not file_bucket.get(task_id).exists:
         obj = RiakObject(TeamClient, file_bucket, task_id)

@@ -7,31 +7,15 @@ master=True
 vacuum=True
 enable-threads=True
 
+
 touch-reload=app.py
 touch-reload=model.py
 touch-reload=tasks.py
-touch-reload=utils/departements.py
-touch-reload=utils/downloads.py
-touch-reload=utils/users.py
-touch-reload=utils/files.py
-touch-reload=utils/rules.py
-touch-reload=utils/fagit.py
-touch-reload=utils/validators.py
-touch-reload=utils/permissions.py
-touch-reload=utils/reports.py
-touch-reload=utils/logs.py
-touch-reload=utils/shots.py
-touch-reload=utils/sequences.py
-touch-reload=utils/projects.py
-touch-reload=utils/settings.py
-touch-reload=utils/emails.py
-touch-reload=utils/locks.py
-touch-reload=utils/processes.py
-touch-reload=utils/comments.py
-touch-reload=utils/items.py
 touch-reload=utils/assets.py
-touch-reload=utils/messages.py
-touch-reload=utils/visitors.py
+touch-reload=utils/AAA.py
+touch-reload=utils/reports.py
+
+
 
 
 harakiri=60

@@ -18,17 +18,10 @@ import falcon
 import ujson
 import hashlib
 from validators import email_validator
-from model import getdb
 from tasks import send_envelope
 
 
-db=getdb()
 
-def clean(req, resp, *kw):
-    #print kw
-    #print dir(db)
-    db.commit()
-    #db.close()
 
 
 class Mailer(object):

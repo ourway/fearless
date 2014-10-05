@@ -71,3 +71,4 @@ REPO/
 STATIC/
 .idea
 logs/
+.ropeproject/

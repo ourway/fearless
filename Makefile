@@ -16,8 +16,6 @@ build:
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fateam.template > $(CURDIR)/config/supervisor/fateam.conf
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/uwsgi/api.ini.template > $(CURDIR)/config/uwsgi/api.ini
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/nginx/fa_team.conf.template > $(CURDIR)/config/nginx/fa_team.conf
-	@if test ! -f $(OPENSOURCE)/dal.py; then wget --no-check-certificate -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/2b50cf27e2704ad4b5f20e1e0b71f21d4fd04e20/gluon/dal.py; fi
-	@if test ! -f $(OPENSOURCE)/reserved_sql_keywords.py;then wget --no-check-certificate -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/2b50cf27e2704ad4b5f20e1e0b71f21d4fd04e20/gluon/reserved_sql_keywords.py; fi
 	@if test ! -f $(OPENSOURCE)/contenttype.py; then wget --no-check-certificate  -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/2b50cf27e2704ad4b5f20e1e0b71f21d4fd04e20/gluon/contenttype.py; fi
 	@wget http://nginx.org/download/nginx-$(NGINX).tar.gz
 	@tar xf nginx-$(NGINX).tar.gz
