@@ -14,7 +14,7 @@ Clean code is much better than Cleaner comments!
 
 
 import falcon
-from utils.assets import AssetSave
+from utils.assets import AssetSave, ListAssets, GetAsset
 
 class ThingsResource:
     def on_get(self, req, resp):
@@ -32,6 +32,8 @@ things = ThingsResource()
 # things will handle all requests to the '/things' URL path
 app.add_route('/things', things)
 app.add_route('/api/asset/save/{user}/{repo}', AssetSave())
+app.add_route('/api/asset/list', ListAssets())
+app.add_route('/api/asset/{key}', GetAsset())
 
 
 if __name__ == '__main__':

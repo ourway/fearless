@@ -70,3 +70,4 @@ cache/
 REPO/
 STATIC/
 .idea
+logs/

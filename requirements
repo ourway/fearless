@@ -6,6 +6,7 @@ requests
 gevent
 ujson
 uwsgi
+falcon
 riak
 pyinotify
 jsonschema
@@ -17,5 +18,4 @@ pyftpdlib
 fabric
 pysendfile
 werkzeug
-bottle
 elasticsearch
