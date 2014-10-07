@@ -6,6 +6,7 @@
 PYENVDIR="pyenv"
 FFMPEG="2.4.1"
 NGINX="1.6.2"
+USER=
 OPENSOURCE="src/api/opensource"
 
 build:
