@@ -17,13 +17,14 @@ import falcon
 from utils.assets import AssetSave, ListAssets, GetAsset
 from utils.AAA import PersonManager
 
+
 class ThingsResource:
     def on_get(self, req, resp):
         """Handles GET requests"""
         resp.status = falcon.HTTP_200  # This is the default status
+        # resp.set_header('Set-Cookie','fig=newton; Max-Age=200')
+        print req.get_header('Cookie')
         resp.body = "ok"
-
-
 
 # falcon.API instances are callable WSGI apps
 app = falcon.API()
@@ -41,5 +42,8 @@ app.add_route('/api/users', PersonManager())
 
 
 if __name__ == '__main__':
+    import sys
+    import os
+    sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
     from werkzeug import run_simple
     run_simple('0.0.0.0', 5005, app, use_debugger=True, use_reloader=True)
