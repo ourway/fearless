@@ -68,6 +68,7 @@ prepare:
 	@service riak start
 	@service elasticsearch start
 	@service supervisord start
+	@service rabbitmq-server start
 	@service redis start
 	@python2.7 etc/ez_setup.py
 	@python2.7 -m easy_install pip

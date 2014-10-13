@@ -35,13 +35,13 @@ from model import file_bucket, TeamClient, ES, RiakObject  # # riak bucket for o
 from utils.fagit import GIT
 
 
-BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+# BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 # BACKEND_URL = 'amqp'
-BACKEND_URL = 'redis://localhost:6379/0'
+# BACKEND_URL = 'redis://localhost:6379/0'
 
 
-# BROKER_URL = 'redis://localhost:6379/0'
-# BACKEND_URL = 'redis://localhost:6379/1'
+BROKER_URL = 'redis://localhost:6379/0'
+BACKEND_URL = 'redis://localhost:6379/1'
 from celery import Celery
 
 from utils.validators import checkPath, md5_for_file
