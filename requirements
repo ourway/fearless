@@ -14,9 +14,11 @@ jsonschema
 psycopg2
 ipython
 sh
+eventlet
 envelopes
 pyftpdlib
 fabric
 pysendfile
 werkzeug
 elasticsearch
+sqlalchemy

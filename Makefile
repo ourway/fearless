@@ -30,6 +30,7 @@ build:
 	@mv ffmpeg-$(FFMPEG)-64bit-static bin/ffmpeg
 	@rm ffmpeg-$(FFMPEG)-64bit-static.tar.xz
 	@rm -rf nginx-$(NGINX)
+	@rm nginx-$(NGINX).tar.gz
 
 	#wget http://download.redis.io/releases/redis-stable.tar.gz
 
@@ -43,16 +44,12 @@ install:
 	@if test -f /sbin/insserv; then chkconfig --add supervisord; fi
 	@if test -f /sbin/insserv; then chkconfig supervisord on; fi
 	@ln -f -s  $(CURDIR)/config/supervisord.conf /etc/supervisord.conf
-	#@python2.7 etc/ez_setup.py
-	#@python2.7 -m easy_install pip
-	#@python2.7 -m pip install -U setuptools
-	#@python2.7 -m pip install -U virtualenv
 	@mkdir -p /etc/supervisor/conf.d
 	@find $(CURDIR)/config/supervisor -name *.conf | xargs ln -f -s -t /etc/supervisor/conf.d
 	@find $(CURDIR)/config/nginx -name *.conf | xargs ln -f -s -t /etc/nginx/conf.d
+	@mv -f /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.bk
 	@mkdir -p embedded
 	@service nginx restart
-	@service supervisord start
 	@supervisorctl update
 	@supervisorctl restart fa-team-api
 	@supervisorctl restart fa-team-celery
@@ -63,8 +60,18 @@ install:
 	#@sudo -u postgres createdb -O vserver -E UTF8 vserver
 
 prepare:
-	@yum install gcc libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel -y
-	@pip install -U setuptools
-	@pip install -U pip virtualenv
-	@pip install supervisor
+	@yum install gcc nginx redis rabbitmq-server libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel python27 python27-devel -y
+	@yum install http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.1/rhel/6/riak-2.0.1-1.el6.x86_64.rpm -y
+	@yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u55-linux-x64.rpm -y
+	@ln -s -f '/usr/java/default/bin/java' /usr/bin/java
+	@yum install https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.4.noarch.rpm -y
+	@service riak start
+	@service elasticsearch start
+	@service supervisord start
+	@service redis start
+	@python2.7 etc/ez_setup.py
+	@python2.7 -m easy_install pip
+	@python2.7 -m pip install -U setuptools
+	@python2.7 -m pip install -U pip virtualenv
+	@python2.7 -m pip install supervisor
 
