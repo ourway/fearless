@@ -24,23 +24,27 @@ __all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task', 'Repository', 'P
            'Ticket', 'session', 'IntegrityError']
 
 import datetime
+import ujson as json
 from uuid import uuid4  # for random guid generation
 from utils.general import setup_logger
 
-from sqlalchemy import create_engine  # for database
+from sqlalchemy import create_engine, func  # for database
 # for fields and tables
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
 # for models
-from sqlalchemy_utils import PasswordType
+from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
-from sqlalchemy.orm import sessionmaker, validates
+from sqlalchemy.orm import sessionmaker, validates, deferred
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from sqlalchemy.orm import relationship, backref  # for relationships
 
 
 Base = declarative_base()
-engine = create_engine('sqlite:///database/studio.db', echo=False)
+db_path = 'database/studio.db'
+#db_path = ':memory:'
+engine = create_engine('sqlite:///%s'%db_path, echo=False)
 logger = setup_logger('model', 'model.log')
 
 
@@ -115,6 +119,19 @@ class IDMixin(object):
     #__table_args__ = {'mysql_engine': 'InnoDB'}
     #__mapper_args__= {'always_refresh': True}
     id = Column(Integer, primary_key=True)
+    created_on = Column(DateTime, default=datetime.datetime.utcnow)
+    modified_on = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    @property
+    def columns(self):
+        return [ c.name for c in self.__table__.columns ]
+
+    @property
+    def columnitems(self):
+        return dict([ (c, getattr(self, c)) for c in self.columns ])
+
+    def __repr__(self):
+        return json.dumps('{}({})'.format(self.__class__.__name__, self.columnitems))
+
 
 
 class Rule(IDMixin, Base):
@@ -127,67 +144,56 @@ class Rule(IDMixin, Base):
                           secondary=groups_rules, backref='rules')
 
 
-class Group(Base):
+class Group(IDMixin, Base):
 
     '''Groups for membership management
     '''
-    __tablename__ = 'group'
-
-    id = Column(Integer, primary_key=True)
     name = Column(String(32))
     users = relationship('User', backref='group')
 
 
-class User(Base):
+class User(IDMixin, Base):
 
     '''Main users group
     '''
-    __tablename__ = 'user'
 
-    id = Column(Integer, primary_key=True)
     login = Column(String(32), unique=True)
     email = Column(String(64), unique=True)
     password = Column( PasswordType(schemes=['pbkdf2_sha512']) )
     token = Column(String(64), default=getUUID, unique=True)
-    created_on = Column(DateTime, default=datetime.datetime.utcnow)
-    modified_on = Column(DateTime, default=datetime.datetime.utcnow)
+
     firstname = Column(String(64), nullable=True)
     lastname = Column(String(64), nullable=True)
+
     age = Column(Integer)
     group_id = Column(Integer, ForeignKey('group.id'))
     reports = relationship('Report', backref='user')
+
+
+    @hybrid_property
+    def fullname(self):
+        return (self.firstname or '<>') + " " + (self.lastname or '<>')
     # group =
     #reports = Set("Report")
     #groups = Set("Group")
 
-    def __repr__(self):
-        return "<User(login='%s', email='%s', id='%s')>" % (
-            self.login, self.email, self.id)
 
 
-class Report(Base):
+class Report(IDMixin, Base):
 
     '''All reports will be saved here
     '''
-    __tablename__ = 'report'
-
-    id = Column(Integer, primary_key=True)
-    created_on = Column(DateTime, default=datetime.datetime.utcnow)
-    body = Column(Text)
+    body = deferred(Column(Text)) ## load on access
     user_id = Column(Integer, ForeignKey('user.id'))
     project_id = Column(Integer, ForeignKey("project.id"))
 
 
-class Project(Base):
+class Project(IDMixin, Base):
 
     '''Studio Projects
     '''
-    __tablename__ = 'project'
-
-    id = Column(Integer, primary_key=True)
     active = Column(Boolean, default=True)
     name = Column(String(64), unique=True)
-    created_on = Column(DateTime, default=datetime.datetime.utcnow)
     client_id = Column(Integer, ForeignKey("client.id"))
     client = relationship('Client', backref='projects')
     tasks = relationship(
@@ -202,28 +208,24 @@ class Project(Base):
     fps = Column(Float(precision=3), default=False)
     tickets = relationship('Ticket', backref='project')
     reports = relationship('Report', backref='project')
+    @aggregated('tasks', Column(Integer))
+    def calculate_number_of_tasks(self):
+        return func.sum('1') 
 
 
-class Client(Base):
+
+class Client(IDMixin, Base):
 
     '''The Client (e.g. a company) which users may be part of.
     '''
-    __tablename__ = 'client'
-
-    id = Column(Integer, primary_key=True)
     name = Column(String(64), unique=True)
-    created_on = Column(DateTime, default=datetime.datetime.utcnow)
     users = relationship('User', backref='company', secondary='client_users')
 
 
-class Repository(Base):
+class Repository(IDMixin, Base):
 
     """Manages fileserver/repository related data.
     """
-    __tablename__ = 'repository'
-
-    id = Column(Integer, primary_key=True)
-    created_on = Column(DateTime, default=datetime.datetime.utcnow)
     linux_path = Column(String(256))
     windows_path = Column(String(256))
     osx_path = Column(String(256))
@@ -232,14 +234,11 @@ class Repository(Base):
     webdav_path = Column(String(256))
 
 
-class Task(Base):
+class Task(IDMixin, Base):
 
     """Task management
     """
-    __tablename__ = 'task'
-
-    id = Column(Integer, primary_key=True)
-    created_on = Column(DateTime, default=datetime.datetime.utcnow)
+    id = Column(Integer, primary_key=True)  ## over-ride mixin version. because of remote_side
     project_id = Column(Integer, ForeignKey("project.id"))
     name = Column(String(64), unique=True)
     parent_id = Column(Integer, ForeignKey("task.id"))
@@ -262,60 +261,43 @@ class Task(Base):
         return 5
 
 
-class Ticket(Base):
+class Ticket(IDMixin, Base):
 
     """Tickets are the way of reporting errors or asking for changes.
     """
-    __tablename__ = 'ticket'
-
-    id = Column(Integer, primary_key=True)
-    created_on = Column(DateTime, default=datetime.datetime.utcnow)
     project_id = Column(Integer, ForeignKey("project.id"))
     name = Column(String(64), unique=True)
-    body = Column(Text)
+    body = deferred(Column(Text))
 
 
-class Version(Base):
+class Version(IDMixin, Base):
 
     """Holds information about the created versions (files) for a class:`.Task`
     """
-    __tablename__ = 'version'
-
-    id = Column(Integer, primary_key=True)
-    created_on = Column(DateTime, default=datetime.datetime.utcnow)
     take_name = Column(String(256))
     version_number = Column(Integer)
     is_published = Column(Boolean, default=False)
 
 
-class Tag(Base):
+class Tag(IDMixin, Base):
 
     """Used for any tag in orm
     """
-    __tablename__ = 'tag'
-
-    id = Column(Integer, primary_key=True)
     name = Column(String(64), unique=True)
 
 
-class Page(Base):
+class Page(IDMixin, Base):
 
     """Implements o simple page structure for wikis
     """
-    __tablename__ = 'page'
-
-    id = Column(Integer, primary_key=True)
     title = Column(String(256), unique=True)
     content = Column(Text)
 
 
-class Shot(Base):
+class Shot(IDMixin, Base):
 
     """Shot data
     """
-    __tablename__ = 'shot'
-
-    id = Column(Integer, primary_key=True)
     sequences = relationship(
         'Sequence', secondary='shot_sequence', backref='shots')
     scenes = relationship('Scene', secondary='shot_scene', backref='shots')
@@ -323,30 +305,18 @@ class Shot(Base):
     cut_out = Column(Integer)
 
 
-class Sequence(Base):
+class Sequence(IDMixin, Base):
 
     """Sequence data
     """
-    __tablename__ = 'sequence'
-
-    id = Column(Integer, primary_key=True)
 
 
-class Scene(Base):
+
+class Scene(IDMixin, Base):
 
     """Scene data
     """
-    __tablename__ = 'scene'
 
-    id = Column(Integer, primary_key=True)
-
-
-############# Events ################
-
-def logUserCreation(mapper, connection, target):
-    logger.info('New user added|{t.id}|{t.login}'.format(t=target))
-
-event.listen(User, 'after_insert', logUserCreation)
 
 #####################################
 #####################################
@@ -355,18 +325,47 @@ Session = sessionmaker(bind=engine)
 session = Session()
 #####################################
 #####################################
+############# Events ################
+
+def logUserCreation(mapper, connection, target):
+    logger.info('New user added|{t.id}|{t.login}'.format(t=target))
+    #new_group = Group(name=target.login)
+    #target.group= new_group
+    #session.add(new_group)
+
+event.listen(User, 'before_insert', logUserCreation)
+
+
 
 
 if __name__ == '__main__':
-    ed_user = User(login='ed', firstname='Ed Jones', password='edspassword',
-                   email='farsheed.ashouri@gmail.com')
-    session.add(ed_user)
-    try:
-        session.commit()
-    except IntegrityError:
-        print 'User "%s" information is not unique' % ed_user.login
-        session.rollback()
 
-    user = session.query(User).first()
-    for report in session.query(Report).all():
-        print report.body
+    #import os
+    #os.remove('database/studio.db')
+
+    #ed_user = User(login='ed', firstname='Ed Jones', password='edspassword',
+    #               email='farsheed.ashouri@gmail.com')
+
+
+    
+
+    #session.add_all([ed_user])
+    #session.commit()
+    ed_user = session.query(User).first()
+    if not ed_user:
+        ed_user = User(login='ed', firstname='Ed Jones', password='edspassword',
+                   email='farsheed.ashouri@gmail.com')
+
+    session.add(ed_user)
+    session.commit()
+    print ed_user.created_on
+
+    ed_user.lastname = 'Ashouri'
+    print ed_user.modified_on
+    #print session.query(Group).all()
+    #project1 = Project(name="my new project")
+    #task1 = Task(name='animate', project=project1)
+
+
+
+
