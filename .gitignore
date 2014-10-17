@@ -73,3 +73,4 @@ STATIC/
 logs/
 .ropeproject/
 .idea
+.hidden
