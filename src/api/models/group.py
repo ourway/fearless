@@ -28,4 +28,3 @@ class Group(IDMixin, Base):
     '''
     name = Column(String(32), nullable=False, unique=True)
     users = relationship('User', backref='group')
-

@@ -46,12 +46,12 @@ task_responsible = Table("task_responsible", Base.metadata,
                          )
 
 
-
 class Task(IDMixin, Base):
 
     """Task management
     """
-    id = Column(Integer, primary_key=True)  ## over-ride mixin version. because of remote_side
+    id = Column(
+        Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     project_id = Column(Integer, ForeignKey("project.id"))
     title = Column(String(64), unique=True, nullable=False)
     parent_id = Column(Integer, ForeignKey("task.id"))
@@ -73,4 +73,3 @@ class Task(IDMixin, Base):
     @property
     def go(self):
         return 5
-

@@ -24,7 +24,7 @@ __all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task', 'Repository', 'P
            'Ticket', 'session', 'Version', 'Tag', 'Shot', 'Scene', 'Sequence', 'Page']
 
 
-from sqlalchemy import create_engine # for database
+from sqlalchemy import create_engine  # for database
 
 # for models
 from mixin import Base
@@ -32,11 +32,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 
 
-
-
 db_path = 'database/studio.db'
 #db_path = ':memory:'
-engine = create_engine('sqlite:///%s'%db_path, echo=False)
+engine = create_engine('sqlite:///%s' % db_path, echo=False)
 
 from models.group import Group
 from models.user import User
@@ -55,27 +53,21 @@ from models.version import Version
 from models.page import Page
 
 
-
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
 
-
-
 if __name__ == '__main__':
 
     #import os
-    #os.remove('database/studio.db')
+    # os.remove('database/studio.db')
 
-    #ed_user = User(login='ed', firstname='Ed Jones', password='edspassword',
+    # ed_user = User(login='ed', firstname='Ed Jones', password='edspassword',
     #               email='farsheed.ashouri@gmail.com')
 
-
-    
-
-    #session.add_all([ed_user])
-    #session.commit()
+    # session.add_all([ed_user])
+    # session.commit()
 
     ed_user = User(login='ed', firstname='Ed Jones', password='edspassword',
                    email='farsheed.ashouri@gmail.com')
@@ -86,10 +78,6 @@ if __name__ == '__main__':
 
     ed_user.lastname = 'Ashouri'
     print ed_user.modified_on
-    #print session.query(Group).all()
+    # print session.query(Group).all()
     #project1 = Project(name="my new project")
     #task1 = Task(name='animate', project=project1)
-
-
-
-

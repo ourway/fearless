@@ -15,6 +15,7 @@ Clean code is much better than Cleaner comments!
 import functools
 import logging
 
+
 def decorator(d):
     """Make function d a decorator: d wraps a function fn.
      Peter Norvig, my good friend at Dropbox"""

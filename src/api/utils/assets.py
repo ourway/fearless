@@ -22,13 +22,11 @@ from os import path
 from tasks import add_asset
 from tasks import STORAGE
 from utils.validators import checkPath
-import multipart ##git@github.com:hydrogen18/multipart-python.git
+import multipart  # git@github.com:hydrogen18/multipart-python.git
 
 # from celery.result import AsyncResult
 
-from model import file_bucket, ES  ## riak bucket for our files
-
-
+from model import file_bucket, ES  # riak bucket for our files
 
 
 def _generate_id():
@@ -41,26 +39,30 @@ This is a funtion that lets api to get a big/small file from user.
 '''
 
 #@asset_api.post('/save/<user>/<repo>')
+
+
 class AssetSave:
+
     def on_post(self, req, resp, user, repo):
         '''Get data based on a file object or b64 data, save and commit it'''
         contentType = req.content_type
-        #print req.stream.read()
+        # print req.stream.read()
         magic = 'boundary='
         offset = contentType.index(magic)
         assets = {}
         boundary = '--' + contentType[offset + len(magic):]
         for headers, data in multipart.Parser(boundary, req.stream):
-            originalName = headers.next()[1].split(';')[-1].split('=')[-1][1:-1]
+            originalName = headers.next()[1].split(
+                ';')[-1].split('=')[-1][1:-1]
             if originalName:
-                tempraryStoragePath = path.join(STORAGE, user, repo, originalName)
+                tempraryStoragePath = path.join(
+                    STORAGE, user, repo, originalName)
                 bodyMd5 = safeCopyAndMd5(data, tempraryStoragePath,
-                            isGenerator=True)
+                                         isGenerator=True)
                 newAsset = add_asset.delay(user, repo,
-                        uploadedFilePath=tempraryStoragePath, dataMD5=bodyMd5)
+                                           uploadedFilePath=tempraryStoragePath, dataMD5=bodyMd5)
                 assets[originalName] = newAsset.task_id
         resp.body = ujson.dumps(assets)
-
 
     def on_put(self, req, resp, user, repo):
         '''Get data based on a file object or b64 data, save and commit it'''
@@ -69,9 +71,11 @@ class AssetSave:
         tempraryStoragePath = path.join(STORAGE, user, repo, name)
         body = req.stream
         bodyMd5 = safeCopyAndMd5(body, tempraryStoragePath)
-        newAsset = add_asset.delay(user, repo, uploadedFilePath=tempraryStoragePath, dataMD5=bodyMd5)
+        newAsset = add_asset.delay(
+            user, repo, uploadedFilePath=tempraryStoragePath, dataMD5=bodyMd5)
         resp.body = newAsset.task_id
         #resp.body = "I am working"
+
 
 def safeCopyAndMd5(fileobj, destinationPath, isGenerator=False):
     '''copy a file in chunked mode safely'''
@@ -84,7 +88,7 @@ def safeCopyAndMd5(fileobj, destinationPath, isGenerator=False):
     md5 = hashlib.md5()
     if not isGenerator:
         while True:
-            chunk = fileobj.read(2**20)
+            chunk = fileobj.read(2 ** 20)
             if not chunk:
                 break
             md5.update(chunk)
@@ -105,14 +109,11 @@ def safeCopyAndMd5(fileobj, destinationPath, isGenerator=False):
     return dataMd5
 
 
-
-
-
 def getAssetInfo(key):
     '''Get asset Info based on key or md5'''
 
     assetInfo = None
-    if not '-' in key:  ## it might not be a MD5!! Lets find:
+    if not '-' in key:  # it might not be a MD5!! Lets find:
         queryDSL = {
             "fields": ['path', 'ext', 'originalName',
                        'content_type', 'repo', 'user', 'md5'],
@@ -129,7 +130,8 @@ def getAssetInfo(key):
             }
         }
 
-        raw = ES.search(index='assets', doc_type='info', body=queryDSL).get('hits')
+        raw = ES.search(
+            index='assets', doc_type='info', body=queryDSL).get('hits')
         assetInfos = raw.get('hits')
         for assetHitInfo in assetInfos:
             assetOriginalName = assetHitInfo['fields'].get('originalName')
@@ -152,22 +154,23 @@ def getAssetInfo(key):
 
             for key in assetInfo:
                 keydata = assetInfo.get(key)
-                if keydata:  ## if key is there
+                if keydata:  # if key is there
                     assetInfo[key] = keydata[0]
     else:
-        assetRiakObject = file_bucket.get(key)  ## key is the task_id! :)
+        assetRiakObject = file_bucket.get(key)  # key is the task_id! :)
         if assetRiakObject.exists:
             assetInfo = ujson.loads(assetRiakObject.data)
     return assetInfo
 
 
 class GetAsset:
+
     def on_get(self, req, resp, key):
         '''Serve asset based on a key (riak key for finding path'''
         assetInfo = getAssetInfo(key)
         if assetInfo:
             noDownloadDialogFormats = ['m4v', 'mp4', 'json',
-                                    'pdf', 'svg', 'jpg', 'png', 'gif', 'txt']
+                                       'pdf', 'svg', 'jpg', 'png', 'gif', 'txt']
             downloadDialogFileName = None
             staticFilePath = assetInfo.get('path')
             if not assetInfo.get('ext').lower() in noDownloadDialogFormats:
@@ -189,6 +192,7 @@ class GetAsset:
 
 
 class ListAssets:
+
     def on_get(self, req, resp):
         page = req.get_param('page') or 1
         userName = req.get_param('user') or '*'
@@ -204,7 +208,7 @@ class ListAssets:
         limit = 20
         queryDSL = {
             "fields": ["user", "size", "originalName", "path",
-                    "content_type", "key"],
+                       "content_type", "key"],
             "size": limit,
             "from": (page - 1) * limit,
             "query": {
@@ -239,7 +243,8 @@ class ListAssets:
                 }
             }
         }
-        raw = ES.search(index='assets', doc_type='info', body=queryDSL).get('hits')
+        raw = ES.search(
+            index='assets', doc_type='info', body=queryDSL).get('hits')
         hitsCount = raw.get('total')
         hits = raw.get('hits')
         results = list()
@@ -259,8 +264,7 @@ class ListAssets:
             }
             for key in assetExtractedData:
                 keydata = assetExtractedData.get(key)
-                if keydata:  ## if key is there
+                if keydata:  # if key is there
                     assetExtractedData[key] = keydata[0]
             results.append(assetExtractedData)
-        resp.body =  ujson.dumps(results)
-
+        resp.body = ujson.dumps(results)

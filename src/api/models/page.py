@@ -28,4 +28,3 @@ class Page(IDMixin, Base):
     """
     title = Column(String(256), unique=True)
     content = Column(Text)
-

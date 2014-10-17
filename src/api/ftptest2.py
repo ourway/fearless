@@ -44,16 +44,17 @@ class MyHandler(FTPHandler):
 
 def main():
     #authorizer = DummyAuthorizer()
-    authorizer = UnixAuthorizer(rejected_users=["root"], 
-                require_valid_shell=False)
+    authorizer = UnixAuthorizer(rejected_users=["root"],
+                                require_valid_shell=False)
 
     authorizer.override_user('bijan', homedir='/home/share')
-    authorizer.override_user('yazdani', homedir='/home/share',  perm='elradfmw')
-    #authorizer.add_anonymous(homedir='/share/public')
+    authorizer.override_user(
+        'yazdani', homedir='/home/share',  perm='elradfmw')
+    # authorizer.add_anonymous(homedir='/share/public')
 
     handler = MyHandler
     handler.authorizer = authorizer
-    handler.use_send_file=True
+    handler.use_send_file = True
     #handler.abstracted_fs = UnixFilesystem
     server = FTPServer(('', 2121), handler)
     #server = MultiprocessFTPServer(('', 2121), handler)

@@ -40,15 +40,16 @@ class IDMixin(object):
     #__mapper_args__= {'always_refresh': True}
     id = Column(Integer, primary_key=True)
     created_on = Column(DateTime, default=datetime.datetime.utcnow)
-    modified_on = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    modified_on = Column(
+        DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     @property
     def columns(self):
-        return [ c.name for c in self.__table__.columns ]
+        return [c.name for c in self.__table__.columns]
 
     @property
     def columnitems(self):
-        return dict([ (c, getattr(self, c)) for c in self.columns ])
+        return dict([(c, getattr(self, c)) for c in self.columns])
 
     def __repr__(self):
         return json.dumps(self.columnitems)

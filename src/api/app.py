@@ -35,7 +35,7 @@ def get_params(url, flat=True):
         params[param] = params[param][0]
     if not flat:
         return params
-    l = ','.join(['%s="%s"'%(i, params[i]) for i in params])
+    l = ','.join(['%s="%s"' % (i, params[i]) for i in params])
     return l
 
 
@@ -45,9 +45,11 @@ def commit(req, resp):
     except IntegrityError, e:
         session.rollback()
         resp.status = falcon.HTTP_400
-        resp.body = str(e)
+        resp.body = json.dumps(e)
+
 
 class ThingsResource:
+
     def on_get(self, req, resp):
         """Handles GET requests"""
         resp.status = falcon.HTTP_200  # This is the default status
@@ -56,16 +58,15 @@ class ThingsResource:
         resp.body = "ok"
 
 
-
-
-
 class DB:
+
     def on_get(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
         if len(args) == 5:
             id = args[4]
-            query = 'session.query({t}).filter({t}.id=={id})'.format( t=table, id=int(id))
+            query = 'session.query({t}).filter({t}.id=={id})'.format(
+                t=table, id=int(id))
             data = eval(query).first()
         else:
             query = 'session.query({t})'.format(t=table)
@@ -76,7 +77,7 @@ class DB:
 
         data = repr(data)
         resp.body = json.dumps(json.loads(data))
-            ## Ok, We have an id
+        # Ok, We have an id
 
     @falcon.after(commit)
     def on_put(self, req, resp, **kw):
@@ -84,43 +85,48 @@ class DB:
         table = args[3].title()
         query_params = get_params(req.uri)
         insert_cmd = '{t}({q})'.format(t=table, q=query_params)
-        new = eval(insert_cmd)
-        resp.status = falcon.HTTP_201
-        session.add(new)
-        #commit()
+        try:
+            new = eval(insert_cmd)
+            resp.status = falcon.HTTP_201
+            session.add(new)
+            data = repr(new)
+            resp.body = json.dumps(json.loads(data))
+        except TypeError, e:
+            resp.status = falcon.HTTP_400
+            resp.body = json.dumps(e)
+        # commit()
 
     @falcon.after(commit)
     def on_patch(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
         id = args[4]
-        ## lets get the table data
-        query = 'session.query({t}).filter({t}.id=={id})'.format( t=table, id=int(id))
+        # lets get the table data
+        query = 'session.query({t}).filter({t}.id=={id})'.format(
+            t=table, id=int(id))
         result = eval(query)
         ##
         query_params = get_params(req.uri, flat=False)
         result.update(query_params)
         resp.status = falcon.HTTP_202
         #query = 'result({q})'.format(q=query_params)
-        #print eval(query)
+        # print eval(query)
 
     @falcon.after(commit)
     def on_delete(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
         id = args[4]
-        ## lets get the table data
-        query = 'session.query({t}).filter({t}.id=={id})'.format( t=table, id=int(id))
+        # lets get the table data
+        query = 'session.query({t}).filter({t}.id=={id})'.format(
+            t=table, id=int(id))
         result = eval(query).first()
         ##
         session.delete(result)
         resp.status = falcon.HTTP_202
         #query = 'result({q})'.format(q=query_params)
-        #print eval(query)
+        # print eval(query)
 
-
-
-        
 
 # falcon.API instances are callable WSGI apps
 app = falcon.API()
@@ -129,7 +135,7 @@ things = ThingsResource()
 ########################################################
 for table in tables:
     app.add_route('/api/db/{t}'.format(t=table), DB())
-    app.add_route('/api/db/%s/{id}'%table, DB())
+    app.add_route('/api/db/%s/{id}' % table, DB())
 #######################################################
 
 # things will handle all requests to the '/things' URL path
@@ -137,7 +143,6 @@ app.add_route('/api/things', things)
 #app.add_route('/api/asset/save/{user}/{repo}', AssetSave())
 #app.add_route('/api/asset', ListAssets())
 #app.add_route('/api/asset/{key}', GetAsset())
-
 
 
 if __name__ == '__main__':

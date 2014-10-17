@@ -17,10 +17,12 @@ import os
 import hashlib
 from os import path
 
+
 def email_validator(email):
     pat = '^(([^<>()[\\]\\\\.,;:\\s@\\"]+(\\.[^<>()[\\]\\\\.,;:\\s@\\"]+)*)|(\\".+\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$'
     if re.match(re.compile(pat), email):
         return True
+
 
 def checkPath(thepath):
     '''Checks is a directory is available, If not creates it'''
@@ -32,7 +34,7 @@ def checkPath(thepath):
     return targetPath
 
 
-def md5_for_file(f, block_size=2**20):
+def md5_for_file(f, block_size=2 ** 20):
     md5 = hashlib.md5()
     while True:
         data = f.read(block_size)
@@ -40,5 +42,3 @@ def md5_for_file(f, block_size=2**20):
             break
         md5.update(data)
     return md5.hexdigest()
-
-

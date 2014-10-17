@@ -27,4 +27,3 @@ class Tag(IDMixin, Base):
     """Used for any tag in orm
     """
     name = Column(String(64), unique=True, nullable=False)
-

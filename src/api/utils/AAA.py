@@ -20,7 +20,9 @@ from model import Person, Report, Group, Rule
 
 import falcon
 
+
 class PersonManager:
+
     def on_post(self, req, resp):
         '''Add a user to database'''
         name = req.get_param('name')
@@ -30,15 +32,18 @@ class PersonManager:
         last_name = req.get_param('last_name')
         if name and email and password:
             with db_session:
-                user = select(p for p in Person if (p.name==name or p.email==email))[:]
+                user = select(
+                    p for p in Person if (p.name == name or p.email == email))[:]
                 if not user:
 
                     resp.status = falcon.HTTP_201
-                    user = Person(  name=name,
-                                    email=email,
-                                    password=password)
-                    if first_name: user.first_name = first_name.strip()
-                    if last_name: user.last_name = first_name.strip()
+                    user = Person(name=name,
+                                  email=email,
+                                  password=password)
+                    if first_name:
+                        user.first_name = first_name.strip()
+                    if last_name:
+                        user.last_name = first_name.strip()
                     user_rule = Rule.get(name='user')
                     user.groups.create(name=name, rule=user_rule)
                     commit()
@@ -52,6 +57,3 @@ class PersonManager:
     def on_get(self, req, resp):
         '''Authenticate a user'''
         resp.body = 'I am in get mode'
-
-
-

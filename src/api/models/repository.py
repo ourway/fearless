@@ -33,4 +33,3 @@ class Repository(IDMixin, Base):
     ftp_path = Column(String(256))
     sftp_path = Column(String(256))
     webdav_path = Column(String(256))
-

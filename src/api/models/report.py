@@ -26,7 +26,6 @@ class Report(IDMixin, Base):
 
     '''All reports will be saved here
     '''
-    body = deferred(Column(Text, nullable=False)) ## load on access
+    body = deferred(Column(Text, nullable=False))  # load on access
     user_id = Column(Integer, ForeignKey('user.id'))
     project_id = Column(Integer, ForeignKey("project.id"))
-

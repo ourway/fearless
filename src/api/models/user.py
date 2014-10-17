@@ -24,21 +24,19 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from mixin import IDMixin, Base, getUUID, logger
 
 
-
 class User(IDMixin, Base):
 
     '''Main users group
     '''
     login = Column(String(32), unique=True, nullable=False)
     email = Column(String(64), unique=True, nullable=False)
-    password = Column( PasswordType(schemes=['pbkdf2_sha512']), nullable=False)
+    password = Column(PasswordType(schemes=['pbkdf2_sha512']), nullable=False)
     token = Column(String(64), default=getUUID, unique=True)
     firstname = Column(String(64), nullable=True)
     lastname = Column(String(64), nullable=True)
     age = Column(Integer)
     group_id = Column(Integer, ForeignKey('group.id'))
     reports = relationship('Report', backref='user')
-
 
     @hybrid_property
     def fullname(self):
@@ -48,13 +46,10 @@ class User(IDMixin, Base):
     #groups = Set("Group")
 
 
-
-
-
 def logUserCreation(mapper, connection, target):
     logger.info('New user added|{t.id}|{t.login}'.format(t=target))
     #new_group = Group(name=target.login)
     #target.group= new_group
-    #session.add(new_group)
+    # session.add(new_group)
 
 event.listen(User, 'before_insert', logUserCreation)

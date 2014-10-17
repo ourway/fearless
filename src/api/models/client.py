@@ -28,10 +28,10 @@ client_users = Table('client_users', Base.metadata,
                      Column('user_id', Integer, ForeignKey('user.id'))
                      )
 
+
 class Client(IDMixin, Base):
 
     '''The Client (e.g. a company) which users may be part of.
     '''
     name = Column(String(64), unique=True, nullable=False)
     users = relationship('User', backref='company', secondary='client_users')
-

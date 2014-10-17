@@ -22,10 +22,10 @@ from sqlalchemy.orm import validates, deferred
 from mixin import IDMixin, Base
 
 project_users = Table('project_users', Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column('project_id', Integer, ForeignKey('project.id')),
-                     Column('user_id', Integer, ForeignKey('user.id'))
-                     )
+                      Column('id', Integer, primary_key=True),
+                      Column('project_id', Integer, ForeignKey('project.id')),
+                      Column('user_id', Integer, ForeignKey('user.id'))
+                      )
 
 
 class Project(IDMixin, Base):
@@ -48,6 +48,7 @@ class Project(IDMixin, Base):
     fps = Column(Float(precision=3), default=False)
     tickets = relationship('Ticket', backref='project')
     reports = relationship('Report', backref='project')
+
     @aggregated('tasks', Column(Integer))
     def calculate_number_of_tasks(self):
-        return func.sum('1') 
+        return func.sum('1')

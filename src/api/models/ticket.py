@@ -29,4 +29,3 @@ class Ticket(IDMixin, Base):
     project_id = Column(Integer, ForeignKey("project.id"))
     name = Column(String(64), unique=True)
     body = deferred(Column(Text))
-

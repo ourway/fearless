@@ -31,5 +31,3 @@ class Version(IDMixin, Base):
     is_published = Column(Boolean, default=False)
     task_id = Column(Integer, ForeignKey('task.id'))
     #asset_id = Column(Integer, ForeignKey('task.id'))
-
-
