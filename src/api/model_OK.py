@@ -1,1 +1,0 @@
-/home/farsheed/Desktop/model.py

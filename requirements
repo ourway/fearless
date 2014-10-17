@@ -22,3 +22,7 @@ pysendfile
 werkzeug
 elasticsearch
 sqlalchemy
+sqlalchemy-utils
+passlib
+pillow
+qrcode
