@@ -19,7 +19,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
-from models.mixin import IDMixin, Base
+from mixin import IDMixin, Base
 
 
 class Scene(IDMixin, Base):

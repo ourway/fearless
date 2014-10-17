@@ -21,13 +21,13 @@ usage:
 '''
 
 __all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task', 'Repository', 'Project',
-           'Ticket', 'session', 'Version', 'Tag', 'IntegrityError']
+           'Ticket', 'session', 'Version', 'Tag']
 
 
 from sqlalchemy import create_engine # for database
 
 # for models
-from models.mixin import Base
+from mixin import Base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 

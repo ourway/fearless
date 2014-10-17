@@ -12,14 +12,19 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
+
 import datetime
 import ujson as json
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
-
+from utils.general import setup_logger
 from uuid import uuid4  # for random guid generation
+
+
 Base = declarative_base()
+logger = setup_logger('model', 'model.log')
+
 
 def getUUID():
     return str(uuid4())
@@ -46,4 +51,4 @@ class IDMixin(object):
         return dict([ (c, getattr(self, c)) for c in self.columns ])
 
     def __repr__(self):
-        return json.dumps('{}({})'.format(self.__class__.__name__, self.columnitems))
+        return json.dumps(self.columnitems)
