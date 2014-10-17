@@ -13,10 +13,12 @@ Clean code is much better than Cleaner comments!
 '''
 
 import datetime
+import ujson as json
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
 
+from uuid import uuid4  # for random guid generation
 Base = declarative_base()
 
 def getUUID():

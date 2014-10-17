@@ -19,8 +19,12 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
-from models.mixin import IDMixin, Base
+from models.mixin import IDMixin, Base, getUUID
+from sqlalchemy.ext.hybrid import hybrid_property
 
+from utils.general import setup_logger
+
+logger = setup_logger('model', 'model.log')
 
 class User(IDMixin, Base):
 

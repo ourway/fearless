@@ -14,12 +14,18 @@ Clean code is much better than Cleaner comments!
 
 
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
-    Float, Boolean, event
+    Float, Boolean, event, func
 
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from models.mixin import IDMixin, Base
+
+project_users = Table('project_users', Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column('project_id', Integer, ForeignKey('project.id')),
+                     Column('user_id', Integer, ForeignKey('user.id'))
+                     )
 
 
 class Project(IDMixin, Base):
