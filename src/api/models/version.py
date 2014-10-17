@@ -26,7 +26,10 @@ class Version(IDMixin, Base):
 
     """Holds information about the created versions (files) for a class:`.Task`
     """
-    take_name = Column(String(256))
-    version_number = Column(Integer)
+    take_name = Column(String(256), nullable=False)
+    number = Column(Integer, default=1)
     is_published = Column(Boolean, default=False)
+    task_id = Column(Integer, ForeignKey('task.id'))
+    #asset_id = Column(Integer, ForeignKey('task.id'))
+
 

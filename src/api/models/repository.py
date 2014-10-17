@@ -26,6 +26,7 @@ class Repository(IDMixin, Base):
 
     """Manages fileserver/repository related data.
     """
+    name = Column(String(32), nullable=False, unique=True)
     linux_path = Column(String(256))
     windows_path = Column(String(256))
     osx_path = Column(String(256))

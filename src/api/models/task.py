@@ -53,7 +53,7 @@ class Task(IDMixin, Base):
     """
     id = Column(Integer, primary_key=True)  ## over-ride mixin version. because of remote_side
     project_id = Column(Integer, ForeignKey("project.id"))
-    name = Column(String(64), unique=True)
+    title = Column(String(64), unique=True, nullable=False)
     parent_id = Column(Integer, ForeignKey("task.id"))
     children = relationship(
         'Task', backref=backref('parent', remote_side=[id]))
@@ -63,6 +63,7 @@ class Task(IDMixin, Base):
     responsibles = relationship(
         'User', backref='responsible_of', secondary='task_responsible')
     priority = Column(Integer)
+    version = relationship('Version', backref='task')
 
     @validates('name')
     def check_name(self, key, task):

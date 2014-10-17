@@ -26,15 +26,26 @@ from sqlalchemy.exc import IntegrityError  # for exception handeling
 tables = [i for i in av if i[0] in ascii_uppercase]
 
 
-def get_params(url):
+def get_params(url, flat=True):
     '''Return a string out of url params for query
     '''
     urlinfo = urlparse.urlparse(url)
     params = urlparse.parse_qs(urlinfo.query)
     for param in params:
         params[param] = params[param][0]
+    if not flat:
+        return params
     l = ','.join(['%s="%s"'%(i, params[i]) for i in params])
     return l
+
+
+def commit(req, resp):
+    try:
+        session.commit()
+    except IntegrityError, e:
+        session.rollback()
+        resp.status = falcon.HTTP_400
+        resp.body = str(e)
 
 class ThingsResource:
     def on_get(self, req, resp):
@@ -67,24 +78,45 @@ class DB:
         resp.body = json.dumps(json.loads(data))
             ## Ok, We have an id
 
+    @falcon.after(commit)
     def on_put(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
         query_params = get_params(req.uri)
         insert_cmd = '{t}({q})'.format(t=table, q=query_params)
         new = eval(insert_cmd)
+        resp.status = falcon.HTTP_201
         session.add(new)
-        try:
-            session.commit()
-            resp.status = falcon.HTTP_201
-            return
-        except IntegrityError, e:
-            session.rollback()
-            resp.status = falcon.HTTP_400
-            resp.body = str(e)
-            return
-        
+        #commit()
 
+    @falcon.after(commit)
+    def on_patch(self, req, resp, **kw):
+        args = req.path.split('/')
+        table = args[3].title()
+        id = args[4]
+        ## lets get the table data
+        query = 'session.query({t}).filter({t}.id=={id})'.format( t=table, id=int(id))
+        result = eval(query)
+        ##
+        query_params = get_params(req.uri, flat=False)
+        result.update(query_params)
+        resp.status = falcon.HTTP_202
+        #query = 'result({q})'.format(q=query_params)
+        #print eval(query)
+
+    @falcon.after(commit)
+    def on_delete(self, req, resp, **kw):
+        args = req.path.split('/')
+        table = args[3].title()
+        id = args[4]
+        ## lets get the table data
+        query = 'session.query({t}).filter({t}.id=={id})'.format( t=table, id=int(id))
+        result = eval(query).first()
+        ##
+        session.delete(result)
+        resp.status = falcon.HTTP_202
+        #query = 'result({q})'.format(q=query_params)
+        #print eval(query)
 
 
 
@@ -92,15 +124,14 @@ class DB:
 
 # falcon.API instances are callable WSGI apps
 app = falcon.API()
-
-# Resources are represented by long-lived class instances
 things = ThingsResource()
 
-
+########################################################
 for table in tables:
-
     app.add_route('/api/db/{t}'.format(t=table), DB())
     app.add_route('/api/db/%s/{id}'%table, DB())
+#######################################################
+
 # things will handle all requests to the '/things' URL path
 app.add_route('/api/things', things)
 #app.add_route('/api/asset/save/{user}/{repo}', AssetSave())

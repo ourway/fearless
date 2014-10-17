@@ -21,7 +21,7 @@ usage:
 '''
 
 __all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task', 'Repository', 'Project',
-           'Ticket', 'session', 'Version', 'Tag']
+           'Ticket', 'session', 'Version', 'Tag', 'Shot', 'Scene', 'Sequence', 'Page']
 
 
 from sqlalchemy import create_engine # for database

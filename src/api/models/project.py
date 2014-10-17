@@ -33,7 +33,7 @@ class Project(IDMixin, Base):
     '''Studio Projects
     '''
     active = Column(Boolean, default=True)
-    name = Column(String(64), unique=True)
+    name = Column(String(64), unique=True, nullable=False)
     client_id = Column(Integer, ForeignKey("client.id"))
     client = relationship('Client', backref='projects')
     tasks = relationship(

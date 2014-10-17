@@ -35,7 +35,7 @@ class Rule(IDMixin, Base):
     '''Rules for permissions and authorizations
     '''
 
-    name = Column(String(32))
+    name = Column(String(32), nullable=False, unique=True)
     groups = relationship("Group",
                           secondary=groups_rules, backref='rules')
 

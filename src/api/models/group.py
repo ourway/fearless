@@ -26,6 +26,6 @@ class Group(IDMixin, Base):
 
     '''Groups for membership management
     '''
-    name = Column(String(32))
+    name = Column(String(32), nullable=False, unique=True)
     users = relationship('User', backref='group')
 
