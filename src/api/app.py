@@ -150,4 +150,4 @@ if __name__ == '__main__':
     import os
     sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
     from werkzeug import run_simple
-    run_simple('127.0.0.1', 5000, app, use_debugger=True, use_reloader=True)
+    run_simple('0.0.0.0', 5000, app, use_debugger=True, use_reloader=True)

@@ -1,5 +1,5 @@
 server {
-    listen 80;
+    listen 5003;
     server_name _;
     server_tokens off;
     #more_set_headers 'Server: FA-TEAM Server';

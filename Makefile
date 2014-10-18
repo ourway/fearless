@@ -13,7 +13,7 @@ build:
 	@if test ! -d $(PYENVDIR); then python2.7 -m virtualenv $(PYENVDIR); fi
 	@pyenv/bin/pip install -U setuptools
 	@pyenv/bin/pip install -r requirements
-	@pyenv/bin/pip install git+https://github.com/hydrogen18/multipart-python
+	#@pyenv/bin/pip install git+https://github.com/hydrogen18/multipart-python
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fateam.template > $(CURDIR)/config/supervisor/fateam.conf
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/uwsgi/api.ini.template > $(CURDIR)/config/uwsgi/api.ini
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/nginx/fa_team.conf.template > $(CURDIR)/config/nginx/fa_team.conf
@@ -60,7 +60,7 @@ install:
 	#@sudo -u postgres createdb -O vserver -E UTF8 vserver
 
 prepare:
-	@yum install gcc nginx redis rabbitmq-server libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel python27 python27-devel -y
+	@yum install gcc nginx redis libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel python27 python27-devel -y
 	@yum install http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.1/rhel/6/riak-2.0.1-1.el6.x86_64.rpm -y
 	@yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u55-linux-x64.rpm -y
 	@ln -s -f '/usr/java/default/bin/java' /usr/bin/java
@@ -68,7 +68,6 @@ prepare:
 	@service riak start
 	@service elasticsearch start
 	@service supervisord start
-	@service rabbitmq-server start
 	@service redis start
 	@python2.7 etc/ez_setup.py
 	@python2.7 -m easy_install pip

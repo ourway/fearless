@@ -6,7 +6,6 @@ requests
 gevent
 ujson
 uwsgi
-pony
 falcon
 riak
 pyinotify
