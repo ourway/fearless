@@ -1,7 +1,9 @@
-fa-team
+FearLess
 =======
 
-Revolutionary Animation Production Management System
+Fearless is a Revolutionary Animation Production Management System
+
+it's not ready yet,!
 
 
 Installaion
