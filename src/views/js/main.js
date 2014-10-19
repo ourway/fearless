@@ -31,11 +31,14 @@ fateamApp.factory('authFactory', function($resource) {
 	})
 
 	// create the controller and inject Angular's $scope
-	fateamApp.controller('mainController', function($scope, $rootScope, $cookies, authFactory) {
+	fateamApp.controller('authController', function($scope, $rootScope, $cookies, authFactory, $location) {
 		// create a message to display in our view
         $rootScope.title = "Welcome to fa-team!";
+        $scope.$watch($location, function() {
+            $scope.showLogin = $location.path() == '/auth/login'
+        })
 		$scope.appName = 'APMS';
-        $scope.showLogin = true;
+        $scope.$parent.showLogin = "asdasda";
 		$scope.message = $scope.appName + ', A Revolutionary Animation Production Management System!';
         $scope.userInfo = {'logged_in':false};
 
@@ -114,9 +117,7 @@ fateamApp.controller('titleCtrl', function ($scope, $http, $location) {
 });
 
 
-fateamApp.controller('authController', function ($scope, $http, $location) {
-    $scope.$parent.showLogin = null;
-
+fateamApp.controller('mainController', function ($scope, $http, $location) {
 
 });
 //  NON Angular scripts

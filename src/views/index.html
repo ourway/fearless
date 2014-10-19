@@ -85,7 +85,7 @@
 
 
 
-        <div ng-if="showLogin" class="navbar-collapse collapse" ng-init="is_logged_in()">
+        <div ng-controller="authController" ng-if="!showLogin" class="navbar-collapse collapse" ng-init="is_logged_in()">
             <form class="navbar-form navbar-right" role="form" ng-submit="doLogin()"
                 ng-show="!userInfo.logged_in" name="login_form">
             <div class="form-group" >
@@ -94,7 +94,7 @@
             <div class="form-group" ng-init="loginInfo.action='login'">
               <input type="password" placeholder="Password" ng-model="loginInfo.password" class="form-control" required>
             </div>
-            <button class="btn" 
+            <button class="btn"
                 ng-class="{'btn-primary':login_mode!='Sign in', 'btn-success':login_mode=='Sign in'}" ng-init="login_mode='Sign in'">{{login_mode}}</button>
             <button ng-show="login_mode!='Sign in'" ng-click="loginInfo.action='recover'" class="btn btn-warning">Password Recovery</button>
         </form>

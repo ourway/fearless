@@ -16,9 +16,9 @@ Clean code is much better than Cleaner comments!
 from falcon_patch import falcon
 import importlib
 import urlparse
+from urllib2 import quote, unquote
 from string import ascii_uppercase
 import ujson as json
-import Cookie
 import redis
 import hashlib
 import re
@@ -27,9 +27,12 @@ import re
 from models import __all__ as av
 from models import *
 from sqlalchemy.exc import IntegrityError  # for exception handeling
+from utils.AAA import login
+
 tables = [i for i in av if i[0] in ascii_uppercase]
 r = redis.StrictRedis(host='localhost', port=6379, db=3)  # db number 1 and 2 are for celery
-cookie = Cookie.BaseCookie()
+
+
 
 
 def get_cookie(cookiename, raw):
@@ -64,13 +67,16 @@ def getANewSessionId():
     return str(hmac.HMAC(key=str(uuid.uuid4()), digestmod=hashlib.sha1).hexdigest())
 
 def authenticate(req, resp, params):
+    free_services = ['/api/auth/signup', '/api/auth/signin', '/api/things']
+    path = req.relative_uri
     raw = req.headers.get('COOKIE')
     if not raw:
         session = None
     else:
         session = get_cookie('session-id', raw)
+
     ''' Now we need to check if session is available and it's sha1 is in redis'''
-    if session and r.get(hashlib.sha1(session).hexdigest()):
+    if path in free_services or (session and r.get(hashlib.sha1(session).hexdigest())):
         ''' Now we need to authorize user!
             NOT IMPLEMENTED YET
         '''
@@ -80,7 +86,8 @@ def authenticate(req, resp, params):
         hashed_session = hashlib.sha1(session).hexdigest()
         resp.append_header('set-cookie', 'session-id=%s;path=/;max-age=10' % session)  # this session is not yet saved
         resp.status = falcon.HTTP_302
-        resp.location = '/app/#auth/login'
+        next = quote(path)
+        resp.location = '/app/#auth/login?next=%s' % next
 
     #if token != 'rrferl':
     #    raise falcon.HTTPUnauthorized("Authentication Required", "You need to login and have permission!")
@@ -90,7 +97,6 @@ class ThingsResource:
 
     def on_get(self, req, resp):
         """Handles GET requests"""
-        resp.status = falcon.HTTP_200  # This is the default status
         # resp.set_header('Set-Cookie','fig=newton; Max-Age=200')
         # print req.get_header('Cookie')
         resp.body = "ok"
@@ -172,12 +178,13 @@ things = ThingsResource()
 
 ########################################################
 for table in tables:
-    app.add_route('/api/db/{t}'.format(t=table), DB())
+    app.add_route('/api/db/{t}'.format(t=table), DB() )
     app.add_route('/api/db/%s/{id}' % table, DB())
 #######################################################
 
 # things will handle all requests to the '/things' URL path
 app.add_route('/api/things', things)
+app.add_route('/api/auth/login', login() )
 #app.add_route('/api/asset/save/{user}/{repo}', AssetSave())
 #app.add_route('/api/asset', ListAssets())
 #app.add_route('/api/asset/{key}', GetAsset())
