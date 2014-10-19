@@ -31,7 +31,8 @@ import os
 from envelopes import Envelope, GMailSMTP
 from utils.validators import email_validator
 from opensource.contenttype import contenttype
-from model import file_bucket, TeamClient, ES, RiakObject  # # riak bucket for our files
+# # riak bucket for our files
+from model import file_bucket, TeamClient, ES, RiakObject
 from utils.fagit import GIT
 
 
@@ -61,7 +62,7 @@ def download(url):
     basename = url.split('/')[-1]
     r = requests.head(url)
     length = r.headers.get('content-length')
-    if length:  ## there is something
+    if length:  # there is something
         length = int(length) / 1024.0
         data = {'message': 'OK', 'length': length,
                 'basename': basename}
@@ -97,7 +98,8 @@ def add_asset(userName, repositoryName, b64Data=None,
                 'datetime': datetime.utcnow()}
         obj.data = ujson.dumps(data)
         try:
-            ES.create(index='assets', doc_type='info', body=obj.data, id=dataMD5)
+            ES.create(
+                index='assets', doc_type='info', body=obj.data, id=dataMD5)
         except elasticsearch.ConflictError:
             pass
 
@@ -107,12 +109,11 @@ def add_asset(userName, repositoryName, b64Data=None,
     else:
         print 'File {name} is already available'.format(name=originalName)
 
-    #repo = GIT(uploadedFilePath)  ## do git operations
-        #repo.add('{user}->{repo}->{originalName}' \
+    # repo = GIT(uploadedFilePath)  ## do git operations
+        # repo.add('{user}->{repo}->{originalName}' \
         #         .format(user=userName,
         #                 repo=repositoryName,
         #                 originalName=originalName))
-
 
     return originalName
 

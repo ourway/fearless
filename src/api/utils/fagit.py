@@ -22,8 +22,8 @@ import os
 import sh
 
 
-
 class GIT(object):
+
     def __init__(self, filepath, wt=None):
 
         gitdir = os.path.abspath('../../REPO')
@@ -36,12 +36,12 @@ class GIT(object):
         self.wt = os.path.dirname(self.filepath)
         if not os.path.isdir(self.wt):
             os.makedirs(self.wt)
-        self.git = git.bake(_cwd=self.wt, 
+        self.git = git.bake(_cwd=self.wt,
                             _piped="err",
                             git_dir=gitdir,
                             work_tree=self.wt)
         self.git.init()
-    
+
     def add(self, message=''):
         self.git.add(self.basename)
         self.git.commit(m='"{message} | Added {f} to repository"'.format(
@@ -49,4 +49,3 @@ class GIT(object):
 
     def recover(self):
         self.git.checkout(self.basename, f=True)
-

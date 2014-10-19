@@ -1,26 +1,26 @@
 
 import os
 
+
 def get_path(folder, root):
     '''Get absolute path of the folder
     '''
     return os.path.abspath(os.path.join(root, folder))
 
 
-
 root = os.path.abspath('repo')
 production_folders = {
-            'animation':['scenes', 'sourceimages', 'data', 'anim', 'poses', 'previews'], 
-            'rig':['scenes', 'data', 'scripts'], 
-            'model':['obj'], 
-            'render':['scenes', 'sourceimages', 'data', 'test_renders', 'output_for_composite'], 
-            'texture':['8k', '4k', '2k', '1k', '512', '256', '128', '64'], 
-            'art':['references', 'storyboard', 'matte'],
-            'composite':['nuke/images', 'nuke/scripts', 'nuke/data', 'output', 'preview'], 
-            'editorial':['edit/sound', 'edit/voice', 'edit/EDL', 'edit/footage', 'edit/preview', 'output'], 
-            'layout':['scenes', 'sourceimages', 'data'],
-            'references':['camera', 'obj', 'character']
-            }
+    'animation': ['scenes', 'sourceimages', 'data', 'anim', 'poses', 'previews'],
+    'rig': ['scenes', 'data', 'scripts'],
+    'model': ['obj'],
+    'render': ['scenes', 'sourceimages', 'data', 'test_renders', 'output_for_composite'],
+    'texture': ['8k', '4k', '2k', '1k', '512', '256', '128', '64'],
+    'art': ['references', 'storyboard', 'matte'],
+    'composite': ['nuke/images', 'nuke/scripts', 'nuke/data', 'output', 'preview'],
+    'editorial': ['edit/sound', 'edit/voice', 'edit/EDL', 'edit/footage', 'edit/preview', 'output'],
+    'layout': ['scenes', 'sourceimages', 'data'],
+    'references': ['camera', 'obj', 'character']
+}
 
 
 workspace_data = '''//Maya 2014 Project Definition
@@ -70,16 +70,9 @@ workspace -fr "shaders" "renderData/shaders";
 
 for dep in production_folders:
     for folder in production_folders.get(dep):
-        target = get_path(dep+os.path.sep+folder, root)
+        target = get_path(dep + os.path.sep + folder, root)
         os.makedirs(target)
     folder_path = get_path(dep, root)
-    if os.path.isdir(folder_path  + os.path.sep + 'scenes'):
+    if os.path.isdir(folder_path + os.path.sep + 'scenes'):
         with open(folder_path + os.path.sep + 'workspace.mel', 'w') as f:
             f.write(workspace_data)
-
-
-
-
-
-
-

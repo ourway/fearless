@@ -13,7 +13,6 @@ Clean code is much better than Cleaner comments!
 '''
 
 
-
 import falcon
 import ujson
 import hashlib
@@ -21,13 +20,11 @@ from validators import email_validator
 from tasks import send_envelope
 
 
-
-
-
 class Mailer(object):
+
     def on_post(self, req, resp, **kw):
         '''send an email'''
-        data = {'message':'Error'}
+        data = {'message': 'Error'}
         stream = req.stream.read()
         if stream:
             stream = ujson.loads(stream)
@@ -37,7 +34,7 @@ class Mailer(object):
         attach = stream.get('attach')
         if subject and to and message:
             mail = send_envelope.delay(to, subject, message, attach)
-            data = {'message':'ok', 'task_id':mail.task_id}
+            data = {'message': 'ok', 'task_id': mail.task_id}
         else:
             resp.status = falcon.HTTP_400
-        resp.body=ujson.dumps(data)
+        resp.body = ujson.dumps(data)

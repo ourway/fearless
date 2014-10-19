@@ -10,7 +10,7 @@ envelope = Envelope(
 envelope.add_attachment('/home/farsheed/Pictures/Screenshot.jpg')
 
 # Send the envelope using an ad-hoc connection...
-#envelope.send('smtp.googlemail.com', login='vixenserver@gmail.com',
+# envelope.send('smtp.googlemail.com', login='vixenserver@gmail.com',
 #              password='Cc183060', tls=True)
 
 # Or send the envelope using a shared GMail connection...

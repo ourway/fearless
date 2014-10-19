@@ -6,6 +6,8 @@ authorizer = DummyAuthorizer()
 authorizer.add_user("user", "12345", "/home/farsheed", perm="elradfmw")
 
 handler = FTPHandler
+
+
 handler.authorizer = authorizer
 
 from pyftpdlib.authorizers import DummyAuthorizer
@@ -20,4 +22,3 @@ handler.authorizer = authorizer
 
 server = FTPServer(("127.0.0.1", 21), handler)
 server.serve_forever()
-

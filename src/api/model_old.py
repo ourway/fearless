@@ -26,14 +26,13 @@ ES = Elasticsearch()
 from riak import RiakObject
 TeamClient = RiakClient(pb_port=8087, protocol='pbc')
 print "Creating riak connection on port 8087"
-#TeamClient.create_search_index('fateam_assets')
+# TeamClient.create_search_index('fateam_assets')
 file_bucket = TeamClient.bucket('AssetDB01')
-#file_bucket.enable_search()
+# file_bucket.enable_search()
 ##########
 ##############
 db = Database('sqlite', 'database/database.sqlite', create_db=True)
 now = datetime.utcnow
-
 
 
 def getUUID():
@@ -41,6 +40,7 @@ def getUUID():
 
 ############################################################
 ###########################################################
+
 
 class Person(db.Entity):
     name = Required(unicode, unique=True)
@@ -68,29 +68,23 @@ class Rule(db.Entity):
 
 class Group(db.Entity):
     name = Required(unicode, unique=True)
-    persons =  Set(Person)
-    rule =  Required(Rule)
+    persons = Set(Person)
+    rule = Required(Rule)
 
 
 ############################################################
 ###########################################################
-## generate mapping
+# generate mapping
 db.generate_mapping(create_tables=True)
 
-## Lets create some defualt rules
+# Lets create some defualt rules
 default_rules = ['admin', 'user', 'guest', 'manager']
 with db_session:
     for rulename in default_rules:
         if not Rule.get(name=rulename):
-            newrule = Rule(name = rulename)
+            newrule = Rule(name=rulename)
     commit()
-
-
-
-
-
 
 
 if __name__ == '__main__':
     pass
-
