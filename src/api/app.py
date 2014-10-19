@@ -13,18 +13,29 @@ Clean code is much better than Cleaner comments!
 '''
 
 
-import falcon
+from falcon_patch import falcon
 import importlib
 import urlparse
 from string import ascii_uppercase
 import ujson as json
+import Cookie
+import redis
+import hashlib
+import re
 #from utils.assets import AssetSave, ListAssets, GetAsset
 
 from models import __all__ as av
 from models import *
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 tables = [i for i in av if i[0] in ascii_uppercase]
+r = redis.StrictRedis(host='localhost', port=6379, db=3)  # db number 1 and 2 are for celery
+cookie = Cookie.BaseCookie()
 
+
+def get_cookie(cookiename, raw):
+    x = re.findall(re.compile(r'[; ]*'+ cookiename + r'=([\w " \. = \d &]+)'), raw)
+    if x:
+        return x[0]
 
 def get_params(url, flat=True):
     '''Return a string out of url params for query
@@ -47,6 +58,33 @@ def commit(req, resp):
         resp.status = falcon.HTTP_400
         resp.body = json.dumps(e)
 
+def getANewSessionId():
+    import hmac
+    import uuid
+    return str(hmac.HMAC(key=str(uuid.uuid4()), digestmod=hashlib.sha1).hexdigest())
+
+def authenticate(req, resp, params):
+    raw = req.headers.get('COOKIE')
+    if not raw:
+        session = None
+    else:
+        session = get_cookie('session-id', raw)
+    ''' Now we need to check if session is available and it's sha1 is in redis'''
+    if session and r.get(hashlib.sha1(session).hexdigest()):
+        ''' Now we need to authorize user!
+            NOT IMPLEMENTED YET
+        '''
+        pass
+    else:
+        session = getANewSessionId()
+        hashed_session = hashlib.sha1(session).hexdigest()
+        resp.append_header('set-cookie', 'session-id=%s;path=/;max-age=10' % session)  # this session is not yet saved
+        resp.status = falcon.HTTP_302
+        resp.location = '/app/#auth/login'
+
+    #if token != 'rrferl':
+    #    raise falcon.HTTPUnauthorized("Authentication Required", "You need to login and have permission!")
+    #    return
 
 class ThingsResource:
 
@@ -59,8 +97,10 @@ class ThingsResource:
 
 
 class DB:
+    '''Restfull API for database
+    '''
 
-    def on_get(self, req, resp, **kw):
+    def on_get(self, req, resp):
         args = req.path.split('/')
         table = args[3].title()
         if len(args) == 5:
@@ -78,7 +118,7 @@ class DB:
         # Ok, We have an id
 
     @falcon.after(commit)
-    def on_put(self, req, resp, **kw):
+    def on_put(self, req, resp):
         args = req.path.split('/')
         table = args[3].title()
         query_params = get_params(req.uri)
@@ -127,7 +167,7 @@ class DB:
 
 
 # falcon.API instances are callable WSGI apps
-app = falcon.API()
+app = falcon.API(before=[authenticate])
 things = ThingsResource()
 
 ########################################################

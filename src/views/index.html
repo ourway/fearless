@@ -13,6 +13,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/auth.css">
         <style>
             body {
                 padding-top: 50px;
@@ -84,11 +85,11 @@
 
 
 
-        <div class="navbar-collapse collapse" ng-init="is_logged_in()">
+        <div ng-if="showLogin" class="navbar-collapse collapse" ng-init="is_logged_in()">
             <form class="navbar-form navbar-right" role="form" ng-submit="doLogin()"
                 ng-show="!userInfo.logged_in" name="login_form">
             <div class="form-group" >
-              <input type="email" placeholder="Email" class="form-control" ng-model="loginInfo.email" required>
+              <input type="email" placeholder="Email" class="form-control" ng-model="loginInfo.email" required autofocus>
             </div>
             <div class="form-group" ng-init="loginInfo.action='login'">
               <input type="password" placeholder="Password" ng-model="loginInfo.password" class="form-control" required>
