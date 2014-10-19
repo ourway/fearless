@@ -67,8 +67,9 @@ def getANewSessionId():
     return str(hmac.HMAC(key=str(uuid.uuid4()), digestmod=hashlib.sha1).hexdigest())
 
 def authenticate(req, resp, params):
-    free_services = ['/api/auth/signup', '/api/auth/signin', '/api/things']
+    free_services = ['/api/auth/signup', '/api/auth/login', '/api/things']
     path = req.relative_uri
+    print path
     raw = req.headers.get('COOKIE')
     if not raw:
         session = None

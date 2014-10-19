@@ -15,8 +15,8 @@ Clean code is much better than Cleaner comments!
 #import sys, os
 #sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
-from pony.orm import *
-from models import User, Group, Rule
+from models import User, Group, Rule, session
+import ujson as json
 
 import falcon
 
@@ -27,5 +27,9 @@ class login:
         '''Add a user to database'''
         email = req.get_param('email')
         password = req.get_param('password')
+        target = session.query(User).filter(User.email == email).first()
+        if not target or not target.password == password:  # don't tell what's wrong!
+            resp.body = json.dumps({'message':'error'})
 
-        resp.body = 'OK'
+        #print email
+        #resp.body = 'OK'

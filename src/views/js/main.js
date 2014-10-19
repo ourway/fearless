@@ -1,7 +1,7 @@
 var fateamApp = angular.module('fateamApp', ['ngRoute', 'ngResource', 'ngCookies']);
 
 fateamApp.factory('authFactory', function($resource) {
-  return $resource('/api/users/:what',
+  return $resource('/api/auth/:what',
     { what:'@action' },
     { save: { method: 'POST' }}
   );
@@ -48,6 +48,7 @@ fateamApp.factory('authFactory', function($resource) {
         if (validateEmail($scope.loginInfo.email)==false)
             return null
         prom = authFactory.save({}, $scope.loginInfo, function(resp){
+                console.log(resp);
                if (resp.message==true && $scope.loginInfo.action=='login') //green light
                     {
                         $cookies.user_id = resp.id;
@@ -72,7 +73,6 @@ fateamApp.factory('authFactory', function($resource) {
                         $scope.loginInfo.action = 'login';
                     }
         });
-        console.log('ok')
         $scope.loginInfo.action = 'login';
         $scope.login_mode = 'Sign in';
     }
