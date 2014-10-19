@@ -25,4 +25,5 @@ def convert(path, exts=['avi', 'mov']):
 
 
 if __name__ == '__main__':
-    convert('/home/farsheed/windows_share/model_assets')
+    #convert('/home/farsheed/windows_share/model_assets')
+    convert('/home/farsheed/windows_share/old_assets')

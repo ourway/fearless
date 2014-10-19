@@ -60,7 +60,8 @@ install:
 	#@sudo -u postgres createdb -O vserver -E UTF8 vserver
 
 prepare:
-	@yum install gcc nginx redis libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel python27 python27-devel -y
+	@rpm --nosignature -i https://repo.varnish-cache.org/redhat/varnish-4.0.el6.rpm
+	@yum install gcc nginx varnish redis libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel python27 python27-devel -y
 	@yum install http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.1/rhel/6/riak-2.0.1-1.el6.x86_64.rpm -y
 	@yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u55-linux-x64.rpm -y
 	@ln -s -f '/usr/java/default/bin/java' /usr/bin/java

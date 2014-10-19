@@ -71,9 +71,7 @@ class DB:
         else:
             query = 'session.query({t})'.format(t=table)
             data = eval(query).all()
-        if not data:
-            resp.status = falcon.HTTP_404
-            return
+
 
         data = repr(data)
         resp.body = json.dumps(json.loads(data))
@@ -150,4 +148,4 @@ if __name__ == '__main__':
     import os
     sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
     from werkzeug import run_simple
-    run_simple('0.0.0.0', 5000, app, use_debugger=True, use_reloader=True)
+    run_simple('0.0.0.0', 5002, app, use_debugger=True, use_reloader=True)
