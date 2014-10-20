@@ -82,7 +82,7 @@
         </div>
 
 
-        <div ng-controller="mainController" ng-show="$parent.showLogin" class="navbar-collapse collapse" ng-init="is_logged_in()">
+        <div ng-controller="mainController" ng-show="userInfo.logged_in" class="navbar-collapse collapse" ng-init="is_logged_in()">
 
 
         <form class="navbar-form navbar-right" role="form"  ng-submit="doLogout()"
@@ -93,7 +93,7 @@
          <form class="navbar-form navbar-right" role="form"  ng-submit="doLogout()"
 
             ng-show="userInfo.logged_in" name="profile_form">
-              <button class="btn btn-default"><a href="#profile"><strong>{{userInfo.user_name}}</a></strong></button>
+              <button class="btn btn-default"><a href="#profile"><strong>{{userInfo.firstname}}</a></strong></button>
             <button type="submit" class="btn btn-warning">Logout</button>
         </form>
 

@@ -19,27 +19,27 @@ fateamApp.factory('authFactory', function($resource) {
 			// route for the about page
 			.when('/about/', {
 				templateUrl : 'pages/about.html',
-				controller  : 'aboutController'
+				controller  : 'mainController'
 			})
 			.when('/auth/login', {
 				templateUrl : 'pages/auth/login.html',
-				controller  : 'authController'
+				controller  : 'mainController'
 			})
 
 			.when('/auth/signup', {
 				templateUrl : 'pages/auth/signup.html',
-				controller  : 'authController'
+				controller  : 'mainController'
 			})		//$locationProvider.html5Mode(true);
 
 			.when('/auth/reactivate', {
 				templateUrl : 'pages/auth/reactivate.html',
-				controller  : 'authController'
+				controller  : 'mainController'
 			})		//$locationProvider.html5Mode(true);
 		 })
 
 
 	// create the controller and inject Angular's $scope
-	fateamApp.controller('authController', function($scope, $rootScope, $cookies, authFactory, $location, $routeParams) {
+	fateamApp.controller('mainController', function($scope, $rootScope, $cookies, authFactory, $location, $routeParams) {
 		// create a message to display in our view
         $rootScope.title = "Centeral Auth - Fearless";
         if ($routeParams.m) {
@@ -69,15 +69,17 @@ fateamApp.factory('authFactory', function($resource) {
 
                 }
                 setTimeout(function(){$scope.login_wait=null}, resp.wait);
-               if (resp.message=='sucess' && $scope.loginInfo.action=='login') //green light
+               if (resp.message=='success' && $scope.loginInfo.action=='login') //green light
                     {
+                        console.log('Logging in')
                         $cookies.user_id = resp.id;
                         $cookies.user_name = resp.first_name;
-                        $scope.userInfo.user_name = resp.firstname;
+                        $scope.userInfo.firstname = resp.firstname;
                         $scope.userInfo.user_id = resp.id;
                         $scope.loginInfo.email = null;
                         $scope.loginInfo.password = null;
                         $scope.userInfo.logged_in = true;
+                        $scope.$apply();
                     }
             
                if (resp.message=='error' && $scope.loginInfo.action=='login') //green light
@@ -137,13 +139,6 @@ fateamApp.controller('titleCtrl', function ($scope, $http, $location) {
 });
 
 
-fateamApp.controller('mainController', function ($scope, $http, $location) {
-            $scope.$parent.showLogin = false;
-            $scope.go = function ( path ) {
-              $location.path( path );
-            };
-
-});
 //  NON Angular scripts
 //  ========================
 
