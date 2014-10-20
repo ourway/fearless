@@ -15,30 +15,24 @@ Clean code is much better than Cleaner comments!
 
 from falcon_patch import falcon
 import importlib
+from utils.helpers import commit
 import urlparse
-from urllib2 import quote, unquote
 from string import ascii_uppercase
 import ujson as json
-import redis
-import hashlib
-import re
 #from utils.assets import AssetSave, ListAssets, GetAsset
 
 from models import __all__ as av
 from models import *
 from sqlalchemy.exc import IntegrityError  # for exception handeling
-from utils.AAA import login
+from utils.AAA import login, authenticate
 
 tables = [i for i in av if i[0] in ascii_uppercase]
-r = redis.StrictRedis(host='localhost', port=6379, db=3)  # db number 1 and 2 are for celery
 
 
 
 
-def get_cookie(cookiename, raw):
-    x = re.findall(re.compile(r'[; ]*'+ cookiename + r'=([\w " \. = \d &]+)'), raw)
-    if x:
-        return x[0]
+
+
 
 def get_params(url, flat=True):
     '''Return a string out of url params for query
@@ -53,46 +47,10 @@ def get_params(url, flat=True):
     return l
 
 
-def commit(req, resp):
-    try:
-        session.commit()
-    except IntegrityError, e:
-        session.rollback()
-        resp.status = falcon.HTTP_400
-        resp.body = json.dumps(e)
 
-def getANewSessionId():
-    import hmac
-    import uuid
-    return str(hmac.HMAC(key=str(uuid.uuid4()), digestmod=hashlib.sha1).hexdigest())
 
-def authenticate(req, resp, params):
-    free_services = ['/api/auth/signup', '/api/auth/login', '/api/things']
-    path = req.relative_uri
-    print path
-    raw = req.headers.get('COOKIE')
-    if not raw:
-        session = None
-    else:
-        session = get_cookie('session-id', raw)
 
-    ''' Now we need to check if session is available and it's sha1 is in redis'''
-    if path in free_services or (session and r.get(hashlib.sha1(session).hexdigest())):
-        ''' Now we need to authorize user!
-            NOT IMPLEMENTED YET
-        '''
-        pass
-    else:
-        session = getANewSessionId()
-        hashed_session = hashlib.sha1(session).hexdigest()
-        resp.append_header('set-cookie', 'session-id=%s;path=/;max-age=10' % session)  # this session is not yet saved
-        resp.status = falcon.HTTP_302
-        next = quote(path)
-        resp.location = '/app/#auth/login?next=%s' % next
 
-    #if token != 'rrferl':
-    #    raise falcon.HTTPUnauthorized("Authentication Required", "You need to login and have permission!")
-    #    return
 
 class ThingsResource:
 

@@ -33,40 +33,53 @@ fateamApp.factory('authFactory', function($resource) {
 	// create the controller and inject Angular's $scope
 	fateamApp.controller('authController', function($scope, $rootScope, $cookies, authFactory, $location) {
 		// create a message to display in our view
-        $rootScope.title = "Welcome to fa-team!";
+        $rootScope.title = "Centeral Auth - Fearless";
         $scope.$watch($location, function() {
             $scope.showLogin = $location.path() == '/auth/login'
         })
 		$scope.appName = 'APMS';
-        $scope.$parent.showLogin = "asdasda";
+        $scope.$parent.showLogin = false;
 		$scope.message = $scope.appName + ', A Revolutionary Animation Production Management System!';
         $scope.userInfo = {'logged_in':false};
 
     //Here is login format. I will send email and passwork and see if it is OK to continue
     //if the result.message===true then we are ok to continue authentication
     $scope.doLogin = function() {
-        if (validateEmail($scope.loginInfo.email)==false)
-            return null
+        if (validateEmail($scope.loginInfo.email) == false)
+            return null;
+
+                $scope.AuthRespMessage = null;
+                $scope.AuthRespInfo = null;
+
         prom = authFactory.save({}, $scope.loginInfo, function(resp){
-                console.log(resp);
-               if (resp.message==true && $scope.loginInfo.action=='login') //green light
+                // Here we need an anomality prevention method:
+                $scope.login_wait = resp.wait;
+                $scope.AuthRespMessage = resp.message;
+                $scope.AuthRespInfo = resp.info;
+                if (resp.message == 'error') {
+                    $scope.loginInfo.password = null;
+                    $scope.enable_signup = true;
+
+                }
+                setTimeout(function(){$scope.login_wait=null}, resp.wait);
+               if (resp.message=='sucess' && $scope.loginInfo.action=='login') //green light
                     {
                         $cookies.user_id = resp.id;
                         $cookies.user_name = resp.first_name;
-                        $scope.userInfo.user_name = resp.first_name;
+                        $scope.userInfo.user_name = resp.firstname;
                         $scope.userInfo.user_id = resp.id;
                         $scope.loginInfo.email = null;
                         $scope.loginInfo.password = null;
                         $scope.userInfo.logged_in = true;
                     }
             
-               if (resp.message==false && $scope.loginInfo.action=='login') //green light
+               if (resp.message=='error' && $scope.loginInfo.action=='login') //green light
                 {
-                        $scope.login_mode = 'Register';
-                        $scope.loginInfo.action = 'register';
+                        $scope.login_mode = 'signup';
+                        $scope.loginInfo.action = 'signup';
                 }
                 
-               if (resp.message==true && $scope.loginInfo.action=='register') //green light
+               if (resp.message=='success' && $scope.loginInfo.action=='signup') //green light
   // red light
                     {
                         $scope.login_mode = 'Sign in';
@@ -118,7 +131,10 @@ fateamApp.controller('titleCtrl', function ($scope, $http, $location) {
 
 
 fateamApp.controller('mainController', function ($scope, $http, $location) {
-
+            $scope.$parent.showLogin = false;
+            $scope.go = function ( path ) {
+              $location.path( path );
+            };
 });
 //  NON Angular scripts
 //  ========================

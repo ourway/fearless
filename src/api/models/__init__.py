@@ -20,18 +20,19 @@ usage:
     print session.query(Report).all()
 '''
 
-__all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task', 'Repository', 'Project',
-           'Ticket', 'session', 'Version', 'Tag', 'Shot', 'Scene', 'Sequence', 'Page']
+__all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task', 'Repository', 'Project', 'now',
+           'Ticket', 'session', 'Version', 'Tag', 'Shot', 'Scene', 'Sequence', 'Page', 'r']
 
 
 from sqlalchemy import create_engine  # for database
 
 # for models
-from mixin import Base
+from mixin import Base, now
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError  # for exception handeling
+import redis
 
-
+r = redis.StrictRedis(host='localhost', port=6379, db=3)  # db number 1 and 2 are for celery
 db_path = 'database/studio.db'
 #db_path = ':memory:'
 engine = create_engine('sqlite:///%s' % db_path, echo=False)

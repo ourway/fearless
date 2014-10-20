@@ -22,18 +22,18 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from mixin import IDMixin, Base, getUUID, logger
-
+import datetime
 
 class User(IDMixin, Base):
 
     '''Main users group
     '''
-    login = Column(String(32), unique=True, nullable=False)
     email = Column(String(64), unique=True, nullable=False)
     password = Column(PasswordType(schemes=['pbkdf2_sha512']), nullable=False)
     token = Column(String(64), default=getUUID, unique=True)
     firstname = Column(String(64), nullable=True)
     lastname = Column(String(64), nullable=True)
+    lastLogIn = Column(DateTime)
     age = Column(Integer)
     group_id = Column(Integer, ForeignKey('group.id'))
     reports = relationship('Report', backref='user')

@@ -82,21 +82,16 @@
         </div>
 
 
-        <div ng-controller="authController" ng-if="!showLogin" class="navbar-collapse collapse" ng-init="is_logged_in()">
-            <form class="navbar-form navbar-right" role="form" ng-submit="doLogin()"
-                ng-show="!userInfo.logged_in" name="login_form">
-            <div class="form-group" >
-              <input type="email" placeholder="Email" class="form-control" ng-model="loginInfo.email" required autofocus>
-            </div>
-            <div class="form-group" ng-init="loginInfo.action='login'">
-              <input type="password" placeholder="Password" ng-model="loginInfo.password" class="form-control" required>
-            </div>
-            <button class="btn"
-                ng-class="{'btn-primary':login_mode!='Sign in', 'btn-success':login_mode=='Sign in'}" ng-init="login_mode='Sign in'">{{login_mode}}</button>
-            <button ng-show="login_mode!='Sign in'" ng-click="loginInfo.action='recover'" class="btn btn-warning">Password Recovery</button>
-        </form>
+        <div ng-controller="mainController" ng-if="!showLogin" class="navbar-collapse collapse" ng-init="is_logged_in()">
+
 
         <form class="navbar-form navbar-right" role="form"  ng-submit="doLogout()"
+            ng-show="!userInfo.logged_in" name="profile_form">
+            <button class="btn btn-success" ng-click="go('auth/login')">Sign in</button>
+        </form>
+
+         <form class="navbar-form navbar-right" role="form"  ng-submit="doLogout()"
+
             ng-show="userInfo.logged_in" name="profile_form">
               <button class="btn btn-default"><a href="#profile"><strong>{{userInfo.user_name}}</a></strong></button>
             <button type="submit" class="btn btn-warning">Logout</button>
@@ -112,7 +107,7 @@
 
       </div>
     </div>
-	<div id="main" style="min-height:600px">
+	<div id="main" style="min-height:400px">
 
 		<!-- angular templating -->
 		<!-- this is where content will be injected -->
@@ -121,8 +116,11 @@
     <hr>
     <div class="container">
       <footer>
-      <p>&copy; Farsheed Ashouri 2014      
-      </p>
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			 <address> <strong>Pooya Mehr Studios, Ltd.</strong><br /> 000 Sarparast St, <br /> Tehran, Iran 94107<br /> <abbr title="Phone">P:</abbr> (123) 456-7890</address>
+		</div>
+	</div>
       </footer>
   </div> <!-- /container -->        
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.0.min.js"><\/script>')</script>

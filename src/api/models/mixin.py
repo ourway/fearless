@@ -21,6 +21,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from utils.general import setup_logger
 from uuid import uuid4  # for random guid generation
 
+now = datetime.datetime.utcnow
 
 Base = declarative_base()
 logger = setup_logger('model', 'model.log')
@@ -39,7 +40,7 @@ class IDMixin(object):
     #__table_args__ = {'mysql_engine': 'InnoDB'}
     #__mapper_args__= {'always_refresh': True}
     id = Column(Integer, primary_key=True)
-    created_on = Column(DateTime, default=datetime.datetime.utcnow)
+    created_on = Column(DateTime, default=now)
     modified_on = Column(
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 

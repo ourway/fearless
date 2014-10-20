@@ -13,6 +13,8 @@ Clean code is much better than Cleaner comments!
 '''
 
 import falcon
+import re
+
 
 class Response(falcon.response.Response):
     def __init__(self):
@@ -39,5 +41,21 @@ class Response(falcon.response.Response):
  
         return header_list + self.extra_headers
  
- 
+
+
+class Request(falcon.request.Request):
+    def __init__(self, env):
+        super(Request, self).__init__(env)
+
+    def cookie(self, name):
+        raw = self.headers.get('COOKIE')
+        if not raw:
+            return
+        else:
+            x = re.findall(re.compile(r'[; ]*'+ name + r'=([\w " \. = \d &]+)'), raw)
+            if x:
+                return x[0]
+
+
 falcon.api.Response = Response
+falcon.api.Request = Request
