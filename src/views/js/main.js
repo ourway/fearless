@@ -1,13 +1,13 @@
-var fateamApp = angular.module('fateamApp', ['ngRoute', 'ngResource', 'ngCookies']);
+var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'ngCookies']);
 
-fateamApp.factory('authFactory', function($resource) {
+fearlessApp.factory('authFactory', function($resource) {
   return $resource('/api/auth/:what',
     { what:'@action' },
     { save: { method: 'POST' }}
   );
 });
 
-	fateamApp.config(function($routeProvider, $locationProvider) {
+	fearlessApp.config(function($routeProvider, $locationProvider) {
 		$routeProvider
 
 			// route for the home page
@@ -21,12 +21,17 @@ fateamApp.factory('authFactory', function($resource) {
 				templateUrl : 'pages/about.html',
 				controller  : 'mainController'
 			})
-			.when('/auth/login', {
+			.when('/auth/login/:next', {
 				templateUrl : 'pages/auth/login.html',
 				controller  : 'mainController'
 			})
 
-			.when('/auth/signup', {
+			.when('/auth/login/', {
+				templateUrl : 'pages/auth/login.html',
+				controller  : 'mainController'
+			})
+
+            .when('/auth/signup', {
 				templateUrl : 'pages/auth/signup.html',
 				controller  : 'mainController'
 			})		//$locationProvider.html5Mode(true);
@@ -39,14 +44,18 @@ fateamApp.factory('authFactory', function($resource) {
 
 
 	// create the controller and inject Angular's $scope
-	fateamApp.controller('mainController', function($scope, $rootScope, $cookies, authFactory, $location, $routeParams) {
+	fearlessApp.controller('mainController', function($scope, $rootScope, $cookies, authFactory, $location, $routeParams) {
 		// create a message to display in our view
         $rootScope.title = "Centeral Auth - Fearless";
+        $scope.check_auth_area = function() {
+            if ($location.$$path.split('/')[1] == 'auth')
+                return true;
+        }
         if ($routeParams.m) {
             $scope.AuthRespMessage = atob($routeParams.m)
         }
 
-		$scope.appName = 'APMS';
+		$scope.appName = 'fearless';
         $scope.$parent.showLogin = false;
 		$scope.message = $scope.appName + ', A Revolutionary Animation Production Management System!';
         $scope.userInfo = {'logged_in':false};
@@ -72,68 +81,70 @@ fateamApp.factory('authFactory', function($resource) {
                if (resp.message=='success' && $scope.loginInfo.action=='login') //green light
                     {
                         console.log('Logging in')
-                        $cookies.user_id = resp.id;
-                        $cookies.user_name = resp.first_name;
-                        $scope.userInfo.firstname = resp.firstname;
-                        $scope.userInfo.user_id = resp.id;
+                        $cookies.userid = resp.id;
+                        $cookies.username = resp.firstname;
+                        $scope.userInfo.username = resp.firstname;
+                        $scope.userInfo.userid = resp.id;
                         $scope.loginInfo.email = null;
                         $scope.loginInfo.password = null;
                         $scope.userInfo.logged_in = true;
-                        $scope.$apply();
+                        try {
+                            $location.path(atob($routeParams.next));
+                        }
+                        catch(e){
+                            $location.path( '/' ) ;
+                        }
                     }
             
-               if (resp.message=='error' && $scope.loginInfo.action=='login') //green light
-                {
-                        $scope.login_mode = 'signup';
-                        $scope.loginInfo.action = 'signup';
-                }
-                
-               if (resp.message=='success' && $scope.loginInfo.action=='signup') //green light
-  // red light
-                    {
-                        $scope.login_mode = 'Sign in';
-                        $scope.loginInfo.action = 'login';
-                    }
-        });
-        $scope.loginInfo.action = 'login';
-        $scope.login_mode = 'Sign in';
-    }
 
+        });
+    }
 
     // logout actions
     $scope.doLogout = function(){
-            $cookies.user_id = '';
-            $cookies.user_name = '';
+            $cookies.userid = '';
+            $cookies.username = '';
             $scope.userInfo.logged_in = false;
-            $scope.userInfo.user_name = null;
-            $scope.userInfo.user_id = null;
+            $scope.userInfo.username = null;
+            $scope.userInfo.userid = null;
             //$scope.userInfo.logged_in = true;
 
         }
     //Check if user is logged in
     $scope.is_logged_in = function(){
-        var user_id = $cookies.user_id; 
-        var user_name = $cookies.user_name;
-       if (user_id && user_name)
+        var userid = $cookies.userid;
+        var username = $cookies.username;
+       if (userid && username)
             {
-                $scope.userInfo.user_name = user_name;
-                $scope.userInfo.user_id = user_id;
+                $scope.userInfo.username = username;
+                $scope.userInfo.userid = userid;
                 $scope.userInfo.logged_in = true;
                 return true
-            } 
-    }
+            }
+        else {
+              $scope.userInfo.username = null;
+              $scope.userInfo.userid = null;
+              $scope.userInfo.logged_in = false;
+              $location.path('/auth/login/'+btoa($location.$$path));
+       }
+       }
+
+
+      $scope.go = function ( path ) {
+          $location.path( path );
+        };
 
 
 	});
 
-	fateamApp.controller('aboutController', function($scope) {
+	fearlessApp.controller('aboutController', function($scope) {
 		$scope.message = $scope.appName + '! I am an about page.';
 	});
 
 
 
 
-fateamApp.controller('titleCtrl', function ($scope, $http, $location) {
+fearlessApp.controller('titleCtrl', function ($scope, $http, $location) {
     console.log
 
 });

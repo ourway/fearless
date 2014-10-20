@@ -2,23 +2,34 @@
 
     <div class="container" >
       <form class="form-signin" role="form" ng-submit="doLogin()" enctype="multipart/form-data">
-        <h3 class="form-signin-heading">REGISTER</h3><small>Centeral Authentication System</small><hr/>
+          <h3 class="form-signin-heading"><strong>REGISTER</strong></h3><small class="glyphicon glyphicon-cloud"></small> <small> Centeral Authentication System</small><hr/>
 
-  <div ng-show="AuthRespInfo" class="alert alert-dismissable"
+  <div ng-show="AuthRespMessage" class="alert alert-dismissable"
        ng-class="{'alert-danger':AuthRespMessage!='success', 'alert-sucess':AuthRespMessage=='sucess'}">
-     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-    <h4>
-        {{AuthRespMessage | uppercase}}!
-    </h4> <strong></strong> {{AuthRespInfo}}
+    <h5>
+        <strong>{{AuthRespMessage | uppercase}}!</strong>
+    </h5> <strong></strong> {{AuthRespInfo}}
   </div>
 
         <input type="email" class="form-control" placeholder="Email address" ng-model="loginInfo.email" required autofocus>
         <input type="password" class="form-control" placeholder="Password" ng-model="loginInfo.password"  required>
          <input type="text" class="form-control" placeholder="First Name" ng-model="loginInfo.firstname"  required>
          <input type="text" class="form-control" placeholder="Last Name" ng-model="loginInfo.lastname"  required>
+            <br/>
+          <table class="table borderless ">
+              <tr>
+                  <td class="col-md-5">
+                 <button type="signin" ng-disabled="login_wait" ng-click="loginInfo.action='signup';doLogin()"
+                class="btn btn-lg btn-success btn-block" ><strong>Register</strong>  </button>
+                  </td>
+                  <td class="col-md-5">
+                      <span>Have an account?</span><br/>
+                      <a class="" href="#auth/login"><strong>login</strong></a><br/>
+                  </td>
+                </tr>
 
-        <button type="signin" ng-disabled="login_wait" ng-click="loginInfo.action='signup'"
-                class="btn btn-lg btn-success btn-block" >Sign Up</button>
+
+          </table>
 
       </form>
 

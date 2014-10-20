@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" ng-app="fateamApp"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" ng-app="fateamApp"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9" ng-app="fateamApp"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" ng-app="fateamApp" > <!--<![endif]-->
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" ng-app="fearlessApp"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" ng-app="fearlessApp"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" ng-app="fearlessApp"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" ng-app="fearlessApp" > <!--<![endif]-->
     <head>
         <meta charset="utf-8">
 	<base href="/app/">
@@ -82,20 +82,13 @@
         </div>
 
 
-        <div ng-controller="mainController" ng-show="userInfo.logged_in" class="navbar-collapse collapse" ng-init="is_logged_in()">
+        <div ng-if="!check_auth_area()" class="navbar-collapse collapse" ng-init="is_logged_in()">
 
 
-        <form class="navbar-form navbar-right" role="form"  ng-submit="doLogout()"
-            ng-show="!userInfo.logged_in" name="profile_form">
-            <button class="btn btn-success" ng-click="go('auth/login')">Sign in</button>
+        <form class="navbar-form navbar-right" role="form" name="profile_form">
+            <button class="btn btn-success" ng-click="doLogout();go('auth/login/'+$location.$$path)">Sign Out</button>
         </form>
 
-         <form class="navbar-form navbar-right" role="form"  ng-submit="doLogout()"
-
-            ng-show="userInfo.logged_in" name="profile_form">
-              <button class="btn btn-default"><a href="#profile"><strong>{{userInfo.firstname}}</a></strong></button>
-            <button type="submit" class="btn btn-warning">Logout</button>
-        </form>
 
 
 
@@ -107,7 +100,7 @@
 
       </div>
     </div>
-	<div id="main" style="min-height:400px">
+	<div id="main" style="min-height:500px">
 
 		<!-- angular templating -->
 		<!-- this is where content will be injected -->
