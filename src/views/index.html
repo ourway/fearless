@@ -82,7 +82,7 @@
         </div>
 
 
-        <div ng-controller="mainController" ng-if="!showLogin" class="navbar-collapse collapse" ng-init="is_logged_in()">
+        <div ng-controller="mainController" ng-show="$parent.showLogin" class="navbar-collapse collapse" ng-init="is_logged_in()">
 
 
         <form class="navbar-form navbar-right" role="form"  ng-submit="doLogout()"

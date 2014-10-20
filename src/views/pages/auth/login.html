@@ -4,12 +4,12 @@
       <form class="form-signin" role="form" ng-submit="doLogin()" enctype="multipart/form-data">
         <h3 class="form-signin-heading">SIGN IN</h3><small>Centeral Authentication System</small><hr/>
 
-  <div ng-show="AuthRespInfo" class="alert alert-dismissable"
-       ng-class="{'alert-danger':AuthRespMessage=='error', 'alert-sucess':AuthRespMessage=='sucess'}">
+  <div ng-show="AuthRespMessage" class="alert alert-dismissable"
+       ng-class="{'alert-danger':AuthRespMessage!='success', 'alert-sucess':AuthRespMessage=='sucess'}">
      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-    <h4>
+    <h5>
         {{AuthRespMessage | uppercase}}!
-    </h4> <strong></strong> {{AuthRespInfo}}
+    </h5> <strong></strong> {{AuthRespInfo}}
   </div>
 
         <input type="email" class="form-control" placeholder="Email address" ng-model="loginInfo.email" required autofocus>

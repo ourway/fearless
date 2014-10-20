@@ -27,10 +27,15 @@ def commit(req, resp):
         resp.body = json.dumps(e)
 
 
+def jsonify(self, resp):
+    '''Everything is json here'''
+    resp.body = json.dumps(resp.body)
+
+    #resp.body = json.dumps(resp.body)
 
 def punish(self, req, resp):
     '''Add a user to database'''
     sid = req.cookie('session-id')
     if sid and r.get('fail_'+sid):
-        resp.body = json.dumps({'message': 'error', 'info':'You need to wait!', 'wait':5})
+        resp.body = {'message': 'error', 'info':'You need to wait!', 'wait':5}
         return

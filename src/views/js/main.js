@@ -31,27 +31,31 @@ fateamApp.factory('authFactory', function($resource) {
 				controller  : 'authController'
 			})		//$locationProvider.html5Mode(true);
 
-	})
+			.when('/auth/reactivate', {
+				templateUrl : 'pages/auth/reactivate.html',
+				controller  : 'authController'
+			})		//$locationProvider.html5Mode(true);
+		 })
+
 
 	// create the controller and inject Angular's $scope
-	fateamApp.controller('authController', function($scope, $rootScope, $cookies, authFactory, $location) {
+	fateamApp.controller('authController', function($scope, $rootScope, $cookies, authFactory, $location, $routeParams) {
 		// create a message to display in our view
         $rootScope.title = "Centeral Auth - Fearless";
-        $scope.$watch($location, function() {
-            $scope.showLogin = $location.path() == '/auth/login'
-        })
+        if ($routeParams.m) {
+            $scope.AuthRespMessage = atob($routeParams.m)
+        }
+
 		$scope.appName = 'APMS';
         $scope.$parent.showLogin = false;
 		$scope.message = $scope.appName + ', A Revolutionary Animation Production Management System!';
         $scope.userInfo = {'logged_in':false};
 
-    //Here is login format. I will send email and passwork and see if it is OK to continue
-    //if the result.message===true then we are ok to continue authentication
+
     $scope.doLogin = function() {
         if (validateEmail($scope.loginInfo.email) == false)
             return null;
 
-                $scope.AuthRespMessage = null;
                 $scope.AuthRespInfo = null;
 
         prom = authFactory.save({}, $scope.loginInfo, function(resp){
@@ -138,6 +142,7 @@ fateamApp.controller('mainController', function ($scope, $http, $location) {
             $scope.go = function ( path ) {
               $location.path( path );
             };
+
 });
 //  NON Angular scripts
 //  ========================

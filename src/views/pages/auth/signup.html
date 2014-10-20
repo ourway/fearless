@@ -5,7 +5,7 @@
         <h3 class="form-signin-heading">REGISTER</h3><small>Centeral Authentication System</small><hr/>
 
   <div ng-show="AuthRespInfo" class="alert alert-dismissable"
-       ng-class="{'alert-danger':AuthRespMessage=='error', 'alert-sucess':AuthRespMessage=='sucess'}">
+       ng-class="{'alert-danger':AuthRespMessage!='success', 'alert-sucess':AuthRespMessage=='sucess'}">
      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
     <h4>
         {{AuthRespMessage | uppercase}}!
@@ -14,8 +14,8 @@
 
         <input type="email" class="form-control" placeholder="Email address" ng-model="loginInfo.email" required autofocus>
         <input type="password" class="form-control" placeholder="Password" ng-model="loginInfo.password"  required>
-          <input type="text" class="form-control" placeholder="First Name" ng-model="loginInfo.firstname"  required>
-          <input type="text" class="form-control" placeholder="Last Name" ng-model="loginInfo.lastname"  required>
+         <input type="text" class="form-control" placeholder="First Name" ng-model="loginInfo.firstname"  required>
+         <input type="text" class="form-control" placeholder="Last Name" ng-model="loginInfo.lastname"  required>
 
         <button type="signin" ng-disabled="login_wait" ng-click="loginInfo.action='signup'"
                 class="btn btn-lg btn-success btn-block" >Sign Up</button>

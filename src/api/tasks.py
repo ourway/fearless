@@ -133,7 +133,7 @@ def send_envelope(to, subject, message, attach=None):
                    u'Pooyamehr Animation System Notification'),
         to_addr=to,
         subject=subject,
-        text_body=message
+        html_body=message
     )
 
     if attach and os.path.isfile(attach):

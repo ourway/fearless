@@ -15,7 +15,7 @@ Clean code is much better than Cleaner comments!
 
 from falcon_patch import falcon
 import importlib
-from utils.helpers import commit
+from utils.helpers import commit, jsonify
 import urlparse
 from string import ascii_uppercase
 import ujson as json
@@ -24,7 +24,7 @@ import ujson as json
 from models import __all__ as av
 from models import *
 from sqlalchemy.exc import IntegrityError  # for exception handeling
-from utils.AAA import login, signup, authenticate
+from utils.AAA import Login, Signup, Authenticate, Verify, Reactivate, Reset
 
 tables = [i for i in av if i[0] in ascii_uppercase]
 
@@ -132,7 +132,7 @@ class DB:
 
 
 # falcon.API instances are callable WSGI apps
-app = falcon.API()
+app = falcon.API(before=[Authenticate], after=[jsonify])
 things = ThingsResource()
 
 ########################################################
@@ -143,8 +143,11 @@ for table in tables:
 
 # things will handle all requests to the '/things' URL path
 app.add_route('/api/things', things)
-app.add_route('/api/auth/login', login() )
-app.add_route('/api/auth/signup', signup() )
+app.add_route('/api/auth/login', Login() )
+app.add_route('/api/auth/signup', Signup() )
+app.add_route('/api/auth/activate', Verify() )
+app.add_route('/api/auth/reactivate', Reactivate() )
+app.add_route('/api/auth/reset', Reset() )
 #app.add_route('/api/asset/save/{user}/{repo}', AssetSave())
 #app.add_route('/api/asset', ListAssets())
 #app.add_route('/api/asset/{key}', GetAsset())

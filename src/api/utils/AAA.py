@@ -22,6 +22,7 @@ import ujson as json
 import hmac
 import uuid
 import hashlib
+from base64 import encodestring
 from urllib2 import quote, unquote
 import falcon
 from tasks import send_envelope
@@ -30,15 +31,13 @@ def getANewSessionId():
     return str(hmac.HMAC(key=str(uuid.uuid4()), digestmod=hashlib.sha1).hexdigest())
 
 
-def authenticate(req, resp, params):
-    free_services = ['/api/auth/signup', '/api/auth/login', '/api/things']
-    path = req.relative_uri
-    print path
+def Authenticate(req, resp, params):
+    free_services = ['/api/auth/signup', '/api/auth/login', '/api/things', '/api/auth/activate']
     sid = req.cookie('session-id')
     req.cookie('heyyy')
 
     ''' Now we need to check if session is available and it's sha1 is in redis'''
-    if path in free_services or (sid and r.get(hashlib.sha1(sid).hexdigest())):
+    if req.path in free_services or (sid and r.get(hashlib.sha1(sid).hexdigest())):
         ''' Now we need to authorize user!
             NOT IMPLEMENTED YET
         '''
@@ -46,9 +45,9 @@ def authenticate(req, resp, params):
     else:
         sid = getANewSessionId()
         hashed_sid = hashlib.sha1(sid).hexdigest()
-        resp.append_header('set-cookie', 'session-id=%s;path=/;max-age=10' % sid)  # this session is not yet saved
-        resp.status = falcon.HTTP_302
-        next = quote(path)
+        resp.append_header('Set-Cookie', 'session-id=%s;path=/;max-age=10' % sid)  # this session is not yet saved
+        resp.status = falcon.HTTP_303
+        next = quote(req.path)
         resp.location = '/app/#auth/login?next=%s' % next
 
     #if token != 'rrferl':
@@ -56,7 +55,7 @@ def authenticate(req, resp, params):
     #    return
 
 
-class login:
+class Login:
     '''Main login class
     '''
     @falcon.after(commit)
@@ -64,7 +63,7 @@ class login:
         '''Add a user to database'''
         sid = req.cookie('session-id')
         if sid and r.get('fail_'+sid):
-            resp.body = json.dumps({'message': 'error', 'info':'You need to wait', 'wait':5})
+            resp.body = {'message': 'error', 'info':'You need to wait', 'wait':5}
             return
         form = json.loads(req.stream.read())
         target = session.query(User).filter(User.email == form.get('email')).first()
@@ -77,28 +76,35 @@ class login:
             cookie will be used
         '''
         resp.append_header('set-cookie', 'session-id=%s;path=/;max-age=5' % sid)  # this session is not yet saved
-        if not target or not target.password == password:  # don't tell what's wrong!
+        if not target or not target.password == form.get('password'):  # don't tell what's wrong!
             r.incr('fail_'+sid, 1)
-            resp.body = json.dumps({'message':'error', 'info': 'login information is not correct', 'wait':2})
+            print target
+            resp.body = {'message':'error', 'info': 'login information is not correct', 'wait':2}
         else:
+            if target.active:
+                target.lastLogIn = now()
+                resp.body = {'message':'success',
+                                        'firstname':target.firstname,
+                                        'id':target.id}
+            else:
 
-            target.lastLogIn = now()
-            resp.body = json.dumps({'message':'sucess',
-                                    'firstname':target.firstname,
-                                    'id':target.id})
+                resp.body = {'message':'error',
+                             'info':'Please check your email and activate your account'}
+
+
 
 
 
         #print email
         #resp.body = 'OK'
-class signup:
+class Signup:
     '''Main login class
     '''
     @falcon.after(commit)
     def on_post(self, req, resp):
         sid = req.cookie('session-id')
         if sid and r.get('fail_'+sid):
-            resp.body = json.dumps({'message': 'error', 'info':'You need to wait', 'wait':5})
+            resp.body = {'message': 'error', 'info':'You need to wait', 'wait':5}
             return
 
 
@@ -111,15 +117,62 @@ class signup:
                            lastname=form.get('lastname'))
             session.add(newuser)
             commit(req, resp)
+            origin = req.headers.get('ORIGIN')
+            activation_link = origin + '/api/auth/activate?token=' + newuser.token
+            send_envelope.delay(form.get('email'), 'Account Activation',
+                'Hi <strong>{u}</strong>! Please <a href="{l}">Activate</a> your account.'.format(u=newuser.firstname.title(),
+                                    l=activation_link))
 
-            send_envelope.delay(form.get('email'), 'Account Activation', 'your acount is here')
-            resp.body = json.dumps({'message': 'success', 'info':'check your activation email'})
-
-
-
+            resp.body = {'message': 'success', 'info':'check your activation email'}
         else:
-            resp.body = json.dumps({'message': 'error', 'info':'email already available'})
+            resp.body = {'message': 'error', 'info':'email already available'}
+
             return
 
+class Verify:
+    '''Account activation
+    '''
+
+    @falcon.after(commit)
+    def on_get(self, req, resp):
+        token = req.get_param('token')
+        target = session.query(User).filter(User.token==token).first()
+        if not target:
+            m = encodestring('Activation key is expired!')
+            resp.status = falcon.HTTP_303
+            resp.location = '/app/#auth/reactivate?m=%s'%m
+        else:
+            new_token = str(uuid.uuid4())
+            target.active = True
+            target.token = new_token
+            resp.status = falcon.HTTP_302
+            resp.location = '/app/#auth/login'
 
 
+
+class Reactivate:
+    '''Account activation
+    '''
+    def on_post(self, req, resp):
+
+        form = json.loads(req.stream.read())
+        target = session.query(User).filter(User.email==form.get('email')).first()
+        if target:
+            origin = req.headers.get('ORIGIN')
+            activation_link = origin + '/api/auth/activate?token=' + target.token
+            send_envelope.delay(form.get('email'), 'Account ReActivation',
+                'Hi <strong>{u}</strong>! Please <a href="{l}">ReActivate</a> your account.'.format(u=target.firstname,
+                                    l=activation_link))
+            resp.status = falcon.HTTP_302
+            resp.location = '/app/#auth/login'
+        else:
+            resp.status = falcon.HTTP_202
+            resp.body = {'message': 'error', 'info':'email not available'}
+
+
+
+class Reset:
+    '''Account activation
+    '''
+    def on_post(self, req, resp):
+        pass
