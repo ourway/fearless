@@ -20,8 +20,10 @@ usage:
     print session.query(Report).all()
 '''
 
-__all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task', 'Repository', 'Project', 'now',
-           'Ticket', 'session', 'Version', 'Tag', 'Shot', 'Scene', 'Sequence', 'Page', 'r']
+__all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task',
+           'Repository', 'Project', 'now', 'Ticket', 'session',
+           'Version', 'Tag', 'Shot', 'Scene', 'Sequence',
+           'Page', 'r', 'es']
 
 
 from sqlalchemy import create_engine  # for database
@@ -31,6 +33,9 @@ from mixin import Base, now
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 import redis
+
+from elasticsearch import Elasticsearch
+es = Elasticsearch()
 
 r = redis.StrictRedis(host='localhost', port=6379, db=3)  # db number 1 and 2 are for celery
 db_path = 'database/studio.db'

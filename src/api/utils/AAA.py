@@ -24,7 +24,7 @@ import uuid
 import hashlib
 from urllib2 import quote, unquote
 import falcon
-
+from tasks import send_envelope
 
 def getANewSessionId():
     return str(hmac.HMAC(key=str(uuid.uuid4()), digestmod=hashlib.sha1).hexdigest())
@@ -66,9 +66,8 @@ class login:
         if sid and r.get('fail_'+sid):
             resp.body = json.dumps({'message': 'error', 'info':'You need to wait', 'wait':5})
             return
-        email = req.get_param('email')
-        password = req.get_param('password')
-        target = session.query(User).filter(User.email == email).first()
+        form = json.loads(req.stream.read())
+        target = session.query(User).filter(User.email == form.get('email')).first()
         if not sid:
             sid = getANewSessionId()
 
@@ -102,16 +101,20 @@ class signup:
             resp.body = json.dumps({'message': 'error', 'info':'You need to wait', 'wait':5})
             return
 
-        email = req.get_param('email')
-        password = req.get_param('password')
-        firstname = req.get_param('firstname')
-        lastname = req.get_param('lastname')
-        if not session.query(User).filter(User.email == email).first():
-            newuser = User(email=email, password=password, firstname=firstname, lastname=lastname)
+
+        form = json.loads(req.stream.read())
+
+        if not session.query(User).filter(User.email == form.get('email')).first():
+            newuser = User(email=form.get('email'),
+                           password=form.get('password'),
+                           firstname=form.get('firstname'),
+                           lastname=form.get('lastname'))
             session.add(newuser)
             commit(req, resp)
 
+            send_envelope.delay(form.get('email'), 'Account Activation', 'your acount is here')
             resp.body = json.dumps({'message': 'success', 'info':'check your activation email'})
+
 
 
         else:

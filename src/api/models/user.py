@@ -36,6 +36,7 @@ class User(IDMixin, Base):
     lastLogIn = Column(DateTime)
     age = Column(Integer)
     group_id = Column(Integer, ForeignKey('group.id'))
+    active = Column(Boolean, default=False)
     reports = relationship('Report', backref='user')
 
     @hybrid_property
@@ -47,7 +48,7 @@ class User(IDMixin, Base):
 
 
 def logUserCreation(mapper, connection, target):
-    logger.info('New user added|{t.id}|{t.login}'.format(t=target))
+    logger.info('New user added|{t.id}|{t.email}'.format(t=target))
     #new_group = Group(name=target.login)
     #target.group= new_group
     # session.add(new_group)

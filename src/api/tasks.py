@@ -32,7 +32,7 @@ from envelopes import Envelope, GMailSMTP
 from utils.validators import email_validator
 from opensource.contenttype import contenttype
 # # riak bucket for our files
-from model import file_bucket, TeamClient, ES, RiakObject
+from models import session, es
 from utils.fagit import GIT
 
 
@@ -70,6 +70,8 @@ def download(url):
         data = {'message': 'ERROR'}
     return ujson.dumps(data)
 
+class mydatatype(object):
+    pass
 
 @app.task
 def add_asset(userName, repositoryName, b64Data=None,
@@ -84,26 +86,27 @@ def add_asset(userName, repositoryName, b64Data=None,
     content_type = contenttype('.%s' % ext)
     content_type = contenttype(uploadedFilePath)
 
-    if not file_bucket.get(task_id).exists:
-        obj = RiakObject(TeamClient, file_bucket, task_id)
-        obj.content_type = 'application/json'
-        data = {'path': uploadedFilePath,
-                'content_type': content_type,
-                'ext': ext,
-                'originalName': originalName,
-                'md5': dataMD5,
-                'key': task_id,
-                'user': userName,
-                'repo': repositoryName,
-                'datetime': datetime.utcnow()}
-        obj.data = ujson.dumps(data)
-        try:
-            ES.create(
-                index='assets', doc_type='info', body=obj.data, id=dataMD5)
-        except elasticsearch.ConflictError:
-            pass
+    #if not file_bucket.get(task_id).exists:
+    #    obj = RiakObject(TeamClient, file_bucket, task_id)
+    obj = mydatatype()
+    obj.content_type = 'application/json'
+    data = {'path': uploadedFilePath,
+            'content_type': content_type,
+            'ext': ext,
+            'originalName': originalName,
+            'md5': dataMD5,
+            'key': task_id,
+            'user': userName,
+            'repo': repositoryName,
+            'datetime': datetime.utcnow()}
+    obj.data = ujson.dumps(data)
+    try:
+        ES.create(
+            index='assets', doc_type='info', body=obj.data, id=dataMD5)
+    except elasticsearch.ConflictError:
+        pass
 
-        obj.store()
+        #obj.store()
         print '\Info for {name} added to riak db\n'.format(name=originalName)
 
     else:

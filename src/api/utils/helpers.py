@@ -12,7 +12,11 @@ Just remember: Each comment is like an apology!
 Clean code is much better than Cleaner comments!
 '''
 
+import falcon
 from models import session
+from sqlalchemy.exc import IntegrityError  # for exception handeling
+import ujson as json
+
 
 def commit(req, resp):
     try:

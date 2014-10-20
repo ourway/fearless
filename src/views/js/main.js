@@ -26,7 +26,10 @@ fateamApp.factory('authFactory', function($resource) {
 				controller  : 'authController'
 			})
 
-		//$locationProvider.html5Mode(true);
+			.when('/auth/signup', {
+				templateUrl : 'pages/auth/signup.html',
+				controller  : 'authController'
+			})		//$locationProvider.html5Mode(true);
 
 	})
 

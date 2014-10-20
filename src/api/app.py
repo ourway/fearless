@@ -24,7 +24,7 @@ import ujson as json
 from models import __all__ as av
 from models import *
 from sqlalchemy.exc import IntegrityError  # for exception handeling
-from utils.AAA import login, authenticate
+from utils.AAA import login, signup, authenticate
 
 tables = [i for i in av if i[0] in ascii_uppercase]
 
@@ -132,7 +132,7 @@ class DB:
 
 
 # falcon.API instances are callable WSGI apps
-app = falcon.API(before=[authenticate])
+app = falcon.API()
 things = ThingsResource()
 
 ########################################################
@@ -144,6 +144,7 @@ for table in tables:
 # things will handle all requests to the '/things' URL path
 app.add_route('/api/things', things)
 app.add_route('/api/auth/login', login() )
+app.add_route('/api/auth/signup', signup() )
 #app.add_route('/api/asset/save/{user}/{repo}', AssetSave())
 #app.add_route('/api/asset', ListAssets())
 #app.add_route('/api/asset/{key}', GetAsset())
