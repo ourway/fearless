@@ -80,7 +80,6 @@ fearlessApp.factory('authFactory', function($resource) {
                 setTimeout(function(){$scope.login_wait=null}, resp.wait);
                if (resp.message=='success' && $scope.loginInfo.action=='login') //green light
                     {
-                        console.log('Logging in')
                         $cookies.userid = resp.id;
                         $cookies.username = resp.firstname;
                         $scope.userInfo.username = resp.firstname;
@@ -89,13 +88,28 @@ fearlessApp.factory('authFactory', function($resource) {
                         $scope.loginInfo.password = null;
                         $scope.userInfo.logged_in = true;
                         try {
-                            $location.path(atob($routeParams.next));
+                            next_page = atob($routeParams.next);
+                            if (next_page.split('/')[1] === 'api')
+                                window.location = next_page;
+                            else
+                                $location.path(next_page);
                         }
                         catch(e){
                             $location.path( '/' ) ;
                         }
                     }
-            
+
+            if (resp.message=='success' && $scope.loginInfo.action=='signup') //green light
+            {
+                window.location =  '#auth/login/?m=' + btoa(resp.info)  ;
+            }
+            if (resp.message=='error' && resp.not_active)
+            {
+                console.log('here')
+                setTimeout(function(){
+                    window.location =  '#auth/reactivate';}, 2000);
+            }
+
 
         });
     }
@@ -125,7 +139,10 @@ fearlessApp.factory('authFactory', function($resource) {
               $scope.userInfo.username = null;
               $scope.userInfo.userid = null;
               $scope.userInfo.logged_in = false;
-              $location.path('/auth/login/'+btoa($location.$$path));
+              next_page = btoa($location.$$path);
+              if (next_page == 'Lw==')  // if its just a # sign
+                next_page = ''
+              $location.path('/auth/login/'+next_page);
        }
        }
 

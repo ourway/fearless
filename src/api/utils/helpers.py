@@ -16,6 +16,12 @@ import falcon
 from models import session
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 import ujson as json
+import commands
+
+def get_ip():
+    '''Simple method'''
+    ip = commands.getoutput("/sbin/ifconfig").split("\n")[1].split()[1][5:]
+    return ip
 
 
 def commit(req, resp):

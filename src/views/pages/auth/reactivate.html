@@ -1,20 +1,19 @@
 
 
     <div class="container" >
-      <form class="form-signin" role="form" ng-submit="doLogin()" enctype="multipart/form-data">
-        <h3 class="form-signin-heading">Activation Process</h3><small>Centeral Authentication System</small><hr/>
+      <form class="form-signin" role="form" enctype="multipart/form-data">
+          <h3 class="form-signin-heading"><strong>RE ACTIVATION</strong></h3><small class="glyphicon glyphicon-cloud"></small> <small> Centeral Authentication System</small><hr/>
 
   <div ng-show="AuthRespMessage" class="alert alert-dismissable"
        ng-class="{'alert-danger':AuthRespMessage!='success', 'alert-sucess':AuthRespMessage=='sucess'}">
-     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
     <h5>
-        {{AuthRespMessage | uppercase}}!
+        <strong>{{AuthRespMessage | uppercase}}!</strong>
     </h5> <strong></strong> {{AuthRespInfo}}
   </div>
 
         <input type="email" class="form-control" placeholder="Email address" ng-model="loginInfo.email" required autofocus>
         <br/>
-        <button type="signin" ng-disabled="login_wait" ng-click="loginInfo.action='reactivate'"
+        <button type="signin" ng-disabled="login_wait" ng-click="loginInfo.action='reactivate';doLogin();"
                 class="btn btn-lg btn-success btn-block" >Send My Activation Key</button>
 
       </form>
