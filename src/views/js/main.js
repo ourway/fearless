@@ -44,7 +44,8 @@ fearlessApp.factory('authFactory', function($resource) {
 
 
 	// create the controller and inject Angular's $scope
-	fearlessApp.controller('mainController', function($scope, $rootScope, $cookies, authFactory, $location, $routeParams) {
+	fearlessApp.controller('mainController', function($scope, $rootScope, $cookies,$http,
+                                                      $timeout, authFactory, $location, $routeParams) {
 		// create a message to display in our view
         $rootScope.title = "Centeral Auth - Fearless";
         $scope.check_auth_area = function() {
@@ -103,11 +104,11 @@ fearlessApp.factory('authFactory', function($resource) {
             {
                 window.location =  '#auth/login/?m=' + btoa(resp.info)  ;
             }
-            if (resp.message=='error' && resp.not_active)
+            if (resp.message=='warning' && resp.not_active)
             {
-                console.log('here')
-                setTimeout(function(){
-                    window.location =  '#auth/reactivate';}, 2000);
+                $timeout(function(){
+                    $location.path( 'auth/reactivate' );
+                }, 2000);
             }
 
 
@@ -121,6 +122,7 @@ fearlessApp.factory('authFactory', function($resource) {
             $scope.userInfo.logged_in = false;
             $scope.userInfo.username = null;
             $scope.userInfo.userid = null;
+            $http.post('/api/auth/logout');
             //$scope.userInfo.logged_in = true;
 
         }

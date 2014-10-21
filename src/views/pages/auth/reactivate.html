@@ -5,7 +5,7 @@
           <h3 class="form-signin-heading"><strong>RE ACTIVATION</strong></h3><small class="glyphicon glyphicon-cloud"></small> <small> Centeral Authentication System</small><hr/>
 
   <div ng-show="AuthRespMessage" class="alert alert-dismissable"
-       ng-class="{'alert-danger':AuthRespMessage!='success', 'alert-sucess':AuthRespMessage=='sucess'}">
+       ng-class="{'alert-warning':AuthRespMessage!='error', 'alert-danger':AuthRespMessage=='error'}">
     <h5>
         <strong>{{AuthRespMessage | uppercase}}!</strong>
     </h5> <strong></strong> {{AuthRespInfo}}

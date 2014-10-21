@@ -85,8 +85,9 @@
         <div ng-if="!check_auth_area()" class="navbar-collapse collapse" ng-init="is_logged_in()">
 
 
-        <form class="navbar-form navbar-right" role="form" name="profile_form">
-            <button class="btn btn-success" ng-click="doLogout();go('auth/login/'+$location.$$path)">Sign Out</button>
+        <form ng-if="userInfo.logged_in" class="navbar-form navbar-right" role="form" name="profile_form">
+            <button class="btn btn-info" ng-click=";go('profile/')">{{userInfo.username}}</button>
+            <button class="btn btn-danger" ng-click="loginInfo.action='signout';doLogout();go('auth/login/'+$location.$$path)">Sign Out</button>
         </form>
 
 
