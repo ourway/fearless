@@ -14,7 +14,7 @@ production_folders = {
     'rig': ['scenes', 'data', 'scripts'],
     'model': ['obj'],
     'render': ['scenes', 'sourceimages', 'data', 'test_renders', 'output_for_composite'],
-    'texture': ['images/8k', 'images/4k', 'images/2k', 'images/1k', 'imeages/512', 'images/256', 'images/128', 'images/64',
+    'texture': ['images/8k', 'images/4k', 'images/2k', 'images/1k', 'images/512', 'images/256', 'images/128', 'images/64',
                 'source/mudbox', 'source/mari', 'source/3dcoat', 'source/photoshop', 'source/bodypaint3d', 'source/ZBrush', 'source/references'],
     'art': ['references', 'storyboard', 'matte'],
     'composite': ['nuke/images', 'nuke/scripts', 'nuke/data', 'output', 'preview'],

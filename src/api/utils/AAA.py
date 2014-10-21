@@ -51,6 +51,7 @@ def Authenticate(req, resp, params):
             ...
 
     '''
+    #return
     ip = req.env.get('HTTP_X_FORWARDED_FOR')
     free_services = ['/api/auth/signup', '/api/auth/login',
                      '/api/things', '/api/auth/activate', '/api/auth/reactivate',
@@ -211,6 +212,7 @@ class Verify:
             logger.info('{ip}|Verified an activation key'.format(ip=ip))
             resp.status = falcon.HTTP_302
             resp.location = '/app/#auth/login'
+
 
 
 

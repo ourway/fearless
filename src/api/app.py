@@ -19,7 +19,7 @@ from utils.helpers import commit, jsonify
 import urlparse
 from string import ascii_uppercase
 import ujson as json
-#from utils.assets import AssetSave, ListAssets, GetAsset
+from utils.assets import AssetSave, ListAssets, GetAsset
 
 from models import __all__ as av
 from models import *
@@ -132,6 +132,7 @@ class DB:
 
 
 # falcon.API instances are callable WSGI apps
+#app = falcon.API()
 app = falcon.API(before=[Authenticate], after=[jsonify])
 things = ThingsResource()
 
@@ -149,9 +150,9 @@ app.add_route('/api/auth/activate', Verify() )
 app.add_route('/api/auth/reactivate', Reactivate() )
 app.add_route('/api/auth/reset', Reset() )
 app.add_route('/api/auth/logout', Logout() )
-#app.add_route('/api/asset/save/{user}/{repo}', AssetSave())
-#app.add_route('/api/asset', ListAssets())
-#app.add_route('/api/asset/{key}', GetAsset())
+app.add_route('/api/asset/save/{repo}', AssetSave())
+app.add_route('/api/asset', ListAssets())
+app.add_route('/api/asset/{key}', GetAsset())
 
 
 if __name__ == '__main__':

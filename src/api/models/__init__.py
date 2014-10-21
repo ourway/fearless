@@ -22,7 +22,7 @@ usage:
 
 __all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task',
            'Repository', 'Project', 'now', 'Ticket', 'session',
-           'Version', 'Tag', 'Shot', 'Scene', 'Sequence',
+           'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
            'Page', 'r', 'es']
 
 
@@ -38,8 +38,8 @@ from elasticsearch import Elasticsearch
 es = Elasticsearch()
 
 r = redis.StrictRedis(host='localhost', port=6379, db=3)  # db number 1 and 2 are for celery
+db_path = ':memory:'
 db_path = 'database/studio.db'
-#db_path = ':memory:'
 engine = create_engine('sqlite:///%s' % db_path, echo=False)
 
 from models.group import Group
@@ -57,6 +57,7 @@ from models.scene import Scene
 from models.tag import Tag
 from models.version import Version
 from models.page import Page
+from models.asset import Asset
 
 
 Base.metadata.create_all(engine)

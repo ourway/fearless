@@ -32,9 +32,9 @@ from envelopes import Envelope, GMailSMTP
 from utils.validators import email_validator
 from opensource.contenttype import contenttype
 # # riak bucket for our files
-from models import session, es
+from models import session, es, Asset, Repository
 from utils.fagit import GIT
-
+from sqlalchemy.exc import IntegrityError  # for exception handeling
 
 # BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 # BACKEND_URL = 'amqp'
@@ -74,43 +74,44 @@ class mydatatype(object):
     pass
 
 @app.task
-def add_asset(userName, repositoryName, b64Data=None,
-              uploadedFilePath=None, dataMD5=None):
-    '''Add asset to database'''
-    if not (b64Data or uploadedFilePath):
-        return 'Not b64 or path'
+def add_asset(dataMD5, uploadedFilePath):
+    ''' Add asset to database
+        Why I provide the md5? Cause we can get md5 in uploading process before.
+    '''
+    if not uploadedFilePath:
+        return 'Not any path'
 
+    targetAsset = session.query(Asset).filter(Asset.key==dataMD5).first()
+    if not targetAsset:
+        print 'Target asset is not available!'
+        return
     task_id = add_asset.request.id
-    originalName = os.path.basename(uploadedFilePath) or 'Base64 Data'
-    ext = originalName.split('.')[-1]
-    content_type = contenttype('.%s' % ext)
-    content_type = contenttype(uploadedFilePath)
-
-    #if not file_bucket.get(task_id).exists:
-    #    obj = RiakObject(TeamClient, file_bucket, task_id)
+    originalName = os.path.basename(uploadedFilePath)
+    targetAsset.ext = originalName.split('.')[-1]
+    targetAsset.content_type = contenttype(uploadedFilePath)
+    targetAsset.path = os.path.join(os.path.relpath(os.path.dirname(uploadedFilePath),
+                                targetAsset.repository.path) or '', dataMD5+'.'+targetAsset.ext)
+    print '*'*80
+    print targetAsset.path
+    print '*'*80
     obj = mydatatype()
     obj.content_type = 'application/json'
     data = {'path': uploadedFilePath,
-            'content_type': content_type,
-            'ext': ext,
-            'originalName': originalName,
-            'md5': dataMD5,
+            'content_type': targetAsset.content_type,
+            'ext': targetAsset.ext,
+            'originalName': targetAsset.name,
+            'md5': targetAsset.key,
             'key': task_id,
-            'user': userName,
-            'repo': repositoryName,
+            'asset': targetAsset.id,
+            'repository': targetAsset.repository.id,
             'datetime': datetime.utcnow()}
     obj.data = ujson.dumps(data)
     try:
-        ES.create(
-            index='assets', doc_type='info', body=obj.data, id=dataMD5)
+        es.create(
+            index='assets2', doc_type='info', body=obj.data)
     except elasticsearch.ConflictError:
         pass
 
-        #obj.store()
-        print '\Info for {name} added to riak db\n'.format(name=originalName)
-
-    else:
-        print 'File {name} is already available'.format(name=originalName)
 
     # repo = GIT(uploadedFilePath)  ## do git operations
         # repo.add('{user}->{repo}->{originalName}' \
@@ -118,7 +119,12 @@ def add_asset(userName, repositoryName, b64Data=None,
         #                 repo=repositoryName,
         #                 originalName=originalName))
 
-    return originalName
+
+    try:
+        session.commit()
+        return targetAsset.key
+    except IntegrityError:
+        return 'Error'
 
 
 @app.task

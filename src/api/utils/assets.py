@@ -15,18 +15,22 @@ Clean code is much better than Cleaner comments!
 import ujson
 import time
 import hashlib
+from cStringIO import StringIO
 import falcon
 import os
+from helpers import commit
 from sys import stderr
 from os import path
 from tasks import add_asset
 from tasks import STORAGE
+from opensource.contenttype import contenttype
 from utils.validators import checkPath
-import multipart  # git@github.com:hydrogen18/multipart-python.git
+from base64 import encode
 
 # from celery.result import AsyncResult
+from models import Asset, Repository, es, session
 
-from model import file_bucket, ES  # riak bucket for our files
+
 
 
 def _generate_id():
@@ -43,42 +47,37 @@ This is a funtion that lets api to get a big/small file from user.
 
 class AssetSave:
 
-    def on_post(self, req, resp, user, repo):
+    @falcon.after(commit)
+    def on_put(self, req, resp, repo):
         '''Get data based on a file object or b64 data, save and commit it'''
-        contentType = req.content_type
-        # print req.stream.read()
-        magic = 'boundary='
-        offset = contentType.index(magic)
-        assets = {}
-        boundary = '--' + contentType[offset + len(magic):]
-        for headers, data in multipart.Parser(boundary, req.stream):
-            originalName = headers.next()[1].split(
-                ';')[-1].split('=')[-1][1:-1]
-            if originalName:
-                tempraryStoragePath = path.join(
-                    STORAGE, user, repo, originalName)
-                bodyMd5 = safeCopyAndMd5(data, tempraryStoragePath,
-                                         isGenerator=True)
-                newAsset = add_asset.delay(user, repo,
-                                           uploadedFilePath=tempraryStoragePath, dataMD5=bodyMd5)
-                assets[originalName] = newAsset.task_id
-        resp.body = ujson.dumps(assets)
-
-    def on_put(self, req, resp, user, repo):
-        '''Get data based on a file object or b64 data, save and commit it'''
-        print '\nI got request\n'
-        name = req.get_param('name') or 'undefined.data'
-        tempraryStoragePath = path.join(STORAGE, user, repo, name)
+        targetRepo = session.query(Repository).filter(Repository.name==repo).first()
         body = req.stream
-        bodyMd5 = safeCopyAndMd5(body, tempraryStoragePath)
-        newAsset = add_asset.delay(
-            user, repo, uploadedFilePath=tempraryStoragePath, dataMD5=bodyMd5)
-        resp.body = newAsset.task_id
-        #resp.body = "I am working"
+        if targetRepo:
+            name = req.get_param('name') or 'undefined.%s.raw'%_generate_id()
+            tempraryStoragePath = path.join(targetRepo.path,
+                contenttype(name).split(';')[0].replace('x-', ''), name)
+            bodyMd5 = safeCopyAndMd5(body, tempraryStoragePath)
+            old_asset = session.query(Asset).filter(Asset.repository==targetRepo).filter(Asset.key==bodyMd5).first()
+            if not old_asset:
+                asset = Asset(key=bodyMd5, repository=targetRepo)
+                session.add(asset)
+                newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
+                asset.task_id = newAsset.task_id
+                resp.body = {'message':'Asset created', 'key': asset.key}
+                #resp.body = "I am working"
+            else:
+                resp.body = {'message':'Asset already available'}
+        else:
+            while True:
+                chunk = req.stream.read(2**20)
+                if not chunk: break
+
+            resp.body = {'message':'Repo is not available'}
 
 
-def safeCopyAndMd5(fileobj, destinationPath, isGenerator=False):
+def safeCopyAndMd5(fileobj, destinationPath):
     '''copy a file in chunked mode safely'''
+
     destDir = path.dirname(destinationPath)
     ext = destinationPath.split('.')[-1]
     checkPath(destDir)
@@ -86,17 +85,13 @@ def safeCopyAndMd5(fileobj, destinationPath, isGenerator=False):
         os.remove(destinationPath)
     f = open(destinationPath, 'wb')
     md5 = hashlib.md5()
-    if not isGenerator:
-        while True:
-            chunk = fileobj.read(2 ** 20)
-            if not chunk:
-                break
-            md5.update(chunk)
-            f.write(chunk)
-    else:
-        for chunk in fileobj:
-            md5.update(chunk)
-            f.write(chunk)
+    while True:
+        chunk = fileobj.read(2 ** 20)
+        if not chunk:
+            break
+        md5.update(chunk)
+        f.write(chunk)
+
     f.close()
     dataMd5 = md5.hexdigest()
     newAssetName = '%s.%s' % (dataMd5, ext)
@@ -130,8 +125,8 @@ def getAssetInfo(key):
             }
         }
 
-        raw = ES.search(
-            index='assets', doc_type='info', body=queryDSL).get('hits')
+        raw = es.search(
+            index='assets2', doc_type='info', body=queryDSL).get('hits')
         assetInfos = raw.get('hits')
         for assetHitInfo in assetInfos:
             assetOriginalName = assetHitInfo['fields'].get('originalName')
@@ -156,10 +151,7 @@ def getAssetInfo(key):
                 keydata = assetInfo.get(key)
                 if keydata:  # if key is there
                     assetInfo[key] = keydata[0]
-    else:
-        assetRiakObject = file_bucket.get(key)  # key is the task_id! :)
-        if assetRiakObject.exists:
-            assetInfo = ujson.loads(assetRiakObject.data)
+
     return assetInfo
 
 
@@ -167,29 +159,25 @@ class GetAsset:
 
     def on_get(self, req, resp, key):
         '''Serve asset based on a key (riak key for finding path'''
-        assetInfo = getAssetInfo(key)
-        if assetInfo:
-            noDownloadDialogFormats = ['m4v', 'mp4', 'json',
-                                       'pdf', 'svg', 'jpg', 'png', 'gif', 'txt']
-            downloadDialogFileName = None
-            staticFilePath = assetInfo.get('path')
-            if not assetInfo.get('ext').lower() in noDownloadDialogFormats:
-                downloadDialogFileName = assetInfo.get('originalName')
 
-            assetStatisPath = '{user}/{repo}/{md5}.{ext}'.format(
-                user=assetInfo.get('user'),
-                repo=assetInfo.get('repo'),
-                md5=assetInfo.get('md5'),
-                ext=assetInfo.get('ext'),
-            )
-            assetStaticUrl = '/static/%s' % assetStatisPath
-            resp.status = falcon.HTTP_301
-            resp.location = assetStaticUrl
-        else:
-            taskResult = add_asset.AsyncResult(key)
-            resp.status = falcon.HTTP_404
-            return taskResult.status
-
+        target = session.query(Asset).filter(Asset.key==key).first()
+        if target:
+            print target
+            filepath = os.path.join(target.repository.path, target.path)
+            f = open(filepath)
+            #resp.stream_len=500
+            if req.get_param('b64'):
+                encf = StringIO()
+                encode(f, encf)
+                encf.seek(0, os.SEEK_END)
+                datalen = s.tell()
+                encf.seek(0)
+                resp.stream_len = datalen
+                resp.stream = encf
+            else:
+                resp.content_type = str(target.content_type)
+                resp.stream_len = os.path.getsize(filepath)
+                resp.stream = f
 
 class ListAssets:
 
@@ -243,7 +231,7 @@ class ListAssets:
                 }
             }
         }
-        raw = ES.search(
+        raw = es.search(
             index='assets', doc_type='info', body=queryDSL).get('hits')
         hitsCount = raw.get('total')
         hits = raw.get('hits')
@@ -267,4 +255,4 @@ class ListAssets:
                 if keydata:  # if key is there
                     assetExtractedData[key] = keydata[0]
             results.append(assetExtractedData)
-        resp.body = ujson.dumps(results)
+        resp.body = results

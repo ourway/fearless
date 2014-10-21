@@ -17,6 +17,7 @@ from models import session
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 import ujson as json
 import commands
+import cStringIO
 
 def get_ip():
     '''Simple method'''
@@ -30,12 +31,17 @@ def commit(req, resp):
     except IntegrityError, e:
         session.rollback()
         resp.status = falcon.HTTP_400
-        resp.body = json.dumps(e)
+        resp.body = e
 
 
 def jsonify(self, resp):
     '''Everything is json here'''
-    resp.body = json.dumps(resp.body)
+    if isinstance(resp.stream, (file, cStringIO.OutputType)):
+        return
+    elif isinstance(resp.body, (file, cStringIO.OutputType)):
+        return
+    else:
+        resp.body = json.dumps(resp.body)
 
     #resp.body = json.dumps(resp.body)
 

@@ -24,6 +24,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from mixin import IDMixin, Base, getUUID, logger
 import datetime
 
+
+
+
+
 class User(IDMixin, Base):
 
     '''Main users group
@@ -35,7 +39,6 @@ class User(IDMixin, Base):
     lastname = Column(String(64), nullable=True)
     lastLogIn = Column(DateTime)
     age = Column(Integer)
-    group_id = Column(Integer, ForeignKey('group.id'))
     active = Column(Boolean, default=False)
     reports = relationship('Report', backref='user')
 

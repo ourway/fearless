@@ -28,4 +28,3 @@ class Report(IDMixin, Base):
     '''
     body = deferred(Column(Text, nullable=False))  # load on access
     user_id = Column(Integer, ForeignKey('user.id'))
-    project_id = Column(Integer, ForeignKey("project.id"))

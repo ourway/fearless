@@ -34,4 +34,4 @@ class Client(IDMixin, Base):
     '''The Client (e.g. a company) which users may be part of.
     '''
     name = Column(String(64), unique=True, nullable=False)
-    users = relationship('User', backref='company', secondary='client_users')
+    users = relationship('User', backref='companies', secondary='client_users')
