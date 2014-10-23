@@ -13,8 +13,24 @@
 
         <input type="email" class="form-control" placeholder="Email address" ng-model="loginInfo.email" required autofocus>
         <br/>
+
+           <table class="table borderless ">
+              <tr>
+                  <td class="col-md-6">
         <button type="signin" ng-disabled="login_wait" ng-click="loginInfo.action='reactivate';doLogin();"
                 class="btn btn-lg btn-success btn-block" >Send My Activation Key</button>
+                  </td>
+                  <td class="col-md-3">
+                      <span>Or maybe<br/>
+                      <a class="" href="#auth/login"><strong>login</strong></a><br/>
+                  </td>
+                </tr>
+
+
+          </table>
+
+
+
 
       </form>
 

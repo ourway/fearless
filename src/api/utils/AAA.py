@@ -211,7 +211,8 @@ class Verify:
             target.token = new_token
             logger.info('{ip}|Verified an activation key'.format(ip=ip))
             resp.status = falcon.HTTP_302
-            resp.location = '/app/#auth/login'
+            m = encodestring('Welcome!  Successfully Activated.')
+            resp.location = '/app/#auth/login?m=%s'%m
 
 
 
@@ -220,6 +221,17 @@ class Reactivate:
     '''Account activation
     '''
     def on_post(self, req, resp):
+        sid = req.cookie('session-id')
+        if sid and r.get('reactivation_%s'%sid):
+            resp.body = {'message': 'error', 'info':'Please wait 5 seconds...',
+                         'not_active':False, 'wait':5}
+            return
+
+        if not sid:
+            sid = getANewSessionId()
+            resp.set_header('set-cookie', 'session-id=%s; path=/; max-age=%s; HttpOnly' % (sid, 5))  # this session is temprary
+        r.incr('reactivation_'+sid, 1)
+        r.expire('reactivation_' + sid, 60)
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         form = json.loads(req.stream.read())
         target = session.query(User).filter(User.email==form.get('email')).first()
@@ -235,7 +247,10 @@ class Reactivate:
 
             logger.info('{ip}|requested reactivation key for {u}'.format(ip=ip, u=target.email))
             resp.body = {'message': 'success', 'info':'check your reactivation email'}
-            return
+            #resp.status = falcon.HTTP_302
+            #m = encodestring('Check your email for activation key.')
+            #resp.location = '/app/#auth/login?m=%s'%m
+            #return
 
         else:
             resp.status = falcon.HTTP_202

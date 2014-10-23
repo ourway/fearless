@@ -53,8 +53,17 @@ fearlessApp.factory('authFactory', function($resource) {
                 return true;
         }
         if ($routeParams.m) {
-            $scope.AuthRespMessage = atob($routeParams.m)
+            try{
+                $scope.AuthRespMessage = atob($routeParams.m);
+                $timeout(function () {
+                    $location.url($location.path());
+                    }, 3000);
+            }
+            catch(e) {
+                console.log('ok');
+            }
         }
+
 
 		$scope.appName = 'fearless';
         $scope.$parent.showLogin = false;
@@ -85,6 +94,7 @@ fearlessApp.factory('authFactory', function($resource) {
                         $cookies.username = resp.firstname;
                         $scope.userInfo.username = resp.firstname;
                         $scope.userInfo.userid = resp.id;
+                        $('#loginSubmitButton').text('Done!')
                         $scope.loginInfo.email = null;
                         $scope.loginInfo.password = null;
                         $scope.userInfo.logged_in = true;
