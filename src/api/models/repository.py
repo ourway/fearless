@@ -24,6 +24,8 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from mixin import IDMixin, Base
 
+import ujson as json # for collection data validation and parsing
+
 
 class Repository(IDMixin, Base):
 
@@ -36,6 +38,7 @@ class Repository(IDMixin, Base):
     ftp_path = Column(String(256))
     sftp_path = Column(String(256))
     webdav_path = Column(String(256))
+    collections = relationship('Collection', backref='repository')
 
     @validates('path')
     def create_folders(self, key, path):
@@ -44,8 +47,29 @@ class Repository(IDMixin, Base):
         readme = os.path.join(path, 'fearless.rst')
         with open(readme, 'wb') as f:
             f.write('welcome to Fearless repository')
-        GIT(readme).add('repo "%s" created successfully' % self.name)
+        GIT(readme).add('repo *%s* created successfully' % self.name)
         return path
+
+    @validates('collections')
+    def check_collection_data(self, key, data):
+        collection =  json.loads(data.schema)
+        #print collection.get('folders')
+        for folder in collection.get('folders'):
+            newFolder = os.path.join(self.path, data.name, folder)
+            if not os.path.isdir(newFolder):
+                try:
+                    os.makedirs(newFolder)
+                except OSError:
+                    pass
+        for each in collection.get('files'):
+            newFile = os.path.join(self.path, data.name, each)
+            if not os.path.isfile(newFile):
+                with open(newFile, 'w') as f: pass
+        message = 'Added: files to collection:*%s* of repo:*%s*' % ( data.name, self.name)
+        GIT('.', wt=os.path.join(self.path, data.name)).add()
+
+        return data
+
 
 
 

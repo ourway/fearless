@@ -24,17 +24,23 @@ class GIT(object):
         gitdir = os.path.abspath('../../REPO')
         if not os.path.isdir(gitdir):
             os.makedirs(gitdir)
-
         self.filepath = filepath
-        self.basename = os.path.basename(filepath)
         git = sh.git
-        self.wt = os.path.dirname(self.filepath)
+        if not wt:
+            self.wt = os.path.dirname(self.filepath)
+        else:
+            self.wt = wt
+        if filepath != '.':
+            self.basename = os.path.relpath(filepath, self.wt)
+        else:
+            self.basename = '.'
         if not os.path.isdir(self.wt):
             os.makedirs(self.wt)
         self.git = git.bake(_cwd=self.wt,
-                            _piped="err",
-                            git_dir=gitdir,
-                            work_tree=self.wt)
+                            #_piped="err",
+                            #git_dir=gitdir,
+                            #work_tree=self.wt
+                            )
         self.git.init()
 
     def add(self, message=''):

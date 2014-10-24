@@ -23,9 +23,9 @@ usage:
 __all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task',
            'Repository', 'Project', 'now', 'Ticket', 'session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
-           'Page', 'r', 'es']
+           'Page', 'Collection' , 'r', 'es']
 
-
+import os
 from sqlalchemy import create_engine  # for database
 
 # for models
@@ -40,6 +40,11 @@ es = Elasticsearch()
 r = redis.StrictRedis(host='localhost', port=6379, db=3)  # db number 1 and 2 are for celery
 db_path = ':memory:'
 db_path = 'database/studio.db'
+
+db_dir = os.path.dirname(db_path)
+if not os.path.isdir(db_dir):
+    os.makedirs(db_dir)
+
 engine = create_engine('sqlite:///%s' % db_path, echo=False)
 
 from models.group import Group
@@ -58,6 +63,7 @@ from models.tag import Tag
 from models.version import Version
 from models.page import Page
 from models.asset import Asset
+from models.collection import Collection
 
 
 Base.metadata.create_all(engine)
