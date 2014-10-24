@@ -1,3 +1,5 @@
+#!../pyenv/bin/python
+
 from models import *
 
 '''We have a client'''
@@ -15,6 +17,8 @@ client.projects.append(proj)
 
 asset = Asset(key='mayafile')
 asset.users.append(user2)
+import pdb; pdb.set_trace()
+import pdb; pdb.set_trace()
 repo1 = Repository(name='happy', path='/home/farsheed/Desktop/dout')
 proj.repository = repo1
 
