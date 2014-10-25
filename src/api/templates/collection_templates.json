@@ -1,0 +1,31 @@
+{
+    "maya": {
+
+        "folders": {
+            "scenes": ["ma", "mb"],
+            "sourceimages": ["png", "tif", "tiff", "tdl", "tx", "tex", "iff"],
+            "data": ["obj", "sl"],
+            "shaders": ["slo", "sdl"]
+        },
+        "files": {
+            "workspace.mel": "",
+            "readme.txt": ""
+        },
+        "ignore": ["*.png", "*.cache", "*.mc"],
+    },
+
+    "nuke": {
+
+        "folders": {
+            "scripts": ["nk"],
+            "images": ["exr", "png", "tga", "jpg", "tiff"],
+            "output": ["exr", "png"]
+        },
+        "files": {
+            "readme.txt": ""
+        },
+        "ignore": []
+    },
+
+}
+
