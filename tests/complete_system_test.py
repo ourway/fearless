@@ -15,6 +15,7 @@ user1 = User(email='rodmena@me.com', password='rrferl', active=True)
 user2 = User(email='farsheed.ashouri@gmail.com', password='rrferl', active=True)
 ''' Our main project '''
 proj = Project(name='Fearless project 1')
+proj.lead = user2
 
 '''OK, Not assign relations'''
 
@@ -23,7 +24,7 @@ client.projects.append(proj)
 
 
 repo1 = Repository(name='happy', path='/home/farsheed/Desktop/my_asm_project')
-proj.repository = repo1
+repo1.project = proj
 
 ''' Lets create a maya collection in this repository'''
 #maya_section = Collection(name='seq1', 
@@ -48,6 +49,7 @@ session.add_all([user1, user2, proj, client, repo1, nuke_section, maya_section, 
 try:
     session.commit()
     import shutil
+    print repo1.project
     print asset1.full_path
     #print maya_section.assets
     shutil.copyfileobj(maya_section.archive, open('maya_section.tar', 'w'))

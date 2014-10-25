@@ -35,20 +35,20 @@ class Project(IDMixin, Base):
     active = Column(Boolean, default=True)
     name = Column(String(64), unique=True, nullable=False)
     client_id = Column(Integer, ForeignKey("client.id"))
-    owner = relationship('Client', backref='projects')
+    client = relationship('Client', backref='projects')
     tasks = relationship(
         'Task', backref='project', cascade="all, delete-orphan")
     users = relationship('User', backref='projects', secondary='project_users')
     lead_id = Column(Integer, ForeignKey("user.id"))
     lead = relationship('User', backref='projects_lead')
     director = relationship('User', backref='directs')
-    repository_id = Column(Integer, ForeignKey("repository.id"), nullable=False, unique=True)
-    repository = relationship('Repository', backref='projects')
     is_stereoscopic = Column(Boolean, default=False)
-    fps = Column(Float(precision=3), default=False)
+    fps = Column(Float(precision=3), default=24.000)
     tickets = relationship('Ticket', backref='project')
 
 
     @aggregated('tasks', Column(Integer))
     def calculate_number_of_tasks(self):
         return func.sum('1')
+
+

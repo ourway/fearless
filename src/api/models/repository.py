@@ -40,6 +40,8 @@ class Repository(IDMixin, Base):
     sftp_path = Column(String(256))
     webdav_path = Column(String(256))
     collections = relationship('Collection', backref='repository')
+    project_id = Column(Integer, ForeignKey("project.id"), nullable=False, unique=True)
+    project = relationship('Project', backref='repositories')
 
     @validates('path')
     def create_folders(self, key, path):
