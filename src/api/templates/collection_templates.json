@@ -5,13 +5,14 @@
             "scenes": ["ma", "mb"],
             "sourceimages": ["png", "tif", "tiff", "tdl", "tx", "tex", "iff"],
             "data": ["obj", "sl"],
-            "shaders": ["slo", "sdl"]
+            "shaders": ["slo", "sdl"],
+            "images":["png", "iff", "exr", "iff", "jpg"]
         },
         "files": {
-            "workspace.mel": "",
-            "readme.txt": ""
+            "workspace.mel": "workspace.mel",
+            "README.txt": "readme.txt"
         },
-        "ignore": ["*.png", "*.cache", "*.mc"],
+        "ignore": ["*.png", "*.cache", "*.mc"]
     },
 
     "nuke": {
@@ -22,10 +23,11 @@
             "output": ["exr", "png"]
         },
         "files": {
-            "readme.txt": ""
+            "README.txt": "readme.txt",
+            "Nuke_pipeline_Guide.txt": "nuke_guideline.txt"
         },
         "ignore": []
-    },
+    }
 
 }
 

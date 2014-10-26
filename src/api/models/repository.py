@@ -24,7 +24,7 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from mixin import IDMixin, Base
 from collections import defaultdict
-
+from mako.template import Template
 import ujson as json # for collection data validation and parsing
 
 
@@ -73,7 +73,14 @@ class Repository(IDMixin, Base):
             for each in collection.get('files'):
                 newFile = os.path.join(self.path, data.path or self.path, data.name, each)
                 if not os.path.isfile(newFile):
-                    with open(newFile, 'w') as f: pass
+                    with open(newFile, 'w') as f:
+                        tempname = collection.get('files').get(each)
+                        templateFile = os.path.join(os.path.dirname(__file__), '../templates/%s'%tempname)
+                        if os.path.isfile(templateFile):
+                            template = Template(filename=templateFile)
+                            f.write(template.render(reponame=self.name, project=self.project.name,
+                                                    id=data.id, collection=data.name))
+                        pass
             message = 'Added: files to collection:*%s* of repo:*%s*' % ( data.name, self.name)
 
             for each in collection.get('ignore'):

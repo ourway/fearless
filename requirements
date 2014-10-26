@@ -25,3 +25,4 @@ sqlalchemy-utils
 passlib
 pillow
 qrcode
+mako
