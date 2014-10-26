@@ -27,5 +27,8 @@ class Ticket(IDMixin, Base):
     """Tickets are the way of reporting errors or asking for changes.
     """
     project_id = Column(Integer, ForeignKey("project.id"))
-    name = Column(String(64), unique=True)
+    name = Column(String(64), nullable=False)
     body = deferred(Column(Text))
+
+    def __init__(self, name):
+        self.name = name

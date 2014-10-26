@@ -55,15 +55,16 @@ class Task(IDMixin, Base):
     project_id = Column(Integer, ForeignKey("project.id"))
     title = Column(String(64), unique=True, nullable=False)
     parent_id = Column(Integer, ForeignKey("task.id"))
-    children = relationship(
-        'Task', backref=backref('parent', remote_side=[id]))
+    children = relationship('Task', backref=backref('parent', remote_side=[id]))
     resources = relationship('User', backref='tasks', secondary='task_users')
+    alternative_resources = relationship('User', backref='alternative_for', secondary='task_users')
     watchers = relationship(
         'User', backref='watches', secondary='task_watchers')
     responsibles = relationship(
         'User', backref='responsible_of', secondary='task_responsible')
     priority = Column(Integer)
     version = relationship('Version', backref='task')
+    #task = relationship('Task', backref='parent')
 
     @validates('name')
     def check_name(self, key, task):

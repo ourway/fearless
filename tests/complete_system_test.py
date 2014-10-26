@@ -15,6 +15,7 @@ user1 = User(email='rodmena@me.com', password='rrferl', active=True)
 user2 = User(email='farsheed.ashouri@gmail.com', password='rrferl', active=True)
 ''' Our main project '''
 proj = Project(name='Fearless project 1')
+#proj.tickets.append('i am a ticket')
 proj.lead = user2
 
 '''OK, Not assign relations'''
