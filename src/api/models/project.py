@@ -40,7 +40,8 @@ class Project(IDMixin, Base):
     end = Column(DateTime)
     client = relationship('Client', backref='projects')
     tasks = relationship(
-        'Task', backref='project', cascade="all, delete-orphan")
+        'Task', backref='project',
+        cascade="all, delete-orphan")
     users = relationship('User', backref='projects', secondary='project_users')
     lead_id = Column(Integer, ForeignKey("user.id"))
     lead = relationship('User', backref='projects_lead')

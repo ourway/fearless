@@ -47,6 +47,16 @@ class Shot(IDMixin, Base):
     scenes = relationship('Scene', secondary='shot_scene', backref='shots')
     cut_in = Column(Integer, default=1)
     cut_out = Column(Integer)
+    number = Column(Integer, nullable=False)
     name = Column(String(64), nullable=False)  # shot6
-    code = Column(String(64))  # SHOO1
+    code = Column(String(64), nullable=False)  # SHOO1
+    timerate = Column(Integer, default=1)
     project_id = Column(Integer, ForeignKey("project.id"))
+
+
+
+    @validates('number')
+    def _assign_name_code(self, key, data):
+        self.name = 'shot_%s' % str(data).zfill(4)
+        self.code = 'SH_%s' % str(data).zfill(4)
+        return data

@@ -59,4 +59,4 @@ def logUserCreation(mapper, connection, target):
     #target.group= new_group
     # session.add(new_group)
 
-event.listen(User, 'before_insert', logUserCreation)
+event.listen(User, 'after_insert', logUserCreation)

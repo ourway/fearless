@@ -26,6 +26,9 @@ now = datetime.datetime.utcnow
 Base = declarative_base()
 logger = setup_logger('model', 'model.log')
 
+def get_session():
+    from models import session
+    return session
 
 def getUUID():
     return str(uuid4())

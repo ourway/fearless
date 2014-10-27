@@ -28,14 +28,14 @@ repo1 = Repository(name='happy', path='/home/farsheed/Desktop/my_asm_project')
 repo1.project = proj
 
 ''' Lets create a maya collection in this repository'''
-#maya_section = Collection(name='seq1', 
+#maya_section = Collection(name='seq1',
 #                schema='''
 #        {
-#            "folders":["scenes", "sourceimages", "data"], 
+#            "folders":["scenes", "sourceimages", "data"],
 #            "files":["workspace.mel", "readme.txt"],
 #            "ignore":["*.png", "*.cache", "*.mc", "*.txt"]
 #        }
-#                          
+#
 #        ''')
 
 nuke_section = Collection(name='composite', template='nuke')
@@ -51,21 +51,32 @@ task1.resources.append(user1)
 task2 = Task(title="model")
 task2.resources.append(user2)
 task2.resources.append(user1)
+task1.project=proj
 task2.project=proj
-task1.depends_on.append(task2)
+
+root_task = Task(title='research')
+master_task = Task(title='cleanup')
+root_task.start = 'now'
+master_task.start = 'now'
+root_task.duration = 15
+master_task.duration = 10
+
+task2.depends.append(task1)
 
 task1.start = '2014-1-1'
-task2.start = '2013-12-15'
-task2.end   = '2014-1-15'
-task1.end   = '2014-1-20'
+task1.duration= 18
 
-session.add_all([task1, user1, user2, proj, client, repo1, nuke_section, maya_section])
+task2.start = '2014-2-1'
+task2.duration= 15
+
+
+session.add_all([root_task, user1, user2, proj, client, repo1, nuke_section, maya_section, task1, task2])
 try:
     session.commit()
     import shutil
-    print proj.tasks
+    print task2.title, task2.depends
     #print maya_section.assets
-    shutil.copyfileobj(maya_section.archive, open('maya_section.tar', 'w'))
+    #shutil.copyfileobj(maya_section.archive, open('maya_section.tar', 'w'))
 except Exception, e:
     print e
 finally:
