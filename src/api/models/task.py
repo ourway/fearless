@@ -19,7 +19,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
-from mixin import IDMixin, Base
+from mixin import IDMixin, Base, convert_to_datetime
 
 
 task_users = Table('task_users', Base.metadata,
@@ -54,15 +54,18 @@ class Task(IDMixin, Base):
         Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     project_id = Column(Integer, ForeignKey("project.id"))
     title = Column(String(64), unique=True, nullable=False)
+    start = Column(DateTime, nullable=False)
+    end = Column(DateTime, nullable=False)
     parent_id = Column(Integer, ForeignKey("task.id"))
     children = relationship('Task', backref=backref('parent', remote_side=[id]))
+    depends_on = relationship('Task', backref=backref('dependent_of', remote_side=[id]))
     resources = relationship('User', backref='tasks', secondary='task_users')
     alternative_resources = relationship('User', backref='alternative_for', secondary='task_users')
     watchers = relationship(
         'User', backref='watches', secondary='task_watchers')
     responsibles = relationship(
         'User', backref='responsible_of', secondary='task_responsible')
-    priority = Column(Integer)
+    priority = Column(Integer, default=5)
     version = relationship('Version', backref='task')
     #task = relationship('Task', backref='parent')
 
@@ -74,3 +77,13 @@ class Task(IDMixin, Base):
     @property
     def go(self):
         return 5
+
+    @validates('start')
+    def _check_start(self, key, data):
+        return convert_to_datetime(data)
+
+
+    @validates('end')
+    def _check_end(self, key, data):
+        return convert_to_datetime(data)
+

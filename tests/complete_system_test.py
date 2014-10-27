@@ -43,15 +43,27 @@ maya_section = Collection(name='maya', template='maya', path='3d_data')
 
 repo1.collections.append(maya_section)
 repo1.collections.append(nuke_section)
-asset1 = Asset(key='testscenefile', path='scenes', ext='mb')
-asset1.collection = maya_section
+#asset1 = Asset(key='testscenefile', path='scenes', ext='mb')
+#asset1.collection = maya_section
 
-session.add_all([user1, user2, proj, client, repo1, nuke_section, maya_section, asset1])
+task1 = Task(title="rig")
+task1.resources.append(user1)
+task2 = Task(title="model")
+task2.resources.append(user2)
+task2.resources.append(user1)
+task2.project=proj
+task1.depends_on.append(task2)
+
+task1.start = '2014-1-1'
+task2.start = '2013-12-15'
+task2.end   = '2014-1-15'
+task1.end   = '2014-1-20'
+
+session.add_all([task1, user1, user2, proj, client, repo1, nuke_section, maya_section])
 try:
     session.commit()
     import shutil
-    print repo1.project
-    print asset1.full_path
+    print proj.tasks
     #print maya_section.assets
     shutil.copyfileobj(maya_section.archive, open('maya_section.tar', 'w'))
 except Exception, e:

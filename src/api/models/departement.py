@@ -22,15 +22,25 @@ from sqlalchemy.orm import validates, deferred
 from mixin import IDMixin, Base
 
 
-users_groups = Table('users_groups', Base.metadata,
+users_departements = Table('users_departements', Base.metadata,
                      Column('id', Integer, primary_key=True),
                      Column('user_id', Integer, ForeignKey('user.id')),
-                     Column('group_id', Integer, ForeignKey('group.id'))
+                     Column('departement_id', Integer, ForeignKey('departement.id'))
                      )
 
-class Group(IDMixin, Base):
+
+sequences_departements = Table('sequences_departements', Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column('sequence_id', Integer, ForeignKey('sequence.id')),
+                     Column('departement_id', Integer, ForeignKey('departement.id'))
+                     )
+
+
+
+class Departement(IDMixin, Base):
 
     '''Groups for membership management
     '''
-    name = Column(String(32), nullable=False, unique=True)
-    users = relationship('User', backref='groups', secondary='users_groups')
+    name = Column(String(64), nullable=False)
+    users = relationship('User', backref='departements', secondary='users_departements')
+    sequences = relationship('Sequence', backref='departements', secondary='sequences_departements')
