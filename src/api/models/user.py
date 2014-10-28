@@ -39,7 +39,10 @@ class User(IDMixin, Base):
     lastname = Column(String(64), nullable=True)
     lastLogIn = Column(DateTime)
     age = Column(Integer)
+    daily_working_hours = Column(Integer, default=8)
+    off_days = Column(String(32), default='fri')
     active = Column(Boolean, default=False)
+    rate = Column(Float(precision=5), default = 1.850)
     reports = relationship('Report', backref='user')
 
     @hybrid_property
@@ -56,4 +59,4 @@ def logUserCreation(mapper, connection, target):
     #target.group= new_group
     # session.add(new_group)
 
-event.listen(User, 'before_insert', logUserCreation)
+event.listen(User, 'after_insert', logUserCreation)

@@ -19,7 +19,8 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
-from mixin import IDMixin, Base
+from sqlalchemy.ext.associationproxy import association_proxy
+from mixin import IDMixin, Base, now
 
 project_users = Table('project_users', Base.metadata,
                       Column('id', Integer, primary_key=True),
@@ -33,18 +34,23 @@ class Project(IDMixin, Base):
     '''Studio Projects
     '''
     active = Column(Boolean, default=True)
+    status = Column(Integer, default=0) # 0-active, 1-pending, 2-stopped, 3-finished
     name = Column(String(64), unique=True, nullable=False)
     client_id = Column(Integer, ForeignKey("client.id"))
+    end = Column(DateTime)
     client = relationship('Client', backref='projects')
     tasks = relationship(
-        'Task', backref='project', cascade="all, delete-orphan")
+        'Task', backref='project',
+        cascade="all, delete-orphan")
     users = relationship('User', backref='projects', secondary='project_users')
     lead_id = Column(Integer, ForeignKey("user.id"))
     lead = relationship('User', backref='projects_lead')
     director = relationship('User', backref='directs')
     is_stereoscopic = Column(Boolean, default=False)
     fps = Column(Float(precision=3), default=24.000)
-    tickets = relationship('Ticket', backref='project')
+    tk = relationship('Ticket', backref='project')
+    sequences = relationship('Sequence', backref='project')
+    tickets = association_proxy('tk', 'Ticket')
 
 
     @aggregated('tasks', Column(Integer))

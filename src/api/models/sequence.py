@@ -24,5 +24,16 @@ from mixin import IDMixin, Base
 
 class Sequence(IDMixin, Base):
 
+    number = Column(Integer, nullable=False)
+    name = Column(String(64), nullable=False)  # sequence1
+    code = Column(String(64))  # SEQ1
+    project_id = Column(Integer, ForeignKey("project.id"))
+    shots = relationship('Sequence', backref='sequences', secondary='shots_sequences')
     """Sequence data
     """
+
+    @validates('number')
+    def _assign_name_code(self, key, data):
+        self.name = 'sequence_%s' % str(data).zfill(3)
+        self.code = 'SEQ_%s' % str(data).zfill(3)
+        return data

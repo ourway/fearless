@@ -26,9 +26,32 @@ now = datetime.datetime.utcnow
 Base = declarative_base()
 logger = setup_logger('model', 'model.log')
 
+def get_session():
+    from models import session
+    return session
 
 def getUUID():
     return str(uuid4())
+
+
+def convert_to_datetime(inp):
+    '''converts input string to a valid datetime object'''
+    if isinstance(inp, datetime.datetime):
+        return inp
+    elif isinstance(inp, str):
+        ''' "2014-03-05-11-54" '''
+        length = len(inp.split('-'))
+        if ':' in inp:
+            length = length+1
+        format = '%Y-%m-%d:%H-%M-%S'
+        fmtlen = (length*3) - 1
+        fmt = format[:fmtlen]
+        return datetime.datetime.strptime(inp, fmt)
+
+
+
+
+
 
 
 class IDMixin(object):
@@ -41,8 +64,7 @@ class IDMixin(object):
     #__mapper_args__= {'always_refresh': True}
     id = Column(Integer, primary_key=True)
     created_on = Column(DateTime, default=now)
-    modified_on = Column(
-        DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    modified_on = Column( DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
 
     @property
     def columns(self):
