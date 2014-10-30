@@ -54,8 +54,12 @@ task_responsible = Table("task_responsible", Base.metadata,
                              "responsible_id", Integer, ForeignKey("user.id"), primary_key=True)
                          )
 
-
-
+task_relations = Table(
+    'task_relations', Base.metadata,
+    Column('task_a_id', Integer, ForeignKey('task.id'),
+                                        primary_key=True),
+    Column('task_b_id', Integer, ForeignKey('task.id'),
+                                        primary_key=True))
 
 class Task(IDMixin, Base):
 
@@ -71,18 +75,6 @@ class Task(IDMixin, Base):
     parent_id = Column(Integer, ForeignKey("task.id"))
 
 
-    depends = association_proxy(
-        'task_depends_on',
-        'depends_on',
-        creator=lambda n: TaskDependency(depends_on=n)
-    )
-
-    dependent = association_proxy(
-        'task_dependent_of',
-        'dependent_of',
-        creator=lambda n: TaskDependency(dependent_of=n)
-    )
-
     resources = relationship('User', backref='tasks', secondary='task_users')
     alternative_resources = relationship('User', backref='alternative_for', secondary='task_alt_users')
     watchers = relationship(
@@ -92,12 +84,16 @@ class Task(IDMixin, Base):
     priority = Column(Integer, default=5)
     version = relationship('Version', backref='task')
     #task = relationship('Task', backref='parent')
-
+    ######### GOLDEN SOLUSION : Nested tree  for task to task relations ###########
+    depends = relationship("Task", secondary=task_relations,
+                           primaryjoin= id==task_relations.c.task_a_id,
+                           secondaryjoin= id==task_relations.c.task_b_id,
+                           backref='dependent_of' )
+    ###############################################################################
     def __repr__(self):
-        return "Task(title=%r, id=%r, parent_id=%r)" % (
+        return "Task(title=%r, id=%r)" % (
                     self.title,
                     self.id,
-                    self.parent_id
                 )
 
     def dump(self, _indent=0):
@@ -150,22 +146,6 @@ class Task(IDMixin, Base):
 
 
 
-class TaskDependency(IDMixin, Base):
-
-    depends_on_id = Column(Integer,
-                        ForeignKey('task.id'),
-                        )
-
-    dependent_of_id = Column(Integer,
-                        ForeignKey('task.id'),
-                        )
-
-    depends_on = relationship('Task',
-                                primaryjoin=depends_on_id==Task.id,
-                                backref='task_depends_on')
-    dependent_of = relationship('Task',
-                                primaryjoin=dependent_of_id==Task.id,
-                                backref='task_dependent_of')
 
 
 
