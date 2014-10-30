@@ -44,6 +44,7 @@ class Project(IDMixin, Base):
         cascade="all, delete-orphan")
     users = relationship('User', backref='projects', secondary='project_users')
     lead_id = Column(Integer, ForeignKey("user.id"))
+    working_days = Column(String(128), default='sat 09:00 - 18:00,')
     lead = relationship('User', backref='projects_lead')
     director = relationship('User', backref='directs')
     is_stereoscopic = Column(Boolean, default=False)

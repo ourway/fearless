@@ -1,22 +1,24 @@
         
 
-project Studio_30 "My Great Studio" 2014-10-17 +2w {
+project Studio_30 "Pooyamehr Studio test project 1 " 2014-10-10 +2m {
     #timingresolution 20min
-    dailyworkinghours 8
+    now 2014-10-30
+    dailyworkinghours 7.45
     #weekstartsfriday
-    workinghours mon 09:00 - 18:00
-    workinghours tue 09:00 - 18:00
-    workinghours wed 09:00 - 18:00
-    workinghours thu 09:00 - 13:00
-    workinghours sat 09:00 - 18:00
-    workinghours sun 09:00 - 18:00
+    workinghours mon 09:15 - 13:00, 14:00 - 18:00 
+    workinghours tue 09:15 - 13:00, 14:00 - 18:00
+    workinghours wed 09:15 - 13:00, 14:00 - 18:00
+    workinghours thu off
+    workinghours sat 09:15 - 13:00, 14:00 - 18:00
+    workinghours sun 09:15 - 13:00, 14:00 - 18:00
     workinghours fri off
-    timeformat "%Y-%m-%d"
+
+    timeformat "%m/%d:%H-%M"
     scenario plan "Plan" {
         scenario delayed "Delayed"
         }
 
-        
+
         }
 
 # resources
@@ -34,8 +36,15 @@ project Studio_30 "My Great Studio" 2014-10-17 +2w {
             resource render1 "Amir" {
                 managers td, td2
                 efficiency 0.7
-                rate 3.2
+                rate 3.3
             }
+            resource render2 "Gamari" {
+                managers td, td2
+                efficiency 0.9
+                rate 2.1
+            }
+
+
             resource art1 "kheirandish" {
                 managers td
                 efficiency 0.9
@@ -52,60 +61,268 @@ project Studio_30 "My Great Studio" 2014-10-17 +2w {
                 rate 3.0
             }
 
+            resource anim1 "behroozi"{
+            managers td
+            efficiency 1
+            rate 3.3
         }
+
+            resource rig1 "khalil"{
+            managers td
+            efficiency 1
+            rate 3.3
         }
+            resource rig2 "daliri"{
+            managers rig1
+            efficiency .5
+            rate 1
+        }            
+        resource rig3 "erfani"{
+            managers rig1
+            efficiency .5
+            rate 1
+        }
+          resource dir1 "Majid Majdi"{
+          managers td
+          efficiency 1
+          rate 15
+          limits { dailymax 3h}
+        }
+
+        resource layout1 "Bijan" {
+          managers td, td2
+          efficiency 1
+          rate 2
+          limits {}
+        }
+
+        resource tex1 "Amin" {
+          managers td, td2
+          efficiency 1
+          rate 3
+          limits {}
+        }        
+        
+        resource tex2 "Imani" {
+          managers tex1
+          efficiency .6
+          rate 1
+          limits {}
+        }        
+        
+        resource tex3 "Nazari" {
+          managers tex1
+          efficiency 1
+          rate 1
+          limits {}
+        }
+
+        resource tex4 "Ahmadi" {
+          managers tex1
+          efficiency .7
+          rate 1
+          limits {}
+        }
+        resource tex5 "Mansouri" {
+          managers tex1
+          efficiency .6
+          rate 1
+          limits { weeklymax 24h}
+        }
+
+
+
+  }
+}
 
         # tasks
         
 
 
-account cost "Project Cost" {
-  account dev "Development"
-  account doc "Documentation"
-}
-account rev "Payments"
-balance cost rev
 
 
-task Proj_1 "Start project" {
-    #effort 5d
-    chargeset dev
-    #allocate crew
-    #duration 5
-    charge 1 perday
-    responsible td
-    task storyboard "Story boarding"{
-            allocate art1
-            start 2014-10-18
-            effort 8h
-            delayed:start  2014-10-20
-            priority 1000
-        }
 
-    task colorcoding "Color Code" {
-
-        depends !storyboard
-        effort 17h
-        allocate art1 {
-        }
-    }
-
-    task music "Music Selection" {
-
-        depends !storyboard
-        effort 3h
+task proj1 "Test Project 1"{
+  start ${projectstart}
+  task development "Developement" {
+      task screenplay "Screen Play"{
         allocate art1
-    }
+        effort 8h
+      }
 
-    task modeling "Select Character" {
-        allocate model1
-        responsible td2, model1
-        effort 5h
+      task storyboard "Story Boarding" {
+        allocate art2
+        effort 8h
+        depends !screenplay
+        }
+
+      task colorcode "Color Coding" {
+        allocate art1
+        effort 8h
         depends !storyboard
-    }
+        }
 
+      task voice "Voice Selection" {
+        depends !screenplay
+        allocate art1
+        effort 3.5h
+        }
+      task music "music Selection" {
+        depends !storyboard
+        allocate art1
+        effort 4h
+        }
+      task charater_design "Character Design" {
+        depends !screenplay
+        allocate art1
+        effort 3h
+        }
+
+  }
+  task preproduction "Pre Production Stage"{
+    allocate art1
+      
+      task layout_s1 "Layout Stage 1"{
+        allocate layout1
+        depends proj1.development.storyboard
+        effort 8h
+      }
+      task layout_s2 "Layout Stage 2"{
+        allocate layout1
+        depends !layout_s1
+        effort 8h
+      }
+  
+    task setdesign "Set Design"{
+      allocate model1
+      depends proj1.development.storyboard
+      effort 8h
+      }
+
+    task character_texture "Texture of Character"{
+      allocate tex1, tex2, tex3, tex4, tex5
+      depends proj1.development.storyboard
+      effort 24h
+      }
+    task env_texture "Texture of environment"{
+      allocate tex1, tex2, tex3, tex4, tex5
+      depends !setdesign
+      effort 24h
+      }
+
+
+  }
+  task production "Production"{
+      task layout_s3 "Layout Stage 3"{
+        allocate layout1
+        depends proj1.preproduction.layout_s2
+        effort 8h
+      }
     
-}        
+      task character_model_stage_1 "Stage 1 of character modeling" {
+        allocate model1
+        depends proj1.development.charater_design
+        effort 8h
+        }
+
+      task character_model_stage_2 "Stage 2 of character modeling" {
+        allocate model1
+        depends !character_model_stage_1
+        effort 8h
+        }     
+
+      task character_model_stage_3 "Stage 3 of character modeling" {
+        allocate model1
+        depends !character_model_stage_2
+        effort 16h
+        }
+        task rig_stage_1 "Stage 1 of rig" {
+        allocate rig1, rig2, rig3
+        depends !character_model_stage_1
+        effort 8h
+        }
+        task rig_stage_2 "Stage 2 of rig" {
+        allocate rig1, rig2, rig3
+        depends !rig_stage_1, !character_model_stage_2
+        effort 8h
+        }        
+      task rig_stage_3 "Stage 3 of rig" {
+        allocate rig1, rig2, rig3
+        complete 100
+        depends !rig_stage_2, !character_model_stage_3
+        effort 16h
+        }
+
+        task anim_stage_1 "Stage 1 of animation" {
+        allocate anim1
+        depends !rig_stage_1, proj1.preproduction.layout_s1
+        effort 6h
+        }
+        task anim_stage_2 "Stage 2 of animation" {
+        allocate anim1
+        depends !anim_stage_1, !rig_stage_2, proj1.preproduction.layout_s2
+        effort 7h
+        }        
+      task anim_stage_3 "Stage 3 of animation" {
+        allocate anim1
+        depends !anim_stage_2, !rig_stage_3, proj1.production.layout_s3
+        effort 6h
+        }
+      task render_stage_1 "Stage 1 of render" {
+        allocate render1, render2
+        depends proj1.preproduction.layout_s1
+        effort 20h
+        }
+      task render_stage_2 "Stage 2 of render" {
+        allocate render1
+        depends proj1.preproduction.layout_s2, !render_stage_1, !anim_stage_2
+        effort 16h
+        }        
+      task render_stage_3 "Stage 3 of render" {
+        allocate render1
+        depends proj1.production.layout_s3, !render_stage_2, !anim_stage_3
+        effort 26h
+        }        
+      task comp_stage_1 "Stage 1 of composite" {
+        allocate render1
+        depends !render_stage_1
+        effort 7h
+        }
+      task comp_stage_2 "Stage 2 of composite" {
+        allocate render1
+        depends !render_stage_2
+        effort 8h
+        }        
+      task comp_stage_3 "Stage 3 of composite" {
+        allocate render1
+        depends !render_stage_3
+        effort 10h
+        }
+
+
+  }
+  task postproduction "Post Production"{
+      task edit_1 "Editorial" {
+        allocate layout1
+        effort 4h
+        depends proj1.production.comp_stage_1
+      }
+      task edit_2 "Editorial" {
+        allocate layout1
+        effort 5h
+        depends proj1.production.comp_stage_2
+      }
+      task edit_3 "Editorial" {
+        allocate layout1
+        effort 8h
+        depends proj1.production.comp_stage_3
+      }
+
+  }
+
+}
+
+
 
 
 
@@ -133,7 +350,7 @@ task Proj_1 "Start project" {
 resourcereport resourceGraph "" {
   scenarios delayed
   headline "Resource Allocation For Sprint Project 1"
-  columns no, name, effort, rate, freetime, chart {scale day width 600}, managers, cost
+  columns no, name, effort, freetime, start, end, status,turnover, chart {scale day width 200}
   loadunit hours
   # We only like to show leaf tasks for leaf resources.
     hidetask ~(isleaf() & isleaf_())
