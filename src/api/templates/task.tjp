@@ -1,0 +1,12 @@
+task ${task.title}_${task.id} "${task.title.title()}_${task.id}" {
+    %if task.resources:
+        allocate ${''.join([i.alias for i in task.resources])}
+    %endif
+    %if task.duration:
+        effort ${task.duration}
+    %endif
+    %if not task.depends:
+        start ${task.start.strftime('%Y-%m-%d:%H-%M')}
+    %endif
+            ${subtask}
+    }

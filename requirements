@@ -21,6 +21,7 @@ pysendfile
 werkzeug
 elasticsearch
 sqlalchemy
+sqlalchemy_mptt
 sqlalchemy-utils
 passlib
 pillow

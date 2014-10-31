@@ -5,7 +5,9 @@ module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/ap
 sys.path.append(module_path)
 
 
-
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import aliased
+from sqlalchemy.orm import subqueryload
 from models import *
 
 '''We have a client'''
@@ -57,15 +59,11 @@ task2.project=proj
 root_task = Task(title='research')
 master_task = Task(title='cleanup')
 master_task.project=proj
-root_task.project=proj
-#root_task.start = 'now'
-#master_task.start = 'now'
 
-#task2.depends.append(task1)
-master_task.depends.append(root_task)
-task2.depends.append(master_task)
-task1.depends.append(master_task)
-task1.depends.append(task2)
+task1.parent=master_task
+master_task.parent = task2
+
+
 
 #task1.start = '2014-1-1'
 task1.duration= 18
@@ -75,14 +73,11 @@ task2.duration= 15
 
 
 session.add_all([root_task, user1, user2, proj, client, repo1, nuke_section, maya_section, task1, task2])
-try:
-    session.commit()
+session.commit()
     #import shutil
-    print root_task
+print Task.get_tree(session)
+
     #print maya_section.assets
     #shutil.copyfileobj(maya_section.archive, open('maya_section.tar', 'w'))
-except Exception, e:
-    print e
-finally:
-    os.system('rm -rf database')
+os.system('rm -rf database')
 

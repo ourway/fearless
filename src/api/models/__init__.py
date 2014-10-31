@@ -26,11 +26,9 @@ __all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task',
            'Page', 'Collection' , 'r', 'es', 'Departement']
 
 import os
-from sqlalchemy import create_engine  # for database
 
 # for models
-from mixin import Base, now
-from sqlalchemy.orm import sessionmaker
+from mixin import now
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 import redis
 
@@ -38,17 +36,9 @@ from elasticsearch import Elasticsearch
 es = Elasticsearch()
 
 r = redis.StrictRedis(host='localhost', port=6379, db=3)  # db number 1 and 2 are for celery
-db_path = ':memory:'
-#db_path = 'database/studio.db'
 
-try:
-    db_dir = os.path.dirname(db_path)
-    if not os.path.isdir(db_dir):
-        os.makedirs(db_dir)
-except OSError:
-    pass
+from db import session, engine, Base
 
-engine = create_engine('sqlite:///%s' % db_path, echo=False)
 
 from models.group import Group
 from models.user import User
@@ -71,8 +61,6 @@ from models.departement import Departement
 
 
 Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
 
 
 if __name__ == '__main__':

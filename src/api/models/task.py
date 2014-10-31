@@ -12,15 +12,18 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
+import os
 import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
 
+from db import session
+from mako.template import Template
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
-from mixin import IDMixin, Base, convert_to_datetime, now
+from mixin import IDMixin, Base, convert_to_datetime, now, BaseNestedSets
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
 task_users = Table('task_users', Base.metadata,
@@ -61,7 +64,7 @@ task_relations = Table(
     Column('task_b_id', Integer, ForeignKey('task.id'),
                                         primary_key=True))
 
-class Task(IDMixin, Base):
+class Task(IDMixin, Base, BaseNestedSets):
 
     """Task management
     """
@@ -85,23 +88,8 @@ class Task(IDMixin, Base):
     version = relationship('Version', backref='task')
     #task = relationship('Task', backref='parent')
     ######### GOLDEN SOLUSION : Nested tree  for task to task relations ###########
-    depends = relationship("Task", secondary=task_relations,
-                           primaryjoin= id==task_relations.c.task_a_id,
-                           secondaryjoin= id==task_relations.c.task_b_id,
-                           backref='dependent_of' )
+
     ###############################################################################
-    def __repr__(self):
-        template =  """
-        task %s_%s "%s" {
-            allocate %s
-            effort %sh
-
-                %s
-
-         }"""
-        return template % (self.title, self.id, self.title,
-                ','.join([i.alias for i in self.resources]),
-                self.duration, '---'.join([repr(k) for k in self.dependent_of]))
 
     def dump(self, _indent=0):
         return repr(self)
@@ -115,29 +103,6 @@ class Task(IDMixin, Base):
     def go(self):
         return 5
 
-
-    @validates('depends')
-    def _add_all_dependencies(self, key, data):
-        def _get_deps(target):
-            if target.depends:
-                for i in target.depends:
-                    if not i in self.depends:
-                        self.depends.append(i)
-                        _get_deps(i)
-        _get_deps(data)
-        return data
-
-
-    @validates('dependent_of')
-    def _add_all_dependents_of(self, key, data):
-        def _get_deps_of(target):
-            if target.dependent_of:
-                for i in target.dependent_of:
-                    self.dependent_of.append(i)
-                    _get_deps_of(i)
-
-        _get_deps_of(data)
-        return data
 
     @validates('start')
     def _check_start(self, key, data):
@@ -176,8 +141,7 @@ def receive_before_insert(mapper, connection, target):
 
 @event.listens_for(Task, 'after_insert')
 def receive_before_insert(mapper, connection, target):
-    for task in target.project.tasks:
-        pass
+    pass
         #print task.title
     # ... (update task confighandling logic) ...
 

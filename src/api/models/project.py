@@ -45,7 +45,7 @@ class Project(IDMixin, Base):
     users = relationship('User', backref='projects', secondary='project_users')
     lead_id = Column(Integer, ForeignKey("user.id"))
     working_days = Column(String(128), default='sat 09:00 - 18:00,')
-    lead = relationship('User', backref='projects_lead')
+    lead = relationship('User', backref='leads')
     director = relationship('User', backref='directs')
     is_stereoscopic = Column(Boolean, default=False)
     fps = Column(Float(precision=3), default=24.000)
