@@ -20,7 +20,7 @@ from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
-from mixin import IDMixin, Base, convert_to_datetime
+from mixin import IDMixin, Base, convert_to_datetime, now
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
 task_users = Table('task_users', Base.metadata,
@@ -69,7 +69,7 @@ class Task(IDMixin, Base):
         Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     project_id = Column(Integer, ForeignKey("project.id"))
     title = Column(String(64), unique=True, nullable=False)
-    start = Column(DateTime, nullable=False)
+    start = Column(DateTime, nullable=False, default=now)
     end = Column(DateTime, nullable=False)
     duration = Column(Float(precision=3), nullable=False)
     parent_id = Column(Integer, ForeignKey("task.id"))
@@ -91,9 +91,10 @@ class Task(IDMixin, Base):
                            backref='dependent_of' )
     ###############################################################################
     def __repr__(self):
-        return "Task(title=%r, id=%r)" % (
+        return "Task(title=%r, id=%r, duration=%r)" % (
                     self.title,
                     self.id,
+                    self.duration,
                 )
 
     def dump(self, _indent=0):
@@ -107,6 +108,30 @@ class Task(IDMixin, Base):
     @property
     def go(self):
         return 5
+
+
+    @validates('depends')
+    def _add_all_dependencies(self, key, data):
+        def _get_deps(target):
+            if target.depends:
+                for i in target.depends:
+                    if not i in self.depends:
+                        self.depends.append(i)
+                        _get_deps(i)
+        _get_deps(data)
+        return data
+
+
+    @validates('dependent_of')
+    def _add_all_dependents_of(self, key, data):
+        def _get_deps_of(target):
+            if target.dependent_of:
+                for i in target.dependent_of:
+                    self.dependent_of.append(i)
+                    _get_deps_of(i)
+
+        _get_deps_of(data)
+        return data
 
     @validates('start')
     def _check_start(self, key, data):
@@ -128,19 +153,15 @@ class Task(IDMixin, Base):
 
     @validates('duration')
     def _update_end(self, key, data):
+        if not self.start:
+            self.start = now()
         delta = datetime.timedelta(hours=data)
         self.duration_set = True
         if not hasattr(self, 'end_set'):
             self.end = self.start + delta
         return data
 
-    @validates('depends_on')
-    def _add_other_dependencies(self, key, data):
-        return data
 
-    @validates('dependent_of')
-    def _add_other_dependents_of(self, key, data):
-        return data
 
 
 

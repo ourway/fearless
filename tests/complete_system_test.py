@@ -56,21 +56,23 @@ task2.project=proj
 
 root_task = Task(title='research')
 master_task = Task(title='cleanup')
-root_task.start = 'now'
-master_task.start = 'now'
+master_task.project=proj
+root_task.project=proj
+#root_task.start = 'now'
+#master_task.start = 'now'
 root_task.duration = 15
 master_task.duration = 10
 
 #task2.depends.append(task1)
+master_task.depends.append(root_task)
 task2.depends.append(master_task)
 task1.depends.append(master_task)
 task1.depends.append(task2)
-#master_task.dependent_of.append(task1)
 
-task1.start = '2014-1-1'
+#task1.start = '2014-1-1'
 task1.duration= 18
 
-task2.start = '2014-2-1'
+#task2.start = '2014-2-1'
 task2.duration= 15
 
 
@@ -78,9 +80,7 @@ session.add_all([root_task, user1, user2, proj, client, repo1, nuke_section, may
 try:
     session.commit()
     #import shutil
-    print master_task.dependent_of
-    print task1.depends
-    print task2.depends
+    print root_task.dependent_of
     #print maya_section.assets
     #shutil.copyfileobj(maya_section.archive, open('maya_section.tar', 'w'))
 except Exception, e:
