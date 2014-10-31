@@ -71,7 +71,7 @@ class Task(IDMixin, Base):
     title = Column(String(64), unique=True, nullable=False)
     start = Column(DateTime, nullable=False, default=now)
     end = Column(DateTime, nullable=False)
-    duration = Column(Float(precision=3), nullable=False)
+    duration = Column(Float(precision=3), nullable=False, default=0)
     parent_id = Column(Integer, ForeignKey("task.id"))
 
 
@@ -91,11 +91,17 @@ class Task(IDMixin, Base):
                            backref='dependent_of' )
     ###############################################################################
     def __repr__(self):
-        return "Task(title=%r, id=%r, duration=%r)" % (
-                    self.title,
-                    self.id,
-                    self.duration,
-                )
+        template =  """
+        task %s_%s "%s" {
+            allocate %s
+            effort %sh
+
+                %s
+
+         }"""
+        return template % (self.title, self.id, self.title,
+                ','.join([i.alias for i in self.resources]),
+                self.duration, '---'.join([repr(k) for k in self.dependent_of]))
 
     def dump(self, _indent=0):
         return repr(self)
@@ -161,9 +167,19 @@ class Task(IDMixin, Base):
             self.end = self.start + delta
         return data
 
+@event.listens_for(Task, 'before_insert')
+def receive_before_insert(mapper, connection, target):
+    target.duration = target.duration or 0
+
+    # ... (event handling logic) ...
 
 
-
+@event.listens_for(Task, 'after_insert')
+def receive_before_insert(mapper, connection, target):
+    for task in target.project.tasks:
+        pass
+        #print task.title
+    # ... (update task confighandling logic) ...
 
 
 

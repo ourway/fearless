@@ -60,8 +60,6 @@ master_task.project=proj
 root_task.project=proj
 #root_task.start = 'now'
 #master_task.start = 'now'
-root_task.duration = 15
-master_task.duration = 10
 
 #task2.depends.append(task1)
 master_task.depends.append(root_task)
@@ -80,7 +78,7 @@ session.add_all([root_task, user1, user2, proj, client, repo1, nuke_section, may
 try:
     session.commit()
     #import shutil
-    print root_task.dependent_of
+    print root_task
     #print maya_section.assets
     #shutil.copyfileobj(maya_section.archive, open('maya_section.tar', 'w'))
 except Exception, e:

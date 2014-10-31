@@ -12,7 +12,7 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
-
+import re
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
 
@@ -36,6 +36,7 @@ class User(IDMixin, Base):
     password = Column(PasswordType(schemes=['pbkdf2_sha512']), nullable=False)
     token = Column(String(64), default=getUUID, unique=True)
     firstname = Column(String(64), nullable=True)
+    alias = Column(String(64), nullable=True)
     lastname = Column(String(64), nullable=True)
     lastLogIn = Column(DateTime)
     age = Column(Integer)
@@ -45,6 +46,13 @@ class User(IDMixin, Base):
     rate = Column(Float(precision=5), default = 1.850)
     reports = relationship('Report', backref='user')
 
+
+    @validates('email')
+    def _validate_email(self, key, data):
+        if re.match(r'[^@]+@[^@]+\.[^@]+', data):
+            if not self.alias:
+                self.alias = data.split('@')[0].replace('.', '_')
+            return data
     @hybrid_property
     def fullname(self):
         return (self.firstname or '<>') + " " + (self.lastname or '<>')
