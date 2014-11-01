@@ -94,11 +94,11 @@ session.commit()
     #import shutil
 #tj = Task.get_tree(session, json=True)
 
-print proj.plan
+proj.plan
+print [i for i in proj.reports]
 
 
 
     #print maya_section.assets
     #shutil.copyfileobj(maya_section.archive, open('maya_section.tar', 'w'))
-os.system('rm -rf database')
 

@@ -7,8 +7,10 @@ from sqlalchemy_mptt import mptt_sessionmaker
 
 from mixin import Base
 
-db_path = ':memory:'
+#db_path = ':memory:'
 #db_path = 'database/studio.db'
+db_path = os.path.join( os.path.dirname(__file__), '../database/studio.db')
+print db_path
 
 try:
     db_dir = os.path.dirname(db_path)
@@ -17,6 +19,7 @@ try:
 except OSError:
     pass
 
-engine = create_engine('sqlite:///%s' % db_path, echo=False)
+engine = create_engine('sqlite:///%s' % db_path, echo=False, encoding='utf-8')
+#engine.raw_connection().connection.text_factory = str
 Session = mptt_sessionmaker(sessionmaker(bind=engine))
 session = Session()

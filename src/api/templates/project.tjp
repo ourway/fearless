@@ -35,14 +35,14 @@ taskreport breakdown "PMS"{
             formats csv
             timeformat "%Y-%m-%d-%H:%M"
             columns id, start, end
-                taskreport breakdown "report"{
+                taskreport breakdown "report_${project.id}"{
                     formats html
                     timeformat "%m-%d:%H"
                     columns name, start, end, chart { scale day }, managers
                 }
         }
 
-  textreport "ResourceGraph" {
+  textreport "ResourceGraph_${project.id}" {
     formats html
     title "Resource Graph"
     center '<[report id="resourceGraph"]>'

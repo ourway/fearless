@@ -14,6 +14,8 @@ Clean code is much better than Cleaner comments!
 
 import os
 import sh
+
+from lxml import etree
 import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event, func
@@ -23,6 +25,7 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, now, convert_to_datetime
+from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 
 project_users = Table('project_users', Base.metadata,
                       Column('id', Integer, primary_key=True),
@@ -33,6 +36,13 @@ project_users = Table('project_users', Base.metadata,
 from db import session
 from mako.template import Template
 
+
+project_reports = Table('project_reports', Base.metadata,
+    Column('project_id', Integer, ForeignKey("project.id"),
+           primary_key=True),
+    Column('report_id', Integer, ForeignKey("report.id"),
+           primary_key=True)
+)
 
 class Project(IDMixin, Base):
 
@@ -59,6 +69,12 @@ class Project(IDMixin, Base):
     tk = relationship('Ticket', backref='project')
     sequences = relationship('Sequence', backref='project')
     tickets = association_proxy('tk', 'Ticket')
+    rep = relationship("Report", secondary=lambda: project_reports, backref='project')
+    reports = association_proxy('rep', 'body')
+
+
+
+
 
     @aggregated('tasks', Column(Integer))
     def calculate_number_of_tasks(self):
@@ -78,6 +94,10 @@ class Project(IDMixin, Base):
     def _check_start(self, key, data):
         result = convert_to_datetime(data)
         return result
+
+    @validates('rep')
+    def compress_report(self, key, data):
+        return data
 
     @property
     def plan(self):
@@ -103,4 +123,15 @@ class Project(IDMixin, Base):
 
         tj3 = sh.tj3
         tj3(plan_path, o='/tmp')
+        report_path = '/tmp/report_%s.html'%self.id
+        if os.path.isfile(report_path):
+            report = open(report_path)
+            root = etree.parse(report)
+            main_table = root.xpath('//table')[0]
+            tosave = etree.tostring(main_table)
+            self.reports.append(tosave)
+            session.commit()
+        else:
+            print 'not available'
+
         return data

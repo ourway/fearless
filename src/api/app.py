@@ -56,24 +56,27 @@ class DB:
     '''Restfull API for database
     '''
 
-    def on_get(self, req, resp):
+    def on_get(self, req, resp, **kw):
+
         args = req.path.split('/')
         table = args[3].title()
         if len(args) == 5:
             id = args[4]
             query = 'session.query({t}).filter({t}.id=={id})'.format(
                 t=table, id=int(id))
+
             data = eval(query).first()
         else:
             query = 'session.query({t})'.format(t=table)
             data = eval(query).all()
 
+
         data = repr(data)
-        resp.body = json.dumps(json.loads(data))
+        resp.body = json.loads(data)
         # Ok, We have an id
 
     @falcon.after(commit)
-    def on_put(self, req, resp):
+    def on_put(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
         query_params = get_params(req.uri)

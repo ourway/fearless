@@ -48,6 +48,9 @@ fearlessApp.factory('authFactory', function($resource) {
                                                       $timeout, authFactory, $location, $routeParams) {
 		// create a message to display in our view
         $rootScope.title = "Centeral Auth - Fearless";
+        $scope.login_init = function() {
+            //
+        }
         $scope.check_auth_area = function() {
             if ($location.$$path.split('/')[1] == 'auth')
                 return true;
