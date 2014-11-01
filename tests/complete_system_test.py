@@ -14,7 +14,7 @@ import copy
 '''We have a client'''
 client = Client(name='pooyamehr')
 ''' Lets create few users '''
-user1 = User(email='rodmena@me.com', password='rrferl', active=True)
+user1 = User(email='rodmena@me.com', password='rrferl', active=True, firstname='Farsheed', lastname='Ashouri')
 user2 = User(email='farsheed.ashouri@gmail.com', password='rrferl', active=True)
 ''' Our main project '''
 proj = Project(name='Fearless project 1')
@@ -95,11 +95,8 @@ session.commit()
 #tj = Task.get_tree(session, json=True)
 
 proj.plan
-print [i for i in proj.reports]
 
-for i in  session.query(Group).all():
-    print i.rules
-
+print session.query(Project).join(Task).all()
 
 
 

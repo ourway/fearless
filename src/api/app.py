@@ -24,7 +24,8 @@ from utils.assets import AssetSave, ListAssets, GetAsset
 from models import __all__ as av
 from models import *
 from sqlalchemy.exc import IntegrityError  # for exception handeling
-from utils.AAA import Login, Signup, Authenticate, Verify, Reactivate, Reset, Logout
+from utils.AAA import Login, Signup, Authenticate,\
+    Verify, Reactivate, Reset, Logout, GetUserInfo
 
 tables = [i for i in av if i[0] in ascii_uppercase]
 
@@ -155,6 +156,7 @@ app.add_route('/api/auth/activate', Verify())
 app.add_route('/api/auth/reactivate', Reactivate())
 app.add_route('/api/auth/reset', Reset())
 app.add_route('/api/auth/logout', Logout())
+app.add_route('/api/auth/getUserInfo', GetUserInfo())
 app.add_route('/api/asset/save/{repo}', AssetSave())
 app.add_route('/api/asset', ListAssets())
 app.add_route('/api/asset/{key}', GetAsset())

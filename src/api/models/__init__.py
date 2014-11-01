@@ -74,6 +74,7 @@ def init():
             session.add(new)
 
     manager_group = session.query(Group).filter(Group.name=='managers').first()
+    user_group = session.query(Group).filter(Group.name=='users').first()
 
     rule_actions = ['create', 'read', 'delete', 'update']
     rule_areas_managers = ['project', 'shot', 'sequence', 'collection',
@@ -86,14 +87,14 @@ def init():
             if not rule in [i.name for i in rules]:
                 new = Rule(rule)
                 session.add(new)
+                if area in rule_areas_users:
+                    user_group.rls.append(new)
                 manager_group.rls.append(new)
 
     read_rules = session.query(Rule).filter(Rule.name.like('read%')).all()
     users_group = session.query(Group).filter(Group.name=='users').first()
     for rule in read_rules:
         users_group.rls.append(rule)
-
-
 
     session.commit()
     print '*'*25 , '*********************', '*'*25

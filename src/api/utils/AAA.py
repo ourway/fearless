@@ -150,8 +150,10 @@ class Login:
                 # this session is not yet saved
                 resp.set_header(
                     'set-cookie', 'session-id=%s; path=/; max-age=%s; HttpOnly' % (sid, rem_time))
+                target.latest_session_id = hashed_sid
                 r.incr(hashed_sid, 1)  # add it to redis
                 r.expire(hashed_sid, rem_time)
+
                 logger.info(
                     '{ip}|"{u}" loggin in from web"'.format(u=target.email, ip=ip))
                 resp.body = {'message': 'success',
@@ -325,3 +327,12 @@ class Logout:
             hashed_sid = hashlib.sha1(sid).hexdigest()
             logger.info('{ip}|logged out'.format(ip=ip))
             resp.body = r.delete(hashed_sid)
+
+class GetUserInfo:
+
+    def on_post(self, req, resp):
+        sid = req.cookie('session-id')
+        hashed_sid = hashlib.sha1(sid).hexdigest()
+        target = session.query(User).filter(User.latest_session_id==hashed_sid).first()
+        resp.body = {'email':target.email, 'alias':target.alias, 'firstname':target.firstname,
+                     'lastname':target.lastname, 'id':target.id}

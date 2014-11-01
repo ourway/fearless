@@ -146,6 +146,7 @@ class Task(IDMixin, Base, BaseNestedSets):
         return data
 
 
+
 @event.listens_for(Task, 'before_insert')
 def receive_before_insert(mapper, connection, target):
     target.duration = target.duration or 0

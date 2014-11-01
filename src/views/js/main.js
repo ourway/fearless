@@ -7,6 +7,8 @@ fearlessApp.factory('authFactory', function($resource) {
   );
 });
 
+
+
 	fearlessApp.config(function($routeProvider, $locationProvider) {
 		$routeProvider
 
@@ -40,6 +42,11 @@ fearlessApp.factory('authFactory', function($resource) {
 				templateUrl : 'pages/auth/reactivate.html',
 				controller  : 'mainController'
 			})		//$locationProvider.html5Mode(true);
+            .when('/pms', {
+
+                templateUrl: 'pages/pms/index.html',
+                controller: 'pmsCtrl'
+            })
 		 })
 
 
@@ -151,6 +158,7 @@ fearlessApp.factory('authFactory', function($resource) {
                 return true
             }
         else {
+           // This is where I redirect user to login page if she/he is unauthenticated
               $scope.userInfo.username = null;
               $scope.userInfo.userid = null;
               $scope.userInfo.logged_in = false;
@@ -190,3 +198,20 @@ function validateEmail(email) {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
 }
+
+
+
+fearlessApp.controller('pmsCtrl', function($scope, $http, $location){
+    $scope.init = function() {
+
+        $http.post('/api/auth/getUserInfo').success(function(result){
+
+            console.log(result);
+        })
+
+
+
+
+    }
+
+});
