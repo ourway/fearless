@@ -70,7 +70,7 @@ class Project(IDMixin, Base):
     sequences = relationship('Sequence', backref='project')
     tickets = association_proxy('tk', 'Ticket')
     rep = relationship("Report", secondary=lambda: project_reports, backref='project')
-    reports = association_proxy('rep', 'body')
+    reports = association_proxy('rep', 'id')
 
 
 

@@ -17,6 +17,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
     Float, Boolean, event
 
 import bz2
+import ujson as json
 import base64
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
@@ -44,4 +45,6 @@ class Report(IDMixin, Base):
     @property
     def body(self):
         b = base64.decodestring(self.data)
-        return bz2.decompress(b)
+        data = {'body': bz2.decompress(b)}
+        return data
+

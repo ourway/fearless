@@ -18,6 +18,7 @@ from sqlalchemy.exc import IntegrityError  # for exception handeling
 import ujson as json
 import commands
 import cStringIO
+from sqlalchemy.ext import associationproxy
 
 
 def get_ip():
@@ -37,14 +38,24 @@ def commit(req, resp):
 
 def jsonify(self, resp):
     '''Everything is json here'''
-    if isinstance(resp.stream, (file, cStringIO.OutputType)):
+    if isinstance(resp.body, associationproxy._AssociationList):
+        #resp.body = str(resp.body)
+        resp.body = repr(resp.body)
+    elif isinstance(resp.stream, (file, cStringIO.OutputType)):
         return
     elif isinstance(resp.body, (file, cStringIO.OutputType)):
         return
     else:
-        resp.body = json.dumps(resp.body)
-
-    #resp.body = json.dumps(resp.body)
+        try:
+            json.loads(resp.body)
+            data = resp.body
+        except:
+            try:
+                data = json.dumps(resp.body)
+            except:
+                data = resp.body
+        finally:
+            resp.body = str(data)
 
 
 def punish(self, req, resp):

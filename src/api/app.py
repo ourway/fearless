@@ -71,8 +71,20 @@ class DB:
             data = eval(query).all()
 
 
-        data = repr(data)
-        resp.body = json.loads(data)
+        field = req.get_param('field')
+        if field and len(args)==5:
+            try:
+                data = eval('data.%s'%field)
+            except AttributeError:
+                raise falcon.HTTPBadRequest('Bad Request', 'The requested field is not available for database')
+            resp.body = data
+            return
+
+        try:
+            data = repr(data)
+            resp.body = json.loads(data)
+        except (TypeError, ValueError):
+            resp.body = data
         # Ok, We have an id
 
     @falcon.after(commit)
