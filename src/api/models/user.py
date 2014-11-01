@@ -20,11 +20,15 @@ from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
-
+from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, getUUID, logger
 import datetime
 
-
+users_groups = Table('users_groups', Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column('user_id', Integer, ForeignKey('user.id')),
+                     Column('group_id', Integer, ForeignKey('group.id'))
+                     )
 class User(IDMixin, Base):
 
     '''Main users group
@@ -43,12 +47,17 @@ class User(IDMixin, Base):
     active = Column(Boolean, default=False)
     rate = Column(Float(precision=5), default=1.850)
     reports = relationship('Report', backref='user')
+    grps = relationship('Group', backref='users', secondary='users_groups')
+    groups = association_proxy('grps', 'name')
 
     @validates('email')
     def _validate_email(self, key, data):
         if re.match(r'[^@]+@[^@]+\.[^@]+', data):
             if not self.alias:
                 self.alias = data.split('@')[0].replace('.', '_')
+
+            self.groups.append(self.alias)
+
             return data
 
     @hybrid_property

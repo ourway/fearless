@@ -97,6 +97,10 @@ session.commit()
 proj.plan
 print [i for i in proj.reports]
 
+for i in  session.query(Group).all():
+    print i.rules
+
+
 
 
     #print maya_section.assets

@@ -61,8 +61,38 @@ from models.asset import Asset
 from models.collection import Collection
 from models.departement import Departement
 
-
 Base.metadata.create_all(engine)
+
+def init():
+    '''set some defaults values. Like admin rule and group, managers, etc...
+    '''
+    print '*'*25 , 'Initializing database', '*'*25
+    groups = session.query(Group.name).all()
+    for gr in ['managers', 'users', 'clients', 'guests'] :
+        if not gr in groups:
+            new = Group(gr, rule=gr[:-1])
+            session.add(new)
+
+
+    rule_actions = ['can_create', 'can_read', 'can_export']
+    rule_areas = ['project', 'shot', 'sequence', 'page', 'collection',
+                 'report', 'scene', 'task', 'ticket']
+    for act in rule_actions:
+        for area in rule_areas:
+            rule = '%s_%s' % (act, area)
+            new = Rule(rule)
+            session.add(new)
+
+
+
+
+    session.commit()
+    print '*'*25 , '*********************', '*'*25
+
+
+init()
+
+
 
 
 if __name__ == '__main__':

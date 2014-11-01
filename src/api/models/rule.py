@@ -22,11 +22,7 @@ from sqlalchemy.orm import validates, deferred
 from mixin import IDMixin, Base, getUUID
 
 
-groups_rules = Table('group_rules', Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column('rule_id', Integer, ForeignKey('rule.id')),
-                     Column('group_id', Integer, ForeignKey('group.id'))
-                     )
+
 
 
 class Rule(IDMixin, Base):
@@ -35,5 +31,8 @@ class Rule(IDMixin, Base):
     '''
 
     name = Column(String(32), nullable=False, unique=True)
-    groups = relationship("Group",
-                          secondary=groups_rules, backref='rules')
+
+
+
+    def __init__(self, name):
+        self.name = name
