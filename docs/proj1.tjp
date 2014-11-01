@@ -327,7 +327,7 @@ task proj1 "Test Project 1"{
 
 
         # reports
-        taskreport breakdown "Stalker_"{
+taskreport breakdown "Stalker_"{
             formats csv
             timeformat "%Y-%m-%d-%H:%M"
             columns id, start, end

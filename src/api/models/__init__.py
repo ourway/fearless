@@ -23,7 +23,7 @@ usage:
 __all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task',
            'Repository', 'Project', 'now', 'Ticket', 'session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
-           'Page', 'Collection' , 'r', 'es', 'Departement']
+           'Page', 'Collection', 'r', 'es', 'Departement']
 
 import os
 
@@ -35,7 +35,8 @@ import redis
 from elasticsearch import Elasticsearch
 es = Elasticsearch()
 
-r = redis.StrictRedis(host='localhost', port=6379, db=3)  # db number 1 and 2 are for celery
+# db number 1 and 2 are for celery
+r = redis.StrictRedis(host='localhost', port=6379, db=3)
 
 from db import session, engine, Base
 

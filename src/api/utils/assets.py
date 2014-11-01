@@ -31,8 +31,6 @@ from base64 import encode
 from models import Asset, Repository, es, session
 
 
-
-
 def _generate_id():
     return os.urandom(2).encode('hex') + hex(int(time.time() * 10))[5:]
 
@@ -50,29 +48,32 @@ class AssetSave:
     @falcon.after(commit)
     def on_put(self, req, resp, repo):
         '''Get data based on a file object or b64 data, save and commit it'''
-        targetRepo = session.query(Repository).filter(Repository.name==repo).first()
+        targetRepo = session.query(Repository).filter(
+            Repository.name == repo).first()
         body = req.stream
         if targetRepo:
-            name = req.get_param('name') or 'undefined.%s.raw'%_generate_id()
+            name = req.get_param('name') or 'undefined.%s.raw' % _generate_id()
             tempraryStoragePath = path.join(targetRepo.path,
-                contenttype(name).split(';')[0].replace('x-', ''), name)
+                                            contenttype(name).split(';')[0].replace('x-', ''), name)
             bodyMd5 = safeCopyAndMd5(body, tempraryStoragePath)
-            old_asset = session.query(Asset).filter(Asset.repository==targetRepo).filter(Asset.key==bodyMd5).first()
+            old_asset = session.query(Asset).filter(
+                Asset.repository == targetRepo).filter(Asset.key == bodyMd5).first()
             if not old_asset:
                 asset = Asset(key=bodyMd5, repository=targetRepo)
                 session.add(asset)
                 newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
                 asset.task_id = newAsset.task_id
-                resp.body = {'message':'Asset created', 'key': asset.key}
+                resp.body = {'message': 'Asset created', 'key': asset.key}
                 #resp.body = "I am working"
             else:
-                resp.body = {'message':'Asset already available'}
+                resp.body = {'message': 'Asset already available'}
         else:
             while True:
-                chunk = req.stream.read(2**20)
-                if not chunk: break
+                chunk = req.stream.read(2 ** 20)
+                if not chunk:
+                    break
 
-            resp.body = {'message':'Repo is not available'}
+            resp.body = {'message': 'Repo is not available'}
 
 
 def safeCopyAndMd5(fileobj, destinationPath):
@@ -160,12 +161,12 @@ class GetAsset:
     def on_get(self, req, resp, key):
         '''Serve asset based on a key (riak key for finding path'''
 
-        target = session.query(Asset).filter(Asset.key==key).first()
+        target = session.query(Asset).filter(Asset.key == key).first()
         if target:
             print target
             filepath = os.path.join(target.repository.path, target.path)
             f = open(filepath)
-            #resp.stream_len=500
+            # resp.stream_len=500
             if req.get_param('b64'):
                 encf = StringIO()
                 encode(f, encf)
@@ -178,6 +179,7 @@ class GetAsset:
                 resp.content_type = str(target.content_type)
                 resp.stream_len = os.path.getsize(filepath)
                 resp.stream = f
+
 
 class ListAssets:
 

@@ -29,11 +29,6 @@ from utils.AAA import Login, Signup, Authenticate, Verify, Reactivate, Reset, Lo
 tables = [i for i in av if i[0] in ascii_uppercase]
 
 
-
-
-
-
-
 def get_params(url, flat=True):
     '''Return a string out of url params for query
     '''
@@ -47,11 +42,6 @@ def get_params(url, flat=True):
     return l
 
 
-
-
-
-
-
 class ThingsResource:
 
     def on_get(self, req, resp):
@@ -62,6 +52,7 @@ class ThingsResource:
 
 
 class DB:
+
     '''Restfull API for database
     '''
 
@@ -76,7 +67,6 @@ class DB:
         else:
             query = 'session.query({t})'.format(t=table)
             data = eval(query).all()
-
 
         data = repr(data)
         resp.body = json.dumps(json.loads(data))
@@ -138,18 +128,18 @@ things = ThingsResource()
 
 ########################################################
 for table in tables:
-    app.add_route('/api/db/{t}'.format(t=table), DB() )
+    app.add_route('/api/db/{t}'.format(t=table), DB())
     app.add_route('/api/db/%s/{id}' % table, DB())
 #######################################################
 
 # things will handle all requests to the '/things' URL path
 app.add_route('/api/things', things)
-app.add_route('/api/auth/login', Login() )
-app.add_route('/api/auth/signup', Signup() )
-app.add_route('/api/auth/activate', Verify() )
-app.add_route('/api/auth/reactivate', Reactivate() )
-app.add_route('/api/auth/reset', Reset() )
-app.add_route('/api/auth/logout', Logout() )
+app.add_route('/api/auth/login', Login())
+app.add_route('/api/auth/signup', Signup())
+app.add_route('/api/auth/activate', Verify())
+app.add_route('/api/auth/reactivate', Reactivate())
+app.add_route('/api/auth/reset', Reset())
+app.add_route('/api/auth/logout', Logout())
 app.add_route('/api/asset/save/{repo}', AssetSave())
 app.add_route('/api/asset', ListAssets())
 app.add_route('/api/asset/{key}', GetAsset())

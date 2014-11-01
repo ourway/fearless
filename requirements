@@ -11,7 +11,9 @@ riak
 pyinotify
 jsonschema
 psycopg2
+lxml
 ipython
+scrapy
 sh
 eventlet
 envelopes

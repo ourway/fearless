@@ -28,6 +28,7 @@ users_groups = Table('users_groups', Base.metadata,
                      Column('group_id', Integer, ForeignKey('group.id'))
                      )
 
+
 class Group(IDMixin, Base):
 
     '''Groups for membership management

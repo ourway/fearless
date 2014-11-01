@@ -20,4 +20,3 @@ except OSError:
 engine = create_engine('sqlite:///%s' % db_path, echo=False)
 Session = mptt_sessionmaker(sessionmaker(bind=engine))
 session = Session()
-

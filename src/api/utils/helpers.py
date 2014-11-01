@@ -19,6 +19,7 @@ import ujson as json
 import commands
 import cStringIO
 
+
 def get_ip():
     '''Simple method'''
     ip = commands.getoutput("/sbin/ifconfig").split("\n")[1].split()[1][5:]
@@ -45,9 +46,11 @@ def jsonify(self, resp):
 
     #resp.body = json.dumps(resp.body)
 
+
 def punish(self, req, resp):
     '''Add a user to database'''
     sid = req.cookie('session-id')
-    if sid and r.get('fail_'+sid):
-        resp.body = {'message': 'error', 'info':'You need to wait!', 'wait':5}
+    if sid and r.get('fail_' + sid):
+        resp.body = {
+            'message': 'error', 'info': 'You need to wait!', 'wait': 5}
         return

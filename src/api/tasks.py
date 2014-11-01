@@ -31,7 +31,7 @@ import os
 from envelopes import Envelope, GMailSMTP
 from utils.validators import email_validator
 from opensource.contenttype import contenttype
-# # riak bucket for our files
+# riak bucket for our files
 from models import session, es, Asset, Repository
 from utils.fagit import GIT
 from sqlalchemy.exc import IntegrityError  # for exception handeling
@@ -70,8 +70,10 @@ def download(url):
         data = {'message': 'ERROR'}
     return ujson.dumps(data)
 
+
 class mydatatype(object):
     pass
+
 
 @app.task
 def add_asset(dataMD5, uploadedFilePath):
@@ -81,7 +83,7 @@ def add_asset(dataMD5, uploadedFilePath):
     if not uploadedFilePath:
         return 'Not any path'
 
-    targetAsset = session.query(Asset).filter(Asset.key==dataMD5).first()
+    targetAsset = session.query(Asset).filter(Asset.key == dataMD5).first()
     if not targetAsset:
         print 'Target asset is not available!'
         return
@@ -90,10 +92,10 @@ def add_asset(dataMD5, uploadedFilePath):
     targetAsset.ext = originalName.split('.')[-1]
     targetAsset.content_type = contenttype(uploadedFilePath)
     targetAsset.path = os.path.join(os.path.relpath(os.path.dirname(uploadedFilePath),
-                                targetAsset.repository.path) or '', dataMD5+'.'+targetAsset.ext)
-    print '*'*80
+                                                    targetAsset.repository.path) or '', dataMD5 + '.' + targetAsset.ext)
+    print '*' * 80
     print targetAsset.path
-    print '*'*80
+    print '*' * 80
     obj = mydatatype()
     obj.content_type = 'application/json'
     data = {'path': uploadedFilePath,
@@ -112,13 +114,11 @@ def add_asset(dataMD5, uploadedFilePath):
     except elasticsearch.ConflictError:
         pass
 
-
     # repo = GIT(uploadedFilePath)  ## do git operations
         # repo.add('{user}->{repo}->{originalName}' \
         #         .format(user=userName,
         #                 repo=repositoryName,
         #                 originalName=originalName))
-
 
     try:
         session.commit()

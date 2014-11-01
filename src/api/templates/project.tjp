@@ -1,0 +1,43 @@
+project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strftime('%Y-%m-%d')} - ${project.end.strftime('%Y-%m-%d')} {
+    #timingresolution 20min
+    dailyworkinghours 7.45
+    workinghours mon 09:15 - 13:00, 14:00 - 18:00
+    workinghours tue 09:15 - 13:00, 14:00 - 18:00
+    workinghours wed 09:15 - 13:00, 14:00 - 18:00
+    workinghours thu off
+    workinghours sat 09:15 - 13:00, 14:00 - 18:00
+    workinghours sun 09:15 - 13:00, 14:00 - 18:00
+    workinghours fri off
+
+    timeformat "%m/%d:%H-%M"
+    scenario plan "Plan" {
+        scenario delayed "Delayed"
+        }
+}
+
+    resource members "project ${project.name} members" {
+    % for resource in resources:
+        resource ${resource.alias} "${resource.email}" {
+                efficiency ${resource.efficiency}
+                rate ${resource.rate}
+            }
+    % endfor
+    }
+
+    % for task in tasks:
+        ${task}
+    % endfor
+
+
+
+
+taskreport breakdown "PMS"{
+            formats csv
+            timeformat "%Y-%m-%d-%H:%M"
+            columns id, start, end
+                taskreport breakdown "report"{
+                    formats html
+                    timeformat "%m-%d:%H"
+                    columns name, start, end, chart { scale day }, managers
+                }
+        }

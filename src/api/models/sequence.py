@@ -28,7 +28,8 @@ class Sequence(IDMixin, Base):
     name = Column(String(64), nullable=False)  # sequence1
     code = Column(String(64))  # SEQ1
     project_id = Column(Integer, ForeignKey("project.id"))
-    shots = relationship('Sequence', backref='sequences', secondary='shots_sequences')
+    shots = relationship(
+        'Sequence', backref='sequences', secondary='shots_sequences')
     """Sequence data
     """
 

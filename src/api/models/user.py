@@ -25,9 +25,6 @@ from mixin import IDMixin, Base, getUUID, logger
 import datetime
 
 
-
-
-
 class User(IDMixin, Base):
 
     '''Main users group
@@ -40,12 +37,12 @@ class User(IDMixin, Base):
     lastname = Column(String(64), nullable=True)
     lastLogIn = Column(DateTime)
     age = Column(Integer)
+    efficiency = Column(Float(precision=3), default=0.75)
     daily_working_hours = Column(Integer, default=8)
     off_days = Column(String(32), default='fri')
     active = Column(Boolean, default=False)
-    rate = Column(Float(precision=5), default = 1.850)
+    rate = Column(Float(precision=5), default=1.850)
     reports = relationship('Report', backref='user')
-
 
     @validates('email')
     def _validate_email(self, key, data):
@@ -53,6 +50,7 @@ class User(IDMixin, Base):
             if not self.alias:
                 self.alias = data.split('@')[0].replace('.', '_')
             return data
+
     @hybrid_property
     def fullname(self):
         return (self.firstname or '<>') + " " + (self.lastname or '<>')

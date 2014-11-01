@@ -17,6 +17,8 @@ import os
 import sh
 from cStringIO import StringIO
 import zlib
+
+
 class GIT(object):
 
     def __init__(self, filepath, wt=None):
@@ -38,8 +40,8 @@ class GIT(object):
             os.makedirs(self.wt)
         self.git = git.bake(_cwd=self.wt,
                             _piped="err",
-                            #git_dir=gitdir,
-                            #work_tree=self.wt
+                            # git_dir=gitdir,
+                            # work_tree=self.wt
                             )
         self.git.init()
 
@@ -57,7 +59,7 @@ class GIT(object):
 
     def tag(self, tag):
         self.git.tag(tag)
-        
+
     def archive(self, commit='HEAD'):
         '''returns a file object containing zip version of files'''
         f = StringIO()
@@ -65,7 +67,3 @@ class GIT(object):
         f.write(a.stdout)
         f.seek(0)
         return f
-
-
-
-

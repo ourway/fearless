@@ -33,12 +33,11 @@ task_users = Table('task_users', Base.metadata,
                    )
 
 
-
 task_alt_users = Table('task_alt_users', Base.metadata,
-                   Column('id', Integer, primary_key=True),
-                   Column('task_id', Integer, ForeignKey('task.id')),
-                   Column('user_id', Integer, ForeignKey('user.id'))
-                   )
+                       Column('id', Integer, primary_key=True),
+                       Column('task_id', Integer, ForeignKey('task.id')),
+                       Column('user_id', Integer, ForeignKey('user.id'))
+                       )
 
 task_watchers = Table("task_watchers", Base.metadata,
                       Column('id', Integer, primary_key=True),
@@ -60,9 +59,10 @@ task_responsible = Table("task_responsible", Base.metadata,
 task_relations = Table(
     'task_relations', Base.metadata,
     Column('task_a_id', Integer, ForeignKey('task.id'),
-                                        primary_key=True),
+           primary_key=True),
     Column('task_b_id', Integer, ForeignKey('task.id'),
-                                        primary_key=True))
+           primary_key=True))
+
 
 class Task(IDMixin, Base, BaseNestedSets):
 
@@ -70,16 +70,16 @@ class Task(IDMixin, Base, BaseNestedSets):
     """
     id = Column(
         Integer, primary_key=True)  # over-ride mixin version. because of remote_side
-    project_id = Column(Integer, ForeignKey("project.id"))
+    project_id = Column(Integer, ForeignKey("project.id"), nullable=False)
     title = Column(String(64), unique=True, nullable=False)
     start = Column(DateTime, nullable=False, default=now)
     end = Column(DateTime, nullable=False)
     duration = Column(Float(precision=3), nullable=False, default=0)
     parent_id = Column(Integer, ForeignKey("task.id"))
 
-
     resources = relationship('User', backref='tasks', secondary='task_users')
-    alternative_resources = relationship('User', backref='alternative_for', secondary='task_alt_users')
+    alternative_resources = relationship(
+        'User', backref='alternative_for', secondary='task_alt_users')
     watchers = relationship(
         'User', backref='watches', secondary='task_watchers')
     responsibles = relationship(
@@ -87,9 +87,24 @@ class Task(IDMixin, Base, BaseNestedSets):
     priority = Column(Integer, default=5)
     version = relationship('Version', backref='task')
     #task = relationship('Task', backref='parent')
-    ######### GOLDEN SOLUSION : Nested tree  for task to task relations ###########
+    ######### GOLDEN SOLUSION : Nested tree  for task to task relations ######
 
-    ###############################################################################
+    depends = relationship("Task", secondary=task_relations,
+                           primaryjoin=id == task_relations.c.task_a_id,
+                           secondaryjoin=id == task_relations.c.task_b_id,
+                           backref='dependent_of')
+    ##########################################################################
+
+    def __repr__(self):
+        return self.title
+
+    @property
+    def tjp_task(self):
+        templateFile = os.path.join(
+            os.path.dirname(__file__), '../templates/task.tjp')
+        t = Template(filename=templateFile)
+        subtask = '\n'.join([i.tjp_task for i in self.children])
+        return t.render(task=self, subtask=subtask)
 
     def dump(self, _indent=0):
         return repr(self)
@@ -103,22 +118,20 @@ class Task(IDMixin, Base, BaseNestedSets):
     def go(self):
         return 5
 
-
     @validates('start')
     def _check_start(self, key, data):
         if data == 'now':
             return datetime.datetime.utcnow()
         return convert_to_datetime(data)
 
-
     @validates('end')
     def _check_end(self, key, data):
         end = convert_to_datetime(data)
         start = convert_to_datetime(self.start)
-        delta = end-start
+        delta = end - start
         self.end_set = True
         if not hasattr(self, 'duration_set'):
-            self. duration = delta.days*24 + delta.seconds / 3600.0
+            self. duration = delta.days * 24 + delta.seconds / 3600.0
 
         return end
 
@@ -132,6 +145,7 @@ class Task(IDMixin, Base, BaseNestedSets):
             self.end = self.start + delta
         return data
 
+
 @event.listens_for(Task, 'before_insert')
 def receive_before_insert(mapper, connection, target):
     target.duration = target.duration or 0
@@ -142,21 +156,13 @@ def receive_before_insert(mapper, connection, target):
 @event.listens_for(Task, 'after_insert')
 def receive_before_insert(mapper, connection, target):
     pass
-        #print task.title
+    # print task.title
     # ... (update task confighandling logic) ...
-
-
-
-
-
-
-
 
 
 def schedule(mapper, connection, target):
     pass
-    #print target
+    # print target
 
 
 event.listen(Task, 'after_insert', schedule)
-

@@ -23,18 +23,20 @@ from mixin import IDMixin, Base
 
 
 users_departements = Table('users_departements', Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column('user_id', Integer, ForeignKey('user.id')),
-                     Column('departement_id', Integer, ForeignKey('departement.id'))
-                     )
+                           Column('id', Integer, primary_key=True),
+                           Column('user_id', Integer, ForeignKey('user.id')),
+                           Column(
+                               'departement_id', Integer, ForeignKey('departement.id'))
+                           )
 
 
 sequences_departements = Table('sequences_departements', Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column('sequence_id', Integer, ForeignKey('sequence.id')),
-                     Column('departement_id', Integer, ForeignKey('departement.id'))
-                     )
-
+                               Column('id', Integer, primary_key=True),
+                               Column(
+                                   'sequence_id', Integer, ForeignKey('sequence.id')),
+                               Column(
+                                   'departement_id', Integer, ForeignKey('departement.id'))
+                               )
 
 
 class Departement(IDMixin, Base):
@@ -42,5 +44,7 @@ class Departement(IDMixin, Base):
     '''Groups for membership management
     '''
     name = Column(String(64), nullable=False)
-    users = relationship('User', backref='departements', secondary='users_departements')
-    sequences = relationship('Sequence', backref='departements', secondary='sequences_departements')
+    users = relationship(
+        'User', backref='departements', secondary='users_departements')
+    sequences = relationship(
+        'Sequence', backref='departements', secondary='sequences_departements')

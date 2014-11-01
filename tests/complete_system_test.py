@@ -9,7 +9,8 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import subqueryload
 from models import *
-
+from mako.template import Template
+import copy
 '''We have a client'''
 client = Client(name='pooyamehr')
 ''' Lets create few users '''
@@ -17,6 +18,9 @@ user1 = User(email='rodmena@me.com', password='rrferl', active=True)
 user2 = User(email='farsheed.ashouri@gmail.com', password='rrferl', active=True)
 ''' Our main project '''
 proj = Project(name='Fearless project 1')
+proj2  = Project(name='fuooo')
+proj.end = '2014-11-30'
+proj2.end = '2014-12-30'
 #proj.tickets.append('i am a ticket')
 proj.lead = user2
 
@@ -48,34 +52,51 @@ repo1.collections.append(nuke_section)
 #asset1 = Asset(key='testscenefile', path='scenes', ext='mb')
 #asset1.collection = maya_section
 
-task1 = Task(title="rig")
-task1.resources.append(user1)
-task2 = Task(title="model")
-task2.resources.append(user2)
-task2.resources.append(user1)
-task1.project=proj
-task2.project=proj
+rig = Task(title="rig")
+animate = Task(title="animate")
+animate.project=proj
+sellme = Task(title="sell")
+fock = Task(title="gogo", project=proj2)
+fock.resources.append(user1)
+sellme.resources.append(user2)
+sellme.duration = 70
+sellme.project = proj
+rig.resources.append(user1)
+model = Task(title="model")
+model.resources.append(user2)
+model.resources.append(user1)
+rig.project=proj
+model.project=proj
 
-root_task = Task(title='research')
-master_task = Task(title='cleanup')
-master_task.project=proj
+research = Task(title='research')
+cleanup = Task(title='cleanup')
+cleanup.project = proj
+cleanup.parent = research
+research.project=proj
 
-task1.parent=master_task
-master_task.parent = task2
-
+rig.parent = model
+model.parent = research
+research.resources.append(user1)
+rig.depends.append(model)
+animate.depends.append(rig)
+animate.resources.append(user2)
 
 
 #task1.start = '2014-1-1'
-task1.duration= 18
+rig.duration= 18
 
 #task2.start = '2014-2-1'
-task2.duration= 15
+model.duration= 15
 
 
-session.add_all([root_task, user1, user2, proj, client, repo1, nuke_section, maya_section, task1, task2])
+session.add_all([model, user1, user2, proj, client, repo1, nuke_section, maya_section, rig, research, cleanup, sellme])
 session.commit()
     #import shutil
-print Task.get_tree(session)
+#tj = Task.get_tree(session, json=True)
+
+print proj.plan
+
+
 
     #print maya_section.assets
     #shutil.copyfileobj(maya_section.archive, open('maya_section.tar', 'w'))

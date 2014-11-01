@@ -31,6 +31,7 @@ users_assets = Table('users_assets', Base.metadata,
 
 
 class Asset(IDMixin, Base):
+
     '''Groups for membership management
     '''
     key = Column(String(32), nullable=False, unique=True)
@@ -43,15 +44,17 @@ class Asset(IDMixin, Base):
     #repository = relationship('Repository', backref='assets')
     path = Column(String(512))  # relative to collection path
     #repository_id = Column(Integer, ForeignKey('repository.id'))
-    collection_id = Column(Integer, ForeignKey('collection.id'), nullable=False)
+    collection_id = Column(
+        Integer, ForeignKey('collection.id'), nullable=False)
 
     @validates('collection_id')
     def check_file(self, key, collection_id):
         if not os.path.isfile(self.full_path):
-            raise ValueError('Asset %s:* %s * is not available on Storage!'%(self.key, self.full_path))
+            raise ValueError(
+                'Asset %s:* %s * is not available on Storage!' % (self.key, self.full_path))
         else:
             git = GIT(self.full_path, wt=self.collection.path)
-            git.add('Asset *%s*'%self.key)
+            git.add('Asset *%s*' % self.key)
         return collection_id
 
     @hybrid_property
@@ -62,6 +65,4 @@ class Asset(IDMixin, Base):
             ext = '.' + self.ext
         return os.path.join(self.collection.repository.path,
                             self.collection.path, self.collection.name,
-                            self.path or '', self.key+ext)
-
-
+                            self.path or '', self.key + ext)
