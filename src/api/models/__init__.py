@@ -67,22 +67,31 @@ def init():
     '''set some defaults values. Like admin rule and group, managers, etc...
     '''
     print '*'*25 , 'Initializing database', '*'*25
-    groups = session.query(Group.name).all()
+    groups = session.query(Group).all()
     for gr in ['managers', 'users', 'clients', 'guests'] :
-        if not gr in groups:
+        if not gr in [i.name for i in groups]:
             new = Group(gr, rule=gr[:-1])
             session.add(new)
 
+    manager_group = session.query(Group).filter(Group.name=='managers').first()
 
-    rule_actions = ['can_create', 'can_read', 'can_export']
-    rule_areas = ['project', 'shot', 'sequence', 'page', 'collection',
-                 'report', 'scene', 'task', 'ticket']
+    rule_actions = ['create', 'read', 'delete', 'update']
+    rule_areas_managers = ['project', 'shot', 'sequence', 'collection',
+                        'task', 'repository']
+    rule_areas_users = ['tag', 'asset', 'ticket', 'report', 'scene', 'page']
+    rules = session.query(Rule).all()
     for act in rule_actions:
-        for area in rule_areas:
+        for area in rule_areas_managers + rule_areas_users:
             rule = '%s_%s' % (act, area)
-            new = Rule(rule)
-            session.add(new)
+            if not rule in [i.name for i in rules]:
+                new = Rule(rule)
+                session.add(new)
+                manager_group.rls.append(new)
 
+    read_rules = session.query(Rule).filter(Rule.name.like('read%')).all()
+    users_group = session.query(Group).filter(Group.name=='users').first()
+    for rule in read_rules:
+        users_group.rls.append(rule)
 
 
 

@@ -15,7 +15,7 @@ Clean code is much better than Cleaner comments!
 import re
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
-
+from . import session, Group
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
@@ -59,6 +59,10 @@ class User(IDMixin, Base):
             self.groups.append(self.alias)
 
             return data
+
+    @validates('id')
+    def authorize_first_user(self, key, data):
+        return data
 
     @hybrid_property
     def fullname(self):
