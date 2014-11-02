@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<!-- saved from url=(0051)http://wallworm.com/projects/wingbintemp/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<title>WingBin</title>
+	<meta name="description" content="Browser based ram bin">
+	<meta name="keywords" content="ram player, wingbin, video editing, client, notes, sequence, viewer">
+
+	<link href='css/fonts.css' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" type="text/css" href="css/wingbin.css">
+	<link rel="stylesheet" type="text/css" href="css/slider.css">
+	<script src="js/vendor/jquery.min.js"></script> 
+	<script src="js/vendor/jquery-ui.min.js"></script>
+	<script src='js/FileSaver.js'></script>
+	<script src='js/jszip.min.js'></script>
+	<script type="text/javascript" src='js/wingbin.js'> </script>
+	<!-- COLOR PICKER -->
+	<script src='js/spectrum.js'></script>
+	<script src='js/slider.js'></script>
+	<link rel='stylesheet' href='css/spectrum.css' />
+
+  </head>
+  <body><img id="nibImage" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAxklEQVQ4T62TgQ2CMBBF6QSu4gbWCdRNdAJxAnAT3EAn0FFgAvyPtE1p1ECxySV3hXvXu9w3RXL6vljraiezMnzOS3aX3YwZ/HBMHCj5qLhKoVHcyi8Fufq7AFBy4yr/yA+fGkEORANgQuVP0JMgtXE9P6eUTf6hnS2AUs45A0DKBQDT3WQCHgB4yioT0C4FdH9pYfEQWVcGOXcOnXLs8kXy05+5yohqH1Y5giAmZvKtHZ6NmGqfM1Kj0wUzgW5lqZwR0UjOb2XRRMDjyfVoAAAAAElFTkSuQmCC" style="top: 496px; left: 768px; display: block;">
+  <canvas id="brushPreview" width="16" height="16"></canvas>
+  
+
+  <div id="pageWrapper">
+
+	<div id="header">
+		<a href="#"><div class="wingbinLogo"></div></a> 
+
+	</div><!-- END header -->
+
+	<form id="controlForm" method="post" action="http://wallworm.com/projects/wingbintemp/index.html#" enctype="multipart/form-data" accept="image/gif,image/jpeg,image/png" onsubmit="return false;">
+
+		<div id="menubartop">
+
+			<div class="controlBlockInset">
+				<div id='viewerControls'>
+					<button id="sequence1" class='button radiusLeft viewer current'>A</button>
+					<button id="sequence2" class='button radiusRight viewer'>B</button>
+				</div>
+
+				<div class="fileUpload button radius">
+					<div>Upload Images</div>
+					<input type="file" multiple="multiple" name="files" id="fileUpload" class="upload">
+				</div>
+				<div class="fileLoad button radius">
+					<div>Load Project ZIP</div>
+					<input type="file" id="import" class="load">
+				</div>
+
+
+				<button id="download" class="fileSave button radiusLeft">Save Project</button>
+				<input type="text" required="required" class="stopKBD radiusRight" name="name" id="name" placeholder="Project Name">
+
+				<input type="checkbox" id="allData" hint="Click here to include all of the image sequences.">
+				<label for="allData">Include Images</label>
+					
+				<div class="clear"></div>
+			</div><!-- END controlBlockInset -->
+
+			<div class="clear"></div>
+
+		</div><!-- END menubar -->
+
+		
+		<div id="canvasWrapper">
+			<div id="canvasDiv">
+				<img id="sequenceImage" src="./images/placeholder.png">
+				<canvas id="canvas" width="1200" height="500"></canvas>
+			</div>
+			<span id="frameFileName">Frame Missing</span>
+		</div><!-- END canvasWrapper -->
+
+
+		<div id="controls">
+			<div id="timeline"></div>
+			<div id="timelineControls">
+				<button id="lastNote" class="smallCtrl"></button>
+				<button id="previousFrame" class="smallCtrl"></button>
+				<button id="play" class="player"></button>
+				<button id="stop" class="player"></button>
+				<button id="next" class="smallCtrl" ></button>
+				<button id="nextNote" class="smallCtrl"></button>
+
+				<div id="frameCounter">
+					<span id="frameFileFum">0</span>/<span id="frametotal">0</span>
+				</div>
+
+				<!-- <label for="frame">Frame</label> -->
+				<input id="frame" type="range" min="0" max="0" step="1" value="0" size="6">
+				
+				<div id="playbackSettings">
+					<label for="fps">FPS</label><input id="fps" type="number" min="1" max="60" step="1" value="24" size="6">
+					<label for="loop">Loop</label><input type="checkbox" id="loop" checked="">
+					<label for="stopAtNotes">Stop At Notes</label><input type="checkbox" id="stopAtNotes" checked=""> 
+				</div><!-- END playbackSettings -->
+						
+			</div><!-- END timelineControls -->
+			
+
+			<div class="controlBlock">
+				<div class="controlBlockInset">
+					<span id="canvastooglewrapper">
+						<button id="canvasToggle" class="utensil showDrawings" data-state="on" title="Toggles drawing on/off"></button>
+					</span>
+					<span class="seperator"></span>
+					<button id="toolMarker" class="utensil" title="Enables drawing on canvas"></button>
+					<button id="toolEraser" class="utensil" title="Enables eraser for canvas"></button>
+					<button id="toolClear" class="utensil" title="Clears any drawing on active frame"></button>
+					<span class="seperator"></span>
+					<button id="square" class="utensil" title="Makes drawing tip square shaped"></button>
+					<button id="circle" class="utensil" title="Makes drawing tip circular shaped"></button>
+					<span class="seperator"></span>
+					
+					<div class="toolcp">
+						<input type='text' id="toolColorpicker" />
+					</div><!-- END toolcp -->
+
+					<div class="brushoptions">
+						<label for="size">Size</label>
+						<input id="size" type="range" min="1" max="128" step="1" value="16" style="width:90px">
+
+						<label for="brushOpacity">Alpha</label>
+						<input type="range" id="brushOpacity" name="opacity" min="0.1" step=".025" max="1" value="1" style="width:90px">
+					</div><!-- END brushoptions -->
+
+					<div id="noteWrapper">
+						<textarea placeholder="Per Frame Notes..." id="frameNotes" class="stopKBD"></textarea>
+					</div>
+				</div><!-- END controlBlockInset -->
+			</div><!-- END controlBlock -->
+
+			<div class="controlBlock">
+				<div class="controlBlockInset">
+					<div id="info">
+						<div class="infoSide">
+							<h6>Channel A</h6>
+							<div id="aInfo">
+							
+							</div>
+						</div>
+						<div class="infoSide">
+							<h6>Channel B</h6>
+							<div id="bInfo">
+							
+							</div>
+						</div>
+						<div class="clear"></div>
+					</div><!-- END info -->
+				</div><!-- END controlBlockInset -->
+			</div><!-- END controlBlock -->	
+
+		</div><!-- END controls -->
+
+	</form>
+	</div>
+	
+
+</body></html>
