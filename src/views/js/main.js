@@ -203,11 +203,15 @@ function validateEmail(email) {
 
 fearlessApp.controller('pmsCtrl', function($scope, $http, $location){
     $scope.init = function() {
-
         $http.post('/api/auth/getUserInfo').success(function(result){
+            if (result.message == 'ERROR'){
+                next_page = btoa($location.$$path);
+                $location.path('/auth/login/'+ next_page);  // send user to authentication page.
+            }
 
-            console.log(result);
         })
+
+    $scope.$parent.page= 'pms';
 
 
 

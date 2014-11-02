@@ -328,11 +328,15 @@ class Logout:
             logger.info('{ip}|logged out'.format(ip=ip))
             resp.body = r.delete(hashed_sid)
 
-class GetUserInfo:
 
+
+class GetUserInfo:
     def on_post(self, req, resp):
         sid = req.cookie('session-id')
         hashed_sid = hashlib.sha1(sid).hexdigest()
         target = session.query(User).filter(User.latest_session_id==hashed_sid).first()
-        resp.body = {'email':target.email, 'alias':target.alias, 'firstname':target.firstname,
-                     'lastname':target.lastname, 'id':target.id}
+        if target:
+            resp.body = {'email':target.email, 'alias':target.alias, 'firstname':target.firstname,
+                        'lastname':target.lastname, 'id':target.id}
+        else:
+            resp.body = {'message':'ERROR'}
