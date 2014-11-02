@@ -1,3 +1,0 @@
-[submodule "ramplayer"]
-    path = src/views/ramplayer
-    url = git@bitbucket.org:rodmena/ram-player.git
