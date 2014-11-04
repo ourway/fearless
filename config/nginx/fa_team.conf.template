@@ -2,7 +2,7 @@ server {
     listen 5003;
     server_name _;
     server_tokens off;
-    #more_set_headers 'Server: FA-TEAM Server';
+    #more_set_headers 'Server: Fearless Server';
 
      location / {
         rewrite .*/ /app;
