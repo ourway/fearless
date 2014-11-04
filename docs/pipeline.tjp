@@ -1,0 +1,147 @@
+
+project KingOfWater "The King of Water Movie Project" 2014-11-09 +3m {
+
+    workinghours mon 09:15 - 13:00, 14:00 - 18:00
+    workinghours tue 09:15 - 13:00, 14:00 - 18:00
+    workinghours wed 09:15 - 13:00, 14:00 - 18:00
+    workinghours thu 09:15 - 13:00
+    workinghours sat 09:15 - 13:00, 14:00 - 18:00
+    workinghours sun 09:15 - 13:00, 14:00 - 18:00
+    workinghours fri off
+}
+
+
+    resource art "art team" {
+      resource mehrdad "Mehrdaad Shahverdi"
+      resource kheirandish "Mohammad Kheirandish"
+      }
+
+    resource modeling "Modeling Dep" {
+      resource entezami "Arash Entezami"
+      }
+
+    resource Directors "directong team" {
+       resource majidi "Majid Majidi" {
+            workinghours sat 12:00 - 17:00
+            workinghours sun 12:00 - 17:00
+            workinghours mon 12:00 - 17:00
+            workinghours tue 12:00 - 17:00
+            workinghours wed 12:00 - 17:00
+            //vacation 2014-11-9 - 2014-11-24
+         limits{
+            dailymax 4h
+            }
+        }
+      }
+
+    resource Managers "Management team" {
+      }
+
+
+task Sequence1 "Sequence 1 preproduction" {
+  start 2014-11-10
+  task Character_1_concept_art "concept of character1" {
+    task stage1 "Stage1" {
+        allocate art
+        effort 8h
+      }
+    task s1_approval "Stage1 Approval"{
+        allocate kheirandish, majidi
+        effort 3h
+        depends !stage1
+    }
+
+    task stage2 "Character 1 concept Stage2"{
+        allocate art
+        effort 48h
+        depends !s1_approval
+    }
+    task stage2_review_1 "Character 1 stage2 review 1" {
+        allocate majidi
+        effort 6h
+        depends !s1_approval {gaplength 2d}
+      }
+    task stage3 "Character 1 stage3" {
+        allocate art, majidi
+        effort 48h
+        depends !stage2_review_1
+      }
+    task stage2_review_2 "Character 1 stage2 review 2" {
+        allocate majidi
+        effort 6h
+        depends !s1_approval {gaplength 8d}
+      }
+    task stage2_review_3 "Character 1 stage2 review 3" {
+        allocate majidi
+        effort 6h
+        depends !s1_approval {gaplength 12d}
+      }
+    task stage2_review_4 "Character 1 stage2 review 4" {
+        allocate majidi
+        effort 6h
+        depends !s1_approval {gaplength 16d}
+      }
+    task stage2_review_5 "Character 1 stage2 review 5" {
+        allocate majidi
+        effort 6h
+        depends !s1_approval {gaplength 20d}
+      }
+    task stage2_review_6 "Character 1 stage2 review 6" {
+        allocate majidi
+        effort 6h
+        depends !s1_approval {gaplength 24d}
+      }
+    task stage3_review "Character 1 stage3 review" {
+        allocate majidi
+        effort 6h
+        depends !stage3
+      }
+
+  }
+  task char1_modeling "Character 1 Modeling" {
+    task stage_1 "Stage 1" {
+        allocate modeling
+        effort 24h
+        depends Sequence1.Character_1_concept_art.stage2
+      }
+
+    task stage_2 "Stage 2" {
+        allocate modeling
+        effort 48h
+        depends Sequence1.Character_1_concept_art.stage2_review_2
+      }
+    task stage_3 "Stage 3" {
+        allocate modeling
+        effort 96h
+        depends Sequence1.Character_1_concept_art.stage3
+      }
+
+    }
+}
+
+
+
+
+taskreport breakdown "report"{
+      formats html
+      timeformat "%m-%d:%H"
+      columns name, start, end, chart { scale day width 900}, managers
+  }
+
+resourcereport resourceGraph "" {
+  headline "Resource Allocation Sequence 1 Character 1 preproduction"
+  columns no, name, effort, start, end, status,turnover, chart {scale day width 900}
+  loadunit hours
+  # We only like to show leaf tasks for leaf resources.
+    hidetask ~(isleaf() & isleaf_())
+  sorttasks plan.start.up
+}
+
+  textreport "ResourceGraph" {
+    formats html
+    title "Resource Graph"
+    center '<[report id="resourceGraph"]>'
+  }
+
+
+
