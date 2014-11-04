@@ -1,8 +1,8 @@
 	/*
 	
-	Wingbin JavaScript RAM Player
-	Copyright (c) 2014 by John Martini and Shawn Olson
-	All Rights Reserved
+	Showtime JavaScript RAM Player
+    by: Farsheed Ashouri
+	originally by John Martini and Shawn Olson
 	
 	*/
 
@@ -13,8 +13,8 @@
 	var canvasDiv;
 	var context;
 	var SequenceImage = new Image();
-	var currentWidth = 1200;
-	var currentHeight = 500;
+	var currentWidth = 1080;
+	var currentHeight = 720;
 	var timeline;
 	
 	/*Drawing Vars*/
@@ -255,7 +255,7 @@
 
 	
 	/*Class for storing the Sequence Data.*/
-	function wingbin(){
+	function showtime(){
 		this.projectName="";
 		
 		this.AFromFile = false;
@@ -388,7 +388,7 @@
 					} else {
 						
 						$('#frameFileName').html("Frame Missing");
-						// $("#sequenceImage").prop("src","wingbin.png");			
+						// $("#sequenceImage").prop("src","showtime.png");			
 					}
 					break;
 				case 2:
@@ -420,7 +420,7 @@
 					} else {
 					
 							$('#frameFileName').html("Frame Missing");
-							// $("#sequenceImage").prop("src","wingbin.png");			
+							// $("#sequenceImage").prop("src","showtime.png");			
 					}
 					break;
 			}
@@ -696,7 +696,7 @@
 		this.download = function(fullEncode){
 		
 			var zip = new JSZip();
-			zip.file("wingbin.json", this.encode(fullEncode));
+			zip.file("showtime.json", this.encode(fullEncode));
 			
 			var img = zip.folder("frames");
 			
@@ -980,7 +980,7 @@
 				
 					project.projectName = theFile.name.split(".")[0];
 					//var manifestName = project.projectName+".txt";
-					var manifestName ="wingbin.json";
+					var manifestName ="showtime.json";
 					// read the content of the file with JSZip
 					var zip = new JSZip(e.target.result);
 					manifest = zip.file(manifestName);
@@ -1182,7 +1182,7 @@
 			 
 			 
 		 } else {
-			 alert("Uh Oh... you need to update your browser to use Wingbin!");
+			 alert("Uh Oh... you need to update your browser to use showtime!");
 		 }
 
 		 
@@ -1271,5 +1271,5 @@
 
 
 
-var project = new wingbin();
+var project = new showtime();
 		 
