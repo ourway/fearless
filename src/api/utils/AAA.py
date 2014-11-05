@@ -52,11 +52,11 @@ def Authenticate(req, resp, params):
             ...
 
     '''
-    return
+    #return
     ip = req.env.get('HTTP_X_FORWARDED_FOR')
     free_services = ['/api/auth/signup', '/api/auth/login',
                      '/api/things', '/api/auth/activate', '/api/auth/reactivate',
-                     '/api/auth/reset', '/api/auth/logout']
+                     '/api/auth/reset', '/api/auth/logout', '/api/auth/getUserInfo']
     sid = req.cookie('session-id')
     ''' Now we need to check if session is available and it's sha1 is in redis'''
     if req.path in free_services or (sid and r.get(hashlib.sha1(sid).hexdigest())):

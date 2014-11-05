@@ -45,8 +45,8 @@ p {
 {
 	margin: auto;
 	position:relative;
-	width: 1080px;
-	height: 720px;
+	width: 720px;
+	height: 405px;
 	outline: 1px solid rgba(255,255,255,.1);
 	cursor: crosshair;
 }

@@ -61,10 +61,12 @@ class DB:
 
         args = req.path.split('/')
         table = args[3].title()
+        key = req.get_param('key') or 'id'
+
         if len(args) == 5:
             id = args[4]
-            query = 'session.query({t}).filter({t}.id=={id})'.format(
-                t=table, id=int(id))
+            query = 'session.query({t}).filter({t}.{key}=="{id}")'.format(
+                t=table, id=id, key=key)
 
             data = eval(query).first()
         else:
