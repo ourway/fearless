@@ -18,7 +18,7 @@ touch-reload=utils/reports.py
 
 
 
-harakiri=60
+harakiri=120
 cpu-affinity=1
 workers=8
 #threads=20

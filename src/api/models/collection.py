@@ -31,9 +31,9 @@ class Collection(IDMixin, Base):
     '''All reports will be saved here
     '''
     schema = deferred(Column(Text))  # load on access
-    name = Column(String(128), nullable=False)
+    name = Column(String(128))
     template = Column(String(64))
-    path = Column(String(512))  # relative to repo path path
+    path = Column(String(512), nullable=False)  # relative to repo path path
     repository_id = Column(
         Integer, ForeignKey('repository.id'), nullable=False)
     assets = relationship('Asset', backref='collection')
@@ -46,9 +46,21 @@ class Collection(IDMixin, Base):
         except ValueError:
             pass
 
+
+    @validates('path')
+    def check_path(self, key, data):
+        #if not os.path.isdir(data):
+        #    os.makedirs(data)
+        self.name = os.path.basename(data)
+        return data
+
+    @property
+    def url(self):
+        return os.path.join(self.repository.path, self.path)
+
     @hybrid_property
     def archive(self):
         collection_path = os.path.join(
-            self.repository.path, self.path or '', self.name)
+            self.repository.path, self.path or '')
         git = GIT('.', wt=collection_path)
         return git.archive()

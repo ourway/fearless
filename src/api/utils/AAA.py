@@ -325,18 +325,29 @@ class Logout:
         sid = req.cookie('session-id')
         if sid:
             hashed_sid = hashlib.sha1(sid).hexdigest()
-            logger.info('{ip}|logged out'.format(ip=ip))
+            target = session.query(User).filter(User.latest_session_id == hashed_sid).first()
+            if not target:
+                logger.warning(
+                    '{ip}|tried to logout of an invalid session'.format(ip=ip))
+            else:
+                logger.info('{ip}|logged out'.format(ip=ip))
+                target.latest_session_id = None
             resp.body = r.delete(hashed_sid)
 
 
 
+def getUserInfoFromSession(req):
+        sid = req.cookie('session-id')
+        if sid:
+            hashed_sid = hashlib.sha1(sid).hexdigest()
+            target = session.query(User).filter(User.latest_session_id==hashed_sid).first()
+            if target:
+                return {'email':target.email, 'alias':target.alias, 'firstname':target.firstname,
+                            'lastname':target.lastname, 'id':target.id}
+
+        return {'message':'ERROR'}
+
+
 class GetUserInfo:
     def on_post(self, req, resp):
-        sid = req.cookie('session-id')
-        hashed_sid = hashlib.sha1(sid).hexdigest()
-        target = session.query(User).filter(User.latest_session_id==hashed_sid).first()
-        if target:
-            resp.body = {'email':target.email, 'alias':target.alias, 'firstname':target.firstname,
-                        'lastname':target.lastname, 'id':target.id}
-        else:
-            resp.body = {'message':'ERROR'}
+        resp.body = getUserInfoFromSession(req)

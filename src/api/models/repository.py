@@ -41,8 +41,7 @@ class Repository(IDMixin, Base):
     sftp_path = Column(String(256))
     webdav_path = Column(String(256))
     collections = relationship('Collection', backref='repository')
-    project_id = Column(
-        Integer, ForeignKey("project.id"), nullable=False, unique=True)
+    project_id = Column(Integer, ForeignKey("project.id"))
     project = relationship('Project', backref='repositories')
 
     @validates('path')
@@ -51,7 +50,7 @@ class Repository(IDMixin, Base):
             os.makedirs(path)
         readme = os.path.join(path, 'fearless.rst')
         with open(readme, 'wb') as f:
-            f.write('welcome to Fearless repository')
+            f.write('welcome to Fearless repository.')
         GIT(readme).add('repo *%s* created successfully' % self.name)
         return path
 

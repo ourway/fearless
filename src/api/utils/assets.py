@@ -25,12 +25,12 @@ from tasks import add_asset
 from tasks import STORAGE
 from opensource.contenttype import contenttype
 from utils.validators import checkPath
-from base64 import encode
+from base64 import encode, decode
 
 # from celery.result import AsyncResult
-from models import Asset, Repository, es, session
-
-
+from models import Asset, Repository, Collection, es, session
+from AAA import getUserInfoFromSession
+from defaults import public_repository_path
 def _generate_id():
     return os.urandom(2).encode('hex') + hex(int(time.time() * 10))[5:]
 
@@ -48,26 +48,62 @@ class AssetSave:
     @falcon.after(commit)
     def on_put(self, req, resp, repo):
         '''Get data based on a file object or b64 data, save and commit it'''
+        userInfo = getUserInfoFromSession(req)
+        uploader = userInfo.get('alias')
+
         targetRepo = session.query(Repository).filter(
             Repository.name == repo).first()
-        body = req.stream
-        if targetRepo:
-            name = req.get_param('name') or 'undefined.%s.raw' % _generate_id()
-            tempraryStoragePath = path.join(targetRepo.path,
-                                            contenttype(name).split(';')[0].replace('x-', ''), name)
-            bodyMd5 = safeCopyAndMd5(body, tempraryStoragePath)
-            old_asset = session.query(Asset).filter(
-                Asset.repository == targetRepo).filter(Asset.key == bodyMd5).first()
-            if not old_asset:
-                asset = Asset(key=bodyMd5, repository=targetRepo)
-                session.add(asset)
-                newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
-                asset.task_id = newAsset.task_id
-                resp.body = {'message': 'Asset created', 'key': asset.key}
-                #resp.body = "I am working"
+
+        if not uploader:
+            uploader = 'anonymous'
+            targetRepo = session.query(Repository).filter(Repository.name == 'public').first()
+
+        if not targetRepo:
+            pr = session.query(Repository).filter(Repository.name == repo).first()
+            if not pr:
+                targetRepo = Repository(name=repo,
+                                        path=os.path.join(public_repository_path, repo))
+                session.add(targetRepo)
             else:
-                resp.body = {'message': 'Asset already available'}
-        else:
+                targetRepo = pr
+
+        _collection = req.get_param('collection')
+
+        if not _collection:
+            _collection = 'danger'
+        collection = session.query(Collection).filter(Collection.repository==targetRepo)\
+                        .filter(Collection.path==_collection).first()
+        if not collection:
+            collection = Collection(path=_collection, repository=targetRepo)
+            session.add(collection)
+
+
+        body = req.stream
+        b64 = req.get_param('b64')
+        if targetRepo and body:
+            name = req.get_param('name') or 'undefined.%s.raw' % _generate_id()
+            assetExt = name.split('.')[-1]
+            assetPath = contenttype(name).split(';')[0].replace('x-', '') or ''
+            tempraryStoragePath = path.join(targetRepo.path, collection.path,
+                                            assetPath, name)
+
+            name, bodyMd5 = safeCopyAndMd5(body, tempraryStoragePath, b64=b64)
+            asset = session.query(Asset).filter(
+                Asset.repository == targetRepo).filter(Asset.collection == collection)\
+                        .filter(Asset.name==name).first()
+            if not asset:
+                asset = Asset(key=bodyMd5, repository=targetRepo,
+                              collection=collection, name=name,
+                              path=assetPath, ext=assetExt)
+                session.add(asset)
+
+            asset.key = bodyMd5
+                #newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
+                #asset.task_id = newAsset.task_id
+            resp.body = {'message': 'Asset created|updated', 'key': asset.key,
+                             'url': asset.url}
+                #resp.body = "I am working"
+        else:  ## lets consume the stream!
             while True:
                 chunk = req.stream.read(2 ** 20)
                 if not chunk:
@@ -76,16 +112,27 @@ class AssetSave:
             resp.body = {'message': 'Repo is not available'}
 
 
-def safeCopyAndMd5(fileobj, destinationPath):
+def safeCopyAndMd5(fileobj, destinationPath, b64=False):
     '''copy a file in chunked mode safely'''
 
     destDir = path.dirname(destinationPath)
-    ext = destinationPath.split('.')[-1]
+    extsp = destinationPath.split('.')
+    basename = os.path.basename(destinationPath)
+    if len(extsp)>1:
+        ext = extsp[1]
+    else:
+        ext = 'raw'
     checkPath(destDir)
     if path.isfile(destinationPath):
         os.remove(destinationPath)
     f = open(destinationPath, 'wb')
     md5 = hashlib.md5()
+    if b64:
+        b = StringIO()
+        decode(fileobj, b)
+        b.seek(0)
+        fileobj = b
+
     while True:
         chunk = fileobj.read(2 ** 20)
         if not chunk:
@@ -95,14 +142,8 @@ def safeCopyAndMd5(fileobj, destinationPath):
 
     f.close()
     dataMd5 = md5.hexdigest()
-    newAssetName = '%s.%s' % (dataMd5, ext)
-    finalStoragePath = path.join(destDir, newAssetName)
-    if not path.isfile(finalStoragePath):
-        os.rename(destinationPath, finalStoragePath)
-    else:
-        os.remove(destinationPath)
-    os.symlink(newAssetName, destinationPath)
-    return dataMd5
+
+    return (basename, dataMd5)
 
 
 def getAssetInfo(key):

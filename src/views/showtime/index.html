@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- saved from url=(0051)http://wallworm.com/projects/wingbintemp/index.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="en" ng-app="fearlessShowtimeApp"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	
 	<title>Fearless Playtime</title>
 	<meta name="description" content="Browser based ram bin">
@@ -13,6 +13,11 @@
 	<script src="js/vendor/jquery-ui.min.js"></script>
 	<script src='js/FileSaver.js'></script>
 	<script src='js/jszip.min.js'></script>
+	<script src='../js/vendor/angular.min.js'></script>
+	<script src='../js/vendor/angular-resource.min.js'></script>
+	<script src='../js/vendor/angular-route.min.js'></script>
+    <script src='../js/vendor/angular-cookies.min.js'></script>
+    <script type="text/javascript" src='js/showtimeCtrls.js'> </script>
 	<script type="text/javascript" src='js/showtime.js'> </script>
 	<!-- COLOR PICKER -->
 	<script src='js/spectrum.js'></script>
@@ -20,14 +25,14 @@
 	<link rel='stylesheet' href='css/spectrum.css' />
 
   </head>
-  <body><img id="nibImage" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAxklEQVQ4T62TgQ2CMBBF6QSu4gbWCdRNdAJxAnAT3EAn0FFgAvyPtE1p1ECxySV3hXvXu9w3RXL6vljraiezMnzOS3aX3YwZ/HBMHCj5qLhKoVHcyi8Fufq7AFBy4yr/yA+fGkEORANgQuVP0JMgtXE9P6eUTf6hnS2AUs45A0DKBQDT3WQCHgB4yioT0C4FdH9pYfEQWVcGOXcOnXLs8kXy05+5yohqH1Y5giAmZvKtHZ6NmGqfM1Kj0wUzgW5lqZwR0UjOb2XRRMDjyfVoAAAAAElFTkSuQmCC" style="top: 496px; left: 768px; display: block;">
+  <body ng-controller="showtimeCtrl"><img id="nibImage" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAxklEQVQ4T62TgQ2CMBBF6QSu4gbWCdRNdAJxAnAT3EAn0FFgAvyPtE1p1ECxySV3hXvXu9w3RXL6vljraiezMnzOS3aX3YwZ/HBMHCj5qLhKoVHcyi8Fufq7AFBy4yr/yA+fGkEORANgQuVP0JMgtXE9P6eUTf6hnS2AUs45A0DKBQDT3WQCHgB4yioT0C4FdH9pYfEQWVcGOXcOnXLs8kXy05+5yohqH1Y5giAmZvKtHZ6NmGqfM1Kj0wUzgW5lqZwR0UjOb2XRRMDjyfVoAAAAAElFTkSuQmCC" style="top: 496px; left: 768px; display: block;">
   <canvas id="brushPreview" width="16" height="16"></canvas>
   
 
   <div id="pageWrapper">
 
 	<div id="header">
-		<a href="#"><div class="wingbinLogo"></div></a> 
+		<a href="/app/#about/showtime"><div class="wingbinLogo"></div></a> 
 
 	</div><!-- END header -->
 
@@ -51,12 +56,16 @@
 				</div>
 
 
-				<button id="download" class="fileSave button radiusLeft">Save Project</button>
-				<input type="text" required="required" class="stopKBD radiusRight" name="name" id="name" placeholder="Project Name">
+				<button id="download" class="fileSave button radiusLeft">Download</button>
+                <button id="save" class="fileSave button radiusLeft">save</button>
+				<input type="text" required="required" ng-disabled="name!=null" class="stopKBD radiusRight" ng-model="name" placeholder="Project Name">
 
-				<input type="checkbox" id="allData" hint="Click here to include all of the image sequences.">
-				<label for="allData">Include Images</label>
-					
+                <div style="display:none">
+				    <input checked="true" type="checkbox" id="allData" hint="Click here to include all of the image sequences.">
+				    <label for="allData">Include Images</label>
+                </div>
+                |
+                <span style="color:grey"> <strong>{{user}}</strong> showtime area</span>
 				<div class="clear"></div>
 			</div><!-- END controlBlockInset -->
 
@@ -68,9 +77,9 @@
 		<div id="canvasWrapper">
 			<div id="canvasDiv">
 				<img id="sequenceImage" src="./images/placeholder.png">
-				<canvas id="canvas" width="1200" height="500"></canvas>
+				<canvas id="canvas" width="1080" height="720"></canvas>
 			</div>
-			<span id="frameFileName">Frame Missing</span>
+			<span id="frameFileName">Not any foortage!</span>
 		</div><!-- END canvasWrapper -->
 
 

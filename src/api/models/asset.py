@@ -41,21 +41,27 @@ class Asset(IDMixin, Base):
     task_id = Column(String(64))  # celery post processing task id
     ready = Column(Boolean, default=False)  # celery post processing task id
     users = relationship('User', backref='assets', secondary='users_assets')
-    #repository = relationship('Repository', backref='assets')
-    path = Column(String(512))  # relative to collection path
-    #repository_id = Column(Integer, ForeignKey('repository.id'))
+    repository = relationship('Repository', backref='assets')
+    path = Column(String(512))  # relative to collection path, including name
+    repository_id = Column(Integer, ForeignKey('repository.id'))
     collection_id = Column(
         Integer, ForeignKey('collection.id'), nullable=False)
+
 
     @validates('collection_id')
     def check_file(self, key, collection_id):
         if not os.path.isfile(self.full_path):
             raise ValueError(
                 'Asset %s:* %s * is not available on Storage!' % (self.key, self.full_path))
-        else:
-            git = GIT(self.full_path, wt=self.collection.path)
-            git.add('Asset *%s*' % self.key)
+
         return collection_id
+
+    @validates('key')
+    def commit(self, key, data):
+        wt = os.path.join(self.collection.repository.path, self.collection.path)
+        git = GIT('.', wt=wt)
+        git.add('Asset *%s*' % self.name)
+        return data
 
     @hybrid_property
     def full_path(self):
@@ -63,6 +69,13 @@ class Asset(IDMixin, Base):
             ext = ''
         else:
             ext = '.' + self.ext
-        return os.path.join(self.collection.repository.path,
-                            self.collection.path, self.collection.name,
-                            self.path or '', self.key + ext)
+        result = os.path.join(self.collection.repository.path,
+                            self.collection.path,
+                            self.path or '', self.name)
+
+        return result
+
+    @property
+    def url(self):
+        return os.path.join(os.path.basename(self.collection.repository.path),
+                            self.collection.path, self.path or '', self.name)

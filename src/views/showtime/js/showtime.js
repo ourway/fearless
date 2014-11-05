@@ -693,7 +693,7 @@
 		
 		}
 		
-		this.download = function(fullEncode){
+		this.download = function(fullEncode, mode){
 		
 			var zip = new JSZip();
 			zip.file("showtime.json", this.encode(fullEncode));
@@ -732,13 +732,23 @@
 					}
 				}
 			}
-			
-			
-			
 
-			var content = zip.generate({type:"blob"});
-			saveAs(content, this.projectName+".zip");
-		
+
+
+            var content = zip.generate({'type':'blob'});
+
+            if (mode==1) {
+                saveAs(content, this.projectName + ".zip");
+                }
+            else
+            {
+            url = '/api/asset/save/showtime?collection=' + this.projectName + '&name=' + this.projectName + '.zip';
+              var xmlHttpRequest = new XMLHttpRequest();
+              xmlHttpRequest.open("PUT", url, true);
+              xmlHttpRequest.send(content);
+
+            }
+
 		}
 	}
 
@@ -946,13 +956,23 @@
 			$("#download").click(function(){
 			
 				if (project.projectName && project.projectName.length > 0) {
-					project.download($("#allData").prop("checked"));
+					project.download($("#allData").prop("checked"), 1);
 				} else {
 					alert('You must give this project a Name before you can download.');
 				}
 				return false;
 			});
-			/*
+
+			$("#save").click(function(){
+
+				if (project.projectName && project.projectName.length > 0) {
+					project.download($("#allData").prop("checked"), 0);
+				} else {
+					alert('You must give this project a Name before you can download.');
+				}
+				return false;
+			});			/*
+
 			$("#import").click(function(){
 			
 				if (project.projectName.length > 0) {

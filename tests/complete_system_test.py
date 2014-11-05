@@ -44,7 +44,7 @@ repo1.project = proj
 #
 #        ''')
 
-nuke_section = Collection(name='composite', template='nuke')
+nuke_section = Collection(name='composite', template='nuke', path='some3ddata')
 maya_section = Collection(name='maya', template='maya', path='3d_data')
 
 repo1.collections.append(maya_section)

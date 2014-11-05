@@ -2,6 +2,8 @@ server {
     listen 5003;
     server_name _;
     server_tokens off;
+    access_log  /var/log/nginx/fearless_acess.log;
+    error_log  /var/log/nginx/fearless_error.log;
     #more_set_headers 'Server: Fearless Server';
 
      location / {
@@ -19,7 +21,7 @@ server {
     }
 
      location /static {
-        alias {dir}/STATIC;    # your cache path
+        alias {dir}/REPOSITORIES;    # your cache path
         gzip_vary on;
         gzip_http_version 1.1;
         #expires max;

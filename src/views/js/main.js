@@ -110,7 +110,8 @@ fearlessApp.factory('authFactory', function($resource) {
                         $scope.userInfo.logged_in = true;
                         try {
                             next_page = atob($routeParams.next);
-                            if (next_page.split('/')[1] === 'api')
+                            console.log(next_page)
+                            if (next_page.split('/')[1] === 'api' | next_page === 'showtime' )
                                 window.location = next_page;
                             else
                                 $location.path(next_page);

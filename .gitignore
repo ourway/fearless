@@ -68,8 +68,7 @@ src/api/opensource/*.py[cod]
 *.xz
 *.gz
 cache/
-REPO/
-STATIC/
+REPOSITORIES/
 .idea
 logs/
 .ropeproject/
