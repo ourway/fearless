@@ -335,7 +335,7 @@ taskreport breakdown "Stalker_"{
                 taskreport breakdown "report"{
                     formats html
                     timeformat "%m-%d:%H"
-                    columns name, start, end, chart { scale day }, managers
+                    columns name, start, end, freetime, chart { scale day }, managers
                 }
         }
 

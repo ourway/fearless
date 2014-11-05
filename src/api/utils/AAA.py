@@ -52,7 +52,7 @@ def Authenticate(req, resp, params):
             ...
 
     '''
-    #return
+    return
     ip = req.env.get('HTTP_X_FORWARDED_FOR')
     free_services = ['/api/auth/signup', '/api/auth/login',
                      '/api/things', '/api/auth/activate', '/api/auth/reactivate',
@@ -247,6 +247,7 @@ class Reactivate:
     '''Account activation
     '''
 
+    @falcon.after(commit)
     def on_post(self, req, resp):
         sid = req.cookie('session-id')
         if sid and r.get('reactivation_%s' % sid):
@@ -298,6 +299,7 @@ class ChangePassword:
     '''Account activation
     '''
 
+    @falcon.after(commit)
     def on_post(self, req, resp):
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         form = json.loads(req.stream.read())
@@ -309,6 +311,7 @@ class Reset:
     '''Account activation
     '''
 
+    @falcon.after(commit)
     def on_post(self, req, resp):
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         form = json.loads(req.stream.read())
@@ -320,6 +323,7 @@ class Logout:
     '''Account activation
     '''
 
+    @falcon.after(commit)
     def on_post(self, req, resp):
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         sid = req.cookie('session-id')
@@ -349,5 +353,6 @@ def getUserInfoFromSession(req):
 
 
 class GetUserInfo:
+    @falcon.after(commit)
     def on_post(self, req, resp):
         resp.body = getUserInfoFromSession(req)

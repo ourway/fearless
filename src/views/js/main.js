@@ -111,10 +111,14 @@ fearlessApp.factory('authFactory', function($resource) {
                         try {
                             next_page = atob($routeParams.next);
                             console.log(next_page)
-                            if (next_page.split('/')[1] === 'api' | next_page === 'showtime' )
+                            if (next_page.split('/')[1] === 'api' || next_page === 'showtime' )
+                            {
                                 window.location = next_page;
+                            }
                             else
+                            {
                                 $location.path(next_page);
+                            }
                         }
                         catch(e){
                             $location.path( '/' ) ;
@@ -159,6 +163,7 @@ fearlessApp.factory('authFactory', function($resource) {
                 return true
             }
         else {
+        console.log(userid, username)
            // This is where I redirect user to login page if she/he is unauthenticated
               $scope.userInfo.username = null;
               $scope.userInfo.userid = null;

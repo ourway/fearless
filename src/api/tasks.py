@@ -136,7 +136,7 @@ def remove_asset(name):
 def send_envelope(to, subject, message, attach=None):
     envelope = Envelope(
         from_addr=(u'farsheed.ashouri@gmail.com',
-                   u'Pooyamehr Animation System Notification'),
+                   u'Pooyamehr PMS'),
         to_addr=to,
         subject=subject,
         html_body=message
@@ -148,8 +148,7 @@ def send_envelope(to, subject, message, attach=None):
     pwd = '\n==gchZmcoVWbwADMxM2Q'[::-1]
     gmail = GMailSMTP('farsheed.ashouri@gmail.com',
                       base64.decodestring(pwd))
-    if email_validator(to):
-        gmail.send(envelope)
+    gmail.send(envelope)
 
 
 @app.task()

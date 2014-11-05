@@ -98,6 +98,7 @@ proj.plan
 
 print session.query(Project).join(Task).all()
 
+session.commit()
 
 
     #print maya_section.assets

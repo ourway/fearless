@@ -28,7 +28,7 @@ from utils.validators import checkPath
 from base64 import encode, decode
 
 # from celery.result import AsyncResult
-from models import Asset, Repository, Collection, es, session
+from models import Asset, Repository, Collection, es, session, User
 from AAA import getUserInfoFromSession
 from defaults import public_repository_path
 def _generate_id():
@@ -98,6 +98,10 @@ class AssetSave:
                 session.add(asset)
 
             asset.key = bodyMd5
+            targetUser = session.query(User).filter(User.alias == uploader).first()
+            if targetUser:
+                asset.modifiers.append(targetUser)
+                asset.users.append(targetUser)
                 #newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
                 #asset.task_id = newAsset.task_id
             resp.body = {'message': 'Asset created|updated', 'key': asset.key,

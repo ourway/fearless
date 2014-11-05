@@ -1025,8 +1025,8 @@ $(document).ready(function () {
                 }
                 sequence = startSequence;
                 project.setBackground();
-                goToNextFrame()
-
+                //goToNextFrame()
+                startPlaying()
             } else {
                 alert("No Manifest found...");
             }

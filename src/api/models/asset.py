@@ -41,6 +41,7 @@ class Asset(IDMixin, Base):
     task_id = Column(String(64))  # celery post processing task id
     ready = Column(Boolean, default=False)  # celery post processing task id
     users = relationship('User', backref='assets', secondary='users_assets')
+    modifiers = relationship('User', backref='modifying_assets', secondary='users_assets')
     repository = relationship('Repository', backref='assets')
     path = Column(String(512))  # relative to collection path, including name
     repository_id = Column(Integer, ForeignKey('repository.id'))

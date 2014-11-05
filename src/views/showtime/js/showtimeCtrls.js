@@ -27,21 +27,34 @@ function makeid()
                 loc = $location.$$path
                 name = loc.slice(1)
                 if (name.length==8){
+                    $scope.loading = true;
                     $scope.name = name;
-                    $http.get('/api/db/asset/'+name+'.zip?key=name&field=url').success(function(assetInfo){
+                    $http.get('/api/db/asset/'+name+'.zip?key=name&field=url').success(function(assetUrl){
 
-                         asset_url = '/static/'+ assetInfo.split('"')[1]
+                         asset_url = '/static/'+ assetUrl.split('"')[1]
                         JSZipUtils.getBinaryContent(asset_url, function(err, data) {
                               if(err) {
                                 throw err; // or handle err
                               }
-                              loadWithFile(data)
+                              loadWithFile(data);
+                                
+                            // Now it's time to get some asset info
+                            $http.get('/api/db/asset/'+name+'.zip?key=name').success(function(assetInfo){
+                                console.log(assetInfo)
+                                })
+                        
+
+                              $scope.loading = false;
+                              $scope.$apply()
                             });
 
                          //$scope.changed = new Date(assetInfo.modified_on * 1000)
 
 
-                    })
+                    }).error(function(e){
+                        console.log('Asset is not available on server!');
+                        $scope.loading = false;
+                        })
                     // here I should try to load data from asset server
                 }
                 else {

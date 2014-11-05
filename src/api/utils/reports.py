@@ -26,8 +26,7 @@ class Mailer(object):
         '''send an email'''
         data = {'message': 'Error'}
         stream = req.stream.read()
-        if stream:
-            stream = ujson.loads(stream)
+        stream = ujson.loads(stream)
         to = stream.get('to')
         subject = stream.get('subject')
         message = stream.get('message')

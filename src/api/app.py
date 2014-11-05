@@ -20,6 +20,7 @@ import urlparse
 from string import ascii_uppercase
 import ujson as json
 from utils.assets import AssetSave, ListAssets, GetAsset
+from utils.reports import Mailer
 
 from models import __all__ as av
 from models import *
@@ -162,6 +163,7 @@ app.add_route('/api/auth/getUserInfo', GetUserInfo())
 app.add_route('/api/asset/save/{repo}', AssetSave())
 app.add_route('/api/asset', ListAssets())
 app.add_route('/api/asset/{key}', GetAsset())
+app.add_route('/api/sendmail', Mailer())
 
 
 if __name__ == '__main__':
