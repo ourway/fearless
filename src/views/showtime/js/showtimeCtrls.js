@@ -1,5 +1,9 @@
 var fearlessShowtimeApp = angular.module('fearlessShowtimeApp', ['ngResource', 'ngCookies', 'ngRoute']);
 
+
+
+
+
 function makeid()
 {
     var text = "";
@@ -16,6 +20,24 @@ function makeid()
                                                       $timeout, $location, $routeParams) {
 
 
+
+             $scope.timeConverter = function(UNIX_timestamp){
+             var a = new Date(UNIX_timestamp*1000);
+             var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                 var year = a.getFullYear();
+                 var month = months[a.getMonth() - 1];
+                 var date = a.getDate();
+                 var hour = a.getHours();
+                 var min = a.getMinutes();
+                 var sec = a.getSeconds();
+                 var time = date + month + year + '-' + hour + ':' + min;
+                 return time;
+             }
+
+
+
+
+
         $http.post('/api/auth/getUserInfo').success(function(result){
 
             if (result.message == 'ERROR'){
@@ -29,21 +51,16 @@ function makeid()
                 if (name.length==8){
                     $scope.loading = true;
                     $scope.name = name;
-                    $http.get('/api/db/asset/'+name+'.zip?key=name&field=url').success(function(assetUrl){
+                    $http.post('/api/asset/'+name+'.zip?name=true').success(function(assetInfo){
 
-                         asset_url = '/static/'+ assetUrl.split('"')[1]
-                        JSZipUtils.getBinaryContent(asset_url, function(err, data) {
+                        JSZipUtils.getBinaryContent(assetInfo.url+'?rn='+ makeid(), function(err, data) {
                               if(err) {
                                 throw err; // or handle err
                               }
                               loadWithFile(data);
                                 
-                            // Now it's time to get some asset info
-                            $http.get('/api/db/asset/'+name+'.zip?key=name').success(function(assetInfo){
-                                console.log(assetInfo)
-                                })
-                        
 
+                              $scope.asset = assetInfo;
                               $scope.loading = false;
                               $scope.$apply()
                             });

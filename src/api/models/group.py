@@ -23,9 +23,9 @@ from sqlalchemy.orm import validates, deferred
 from mixin import IDMixin, Base
 
 
-groups_rules = Table('group_rules', Base.metadata,
+groups_roles = Table('group_roles', Base.metadata,
                      Column('id', Integer, primary_key=True),
-                     Column('rule_id', Integer, ForeignKey('rule.id')),
+                     Column('role_id', Integer, ForeignKey('role.id')),
                      Column('group_id', Integer, ForeignKey('group.id'))
                      )
 
@@ -35,12 +35,12 @@ class Group(IDMixin, Base):
     '''Groups for membership management
     '''
     name = Column(String(32), nullable=False, unique=True)
-    rls = relationship("Rule",
-                          secondary=groups_rules, backref='groups')
-    rules = association_proxy('rls', 'name')
+    rls = relationship("Role",
+                          secondary=groups_roles, backref='groups')
+    roles = association_proxy('rls', 'name')
 
 
-    def __init__(self, name, rule=None):
+    def __init__(self, name, role=None):
         self.name=name
-        if rule:
-            self.rules.append(rule)
+        if role:
+            self.roles.append(role)

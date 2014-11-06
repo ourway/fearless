@@ -20,7 +20,7 @@ usage:
     print session.query(Report).all()
 '''
 
-__all__ = ['User', 'Report', 'Rule', 'Group', 'Client', 'Task',
+__all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
            'Repository', 'Project', 'now', 'Ticket', 'session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
            'Page', 'Collection', 'r', 'es', 'Departement']
@@ -45,7 +45,7 @@ from db import session, engine, Base
 from models.group import Group
 from models.user import User
 from models.report import Report
-from models.rule import Rule
+from models.role import Role
 from models.client import Client
 from models.project import Project
 from models.repository import Repository
@@ -60,41 +60,46 @@ from models.page import Page
 from models.asset import Asset
 from models.collection import Collection
 from models.departement import Departement
-
+from utils.defaults import public_repository_path
 Base.metadata.create_all(engine)
 
 def init():
-    '''set some defaults values. Like admin rule and group, managers, etc...
+    '''set some defaults values. Like admin role and group, managers, etc...
     '''
     print '*'*25 , 'Initializing database', '*'*25
     groups = session.query(Group).all()
     for gr in ['managers', 'users', 'clients', 'guests'] :
         if not gr in [i.name for i in groups]:
-            new = Group(gr, rule=gr[:-1])
+            new = Group(gr, role=gr[:-1])
             session.add(new)
 
     manager_group = session.query(Group).filter(Group.name=='managers').first()
     user_group = session.query(Group).filter(Group.name=='users').first()
 
-    rule_actions = ['create', 'read', 'delete', 'update']
-    rule_areas_managers = ['project', 'shot', 'sequence', 'collection',
+    role_actions = ['create', 'see', 'delete', 'edit']
+    role_areas_managers = ['project', 'shot', 'sequence', 'collection',
                         'task', 'repository']
-    rule_areas_users = ['tag', 'asset', 'ticket', 'report', 'scene', 'page']
-    rules = session.query(Rule).all()
-    for act in rule_actions:
-        for area in rule_areas_managers + rule_areas_users:
-            rule = '%s_%s' % (act, area)
-            if not rule in [i.name for i in rules]:
-                new = Rule(rule)
+    role_areas_users = ['tag', 'asset', 'ticket', 'report', 'scene', 'page']
+    roles = session.query(Role).all()
+    for act in role_actions:
+        for area in role_areas_managers + role_areas_users:
+            role = '%s_%s' % (act, area)
+            if not role in [i.name for i in roles]:
+                new = Role(role)
                 session.add(new)
-                if area in rule_areas_users:
+                if area in role_areas_users:
                     user_group.rls.append(new)
                 manager_group.rls.append(new)
 
-    read_rules = session.query(Rule).filter(Rule.name.like('read%')).all()
+    read_roles = session.query(Role).filter(Role.name.like('see%')).all()
     users_group = session.query(Group).filter(Group.name=='users').first()
-    for rule in read_rules:
-        users_group.rls.append(rule)
+    for role in read_roles:
+        users_group.rls.append(role)
+
+    profile_files_repository = session.query(Repository).filter(Repository.name == 'profiles').first()
+    if not profile_files_repository:
+        profile_files_repository = Repository(name='profiles', path= os.path.join(public_repository_path, 'profiles'))
+        session.add(profile_files_repository)
 
     session.commit()
     print '*'*25 , '*********************', '*'*25

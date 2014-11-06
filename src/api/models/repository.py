@@ -51,7 +51,7 @@ class Repository(IDMixin, Base):
         readme = os.path.join(path, 'fearless.rst')
         with open(readme, 'wb') as f:
             f.write('welcome to Fearless repository.')
-        GIT(readme).add('repo *%s* created successfully' % self.name)
+        #GIT(readme).add('repo *%s* created successfully' % self.name)
         return path
 
     @validates('collections')
@@ -98,7 +98,7 @@ class Repository(IDMixin, Base):
             collection_git = GIT(
                 '.', wt=os.path.join(self.path, data.path or self.path, data.name))
             collection_git.add(message)
-            collection_git.tag('start')
+            #collection_git.tag('start')
 
             '''Add these collection folders to main repo gitignore.'''
             with open(os.path.join(self.path, '.gitignore'), 'a+') as repoignore:

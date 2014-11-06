@@ -38,8 +38,9 @@ class Asset(IDMixin, Base):
     name = Column(String(128))
     ext = Column(String(32))
     content_type = Column(String(64))
+    version = Column(Integer, default=1)  ## asset versioning
     task_id = Column(String(64))  # celery post processing task id
-    ready = Column(Boolean, default=False)  # celery post processing task id
+    ready = Column(Boolean, default=False)  # post processing
     users = relationship('User', backref='assets', secondary='users_assets')
     modifiers = relationship('User', backref='modifying_assets', secondary='users_assets')
     repository = relationship('Repository', backref='assets')
@@ -57,11 +58,11 @@ class Asset(IDMixin, Base):
 
         return collection_id
 
-    @validates('key')
+    @validates('version')
     def commit(self, key, data):
         wt = os.path.join(self.collection.repository.path, self.collection.path)
-        git = GIT('.', wt=wt)
-        git.add('Asset *%s*' % self.name)
+        git = GIT(self.full_path, wt=wt)
+        git.add('Asset *%s*' % self.name, version=data)
         return data
 
     @hybrid_property

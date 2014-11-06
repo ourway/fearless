@@ -42,8 +42,10 @@
 		<div id="menubartop">
 
 			<div class="controlBlockInset">
+                <button id="new" class='button viewer current'>NEW</button>
+                <button id="clean" class='button viewer current'>Clean</button>
 				<div id='viewerControls'>
-					<button id="sequence1" class='button radiusLeft viewer current'>A</button>
+                    <button id="sequence1" class='button viewer current'>A</button>
 					<button id="sequence2" class='button radiusRight viewer'>B</button>
 				</div>
 
@@ -66,9 +68,16 @@
 				    <label for="allData">Include Images</label>
                 </div>
                 |
-                <span style="color:grey"> <strong>{{user}}</strong> showtime area &bull;</span>
-                <span style="color:#ffffe0"> <pre style="display:inline">{{changed}}</pre></span>
+                <div ng-if="asset" style="display:inline-block;padding:2px;background: #333">
+                <span style="color:#31708f">
+                    <pre style="display:inline;color:#177199">{{timeConverter(asset.datetime)}}</pre>
+                    by <strong style="color:#0081c2">{{asset.last_updated_by}}</strong>
+                    to version <span style="color:#0e90d2">{{asset.version}}</span>
+
+                </span>
+                </div>
                 <h3 style="color:yellow;display:inline" ng-show="loading==true" >loading Show ...</h3>
+
 				<div class="clear"></div>
 			</div><!-- END controlBlockInset -->
 

@@ -32,6 +32,7 @@ class Collection(IDMixin, Base):
     '''
     schema = deferred(Column(Text))  # load on access
     name = Column(String(128))
+    version = Column(Integer, default=1)  ## asset versioning
     template = Column(String(64))
     path = Column(String(512), nullable=False)  # relative to repo path path
     repository_id = Column(

@@ -16,7 +16,7 @@ Clean code is much better than Cleaner comments!
 #sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
 
-from models import User, Group, Rule, session, r, now  # r is redis
+from models import User, Group, Role, session, r, now  # r is redis
 from helpers import commit
 import ujson as json
 import hmac

@@ -96,6 +96,8 @@ class AssetSave:
                               collection=collection, name=name,
                               path=assetPath, ext=assetExt)
                 session.add(asset)
+            else:
+                asset.version += 1
 
             asset.key = bodyMd5
             targetUser = session.query(User).filter(User.alias == uploader).first()
@@ -203,27 +205,22 @@ def getAssetInfo(key):
 
 class GetAsset:
 
-    def on_get(self, req, resp, key):
+    def on_post(self, req, resp, key):
         '''Serve asset based on a key (riak key for finding path'''
 
-        target = session.query(Asset).filter(Asset.key == key).first()
+        name = req.get_param('name')
+        if name == 'true':
+            target = session.query(Asset).filter(Asset.name == key).first()
+        else:
+            target = session.query(Asset).filter(Asset.key == key).first()
         if target:
-            print target
-            filepath = os.path.join(target.repository.path, target.path)
-            f = open(filepath)
-            # resp.stream_len=500
-            if req.get_param('b64'):
-                encf = StringIO()
-                encode(f, encf)
-                encf.seek(0, os.SEEK_END)
-                datalen = s.tell()
-                encf.seek(0)
-                resp.stream_len = datalen
-                resp.stream = encf
-            else:
-                resp.content_type = str(target.content_type)
-                resp.stream_len = os.path.getsize(filepath)
-                resp.stream = f
+            sz = os.path.getsize(target.full_path)
+            modifier = target.modifiers[-1]
+            resp.body = {'url':os.path.join('/static', target.url),
+                         'size':sz, 'key':target.key,
+                         'version':target.version, 'datetime':target.modified_on,
+                         'last_updated_by':modifier.alias}
+
 
 
 class ListAssets:

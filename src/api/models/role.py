@@ -25,7 +25,7 @@ from mixin import IDMixin, Base, getUUID
 
 
 
-class Rule(IDMixin, Base):
+class Role(IDMixin, Base):
 
     '''Rules for permissions and authorizations
     '''

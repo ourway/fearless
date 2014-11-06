@@ -207,16 +207,16 @@ function startPlaying() {
     }
 }
 
+
 function convertImgToBase64(img) {
     var canvas = document.createElement('CANVAS');
     var ctx = canvas.getContext('2d');
-
 
     var dataURL;
     canvas.height = img.height;
     canvas.width = img.width;
     ctx.drawImage(img, 0, 0);
-    dataURL = canvas.toDataURL("image/png");
+    dataURL = canvas.toDataURL("image/jpeg");
 
     canvas = null;
 
@@ -320,6 +320,20 @@ function showtime() {
 
     };
 
+    this.clean = function(){
+        this.frames = 0;
+        this.imgsA = [];
+        this.imgsAdata = {};
+        this.imgsB = [];
+        this.imgsBdata = {};
+        goToFrame(0);
+        $("#sequenceImage").prop('src', '');
+        $("#frame").prop("max", 0);
+        $("#frametotal").html(1);
+        $("#timeline").slider({max: 1000});
+    }
+
+
 
     this.setPlayerSize = function () {
         if (this.imgsA && this.imgsA[0]) {
@@ -357,7 +371,6 @@ function showtime() {
 
                         reader.onload = function (e) {
                             var dataURL = reader.result;
-
 
                             $("#sequenceImage").prop("src", dataURL);
 
@@ -664,7 +677,6 @@ function showtime() {
         zip.file("showtime.json", this.encode(fullEncode));
 
         var img = zip.folder("frames");
-
         for (var f = 0; f < this.frames.length; f++) {
             var fr = this.frames[f];
             if (fr != undefined) {
@@ -715,12 +727,12 @@ function showtime() {
                // And to view in firebug
                data = JSON.parse(xmlHttpRequest.responseText);
                console.log(data.url)
+               location.reload();
               }
              }
             xmlHttpRequest.send(content);
 
         }
-
     }
 }
 
@@ -773,7 +785,7 @@ $(document).ready(function () {
 
 
             previewContext.fill();
-            nib.src = preview.toDataURL();
+            nib.src = preview.toDataURL('image/jpeg');
 
         }
 
@@ -1074,7 +1086,15 @@ $(document).ready(function () {
             return false;
         });
 
-        $("#previousFrame").click(function () {
+        $("#clean").click(function () {
+            project.clean();
+            return false;
+        });
+
+        $("#new").click(function () {
+            location = '/app/showtime';
+            return false;
+        });        $("#previousFrame").click(function () {
             if (playInterval == undefined) {
                 goToLastFrame()
             }
@@ -1175,7 +1195,7 @@ $(document).ready(function () {
         range: "min",
         /* value: $( "#frame" ).val(),*/
         min: 1,
-        max: 100,
+        max: 400,
         slide: function (event, ui) {
 
             goToFrame(ui.value);

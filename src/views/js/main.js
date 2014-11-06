@@ -47,7 +47,11 @@ fearlessApp.factory('authFactory', function($resource) {
                 templateUrl: 'pages/pms/index.html',
                 controller: 'pmsCtrl'
             })
-		 })
+            .when('/profile', {
+
+                templateUrl: 'pages/auth/profile.html',
+                controller: 'profileCtrl'
+            })		 })
 
 
 	// create the controller and inject Angular's $scope
@@ -218,10 +222,12 @@ fearlessApp.controller('pmsCtrl', function($scope, $http, $location){
         })
 
     $scope.$parent.page= 'pms';
-
-
-
-
     }
 
 });
+
+fearlessApp.controller('profileCtrl', function($scope, $http, $location){
+
+});
+
+
