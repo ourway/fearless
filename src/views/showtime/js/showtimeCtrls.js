@@ -51,27 +51,29 @@ function makeid()
                 if (name.length==8){
                     $scope.loading = true;
                     $scope.name = name;
-                    $http.post('/api/asset/'+name+'.zip?name=true').success(function(assetInfo){
+                    $http.post('/api/asset/'+$scope.name+'.zip?name=true').success(function(assetInfo){
 
-                        JSZipUtils.getBinaryContent(assetInfo.url+'?rn='+ makeid(), function(err, data) {
-                              if(err) {
-                                throw err; // or handle err
-                              }
-                              loadWithFile(data);
-                                
 
-                              $scope.asset = assetInfo;
-                              $scope.loading = false;
-                              $scope.$apply()
+                        if (assetInfo.url) {
+                            JSZipUtils.getBinaryContent(assetInfo.url + '?rn=' + makeid(), function (err, data) {
+                                if (err) {
+                                    return false;
+                                    //throw err; // or handle err
+                                }
+                                loadWithFile(data);
+
+
+                                $scope.asset = assetInfo;
+                                $scope.$apply()
                             });
+                         }
+
+                        $scope.loading = false;
 
                          //$scope.changed = new Date(assetInfo.modified_on * 1000)
 
 
-                    }).error(function(e){
-                        console.log('Asset is not available on server!');
-                        $scope.loading = false;
-                        })
+                    })
                     // here I should try to load data from asset server
                 }
                 else {

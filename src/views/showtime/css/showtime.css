@@ -11,9 +11,9 @@ a:hover {text-decoration: underline; color: #13aff0;} /* mouse over link */
 a:active {color:#13aff0;} /* selected link e14d43 2373cc */
 
 body {
-	background-color: #09090A;
+	background-color: #222;
 	position:relative;
-	font-family: 'Open Sans', sans-serif;
+	font-family: arial;
 	font-size:.9em;
 	margin:0;
 	padding:0;
@@ -31,7 +31,7 @@ p {
 	width: 100%;
 	min-width: 800px;
 	margin-left: auto;
-	margin-right:auto
+	margin-right:auto;
 }
 #canvasWrapper
 {
@@ -239,7 +239,7 @@ button:focus {outline:0;}
 .radiusRight{border-radius: 0px 8px 8px 0px}
 .button {
 	font-size: 12px;
-	font-family: verdana;
+	font-family: arial;
 	display:inline-block;
 	margin:0px;
 	float:left;

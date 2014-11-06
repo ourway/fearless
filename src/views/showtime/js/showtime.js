@@ -271,14 +271,14 @@ function showtime() {
     };
 
     this.load = function () {
-        var data = localStorage.getItem(projectName);
+        //var data = localStorage.getItem(projectName);
     };
 
     this.save = function () {
         var dataImage = canvas.toDataURL();
         var f = this.currentFrame();
         this.frames[f] = dataImage;
-        localStorage.setItem((this.projectName + f.toString()), dataImage); // save image data
+        //localStorage.setItem((this.projectName + f.toString()), dataImage); // save image data
         $("li.seqnum_" + f).addClass("hasDrawing");
 
 
@@ -295,14 +295,16 @@ function showtime() {
         proportion = currentWidth / currentHeight //!TODO: use this to rescale h/w if window size is exceeded.
 
 
-        if (currentWidth > $(window).width()) {
-            currentWidth = $(window).width();
+        if (currentWidth+100 > $(window).width()) {
+            currentWidth = $(window).width()-100;
+            currentHeight = currentWidth/proportion;
 
 
         }
 
-        if (currentHeight > $(window).height()) {
-            currentHeight = $(window).height();
+        if (currentHeight+100 > $(window).height()) {
+            currentHeight = $(window).height()-100;
+            currentWidth = currentHeight*proportion;
         }
 
         img1 = null
@@ -357,6 +359,9 @@ function showtime() {
         }
 
     };
+//////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
 
     this.setBackground = function () {
         var f = this.currentFrame();
@@ -366,7 +371,8 @@ function showtime() {
                 if (this.imgsA && this.imgsA[f]) {
                     $('#frameFileName').html(this.imgsA[f].name);
 
-                    if (this.imgsA[f] instanceof Blob) {
+                    if (!this.imgsAdata[f] && this.imgsA[f] instanceof Blob) {
+                        console.log(true)
                         var reader = new FileReader();
 
                         reader.onload = function (e) {
@@ -375,7 +381,11 @@ function showtime() {
                             $("#sequenceImage").prop("src", dataURL);
 
                             if (project.imgsAdata && project.imgsAdata[f] == undefined) {
-                                project.imgsAdata[f] = convertImgToBase64($("#sequenceImage")[0]);
+                                dataURL = convertImgToBase64($("#sequenceImage")[0]);
+                                project.imgsAdata[f] = dataURL;
+                                $("#sequenceImage").prop("src", dataURL);
+                                //_f = new File([project.imgsAdata[f]], _fn, {type: "image/jpeg"});
+                                //project.imgsA[f]=_f;
                             }
 
                             updateCanvas();
@@ -398,7 +408,7 @@ function showtime() {
 
                 if (this.imgsB && this.imgsB[f]) {
                     $('#frameFileName').html(this.imgsA[f].name);
-                    if (this.imgsB[f] instanceof Blob) {
+                    if (!this.imgsBdata[f] && this.imgsB[f] instanceof Blob) {
                         var reader = new FileReader();
 
                         reader.onload = function (e) {
@@ -407,7 +417,9 @@ function showtime() {
 
                             $("#sequenceImage").prop("src", dataURL);
                             if (project.imgsBdata && project.imgsBdata[f] == undefined) {
-                                project.imgsBdata[f] = convertImgToBase64($("#sequenceImage")[0]);
+                                dataURL = convertImgToBase64($("#sequenceImage")[0]);
+                                project.imgsBdata[f] = dataURL;
+                                $("#sequenceImage").prop("src", dataURL);
                             }
 
                             updateCanvas();
@@ -726,7 +738,6 @@ function showtime() {
                //alert the user that a response now exists in the responseTest property.
                // And to view in firebug
                data = JSON.parse(xmlHttpRequest.responseText);
-               console.log(data.url)
                location.reload();
               }
              }
@@ -992,7 +1003,7 @@ $(document).ready(function () {
                         if (tempA != undefined) {
 
 
-                            newImgs[i] = "data:" + A.type + ";base64," + btoa(tempA.asBinary());
+                            newImgs[i] = "data:" + 'image/jpeg' + ";base64," + btoa(tempA.asBinary());
 
                         }
                     }
