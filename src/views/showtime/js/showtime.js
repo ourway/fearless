@@ -148,8 +148,9 @@ function goToFrame(fr) {
 /*Move the time slider forward and display the correct frame and notes.*/
 function goToNextFrame(clear) {
     var fr = project.currentFrame();
-
-    fr++;
+            progressPyChart.segments[0].value = fr;
+            progressPyChart.segments[1].value = project.imgsA.length-fr-1;
+            progressPyChart.update();    fr++;
 
     if (fr > $("#frame").prop("max") * 1) {
 
@@ -1262,27 +1263,18 @@ $(document).ready(function () {
         //range:true,
         slide: function (event, ui) {
             goToFrame(ui.value);
-
+            progressPyChart.segments[0].value = ui.value;
+            progressPyChart.segments[1].value = project.imgsA.length-ui.value-1;
+            progressPyChart.update();
 
         }
     });
 
-    timerange = $("#timerange").slider({
-        range: "min",
-        /* value: $( "#frame" ).val(),*/
-        min: 1,
-        max: project.frames.length,
-        range:true,
-        slide: function (event, ui) {
-            project.cutin = ui.values[0];
-            project.cutout = ui.values[1];
-            $('#frame').prop('max', project.cutout);
-            $('#frame').prop('min', project.cutin);
-            $("#frame").prop("max", project.cutout);
-            $("#frametotal").html(project.frames.length);
-            $("#timeline").slider({max: project.cutout});            //goToFrame(ui.value);
-        }
-    });    $(document).keydown(function (e) {
+
+
+
+
+    $(document).keydown(function (e) {
 
         if (allowKBD) {
             /*Necessary so user can use these keys when typing.*/
@@ -1356,3 +1348,34 @@ function goodbye(e) {
 }
 //window.onbeforeunload=goodbye;
 		 
+progressChartOptions = {
+    segmentShowStroke : true,
+    segmentStrokeColor : "#333",
+    segmentStrokeWidth : 2,
+    percentageInnerCutout : 0, // This is 0 for Pie charts
+    animationSteps : 25,
+    animationEasing : "liner",
+    //animateRotate : true,
+    animateScale : false,
+}
+var progressData = [
+    {
+        value: 0,
+        color:"#aaa",
+        highlight: "#eee",
+        label: "Loaded"
+
+    },
+     {
+        value: 100,
+        color:"#333",
+        highlight: "#555",
+        label: "Remaining"
+
+    },
+
+
+]
+
+var ctx = $("#progressChart").get(0).getContext("2d");
+var progressPyChart = new Chart(ctx).Pie(progressData, progressChartOptions);

@@ -69,11 +69,11 @@ function makeid()
 
 
                                 $scope.asset = assetInfo;
+                                $scope.loading = false;
                                 $scope.$apply()
                             });
                          }
 
-                        $scope.loading = false;
 
                          //$scope.changed = new Date(assetInfo.modified_on * 1000)
 
