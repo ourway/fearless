@@ -1,4 +1,4 @@
-var fearlessShowtimeApp = angular.module('fearlessShowtimeApp', ['ngResource', 'ngCookies', 'ngRoute']);
+var fearlessShowtimeApp = angular.module('fearlessShowtimeApp', ['ngResource', 'ngCookies', 'restangular', 'ngRoute']);
 
 
 
@@ -17,10 +17,14 @@ function makeid()
 
 
     fearlessShowtimeApp.controller('showtimeCtrl', function($scope, $rootScope, $cookies,$http,
-                                                      $timeout, $location, $routeParams) {
+                                                      $timeout, $location, $routeParams, Restangular) {
 
 
+             $scope.asset = {};
 
+             $scope.hey = function(){
+                 console.log($scope.asset);
+             }
              $scope.timeConverter = function(UNIX_timestamp){
              var a = new Date(UNIX_timestamp*1000);
              var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -35,9 +39,6 @@ function makeid()
              }
 
 
-
-
-
         $http.post('/api/auth/getUserInfo').success(function(result){
 
             if (result.message == 'ERROR'){
@@ -45,9 +46,13 @@ function makeid()
                 return
             }
             else {
-                $scope.user = result.alias
+                $scope.user = result
                 loc = $location.$$path
                 name = loc.slice(1)
+                //x = Restangular.one('api', 'asset').post(name+'.zip', {'name':true})
+                //x.then(function(ass){
+                //    console.log(ass);
+                //})
                 if (name.length==8){
                     $scope.loading = true;
                     $scope.name = name;
@@ -81,6 +86,18 @@ function makeid()
                 }
                 project.projectName = $scope.name;
                 $location.path($scope.name);
+
+
+            showtimeUserInfos = Restangular.one('api', 'showtime').getList($scope.user.id);
+            showtimeUserInfos.then(function(result){
+
+                $scope.userShows = result;
+                $scope.goto = function(to){
+                    $location.path(to);
+                    location.reload();
+                }
+            })
+
 
         }
         })

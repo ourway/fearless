@@ -2,22 +2,24 @@
 <!-- saved from url=(0051)http://wallworm.com/projects/wingbintemp/index.html -->
 <html lang="en" ng-app="fearlessShowtimeApp"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	
-	<title>Fearless Playtime</title>
+	<title>Fearless Showtime</title>
 	<meta name="description" content="Browser based ram bin">
 	<meta name="keywords" content="ram player, fearless, video editing, client, notes, sequence, viewer">
 
 	<link href='css/fonts.css' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" href="css/showtime.css">
 	<link rel="stylesheet" type="text/css" href="css/slider.css">
-	<script src="js/vendor/jquery.min.js"></script> 
+	<script src="js/vendor/jquery.min.js"></script>
 	<script src="js/vendor/jquery-ui.min.js"></script>
 	<script src='js/FileSaver.js'></script>
 	<script src='js/jszip.min.js'></script>
     <script src='js/jszip-utils.min.js'></script>
-	<script src='../js/vendor/angular.min.js'></script>
+	<script src='../js/vendor/lodash.min.js'></script>
+    <script src='../js/vendor/angular.min.js'></script>
 	<script src='../js/vendor/angular-resource.min.js'></script>
 	<script src='../js/vendor/angular-route.min.js'></script>
     <script src='../js/vendor/angular-cookies.min.js'></script>
+    <script src='../js/vendor/restangular.min.js'></script>
     <script type="text/javascript" src='js/showtimeCtrls.js'> </script>
 	<script type="text/javascript" src='js/showtime.js'> </script>
 	<!-- COLOR PICKER -->
@@ -26,18 +28,18 @@
 	<link rel='stylesheet' href='css/spectrum.css' />
 
   </head>
-  <body ng-controller="showtimeCtrl"><img id="nibImage" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAxklEQVQ4T62TgQ2CMBBF6QSu4gbWCdRNdAJxAnAT3EAn0FFgAvyPtE1p1ECxySV3hXvXu9w3RXL6vljraiezMnzOS3aX3YwZ/HBMHCj5qLhKoVHcyi8Fufq7AFBy4yr/yA+fGkEORANgQuVP0JMgtXE9P6eUTf6hnS2AUs45A0DKBQDT3WQCHgB4yioT0C4FdH9pYfEQWVcGOXcOnXLs8kXy05+5yohqH1Y5giAmZvKtHZ6NmGqfM1Kj0wUzgW5lqZwR0UjOb2XRRMDjyfVoAAAAAElFTkSuQmCC" style="top: 496px; left: 768px; display: block;">
+  <body ><img id="nibImage" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAxklEQVQ4T62TgQ2CMBBF6QSu4gbWCdRNdAJxAnAT3EAn0FFgAvyPtE1p1ECxySV3hXvXu9w3RXL6vljraiezMnzOS3aX3YwZ/HBMHCj5qLhKoVHcyi8Fufq7AFBy4yr/yA+fGkEORANgQuVP0JMgtXE9P6eUTf6hnS2AUs45A0DKBQDT3WQCHgB4yioT0C4FdH9pYfEQWVcGOXcOnXLs8kXy05+5yohqH1Y5giAmZvKtHZ6NmGqfM1Kj0wUzgW5lqZwR0UjOb2XRRMDjyfVoAAAAAElFTkSuQmCC" style="top: 496px; left: 768px; display: block;">
   <canvas id="brushPreview" width="16" height="16"></canvas>
   
 
-  <div id="pageWrapper">
+  <div id="pageWrapper" ng-controller="showtimeCtrl">
 
 	<div id="header">
 		<a href="/app/#about/showtime"><div class="wingbinLogo"></div></a> 
 
 	</div><!-- END header -->
 
-	<form id="controlForm" method="post" action="index.html#" enctype="multipart/form-data" accept="image/gif,image/jpeg,image/png" onsubmit="return false;">
+
 
 		<div id="menubartop">
 
@@ -61,21 +63,12 @@
 
 				<button id="download" class="fileSave button radiusLeft">Download</button>
                 <button id="save" class="fileSave button radiusLeft">save</button>
-				<input type="text" required="required" ng-disabled="name!=null" class="stopKBD radiusRight" ng-model="name" placeholder="Project Name">
-
+				<input type="text" id="description" required="required" class="stopKBD radiusRight" ng-model="asset.descripion" placeholder="desciption">
                 <div style="display:none">
 				    <input checked="true" type="checkbox" id="allData" hint="Click here to include all of the image sequences.">
 				    <label for="allData">Include Images</label>
                 </div>
-                |
-                <div ng-if="asset" style="display:inline-block;padding:2px;background: #333">
-                <span style="color:#31708f">
-                    <pre style="display:inline;color:#177199">{{timeConverter(asset.datetime)}}</pre>
-                    by <strong style="color:#0081c2">{{asset.last_updated_by}}</strong>
-                    to version <span style="color:#0e90d2">{{asset.version}}</span>
 
-                </span>
-                </div>
                 <h3 style="color:yellow;display:inline" ng-show="loading==true" >loading Show ...</h3>
 
 				<div class="clear"></div>
@@ -85,16 +78,46 @@
 
 		</div><!-- END menubar -->
 
-		
-		<div id="canvasWrapper">
+        <div id="container">
+        <table style="width:100%">
+	    <tr><td style="vertical-align: text-top;padding-left:1%;width:70%">
+
+                <div ng-if="asset.version" style="margin-left: 30px">
+                <span style="color:#31708f">
+                    <pre style="display:inline;color:#177199">{{timeConverter(asset.datetime)}}</pre>
+                    <strong style="color:#0081c2">{{asset.last_updated_by}}</strong>
+                    version: <span style="color:#0e90d2">{{asset.version}}</span>
+                </span>
+                </div>
+
+            <div id="canvasWrapper" style="margin-top: -25px;">
+
+
+
 			<div id="canvasDiv">
 				<img id="sequenceImage" src="./images/placeholder.png">
-				<canvas id="canvas" width="720" height="405"></canvas>
+				<canvas id="canvas" width="960" height="540"></canvas>
 			</div>
 			<span id="frameFileName">Not any foortage!</span>
 		</div><!-- END canvasWrapper -->
+        </td><td style="padding-left: 10px;vertical-align: top;width:30%">
+
+            <div id="sidebar" style="margin:auto;width:250px">
 
 
+                <div style="color:#ccc">
+                    <ul>
+                       <li style="list-style: None" ng-repeat="ua in userShows">
+                          <a href="" ng-click="goto(ua.name)">{{ua.description || ua.name }}</a>
+
+                       </li>
+                    </ul>
+
+                </div>
+             </div>
+          </td></tr>
+        </table>
+        </div>
 		<div id="controls">
 			<div id="timeline"></div>
 			<div id="timelineControls">
@@ -175,7 +198,7 @@
 
 		</div><!-- END controls -->
 
-	</form>
+
 	</div>
 	
 

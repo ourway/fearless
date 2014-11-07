@@ -1,4 +1,4 @@
-var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'ngCookies']);
+var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'ngCookies', 'restangular']);
 
 fearlessApp.factory('authFactory', function($resource) {
   return $resource('/api/auth/:what',

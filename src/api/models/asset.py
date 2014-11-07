@@ -36,6 +36,7 @@ class Asset(IDMixin, Base):
     '''
     key = Column(String(32), nullable=False, unique=True)
     name = Column(String(128))
+    description = Column(String(512))
     ext = Column(String(32))
     content_type = Column(String(64))
     version = Column(Integer, default=1)  ## asset versioning
@@ -62,7 +63,7 @@ class Asset(IDMixin, Base):
     def commit(self, key, data):
         wt = os.path.join(self.collection.repository.path, self.collection.path)
         git = GIT(self.full_path, wt=wt)
-        git.add('Asset *%s*' % self.name, version=data)
+        git.add(self.description or 'Asset *%s*' % self.name, version=data)
         return data
 
     @hybrid_property

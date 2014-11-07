@@ -99,6 +99,11 @@ class AssetSave:
             else:
                 asset.version += 1
 
+            # Asset descriptions
+            if req.get_param('description'):
+                asset.description = req.get_param('description')
+
+
             asset.key = bodyMd5
             targetUser = session.query(User).filter(User.alias == uploader).first()
             if targetUser:
@@ -219,7 +224,7 @@ class GetAsset:
             resp.body = {'url':os.path.join('/static', target.url),
                          'size':sz, 'key':target.key,
                          'version':target.version, 'datetime':target.modified_on,
-                         'last_updated_by':modifier.alias}
+                         'last_updated_by':modifier.alias, 'descripion':target.description}
 
 
 

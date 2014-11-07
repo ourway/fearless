@@ -10,11 +10,9 @@
 
 /*Element Vars*/
 var canvas;
-var canvasDiv;
 var context;
-var SequenceImage = new Image();
-var currentWidth = 720;
-var currentHeight = 405;
+var currentWidth = 960;
+var currentHeight = 540;
 var timeline;
 
 /*Drawing Vars*/
@@ -27,7 +25,6 @@ var nib = new Image();
 var nibShape = "circle";//circle or square
 var lastMouseX;
 var lastMouseY;
-var cursorStyleObject = new Object();
 
 /*Control Vars*/
 var playInterval;
@@ -208,18 +205,27 @@ function startPlaying() {
 }
 
 
-function convertImgToBase64(img) {
+function convertImgToBase64(data) {
+
+
+    var img = new Image();
+
+        // this
+
+
+
+
+
+    img.src = data;
+
     var canvas = document.createElement('CANVAS');
+    canvas.width = currentWidth;
+    canvas.height = currentHeight;
     var ctx = canvas.getContext('2d');
-
-    var dataURL;
-    canvas.height = img.height;
-    canvas.width = img.width;
-    ctx.drawImage(img, 0, 0);
+    ctx.drawImage(img, 0, 0, currentWidth, currentHeight);
     dataURL = canvas.toDataURL("image/jpeg");
-
     canvas = null;
-
+    img = null;
     return dataURL;
 }
 
@@ -286,30 +292,28 @@ function showtime() {
 
     this.setCurrentWidthFromImageSource = function (dataURL) {
         var img1 = new Image();
-        img1.src = dataURL;
+        img1.onload = function() {
+            // this
+                var maxWidth = 960,
+                    maxHeight = 540,
+                    currentWidth = this.width,
+                    currentHeight = this.height;
 
+                if (currentWidth > currentHeight) {
+                  if (currentWidth > maxWidth) {
+                    currentHeight *= maxWidth / currentWidth;
+                    currentWidth = maxWidth;
+                  }
+                }
+                else {
+                  if (currentHeight > maxHeight) {
+                    currentWidth *= maxHeight / currentHeight;
+                    currentHeight = maxHeight;
+                  }
+                }
 
-        currentWidth = img1.width;
-        currentHeight = img1.height;
-
-        proportion = currentWidth / currentHeight //!TODO: use this to rescale h/w if window size is exceeded.
-
-
-        if (currentWidth+100 > $(window).width()) {
-            currentWidth = $(window).width()-100;
-            currentHeight = currentWidth/proportion;
-
-
-        }
-
-        if (currentHeight+100 > $(window).height()) {
-            currentHeight = $(window).height()-100;
-            currentWidth = currentHeight*proportion;
-        }
-
-        img1 = null
-        canvas.width = currentWidth
-        canvas.height = currentHeight
+        canvas.width = currentWidth;
+        canvas.height = currentHeight;
 
         $("#canvasDiv").css("width", currentWidth + 'px');
         $("#canvasDiv").css("height", currentHeight + 'px');
@@ -319,11 +323,15 @@ function showtime() {
 
         $("#sequenceImage").css("width", canvas.width + 'px');
         $("#sequenceImage").css("height", canvas.height + 'px');
+            console.log(currentHeight, currentWidth)
+        }
 
+        img1.src = dataURL;
+        img1 = null;
     };
 
     this.clean = function(){
-        this.frames = 0;
+        this.frames = {};
         this.imgsA = [];
         this.imgsAdata = {};
         this.imgsB = [];
@@ -339,7 +347,7 @@ function showtime() {
 
     this.setPlayerSize = function () {
         if (this.imgsA && this.imgsA[0]) {
-            if (this.imgsA[0] instanceof  Blob) {
+            if (!this.imgsAdata[0] && this.imgsA[0] instanceof  Blob) {
                 var reader = new FileReader();
 
                 reader.onload = function (e) {
@@ -378,10 +386,10 @@ function showtime() {
                         reader.onload = function (e) {
                             var dataURL = reader.result;
 
-                            $("#sequenceImage").prop("src", dataURL);
+                            $("#sequenceImage").prop("src", convertImgToBase64(dataURL));
 
                             if (project.imgsAdata && project.imgsAdata[f] == undefined) {
-                                dataURL = convertImgToBase64($("#sequenceImage")[0]);
+                                dataURL = convertImgToBase64(dataURL);
                                 project.imgsAdata[f] = dataURL;
                                 $("#sequenceImage").prop("src", dataURL);
                                 //_f = new File([project.imgsAdata[f]], _fn, {type: "image/jpeg"});
@@ -413,11 +421,9 @@ function showtime() {
 
                         reader.onload = function (e) {
                             var dataURL = reader.result;
-
-
-                            $("#sequenceImage").prop("src", dataURL);
+                            $("#sequenceImage").prop("src", convertImgToBase64(dataURL));
                             if (project.imgsBdata && project.imgsBdata[f] == undefined) {
-                                dataURL = convertImgToBase64($("#sequenceImage")[0]);
+                                dataURL = convertImgToBase64(dataURL);
                                 project.imgsBdata[f] = dataURL;
                                 $("#sequenceImage").prop("src", dataURL);
                             }
@@ -602,6 +608,7 @@ function showtime() {
 
         if (this.frames && this.frames[f] && this.frames[f] != undefined) {
             var imgN = new Image();
+            imgN.onload = function(){console.log('I am imgN and i ma loading ...')}
             imgN.src = this.frames[f];
             context.drawImage(imgN, 0, 0, currentWidth, currentHeight);
 
@@ -686,7 +693,8 @@ function showtime() {
     this.download = function (fullEncode, mode) {
 
         var zip = new JSZip();
-        zip.file("showtime.json", this.encode(fullEncode));
+        dump = this.encode(fullEncode)
+        zip.file("showtime.json", dump);
 
         var img = zip.folder("frames");
         for (var f = 0; f < this.frames.length; f++) {
@@ -729,20 +737,27 @@ function showtime() {
             saveAs(content, this.projectName + ".zip");
         }
         else {
-            url = '/api/asset/save/showtime?collection=' + this.projectName + '&name=' + this.projectName + '.zip';
-            var xmlHttpRequest = new XMLHttpRequest();
-            xmlHttpRequest.open("PUT", url, true);
-             // subscribe to this event before you send your request.
-             xmlHttpRequest.onreadystatechange=function() {
-              if (xmlHttpRequest.readyState==4) {
-               //alert the user that a response now exists in the responseTest property.
-               // And to view in firebug
-               data = JSON.parse(xmlHttpRequest.responseText);
-               location.reload();
-              }
-             }
-            xmlHttpRequest.send(content);
+            desc = $("#description").val()
+            if (!desc)
+                alert('Please Describe your show')
+            else {
+                url = '/api/asset/save/showtime?collection='+this.projectName+'&name='+this.projectName+'.zip'+'&description='+desc;
+                var xmlHttpRequest = new XMLHttpRequest();
+                xmlHttpRequest.open("PUT", url, true);
+                // subscribe to this event before you send your request.
+                xmlHttpRequest.onreadystatechange = function () {
+                    if (xmlHttpRequest.readyState == 4) {
+                        //alert the user that a response now exists in the responseTest property.
+                        // And to view in firebug
+                        data = JSON.parse(xmlHttpRequest.responseText);
+                        project.latest_dump  = dump;
+                        location.reload();
 
+                    }
+                }
+                xmlHttpRequest.send(content);
+
+            }
         }
     }
 }
@@ -796,6 +811,7 @@ $(document).ready(function () {
 
 
             previewContext.fill();
+            nib.onload = function(){console.log('nib is loading')};
             nib.src = preview.toDataURL('image/jpeg');
 
         }
@@ -941,7 +957,12 @@ $(document).ready(function () {
             }
 
         });
+        $(window).resize(function(){
 
+               project.setPlayerSize();
+               return false;
+
+        })
         $("#name").change(function () {
             project.projectName = $("#name").val();
             return false;
@@ -1267,8 +1288,24 @@ $(document).ready(function () {
     });
 
 
+
 });
 
 
 var project = new showtime();
+function goodbye(e) {
+    if (!project.latest_dump || project.latest_dump != project.encode(true)) {
+        if (!e) e = window.event;
+        //e.cancelBubble is supported by IE - this will kill the bubbling process.
+        e.cancelBubble = true;
+        e.returnValue = 'You have unsaved data!'; //This is displayed on the dialog
+
+        //e.stopPropagation works in Firefox.
+        if (e.stopPropagation) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+    }
+}
+//window.onbeforeunload=goodbye;
 		 
