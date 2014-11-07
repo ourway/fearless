@@ -7,8 +7,8 @@
 	<meta name="keywords" content="ram player, fearless, video editing, client, notes, sequence, viewer">
 
 	<link href='css/fonts.css' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="css/showtime.css">
 	<link rel="stylesheet" type="text/css" href="css/slider.css">
+    <link rel="stylesheet" type="text/css" href="css/showtime.css">
 	<script src="js/vendor/jquery.min.js"></script>
 	<script src="js/vendor/jquery-ui.min.js"></script>
 	<script src='js/FileSaver.js'></script>
@@ -108,7 +108,7 @@
                 <div style="color:#ccc">
                     <ul>
                        <li style="list-style: None" ng-repeat="ua in userShows">
-                          <a href="#{{ua.name}}" ng-click="goto(ua.name)">{{ua.description || ua.name }}</a>
+                          <a href="#/{{ua.name}}" ng-click="goto(ua.name)">{{ua.description || ua.name }}</a>
 
                        </li>
                     </ul>
@@ -120,6 +120,8 @@
         </div>
 		<div id="controls">
 			<div id="timeline"></div>
+            <div id="thumbnails"></div>
+            <div id="timerange"></div>
 			<div id="timelineControls">
 				<button id="lastNote" class="smallCtrl"></button>
 				<button id="previousFrame" class="smallCtrl"></button>

@@ -271,7 +271,7 @@ function showtime() {
     this.frames = {};// array of modified frames in local storage
     this.notes = {};
 
-
+    this.thumbstate = {};
     this.currentFrame = function () {
         return ($('#frame').val() * 1);
     };
@@ -343,7 +343,7 @@ function showtime() {
         $("#sequenceImage").prop('src', '');
         $("#frame").prop("max", 0);
         $("#frametotal").html(1);
-        $("#timeline").slider({max: 1000});
+        $("#timeline").slider({max: 1});
     }
 
 
@@ -373,9 +373,38 @@ function showtime() {
 //////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////
+    this.addThumb = function(data){
+        img = new Image()
+        skips = 10;
+        _f = project.currentFrame()
+        if (_f%skips) {
+            project.thumbstate[_f] = true;
+            return null;
+        }
+        img.onload = function(){
+        var canvas = document.createElement('canvas');
+        ratio = this.width/this.height;
+        tWidth = Math.min(Math.floor($(window).width()/project.imgsA.length) * skips, 128);
+        tHeight= tWidth/ratio;
+        canvas.width = tWidth
+        canvas.height = tHeight ;
+        ctx = canvas.getContext("2d");
+        ctx.drawImage(this, 0, 0, tWidth, tHeight);
+        finalFile = canvas.toDataURL('image/jpeg'); //Always convert to png
+        appendix = '<img class="thmb" id="thmb_'+ _f +'" src="' + finalFile + '"/>';
+        $('#thumbnails').append(appendix);
+        $("#thmb_"+_f).fadeIn();
+        project.thumbstate[_f] = true;
+        canvas = null;
+        }
+        img.src = data;
+        img=null;
+
+    }
 
     this.setBackground = function () {
         var f = this.currentFrame();
+
         $('#frameFileFum').html((Number(f)) + 1);
         switch (sequence) {
             case 1:
@@ -405,6 +434,8 @@ function showtime() {
 
                     } else if (this.imgsAdata && this.imgsAdata[f]) {
                         $("#sequenceImage").prop("src", this.imgsAdata[f]);
+                        if (!this.thumbstate[f])
+                            this.addThumb(this.imgsAdata[f]);
                     }
 
 
@@ -551,6 +582,9 @@ function showtime() {
         out += "</ol>";
         return out;
     }
+//////////////////////////////////////////////////
+    ////////////// read files  ///////////////////
+
 
     this.setFiles = function (files) {
         var info;
@@ -1223,16 +1257,32 @@ $(document).ready(function () {
     timeline = $("#timeline").slider({
         range: "min",
         /* value: $( "#frame" ).val(),*/
-        min: 1,
-        max: 400,
+        min: project.cutin,
+        max: project.cutout,
+        //range:true,
         slide: function (event, ui) {
-
             goToFrame(ui.value);
+
 
         }
     });
 
-    $(document).keydown(function (e) {
+    timerange = $("#timerange").slider({
+        range: "min",
+        /* value: $( "#frame" ).val(),*/
+        min: 1,
+        max: project.frames.length,
+        range:true,
+        slide: function (event, ui) {
+            project.cutin = ui.values[0];
+            project.cutout = ui.values[1];
+            $('#frame').prop('max', project.cutout);
+            $('#frame').prop('min', project.cutin);
+            $("#frame").prop("max", project.cutout);
+            $("#frametotal").html(project.frames.length);
+            $("#timeline").slider({max: project.cutout});            //goToFrame(ui.value);
+        }
+    });    $(document).keydown(function (e) {
 
         if (allowKBD) {
             /*Necessary so user can use these keys when typing.*/
