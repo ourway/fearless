@@ -177,8 +177,9 @@ p {
 #info {
 	color: rgb(72,73,74);
 	margin-bottom: 1em;
-	background:#111113;
-	border-radius: 8px;
+	background:#242424;
+	border-radius: 3px;
+    border: 2px solid #202020;
 	/*overflow:hidden;*/
 }
 #info ol {

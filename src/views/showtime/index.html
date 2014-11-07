@@ -102,13 +102,13 @@
 		</div><!-- END canvasWrapper -->
         </td><td style="padding-left: 10px;vertical-align: top;width:30%">
 
-            <div id="sidebar" style="margin:auto;width:250px">
+            <div id="sidebar" style="margin:auto;width:250px;border-left: 1px solid #303030;min-height:200px">
 
 
                 <div style="color:#ccc">
                     <ul>
                        <li style="list-style: None" ng-repeat="ua in userShows">
-                          <a href="" ng-click="goto(ua.name)">{{ua.description || ua.name }}</a>
+                          <a href="#{{ua.name}}" ng-click="goto(ua.name)">{{ua.description || ua.name }}</a>
 
                        </li>
                     </ul>

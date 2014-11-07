@@ -63,7 +63,7 @@ class Asset(IDMixin, Base):
     def commit(self, key, data):
         wt = os.path.join(self.collection.repository.path, self.collection.path)
         git = GIT(self.full_path, wt=wt)
-        git.add(self.description or 'Asset *%s*' % self.name, version=data)
+        git.add(self.name, version=data)
         return data
 
     @hybrid_property

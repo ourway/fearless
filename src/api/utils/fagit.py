@@ -15,12 +15,17 @@ Clean code is much better than Cleaner comments!
 
 import os
 import sh
+from base64 import encodestring
+from string import ascii_letters
 from cStringIO import StringIO
 import zlib
 
 def fix_name(name):
     for i in '()[]{} ":,./':
         name = name.replace(i, '_')
+    for i in name:
+        if i not in ascii_letters:
+            name.replace(i, encodestring(i))
     return name
 
 class GIT(object):
@@ -42,20 +47,21 @@ class GIT(object):
         if not os.path.isdir(self.wt):
             os.makedirs(self.wt)
         self.git = git.bake(_cwd=self.wt,
+                            _ok_code=[128, 1]
                             #_piped="err",
                             # git_dir=gitdir,
                             # work_tree=self.wt
                             )
-        self.git.init()
+        i = self.git.init()
 
     def add(self, message='', version=1):
-        self.git.add(self.basename)
-        self.git.commit(m="{message} | {f} version {v}".format(
+        a = self.git.add(self.basename)
+        c = self.git.commit(m="{message} | {f} version {v}".format(
             message=message, f=fix_name(self.basename), v=version))
-        self.tag('%s_v%s' % (fix_name(self.basename), version))
+        t = self.tag('%s_v%s' % (fix_name(self.basename), version))
 
     def recover(self):
-        self.git.checkout(self.basename, f=True)
+        c = self.git.checkout(self.basename, f=True)
 
     @property
     def status(self):
@@ -63,7 +69,7 @@ class GIT(object):
 
     def tag(self, tag):
         tag = fix_name(tag)
-        self.git.tag(tag)
+        t = self.git.tag(tag)
 
 
     def archive(self, commit='HEAD'):

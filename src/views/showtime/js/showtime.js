@@ -323,7 +323,6 @@ function showtime() {
 
         $("#sequenceImage").css("width", canvas.width + 'px');
         $("#sequenceImage").css("height", canvas.height + 'px');
-            console.log(currentHeight, currentWidth)
         }
 
         img1.src = dataURL;
@@ -332,11 +331,15 @@ function showtime() {
 
     this.clean = function(){
         this.frames = {};
+        this.notes = {};
         this.imgsA = [];
         this.imgsAdata = {};
         this.imgsB = [];
         this.imgsBdata = {};
+
         goToFrame(0);
+        $("#aInfo").html("");
+        $("#bInfo").html("");
         $("#sequenceImage").prop('src', '');
         $("#frame").prop("max", 0);
         $("#frametotal").html(1);
@@ -380,7 +383,6 @@ function showtime() {
                     $('#frameFileName').html(this.imgsA[f].name);
 
                     if (!this.imgsAdata[f] && this.imgsA[f] instanceof Blob) {
-                        console.log(true)
                         var reader = new FileReader();
 
                         reader.onload = function (e) {
@@ -608,7 +610,6 @@ function showtime() {
 
         if (this.frames && this.frames[f] && this.frames[f] != undefined) {
             var imgN = new Image();
-            imgN.onload = function(){console.log('I am imgN and i ma loading ...')}
             imgN.src = this.frames[f];
             context.drawImage(imgN, 0, 0, currentWidth, currentHeight);
 
@@ -811,8 +812,7 @@ $(document).ready(function () {
 
 
             previewContext.fill();
-            nib.onload = function(){console.log('nib is loading')};
-            nib.src = preview.toDataURL('image/jpeg');
+            nib.src = preview.toDataURL();
 
         }
 
@@ -846,7 +846,6 @@ $(document).ready(function () {
             hide: function (tinycolor) {
                 var col = $("#toolColorpicker").spectrum("get");
                 paintColor = col.toHexString()
-                console.log(paintColor)
                 setPreview()
             },
             color: "rgb(0, 155, 255)",
@@ -1011,7 +1010,6 @@ $(document).ready(function () {
                 var data = project.loadFromJson(manifest.asText());
 
                 var startSequence = sequence;
-                console.log('sdfsdf')
 
                 if (data.A.length > 0) {
 
@@ -1172,7 +1170,6 @@ $(document).ready(function () {
                 case "off":
                     $("#canvasToggle").data("state", "on");
                     // $("#canvasToggle").html("Hide");
-                    console.log("nope");
                     $(canvas).show();
                     break;
 
