@@ -17,7 +17,7 @@ Clean code is much better than Cleaner comments!
 
 
 from models import User, Group, Role, session, r, now  # r is redis
-from helpers import commit
+from helpers import commit, get_ip
 import ujson as json
 import hmac
 import uuid
@@ -347,7 +347,7 @@ def getUserInfoFromSession(req):
             target = session.query(User).filter(User.latest_session_id==hashed_sid).first()
             if target:
                 return {'email':target.email, 'alias':target.alias, 'firstname':target.firstname,
-                            'lastname':target.lastname, 'id':target.id}
+                            'lastname':target.lastname, 'id':target.id, 'server':{'name':'Fearless API', 'ip':get_ip()}}
 
         return {'message':'ERROR'}
 

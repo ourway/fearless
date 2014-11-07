@@ -17,7 +17,7 @@ function makeid()
 
 
     fearlessShowtimeApp.controller('showtimeCtrl', function($scope, $rootScope, $cookies,$http,
-                                                      $timeout, $location, $routeParams, Restangular) {
+                                                      $timeout, $location, $routeParams, Restangular, $interval) {
 
 
              $scope.asset = {};
@@ -69,6 +69,25 @@ function makeid()
 
 
                                 $scope.asset = assetInfo;
+
+                                project.showSyncWs = new WebSocket("ws://"+$scope.user.server.ip+":5004/media/syncshow");
+                                project.showSyncWs.onopen = function() {
+                                    project.assetId = $scope.asset.id;
+                                };
+                                project.showSyncWs.onmessage = function (evt) {
+                                        serverMessage = JSON.parse(evt.data);
+                                        project.lock = serverMessage.lock
+                                        if (project.lock && serverMessage.command!='None' && serverMessage.command != project.command)
+                                        {
+                                            eval(serverMessage.command)  // server tels me what to do
+                                            project.command = serverMessage.command;
+                                        }
+                                        //console.log(serverMessage)
+
+                                };
+                                $interval(function(){
+                                        project.showSyncWs.send(JSON.stringify({'id':project.assetId, 'command':project.command}))
+                                }, 100)
                                 $scope.loading = false;
                                 $scope.$apply()
                             });

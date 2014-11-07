@@ -137,6 +137,7 @@ function canvasInit() {
 
 function goToFrame(fr) {
     $("#frame").val(fr * 1);
+    //project.command = 'goToFrame('+fr+')';
     project.setBackground();
     context.clearRect(0, 0, canvas.width, canvas.height);
     project.getNotes();
@@ -147,10 +148,11 @@ function goToFrame(fr) {
 
 /*Move the time slider forward and display the correct frame and notes.*/
 function goToNextFrame(clear) {
+
     var fr = project.currentFrame();
-            progressPyChart.segments[0].value = fr;
-            progressPyChart.segments[1].value = project.imgsA.length-fr-1;
-            progressPyChart.update();    fr++;
+    progressPyChart.segments[0].value = fr;
+    progressPyChart.segments[1].value = project.imgsA.length-fr-1;
+    progressPyChart.update();    fr++;
 
     if (fr > $("#frame").prop("max") * 1) {
 
@@ -196,7 +198,10 @@ function goToLastFrame() {
 
 
 /*Create an interval object to play the sequence at the correct rate.*/
-function startPlaying() {
+function startPlaying(f) {
+    if (f)
+        goToFrame(f);
+    project.command='startPlaying('+project.currentFrame()+')';
     if (playInterval == undefined) { //only start the interval if it isn't already playing
         playInterval = setInterval(function () {
             goToNextFrame(true)
@@ -436,8 +441,10 @@ function showtime() {
 
                     } else if (this.imgsAdata && this.imgsAdata[f]) {
                         $("#sequenceImage").prop("src", this.imgsAdata[f]);
+
                         if (!this.thumbstate[f])
                             this.addThumb(this.imgsAdata[f]);
+
                     }
 
 
@@ -1104,7 +1111,7 @@ $(document).ready(function () {
                 sequence = startSequence;
                 project.setBackground();
                 //goToNextFrame()
-                startPlaying()
+                //startPlaying()
             } else {
                 alert("No Manifest found...");
             }
@@ -1271,6 +1278,7 @@ $(document).ready(function () {
             progressPyChart.segments[1].value = project.imgsA.length-ui.value-1;
             progressPyChart.update();
 
+
         }
     });
 
@@ -1384,3 +1392,4 @@ var progressData = [
 
 var ctx = $("#progressChart").get(0).getContext("2d");
 var progressPyChart = new Chart(ctx).Pie(progressData, progressChartOptions);
+

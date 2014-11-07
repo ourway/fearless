@@ -4,6 +4,7 @@ redis
 celery
 requests
 gevent
+gevent-websocket
 ujson
 uwsgi
 falcon

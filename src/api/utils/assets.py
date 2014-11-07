@@ -222,7 +222,7 @@ class GetAsset:
             sz = os.path.getsize(target.full_path)
             modifier = target.modifiers[-1]
             resp.body = {'url':os.path.join('/static', target.url),
-                         'size':sz, 'key':target.key,
+                         'size':sz, 'key':target.key, 'id':target.id,
                          'version':target.version, 'datetime':target.modified_on,
                          'last_updated_by':modifier.alias, 'descripion':target.description}
 

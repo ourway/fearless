@@ -172,6 +172,7 @@ position: relative;
 {
 	text-align: right;
 	width:75px;
+    font-family: 'Consolas', 'Deja Vu Sans Mono', 'Bitstream Vera Sans Mono', monospace;
 	margin-left: 10px;
 	margin-right: 10px; 
 	display: inline-block;
