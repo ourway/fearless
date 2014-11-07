@@ -376,23 +376,24 @@ function showtime() {
     /////////////////////////////////////////////////////////////////
     this.addThumb = function(data){
         img = new Image()
-        skips = 10;
+
+        img.onload = function(){
+        ratio = this.width/this.height;
+        tWidth = 96;
+        tHeight= tWidth/ratio;
+        skips = Math.ceil(project.imgsA.length/(($(window).width()-96)/tWidth))
         _f = project.currentFrame()
         if (_f%skips) {
             project.thumbstate[_f] = true;
             return null;
         }
-        img.onload = function(){
         var canvas = document.createElement('canvas');
-        ratio = this.width/this.height;
-        tWidth = Math.min(Math.floor($(window).width()/project.imgsA.length) * skips, 128);
-        tHeight= tWidth/ratio;
         canvas.width = tWidth
         canvas.height = tHeight ;
         ctx = canvas.getContext("2d");
         ctx.drawImage(this, 0, 0, tWidth, tHeight);
         finalFile = canvas.toDataURL('image/jpeg'); //Always convert to png
-        appendix = '<img class="thmb" id="thmb_'+ _f +'" src="' + finalFile + '"/>';
+        appendix = '<a class="thmbLink" onClick="goToFrame('+_f+')"><img class="thmb" id="thmb_'+ _f +'" src="' + finalFile + '"/></a>';
         $('#thumbnails').append(appendix);
         $("#thmb_"+_f).fadeIn();
         project.thumbstate[_f] = true;
@@ -1141,6 +1142,9 @@ $(document).ready(function () {
         $("#toolClear").click(function () {
             project.clearFrame($("#frame").val());
             context.clearRect(0, 0, canvas.width, canvas.height);
+            _f = project.currentFrame()
+            delete project.notes[_f]
+            delete project.frames[_f]
             return false;
         });
 
@@ -1353,10 +1357,11 @@ progressChartOptions = {
     segmentStrokeColor : "#333",
     segmentStrokeWidth : 2,
     percentageInnerCutout : 0, // This is 0 for Pie charts
-    animationSteps : 25,
+    animationSteps : 100,
     animationEasing : "liner",
     //animateRotate : true,
     animateScale : false,
+    animation : false
 }
 var progressData = [
     {
