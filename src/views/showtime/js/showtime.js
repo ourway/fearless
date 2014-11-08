@@ -137,7 +137,7 @@ function canvasInit() {
 
 function goToFrame(fr) {
     $("#frame").val(fr * 1);
-    //project.command = 'goToFrame('+fr+')';
+    project.command = 'goToFrame('+fr+')';
     project.setBackground();
     context.clearRect(0, 0, canvas.width, canvas.height);
     project.getNotes();
@@ -201,7 +201,7 @@ function goToLastFrame() {
 function startPlaying(f) {
     if (f)
         goToFrame(f);
-    project.command='startPlaying('+project.currentFrame()+')';
+    //project.command='startPlaying('+project.currentFrame()+')';
     if (playInterval == undefined) { //only start the interval if it isn't already playing
         playInterval = setInterval(function () {
             goToNextFrame(true)
@@ -736,6 +736,7 @@ function showtime() {
 
     this.download = function (fullEncode, mode) {
 
+
         var zip = new JSZip();
         dump = this.encode(fullEncode)
         zip.file("showtime.json", dump);
@@ -800,6 +801,7 @@ function showtime() {
                     }
                 }
                 xmlHttpRequest.send(content);
+                project.command = 'setTimeout(function(){location.reload();}, 1000)';
 
             }
         }
