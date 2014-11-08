@@ -29,20 +29,20 @@ class SyncShow:
                         if assetId:
                             if not r.get('show_%s_lock'%assetId): # Asset is unlocked
                                 r.set('show_%s_lock'%assetId, str(client))
-                                r.expire('show_%s_lock'%assetId, 30)
+                                r.expire('show_%s_lock'%assetId, 120)
                                 r.set('show_%s_command'%assetId, command)
                                 r.set('show_%s_frames'%assetId, frames)
-                                r.expire('show_%s_command'%assetId, 2)
-                                r.expire('show_%s_frames'%assetId, 2)
+                                r.expire('show_%s_command'%assetId, 1)
+                                r.expire('show_%s_frames'%assetId, 1)
                             else: # Asset is locked
                                 master = r.get('show_%s_lock'%assetId)
                                 if (str(client) == master) and command:
                                     r.set('show_%s_command'%assetId, command)
                                     r.set('show_%s_frames'%assetId, frames)
-                                    r.expire('show_%_command'%assetId, 2)
-                                    r.expire('show_%_frames'%assetId, 2)
-                                command = r.get('show_%s_command'%assetId)
-                                frames = r.get('show_%s_frames'%assetId)
+                                    r.expire('show_%_command'%assetId, 1)
+                                    r.expire('show_%_frames'%assetId, 1)
+                            command = r.get('show_%s_command'%assetId)
+                            frames = r.get('show_%s_frames'%assetId)
                                 #if r.getset('show_%s_%s_latest_command'% (assetId, client), command) == command:
                                 #    command = None
                                 #if r.getset('show_%s_%s_latest_frames'% (assetId, client), frames) == frames:

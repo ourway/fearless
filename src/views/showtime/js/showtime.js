@@ -143,6 +143,10 @@ function goToFrame(fr) {
     project.getNotes();
     $("#timeline").slider({value: (fr * 1)});
 
+    progressPyChart.segments[0].value = fr;
+    progressPyChart.segments[1].value = project.imgsA.length-fr-1;
+    progressPyChart.update();
+
 }
 
 
@@ -150,9 +154,8 @@ function goToFrame(fr) {
 function goToNextFrame(clear) {
 
     var fr = project.currentFrame();
-    progressPyChart.segments[0].value = fr;
-    progressPyChart.segments[1].value = project.imgsA.length-fr-1;
-    progressPyChart.update();    fr++;
+
+    fr++;
 
     if (fr > $("#frame").prop("max") * 1) {
 
@@ -736,7 +739,6 @@ function showtime() {
 
     this.download = function (fullEncode, mode) {
 
-
         var zip = new JSZip();
         dump = this.encode(fullEncode)
         zip.file("showtime.json", dump);
@@ -801,7 +803,10 @@ function showtime() {
                     }
                 }
                 xmlHttpRequest.send(content);
-                project.command = 'setTimeout(function(){location.reload();}, 1000)';
+                project.command = 'setTimeout(function(){location.reload();goToFrame('+project.currentFrame()+');}, 1000)';
+                setTimeout(function(){
+                    project.command = 'goToFrame('+project.currentFrame()+')';
+                }, 1000)
 
             }
         }

@@ -82,7 +82,7 @@ function makeid()
                                         {
                                             eval(serverMessage.command)  // server tels me what to do
                                             project.command = serverMessage.command;
-                                            console.log(serverMessage.command, project.command);
+                                            //console.log(serverMessage.command, project.command);
                                         }
                                         //if (project.lock && serverMessage.frames && serverMessage.frames!='None' && serverMessage.frames != project.frames){
                                         //    project.frames = serverMessage.frames;
@@ -94,7 +94,7 @@ function makeid()
                                         if (project.assetId)
                                             project.showSyncWs.send(JSON.stringify({'id':project.assetId,
                                                 'command':project.command, 'client':$scope.user.id}))
-                                }, 1000/24)
+                                }, 1000/fps)
                                 $scope.loading = false;
                                 $scope.$apply()
                             });
