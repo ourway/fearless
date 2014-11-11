@@ -1,5 +1,5 @@
 #/**************************************************************/
-# -- FaTeam Makefile --
+# -- Fearless Makefile --
 # @author: Farsheed Ashouri
 # #/**************************************************************/
 
@@ -13,10 +13,11 @@ build:
 	@if test ! -d $(PYENVDIR); then python2.7 -m virtualenv $(PYENVDIR); fi
 	@pyenv/bin/pip install -U setuptools
 	@pyenv/bin/pip install -r requirements
-	@pyenv/bin/pip install git+https://github.com/hydrogen18/multipart-python
-	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fateam.template > $(CURDIR)/config/supervisor/fearless.conf
+	#@pyenv/bin/pip install git+https://github.com/hydrogen18/multipart-python
+	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fearless.template > $(CURDIR)/config/supervisor/fearless.conf
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/uwsgi/api.ini.template > $(CURDIR)/config/uwsgi/api.ini
-	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/nginx/fa_team.conf.template > $(CURDIR)/config/nginx/fearless.conf
+	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/nginx/fearless.conf.template > $(CURDIR)/config/nginx/fearless.conf
+	@sed 's:{HOME}:'$(HOME)':' $(CURDIR)/config/nginx/fearless.conf.template > $(CURDIR)/config/nginx/fearless.conf
 	#@if test ! -f $(OPENSOURCE)/contenttype.py; then wget --no-check-certificate  -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/2b50cf27e2704ad4b5f20e1e0b71f21d4fd04e20/gluon/contenttype.py; fi
 	@wget http://nginx.org/download/nginx-$(NGINX).tar.gz
 	@tar xf nginx-$(NGINX).tar.gz
@@ -51,8 +52,8 @@ install:
 	@mkdir -p embedded
 	@service nginx restart
 	@supervisorctl update
-	@supervisorctl restart fa-team-api
-	@supervisorctl restart fa-team-celery
+	@supervisorctl restart fearless-api
+	@supervisorctl restart fearless-celery
 	#@riak-admin bucket-type create siblings_allowed '{"props":{"allow_mult":true}}'
 	#@riak-admin bucket-type activate siblings_allowed
 	#@riak-admin bucket-type status siblings_allowed
