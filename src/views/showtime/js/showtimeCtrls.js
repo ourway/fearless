@@ -66,7 +66,7 @@ $scope.$watch(function(){return $location.$$path},
             if (!$scope.slave && $scope.master==false)
             {
                 $scope.master = true;
-                project.master = true;
+                //project.master = true;
                 project.slave = false;
                 $scope.modetext = 'MASTER';
                 $timeout(function(){
@@ -76,7 +76,7 @@ $scope.$watch(function(){return $location.$$path},
             else
             {
                 $scope.master = false;
-                project.master = false;
+                //project.master = false;
                 $scope.modetext = 'REVIEW';
             }
             }
@@ -128,26 +128,45 @@ $scope.$watch(function(){return $location.$$path},
                                         {
                                             $scope.slave = true;
                                             project.slave = true;
-                                            project.master = false;
+                                            //project.master = false;
                                             $scope.modetext = 'REVIEW';
                                         }
                                         else
                                         {
                                             $scope.slave = false;
                                             project.slave = false;
-                                            project.master = true;
+                                            //project.master = true;
+                                            
                                             $scope.modetext = 'MASTER';
                                         }
+
+                                    
+                                        if ($scope.user.id != project.master){
+
+                                            if (serverMessage.note){
+                                                //console.log(serverMessage.note)
+                                                var note = serverMessage.note;
+                                                if (note == 'None')
+                                                    delete project.notes[JSON.parse(serverMessage.slide)]
+                                                else
+                                                    project.notes[JSON.parse(serverMessage.slide)] = note;
+                                                project.getNotes();
+                                            }
+                                            if (serverMessage.frame && serverMessage.frame != 'None'){
+                                                var frame = serverMessage.frame;
+                                                project.frames[JSON.parse(serverMessage.slide)] = frame;
+                                                project.getNotes();
+                                            }
+                                        }
+
+
                                         if (($scope.user.id != project.master) && (serverMessage.command != project.command) && serverMessage.command != 'None')
                                         {
                                             project.command = serverMessage.command;
                                             //console.log(serverMessage.command);
-                                            if (serverMessage.notes){
-                                                var notes = JSON.parse(serverMessage.notes);
-                                                project.notes = notes;
-                                            }
-                                        
                                             eval(serverMessage.command)  // server tels me what to do
+
+                                        
                                             //console.log(serverMessage.command, project.command);
                                         }
 
@@ -160,13 +179,16 @@ $scope.$watch(function(){return $location.$$path},
                                 };
                                 project.showSyncWsInterval = $interval(function(){
                                         if (project.assetId)
-                                            
                                         {
-                                           
-                                            if ($scope.master)
-                                                dataToSend = JSON.stringify({'id':project.assetId,
-                                                    'command':project.command, 'client':$scope.user.id, 
-                                                    'i_want_to_be_master':$scope.master, 'notes':JSON.stringify(project.notes)});
+                                            if ($scope.master){
+                                                f = project.currentFrame()
+                                                frame =  project.frames[f];
+                                                    dataToSend = JSON.stringify({'id':project.assetId,
+                                                        'command':project.command, 'client':$scope.user.id,
+                                                        'frame':frame,
+                                                        'slide': f,
+                                                        'i_want_to_be_master':$scope.master, 'note':project.notes[f]});
+                                            }
                                             else
                                                 dataToSend = JSON.stringify({'id':project.assetId, 'client':$scope.user.id});
                                             

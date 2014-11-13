@@ -14,12 +14,12 @@
 
 
   </head>
-  <body >
+  <body ng-cloak>
   <img id="nibImage" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAxklEQVQ4T62TgQ2CMBBF6QSu4gbWCdRNdAJxAnAT3EAn0FFgAvyPtE1p1ECxySV3hXvXu9w3RXL6vljraiezMnzOS3aX3YwZ/HBMHCj5qLhKoVHcyi8Fufq7AFBy4yr/yA+fGkEORANgQuVP0JMgtXE9P6eUTf6hnS2AUs45A0DKBQDT3WQCHgB4yioT0C4FdH9pYfEQWVcGOXcOnXLs8kXy05+5yohqH1Y5giAmZvKtHZ6NmGqfM1Kj0wUzgW5lqZwR0UjOb2XRRMDjyfVoAAAAAElFTkSuQmCC" style="top: 496px; left: 768px; display: block;">
   <canvas id="brushPreview" width="16" height="16"></canvas>
   
 
-  <div id="pageWrapper" ng-controller="showtimeCtrl">
+  <div id="pageWrapper" ng-controller="showtimeCtrl" >
 
 	<div id="header">
 		<a href="/app/#about/showtime"><div class="wingbinLogo"></div></a> 
@@ -31,18 +31,18 @@
 		<div id="menubartop">
 
 			<div class="controlBlockInset">
-                <button id="new" class='button viewer '>NEW</button>
-                <button id="clean" class='button viewer '>Clean</button>
+                <button ng-show="!slave" id="new" class='button viewer '>NEW</button>
+                <button ng-show="!slave" id="clean" class='button viewer '>Clean</button>
 				<div id='viewerControls'>
                     <button id="sequence1" class='button viewer current'>A</button>
 					<button id="sequence2" class='button radiusRight viewer'>B</button>
 				</div>
 
-				<div class="fileUpload button radius">
+				<div ng-show="!slave" class="fileUpload button radius">
 					<div>Upload Images</div>
 					<input type="file" multiple="multiple" name="files" id="fileUpload" class="upload">
 				</div>
-				<div class="fileLoad button radius">
+				<div ng-show="!slave" class="fileLoad button radius">
 					<div>Load Project ZIP</div>
 					<input type="file" id="import" class="load">
                 </div>
@@ -51,10 +51,11 @@
 			<div id="extraControls">
                 <button id="mastermode" ng-click="masterme()" ng-class="{'current':master, 'slave':slave}" class="fileSave button ">{{modetext}}</button>
             </div>
-				<button id="download" class="fileSave button radiusLeft">Download</button>
-                <button id="save" class="fileSave button radiusLeft">save</button>
-				<input type="text" id="description" required="required" class="stopKBD radiusRight" ng-model="asset.descripion" placeholder="desciption">
-                <div style="display:none">
+
+				<button  ng-show="!slave" id="download" class="fileSave button radiusLeft">Download</button>
+                <button ng-show="!slave" id="save" class="fileSave button radiusLeft">save</button>
+				<input ng-show="!slave" type="text" id="description" required="required" class="stopKBD radiusRight" ng-model="asset.descripion" placeholder="desciption">
+                <div ng-show="!slave" style="display:none">
 				    <input checked="true" type="checkbox" id="allData" hint="Click here to include all of the image sequences.">
 				    <label for="allData">Include Images</label>
                 </div>
@@ -67,23 +68,24 @@
 
 		</div><!-- END menubar -->
 
-        <div id="container" >
+        <div id="container" onmousedown="return false" >
         <table style="width:100%">
 	    <tr><td style="vertical-align: text-top;padding-left:1%;width:70%">
 
-                <div ng-if="asset.version" style="margin-left: 30px">
-                <span style="color:#31708f">
-                    <pre style="display:inline;color:#177199">{{timeConverter(asset.datetime)}}</pre>
-                    <strong style="color:#0081c2">{{asset.last_updated_by}}</strong>
-                    version: <span style="color:#0e90d2">{{asset.version}}</span>
+
+
+            <div id="canvasWrapper" style="margin-top: -25px;">
+            
+                <div ng-if="asset.version" id="detailinfo">
+                <span >
+                    <pre style="display:inline">{{timeConverter(asset.datetime)}}</pre>
+                    <strong >{{asset.last_updated_by}}</strong>
+                    version: <span >{{asset.version}}</span>
                 </span>
                 </div>
 
-            <div id="canvasWrapper" style="margin-top: -25px;">
 
-
-
-			<div id="canvasDiv" onmousedown="return false" >
+			<div id="canvasDiv" >
                 <canvas style="padding:10px;" id="progressChart" width="128" height="128"></canvas>
 			<span id="frameFileName"></span>
 				<img id="sequenceImage" src="./images/placeholder.png">

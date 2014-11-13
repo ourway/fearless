@@ -10,6 +10,10 @@ a:visited {color:#b9bfc1;} /* visited link */
 a:hover {text-decoration: underline; color: #13aff0;} /* mouse over link */
 a:active {color:#13aff0;} /* selected link e14d43 2373cc */
 
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
+
 body {
 	background-color: #222;
 	position:relative;
@@ -102,14 +106,14 @@ p {
 color: rgba(255, 255, 255, 0.75);
 margin-left: auto;
 margin-right: auto;
-margin-top: 40px;
+margin-top: 48px;
 display: block;
 font-size: 18pt;
 font-family: monospace;
 text-align: center;
 line-height: 2em;
 position: absolute;
-z-index: 99999;
+z-index: 1;
 margin-left: 27px;
 background: rgba(168, 255, 252, 0.25);
 border-radius: 3px;
@@ -117,8 +121,9 @@ padding-left: 10px;
 padding-right: 10px;
 }
 #progressChart{
+    margin-top: 8px;
     position: absolute;
-    z-index: 99999;
+    z-index: 1;
     opacity:0.75;
 }
 
@@ -367,7 +372,13 @@ button:focus {outline:0;}
 .fileSave{
 	margin-left: 1em;
 }
-
+#detailinfo{
+position: absolute;
+z-index: 1;
+margin-top: 1px;
+margin-left: 4px;
+color:#ccc;
+}
 #canvasToggle {
 	border:none;
 	background-color:transparent;

@@ -253,9 +253,11 @@ function toggleChannelButtons() {
     switch (sequence) {
         case 1:
             sequence = 2;
+            project.command = 'toggleChannelButtons();sequence = 2';
             break;
         case 2:
             sequence = 1;
+            project.command = 'toggleChannelButtons();sequence = 1';
             break;
         default:
             sequence = 1;
@@ -458,7 +460,7 @@ function showtime() {
 
                 } else {
 
-                    $('#frameFileName').html("Frame Missing");
+                    $('#frameFileName').html("----");
                     // $("#sequenceImage").prop("src","showtime.png");
                 }
                 break;
@@ -484,11 +486,14 @@ function showtime() {
                         reader.readAsDataURL(this.imgsB[f]);
                     } else if (this.imgsBdata && this.imgsBdata[f]) {
                         $("#sequenceImage").prop("src", this.imgsBdata[f]);
+
+                        if (!this.thumbstate[f])
+                            this.addThumb(this.imgsAdata[f]);
                     }
 
                 } else {
 
-                    $('#frameFileName').html("Frame Missing");
+                    $('#frameFileName').html("----");
                     // $("#sequenceImage").prop("src","showtime.png");
                 }
                 break;
@@ -1252,9 +1257,9 @@ $(document).ready(function () {
         $("#frameNotes").bind('input propertychange', function() {
             var f = project.currentFrame();
             note = $("#frameNotes").val();
-            project.command = 'project.getNotes('+f+', "'+note+'")';
+            project.command = 'project.getNotes('+f+','+JSON.stringify(note)+')';
             project.setNote(f, note);
-            if (/^[\x00-\x7F]+$/.test(note)) //false
+            if (/^[\x00-\x7F]+$/.test(note) && note) //false
                 $('#frameNotes').attr('style', 'direction:ltr');
             else
                 $('#frameNotes').attr('style', 'direction:rtl');
@@ -1286,7 +1291,8 @@ $(document).ready(function () {
     //ADDED FOR BUTTON TOGGLING
     $(function () {
         $('#viewerControls button').click(function () {
-            return toggleChannelButtons();
+            if (!project.slave)
+                return toggleChannelButtons();
         });
     });
 
@@ -1298,10 +1304,13 @@ $(document).ready(function () {
         max: project.cutout,
         //range:true,
         slide: function (event, ui) {
-            goToFrame(ui.value);
-            progressPyChart.segments[0].value = ui.value;
-            progressPyChart.segments[1].value = project.imgsA.length-ui.value-1;
-            progressPyChart.update();
+            if (!project.slave)
+            {
+                goToFrame(ui.value);
+                progressPyChart.segments[0].value = ui.value;
+                progressPyChart.segments[1].value = project.imgsA.length-ui.value-1;
+                progressPyChart.update();
+            }
 
 
         }
@@ -1321,7 +1330,7 @@ $('#canvas').mousemove(function(event) {
 
     $(document).keydown(function (e) {
 
-        if (allowKBD) {
+        if (allowKBD && !project.slave) {
             /*Necessary so user can use these keys when typing.*/
             switch (e.keyCode) {
 

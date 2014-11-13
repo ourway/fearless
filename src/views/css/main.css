@@ -4,6 +4,9 @@
    Author's custom styles
    ========================================================================== */
 
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none !important;
+}
 
 
 

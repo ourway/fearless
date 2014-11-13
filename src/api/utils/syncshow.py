@@ -39,8 +39,9 @@ class SyncShow:
                     data = json.loads(showInfo)
                     assetId = data.get('id')
                     command = data.get('command')
-                    frames = data.get('frames')
-                    notes = data.get('notes')
+                    frame = data.get('frame')
+                    note = data.get('note')
+                    slide = data.get('slide')
                     want_to_be_master = data.get('i_want_to_be_master')
                     client = json.loads(showInfo).get('client') or req.env.get('HTTP_X_FORWARDED_FOR')
                     if assetId:
@@ -49,28 +50,37 @@ class SyncShow:
                             if master and str(client) != master:  ## check if not other master
                                pass
                             else:
+
                                 r.set('show_%s_master'%assetId, str(client))
                                 r.set('show_%s_command'%assetId, command)
-                                r.set('show_%s_frames'%assetId, frames)
-                                r.set('show_%s_notes'%assetId, notes)
+                                r.set('show_%s_frame'%assetId, frame)
+                                r.set('show_%s_note'%assetId, note)
+                                r.set('show_%s_slide'%assetId, slide)
+
                                 r.expire('show_%s_master'%assetId, 1)
                                 r.expire('show_%s_command'%assetId, 1)
-                                r.expire('show_%s_frames'%assetId, 1)
-                                r.expire('show_%s_notes'%assetId, 1)
+                                r.expire('show_%s_frame'%assetId, 1)
+                                r.expire('show_%s_note'%assetId, 1)
+                                r.expire('show_%s_slide'%assetId, 1)
+
 
                         command = r.get('show_%s_command'%assetId)
-                        frames = r.get('show_%s_frames'%assetId)
-                        notes = r.get('show_%s_notes'%assetId)
-                            #notes = json.loads(notes)
-                            #if r.getset('show_%s_%s_latest_command'% (assetId, client), command) == command:
-                            #    command = None
-                            #if r.getset('show_%s_%s_latest_frames'% (assetId, client), frames) == frames:
-                            #    frames = None
-                            #if master == str(client): ## dont send command to its issuer
+                        frame = r.get('show_%s_frame'%assetId)
+                        note = r.get('show_%s_note'%assetId)
+                        slide = r.get('show_%s_slide'%assetId)
+                            #note = json.loads(note)
+                        if r.getset('show_%s_%s_latest_command'% (assetId, client), command) == command:
+                            command = None
+                        if r.getset('show_%s_%s_latest_frame'% (assetId, client), frame) == frame:
+                            frame = None
+                        if r.getset('show_%s_%s_latest_note'% (assetId, client), note) == note:
+                            note = None
+
+                        #if master == str(client): ## dont send command to its issuer
                             #    command = None
                             #    frames = None
                         wsock.send(json.dumps({"master" : r.get('show_%s_master'%assetId),
-                                               "frames":frames, "command":command, "notes":notes}))
+                                               "frame":frame, "command":command, "note":note, "slide":slide}))
 
 
 
