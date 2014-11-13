@@ -296,6 +296,13 @@ button:focus {outline:0;}
 #viewerControls .button.current {background-color:rgb(0,155,255);}
 #viewerControls .button.current:hover {background-color:rgb(20,175,255);}
 #viewerControls .button.current:active {background:rgb(66,161,251);}
+
+#extraControls .button.current {background-color:rgb(0,155,255);}
+#extraControls .button.current:hover {background-color:rgb(20,175,255);}
+#extraControls .button.current:active {background:rgb(66,161,251);}
+
+#extraControls .button.slave {background-color:rgb(205,0,25);font-weight:bold}
+
 .seperator {
 	height: 1.5em;
 	width: 1px;

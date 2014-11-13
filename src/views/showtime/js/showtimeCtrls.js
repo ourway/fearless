@@ -21,7 +21,8 @@ function makeid()
 
 
              $scope.asset = {};
-
+             $scope.master = false;
+             $scope.modetext = 'MASTER';
              $scope.hey = function(){
                  console.log($scope.asset);
              }
@@ -38,7 +39,43 @@ function makeid()
                  return time;
              }
 
-
+$scope.$watch(function(){return $location.$$path},
+    function(){
+        //project.command = 'window.location = ' + $location.$$path;
+        if (project.showSyncWs)
+        {
+            clearInterval(project.showSyncWsInterval.$$intervalId);
+            project.showSyncWs.close();  // close latest websocket connection
+            //project.imgsA = {};
+            $('#thumbnails .thmb').remove();
+            project.imgsAdata = {};
+            //project.imgsB = {};
+            project.imgsBdata = {};
+            project.frames = {};
+            project.notes = {};
+            project.thumbstate = {};
+            //project.AFromFile = false;
+            //project.BFromFile = false;
+            goToFrame(0);
+            //progressPyChart.update();
+            //$('.thmb').fadeOut();
+    
+        }
+        $scope.masterme = function(){
+            if (!$scope.slave && $scope.master==false)
+            {
+                $scope.master = true;
+                $scope.modetext = 'MASTER';
+                $timeout(function(){
+                        project.command = 'goToFrame(' + project.currentFrame() + ')';
+                    }, 500);
+            }
+            else
+            {
+                $scope.master = false;
+                $scope.modetext = 'REVIEW';
+            }
+            }
         $http.post('/api/auth/getUserInfo').success(function(result){
 
             if (result.message == 'ERROR'){
@@ -46,9 +83,13 @@ function makeid()
                 return
             }
             else {
+                    //$location.path(cur);
+
+
                 $scope.user = result
                 loc = $location.$$path
                 name = loc.slice(1)
+
                 //x = Restangular.one('api', 'asset').post(name+'.zip', {'name':true})
                 //x.then(function(ass){
                 //    console.log(ass);
@@ -76,24 +117,38 @@ function makeid()
                                 };
                                 project.showSyncWs.onmessage = function (evt) {
                                         serverMessage = JSON.parse(evt.data);
-                                        project.lock = serverMessage.lock;
-
-                                        if (($scope.user.id != project.lock) && (serverMessage.command != project.command) && serverMessage.command != 'None')
+                                        project.master = serverMessage.master;
+                                        //console.log(serverMessage);
+                                        
+                                        if (project.master && $scope.user.id != project.master)
+                                        {
+                                            $scope.slave = true;
+                                            $scope.modetext = 'REVIEW';
+                                        }
+                                        else
+                                        {
+                                            $scope.slave = false;
+                                            $scope.modetext = 'MASTER';
+                                        }
+                                        if (($scope.user.id != project.master) && (serverMessage.command != project.command) && serverMessage.command != 'None')
                                         {
                                             eval(serverMessage.command)  // server tels me what to do
                                             project.command = serverMessage.command;
                                             //console.log(serverMessage.command, project.command);
                                         }
+
+
                                         //if (project.lock && serverMessage.frames && serverMessage.frames!='None' && serverMessage.frames != project.frames){
                                         //    project.frames = serverMessage.frames;
                                         //}
                                         //console.log(serverMessage)
 
                                 };
-                                $interval(function(){
+                                project.showSyncWsInterval = $interval(function(){
                                         if (project.assetId)
                                             project.showSyncWs.send(JSON.stringify({'id':project.assetId,
-                                                'command':project.command, 'client':$scope.user.id}))
+                                                'command':project.command, 'client':$scope.user.id, 
+                                                'i_want_to_be_master':$scope.master}))
                                 }, 1000/fps)
                                 $scope.loading = false;
                                 $scope.$apply()
@@ -128,6 +183,7 @@ function makeid()
         }
         })
 
+                    });
 
 ///////////////////////////////////////end///////////////////
     });

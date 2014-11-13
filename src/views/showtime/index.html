@@ -28,7 +28,8 @@
 	<link rel='stylesheet' href='css/spectrum.css' />
 
   </head>
-  <body ><img id="nibImage" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAxklEQVQ4T62TgQ2CMBBF6QSu4gbWCdRNdAJxAnAT3EAn0FFgAvyPtE1p1ECxySV3hXvXu9w3RXL6vljraiezMnzOS3aX3YwZ/HBMHCj5qLhKoVHcyi8Fufq7AFBy4yr/yA+fGkEORANgQuVP0JMgtXE9P6eUTf6hnS2AUs45A0DKBQDT3WQCHgB4yioT0C4FdH9pYfEQWVcGOXcOnXLs8kXy05+5yohqH1Y5giAmZvKtHZ6NmGqfM1Kj0wUzgW5lqZwR0UjOb2XRRMDjyfVoAAAAAElFTkSuQmCC" style="top: 496px; left: 768px; display: block;">
+  <body >
+  <img id="nibImage" alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAxklEQVQ4T62TgQ2CMBBF6QSu4gbWCdRNdAJxAnAT3EAn0FFgAvyPtE1p1ECxySV3hXvXu9w3RXL6vljraiezMnzOS3aX3YwZ/HBMHCj5qLhKoVHcyi8Fufq7AFBy4yr/yA+fGkEORANgQuVP0JMgtXE9P6eUTf6hnS2AUs45A0DKBQDT3WQCHgB4yioT0C4FdH9pYfEQWVcGOXcOnXLs8kXy05+5yohqH1Y5giAmZvKtHZ6NmGqfM1Kj0wUzgW5lqZwR0UjOb2XRRMDjyfVoAAAAAElFTkSuQmCC" style="top: 496px; left: 768px; display: block;">
   <canvas id="brushPreview" width="16" height="16"></canvas>
   
 
@@ -36,7 +37,7 @@
 
 	<div id="header">
 		<a href="/app/#about/showtime"><div class="wingbinLogo"></div></a> 
-
+        <div style="margin:20px;float:right;color:#fff;background:#0598FA;padding:5px;border-radius:2px;"><b>{{user.alias}}</b></div>
 	</div><!-- END header -->
 
 
@@ -44,8 +45,8 @@
 		<div id="menubartop">
 
 			<div class="controlBlockInset">
-                <button id="new" class='button viewer current'>NEW</button>
-                <button id="clean" class='button viewer current'>Clean</button>
+                <button id="new" class='button viewer '>NEW</button>
+                <button id="clean" class='button viewer '>Clean</button>
 				<div id='viewerControls'>
                     <button id="sequence1" class='button viewer current'>A</button>
 					<button id="sequence2" class='button radiusRight viewer'>B</button>
@@ -58,9 +59,12 @@
 				<div class="fileLoad button radius">
 					<div>Load Project ZIP</div>
 					<input type="file" id="import" class="load">
-				</div>
+                </div>
 
 
+			<div id="extraControls">
+                <button id="mastermode" ng-click="masterme()" ng-class="{'current':master, 'slave':slave}" class="fileSave button ">{{modetext}}</button>
+            </div>
 				<button id="download" class="fileSave button radiusLeft">Download</button>
                 <button id="save" class="fileSave button radiusLeft">save</button>
 				<input type="text" id="description" required="required" class="stopKBD radiusRight" ng-model="asset.descripion" placeholder="desciption">
@@ -107,7 +111,7 @@
                 <div style="color:#ccc">
                     <ul>
                        <li style="list-style: None" ng-repeat="ua in userShows">
-                          <a href="#/{{ua.name}}" ng-click="goto(ua.name)">{{ua.description || ua.name }}</a>
+                          <a href="#/{{ua.name}}" >{{ua.description || ua.name }}</a>
 
                        </li>
                     </ul>
@@ -124,7 +128,7 @@
                 <canvas style="padding:10px;" id="progressChart" width="64" height="64"></canvas>
 
             </div>
-			<div id="timelineControls">
+			<div ng-show="!slave" id="timelineControls">
 				<button id="lastNote" class="smallCtrl"></button>
 				<button id="previousFrame" class="smallCtrl"></button>
 				<button id="play" class="player"></button>

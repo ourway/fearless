@@ -1,7 +1,9 @@
 __author__ = 'farsheed'
 import os
+import user
+
 fearless_folder = os.path.abspath(os.path.dirname(__file__))
-public_repository_path = os.path.join(os.getenv('HOME'), '.fearlessrepo')
+public_repository_path = os.path.join(user.home, '.fearlessrepo')
 
 
 

@@ -5,8 +5,9 @@ module=app
 callable=app
 master=True
 vacuum=True
-enable-threads=True
-
+enable-threads=False
+offload-threads = 2
+gevent-monkey-patch = true
 
 touch-reload=app.py
 touch-reload=model.py
@@ -25,7 +26,7 @@ workers=8
 disable-logging=False
 listen=128
 optimize=1
-cache2=True,name=ctc_internal_cache,items=200
+cache2=True,name=ctc_internal_cache,items=2000
 #thunder-lock=True
 max-requests=256
 #limit-as=256
@@ -33,6 +34,6 @@ reload-mercy=8
 chmod-socket    = 666
 chmod-socket    = 666
 #daemonize=/home/project/log
-socket={dir}/etc/fa_team_api.socket
+socket={dir}/etc/fearless_api.socket
 http=127.0.0.1:5002
 stats=/tmp/statsockt

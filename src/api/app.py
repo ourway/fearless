@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!../../pyenv/bin/python
 # -*- coding: utf-8 -*-
 _author = 'Farsheed Ashouri'
 '''
@@ -21,9 +21,10 @@ from string import ascii_uppercase
 import ujson as json
 from utils.assets import AssetSave, ListAssets, GetAsset
 from utils.reports import Mailer
-
+from gevent import wsgi
 from models import __all__ as av
 from models import *
+import uwsgi
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
     Verify, Reactivate, Reset, Logout, GetUserInfo
@@ -173,4 +174,5 @@ if __name__ == '__main__':
     import os
     sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
     from werkzeug import run_simple
-    run_simple('0.0.0.0', 5002, app, use_debugger=True, use_reloader=True)
+    run_simple('0.0.0.0', 5004, app, use_debugger=True, use_reloader=True)
+    #wsgi.WSGIServer(('127.0.0.1', 5004), app).serve_forever()

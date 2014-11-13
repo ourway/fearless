@@ -22,25 +22,24 @@ class SyncShow:
                     '''
                     showInfo = wsock.receive()
                     try:
-                        assetId = json.loads(showInfo).get('id')
-                        command = json.loads(showInfo).get('command')
-                        frames = json.loads(showInfo).get('frames')
+                        data = json.loads(showInfo)
+                        assetId = data.get('id')
+                        command = data.get('command')
+                        frames = data.get('frames')
+                        want_to_be_master = data.get('i_want_to_be_master')
                         client = json.loads(showInfo).get('client') or req.env.get('HTTP_X_FORWARDED_FOR')
                         if assetId:
-                            if not r.get('show_%s_lock'%assetId): # Asset is unlocked
-                                r.set('show_%s_lock'%assetId, str(client))
-                                r.expire('show_%s_lock'%assetId, 120)
-                                r.set('show_%s_command'%assetId, command)
-                                r.set('show_%s_frames'%assetId, frames)
-                                r.expire('show_%s_command'%assetId, 1)
-                                r.expire('show_%s_frames'%assetId, 1)
-                            else: # Asset is locked
-                                master = r.get('show_%s_lock'%assetId)
-                                if (str(client) == master) and command:
+                            master = r.get('show_%s_master'%assetId)
+                            if want_to_be_master: # Asset is unlocked
+                                if master and str(client) != master:  ## check if not other master
+                                   pass
+                                else:
+                                    r.set('show_%s_master'%assetId, str(client))
+                                    r.expire('show_%s_master'%assetId, 1)
                                     r.set('show_%s_command'%assetId, command)
                                     r.set('show_%s_frames'%assetId, frames)
-                                    r.expire('show_%_command'%assetId, 1)
-                                    r.expire('show_%_frames'%assetId, 1)
+                                    r.expire('show_%s_command'%assetId, 1)
+                                    r.expire('show_%s_frames'%assetId, 1)
                             command = r.get('show_%s_command'%assetId)
                             frames = r.get('show_%s_frames'%assetId)
                                 #if r.getset('show_%s_%s_latest_command'% (assetId, client), command) == command:
@@ -50,7 +49,7 @@ class SyncShow:
                                 #if master == str(client): ## dont send command to its issuer
                                 #    command = None
                                 #    frames = None
-                            wsock.send(json.dumps({"lock" : r.get('show_%s_lock'%assetId),
+                            wsock.send(json.dumps({"master" : r.get('show_%s_master'%assetId),
                                                    "frames":frames, "command":command}))
 
                     except (ValueError, TypeError):
