@@ -7,25 +7,11 @@
 	<meta name="keywords" content="ram player, fearless, video editing, client, notes, sequence, viewer">
 
 	<link href='css/fonts.css' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="css/slider.css">
+	<link rel="stylesheet" type="text/css" href="../css/slider.css">
     <link rel="stylesheet" type="text/css" href="css/showtime.css">
-	<script src="js/vendor/jquery.min.js"></script>
-	<script src="js/vendor/jquery-ui.min.js"></script>
-	<script src='js/FileSaver.js'></script>
-	<script src='js/jszip.min.js'></script>
-    <script src='../js/vendor/jszip-utils.js'></script>
-	<script src='../js/vendor/lodash.min.js'></script>
-    <script src='../js/vendor/angular.min.js'></script>
-	<script src='../js/vendor/angular-resource.min.js'></script>
-	<script src='../js/vendor/angular-route.min.js'></script>
-    <script src='../js/vendor/angular-cookies.min.js'></script>
-    <script src='../js/vendor/restangular.min.js'></script>
-    <script src='../js/vendor/Chart.min.js'></script>
-    <script type="text/javascript" src='js/showtimeCtrls.js'> </script>
-	<!-- COLOR PICKER -->
-	<script src='js/spectrum.js'></script>
-	<script src='js/slider.js'></script>
-	<link rel='stylesheet' href='css/spectrum.css' />
+    <link rel="stylesheet" type="text/css" href="../css/chat.css">
+	<link rel='stylesheet' href='../css/spectrum.css' />
+
 
   </head>
   <body >
@@ -81,7 +67,7 @@
 
 		</div><!-- END menubar -->
 
-        <div id="container" onmousedown="return false" >
+        <div id="container" >
         <table style="width:100%">
 	    <tr><td style="vertical-align: text-top;padding-left:1%;width:70%">
 
@@ -97,7 +83,7 @@
 
 
 
-			<div id="canvasDiv">
+			<div id="canvasDiv" onmousedown="return false" >
 				<img id="sequenceImage" src="./images/placeholder.png">
 				<canvas id="canvas" width="960" height="540"></canvas>
 			</div>
@@ -117,7 +103,11 @@
                     </ul>
 
                 </div>
-             </div>
+            </div>
+
+
+
+
           </td></tr>
         </table>
         </div>
@@ -208,7 +198,20 @@
 
 
 	</div>
-
-
-  <script type="text/javascript" src='js/showtime.js'> </script>
+	<script src="js/vendor/jquery.min.js"></script>
+	<script src="js/vendor/jquery-ui.min.js"></script>
+	<script src='js/FileSaver.js'></script>
+	<script src='js/jszip.min.js'></script>
+    <script src='../js/vendor/jszip-utils.js'></script>
+	<script src='../js/vendor/lodash.min.js'></script>
+    <script src='../js/vendor/angular.min.js'></script>
+	<script src='../js/vendor/angular-resource.min.js'></script>
+	<script src='../js/vendor/angular-route.min.js'></script>
+    <script src='../js/vendor/angular-cookies.min.js'></script>
+    <script src='../js/vendor/restangular.min.js'></script>
+    <script src='../js/vendor/Chart.min.js'></script>
+    <script type="text/javascript" src='js/showtimeCtrls.js'> </script>
+	<script src='js/spectrum.js'></script>
+	<script src='js/slider.js'></script>
+    <script type="text/javascript" src='js/showtime.js'> </script>
 </body></html>

@@ -650,8 +650,9 @@ function showtime() {
     };
 
 
-    this.getNotes = function () {
-        var f = this.currentFrame();
+    this.getNotes = function (f, note) {
+        if (!f)
+            var f = this.currentFrame();
 
 
         if (this.frames && this.frames[f] && this.frames[f] != undefined) {
@@ -666,6 +667,11 @@ function showtime() {
 
 
         if (this.notes && this.notes[f] && this.notes[f] != undefined) {
+            
+            if (/^[\x00-\x7F]+$/.test(this.notes[f])) //false
+                $('#frameNotes').attr('style', 'direction:ltr');
+            else
+                $('#frameNotes').attr('style', 'direction:rtl');
 
             $("#frameNotes").val(this.notes[f]);
         } else {
@@ -1231,17 +1237,24 @@ $(document).ready(function () {
         });
 
 
-        $(".stopKBD").focus(function () {
+        $(".stopKBD").on('focus', function () {
             allowKBD = false;
         });
 
-        $(".stopKBD").blur(function () {
+        $(".stopKBD").on('blur', function () {
             allowKBD = true;
         });
-
-        $("#frameNotes").change(function () {
+        $("#frameNotes").bind('input propertychange', function() {
             var f = project.currentFrame();
-            project.setNote(f, $("#frameNotes").val());
+            note = $("#frameNotes").val();
+            project.command = 'project.getNotes('+f+', "'+note+'")';
+            project.setNote(f, note);
+            if (/^[\x00-\x7F]+$/.test(note)) //false
+                $('#frameNotes').attr('style', 'direction:ltr');
+            else
+                $('#frameNotes').attr('style', 'direction:rtl');
+            //project.command = 'project.setNote('+ f +', "'+ note +'")';
+
         });
 
         $("#info").click(function (e) {

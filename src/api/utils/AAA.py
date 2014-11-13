@@ -123,8 +123,11 @@ class Login:
                 'message': 'error', 'info': 'Very Quick! Good, but you need to wait', 'wait': 5}
             return
         form = json.loads(req.stream.read())
+        email = form.get('email')
+        if email:
+            email = email.lower()
         target = session.query(User).filter(
-            User.email == form.get('email')).first()
+            User.email == email).first()
         if not sid:
             sid = getANewSessionId()
 
@@ -186,21 +189,23 @@ class Signup:
 
         host = req.protocol + '://' + req.headers.get('HOST')
         form = json.loads(req.stream.read())
+        email=form.get('email')
+        if email:
+            email = email.lower()
         olduser = session.query(User).filter(
-            User.email == form.get('email')).first()
+            User.email == email).first()
         if not olduser:
-            newuser = User(email=form.get('email'),
+            newuser = User(email=email,
                            password=form.get('password'),
                            firstname=form.get('firstname'),
                            lastname=form.get('lastname'),
                            token=str(uuid.uuid4()))
 
             session.add(newuser)
-            #commit(req, resp)
 
             activation_link = host + \
                 '/api/auth/activate?token=' + newuser.token
-            send_envelope.delay(form.get('email'), 'Account Activation',
+            send_envelope.delay(email, 'Account Activation',
                                 'Hi <strong>{u}</strong>! Please <a href="{l}">Activate</a> your account.'.format(u=newuser.firstname.title(),
                                                                                                                   l=activation_link))
 

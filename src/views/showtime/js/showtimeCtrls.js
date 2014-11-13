@@ -57,6 +57,7 @@ $scope.$watch(function(){return $location.$$path},
             //project.AFromFile = false;
             //project.BFromFile = false;
             goToFrame(0);
+            $scope.master = false;
             //progressPyChart.update();
             //$('.thmb').fadeOut();
     
@@ -132,8 +133,14 @@ $scope.$watch(function(){return $location.$$path},
                                         }
                                         if (($scope.user.id != project.master) && (serverMessage.command != project.command) && serverMessage.command != 'None')
                                         {
-                                            eval(serverMessage.command)  // server tels me what to do
                                             project.command = serverMessage.command;
+                                            //console.log(serverMessage.command);
+                                            if (serverMessage.notes){
+                                                var notes = JSON.parse(serverMessage.notes);
+                                                project.notes = notes;
+                                            }
+                                        
+                                            eval(serverMessage.command)  // server tels me what to do
                                             //console.log(serverMessage.command, project.command);
                                         }
 
@@ -146,9 +153,18 @@ $scope.$watch(function(){return $location.$$path},
                                 };
                                 project.showSyncWsInterval = $interval(function(){
                                         if (project.assetId)
-                                            project.showSyncWs.send(JSON.stringify({'id':project.assetId,
-                                                'command':project.command, 'client':$scope.user.id, 
-                                                'i_want_to_be_master':$scope.master}))
+                                            
+                                        {
+                                           
+                                            if ($scope.master)
+                                                dataToSend = JSON.stringify({'id':project.assetId,
+                                                    'command':project.command, 'client':$scope.user.id, 
+                                                    'i_want_to_be_master':$scope.master, 'notes':JSON.stringify(project.notes)});
+                                            else
+                                                dataToSend = JSON.stringify({'id':project.assetId, 'client':$scope.user.id});
+                                            
+                                            project.showSyncWs.send(dataToSend)
+                                        }
                                 }, 1000/fps)
                                 $scope.loading = false;
                                 $scope.$apply()

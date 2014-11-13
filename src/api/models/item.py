@@ -24,13 +24,11 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, getUUID, logger
 import datetime
 
-users_groups = Table('users_groups', Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column('user_id', Integer, ForeignKey('user.id')),
-                     Column('group_id', Integer, ForeignKey('group.id'))
-                     )
-class User(IDMixin, Base):
+
+class Item(IDMixin, Base):
 
     '''Main users group
     '''
+    path = Column(String(128), unique=True, nullable=False)  # showtime/#/DmWdMXXw
+    
 
