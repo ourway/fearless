@@ -66,6 +66,8 @@ $scope.$watch(function(){return $location.$$path},
             if (!$scope.slave && $scope.master==false)
             {
                 $scope.master = true;
+                project.master = true;
+                project.slave = false;
                 $scope.modetext = 'MASTER';
                 $timeout(function(){
                         project.command = 'goToFrame(' + project.currentFrame() + ')';
@@ -74,6 +76,7 @@ $scope.$watch(function(){return $location.$$path},
             else
             {
                 $scope.master = false;
+                project.master = false;
                 $scope.modetext = 'REVIEW';
             }
             }
@@ -124,11 +127,15 @@ $scope.$watch(function(){return $location.$$path},
                                         if (project.master && $scope.user.id != project.master)
                                         {
                                             $scope.slave = true;
+                                            project.slave = true;
+                                            project.master = false;
                                             $scope.modetext = 'REVIEW';
                                         }
                                         else
                                         {
                                             $scope.slave = false;
+                                            project.slave = false;
+                                            project.master = true;
                                             $scope.modetext = 'MASTER';
                                         }
                                         if (($scope.user.id != project.master) && (serverMessage.command != project.command) && serverMessage.command != 'None')

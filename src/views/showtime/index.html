@@ -84,10 +84,11 @@
 
 
 			<div id="canvasDiv" onmousedown="return false" >
+                <canvas style="padding:10px;" id="progressChart" width="128" height="128"></canvas>
+			<span id="frameFileName"></span>
 				<img id="sequenceImage" src="./images/placeholder.png">
 				<canvas id="canvas" width="960" height="540"></canvas>
 			</div>
-			<span id="frameFileName">Not any foortage!</span>
 		</div><!-- END canvasWrapper -->
         </td><td style="padding-left: 10px;vertical-align: top;width:30%">
 
@@ -115,7 +116,6 @@
 			<div id="timeline"></div>
             <div onmousedown="return false" id="thumbnails">
 
-                <canvas style="padding:10px;" id="progressChart" width="64" height="64"></canvas>
 
             </div>
 			<div ng-show="!slave" id="timelineControls">

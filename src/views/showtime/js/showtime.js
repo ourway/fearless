@@ -36,8 +36,13 @@ var manifest;
 var allowKBD = true;
 
 /*Image paths*/
-var imageUrl = "../images/hideicon.svg"
+var imageUrl = "../images/hideicon.svg";
 
+function pad(num, size) {
+    var s = num+"";
+    while (s.length < size) s = "0" + s;
+    return s;
+}
 /*Draw a Stroke from the last position to the current position.*/
 function updateCanvas(thisMouseX, thisMouseY) {
 
@@ -389,7 +394,7 @@ function showtime() {
         ratio = this.width/this.height;
         tWidth = 96;
         tHeight= tWidth/ratio;
-        skips = Math.ceil(project.imgsA.length/(($(window).width()-96)/tWidth))
+        skips = Math.ceil(project.imgsA.length/(($(window).width()-200)/tWidth))
         _f = project.currentFrame()
         if (_f%skips) {
             project.thumbstate[_f] = true;
@@ -419,7 +424,7 @@ function showtime() {
         switch (sequence) {
             case 1:
                 if (this.imgsA && this.imgsA[f]) {
-                    $('#frameFileName').html(this.imgsA[f].name);
+                    $('#frameFileName').html(pad(f+1, 4));
 
                     if (!this.imgsAdata[f] && this.imgsA[f] instanceof Blob) {
                         var reader = new FileReader();
@@ -460,7 +465,7 @@ function showtime() {
             case 2:
 
                 if (this.imgsB && this.imgsB[f]) {
-                    $('#frameFileName').html(this.imgsA[f].name);
+                    $('#frameFileName').html(pad(f+1, 4));
                     if (!this.imgsBdata[f] && this.imgsB[f] instanceof Blob) {
                         var reader = new FileReader();
 
@@ -1303,6 +1308,14 @@ $(document).ready(function () {
     });
 
 
+$('#canvas').mousemove(function(event) {
+        if (event.shiftKey && !project.slave)
+        {
+            x = event.offsetX;
+            percent = x/960;
+            goToFrame(Math.round(project.imgsAdata.length * percent));
+        }
+});
 
 
 
@@ -1311,6 +1324,9 @@ $(document).ready(function () {
         if (allowKBD) {
             /*Necessary so user can use these keys when typing.*/
             switch (e.keyCode) {
+
+
+
 
                 case 37: //LEFT ARROW
                     e.preventDefault();
@@ -1381,10 +1397,10 @@ function goodbye(e) {
 //window.onbeforeunload=goodbye;
 		 
 progressChartOptions = {
-    segmentShowStroke : true,
-    segmentStrokeColor : "#333",
-    segmentStrokeWidth : 2,
-    percentageInnerCutout : 0, // This is 0 for Pie charts
+    segmentShowStroke : false,
+    segmentStrokeColor : "#ccc",
+    segmentStrokeWidth : 1,
+    percentageInnerCutout : 85, // This is 0 for Pie charts
     animationSteps : 100,
     animationEasing : "liner",
     //animateRotate : true,
