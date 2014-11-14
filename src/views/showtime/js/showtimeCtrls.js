@@ -42,18 +42,15 @@ function makeid()
 $scope.$watch(function(){return $location.$$path},
     function(){
         //project.command = 'window.location = ' + $location.$$path;
-        if (project.showSyncWs)
+        if (project && project.showSyncWs)
         {
             clearInterval(project.showSyncWsInterval.$$intervalId);
             project.showSyncWs.close();  // close latest websocket connection
             //project.imgsA = {};
             $('#thumbnails .thmb').remove();
-            project.imgsAdata = {};
-            //project.imgsB = {};
-            project.imgsBdata = {};
-            project.frames = {};
-            project.notes = {};
-            project.thumbstate = {};
+
+            var project = new showtime();
+
             //project.AFromFile = false;
             //project.BFromFile = false;
             goToFrame(0);
@@ -88,7 +85,6 @@ $scope.$watch(function(){return $location.$$path},
             }
             else {
                     //$location.path(cur);
-
 
                 $scope.user = result
                 loc = $location.$$path
@@ -210,6 +206,7 @@ $scope.$watch(function(){return $location.$$path},
                 else {
                     $scope.name = makeid();
                 }
+                project = new showtime()
                 project.projectName = $scope.name;
                 $location.path($scope.name);
 

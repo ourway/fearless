@@ -781,6 +781,7 @@ function showtime() {
         switch (sequence) {
             case 1:
                 this.imgsA = files;
+                project.cutout = this.imgsA.length - 1;
                 if (!this.imgsAdata)
                     this.imgsAdata = {};
                 info = this.generateSeqStats(sequence);
@@ -793,6 +794,7 @@ function showtime() {
                 break
             case 2:
                 this.imgsB = files;
+                project.cutout = this.imgsB.length - 1;
                 if (!this.imgsBdata)
                     this.imgsBdata = {};
                 info = this.generateSeqStats(sequence);
@@ -804,27 +806,11 @@ function showtime() {
         }
 
 
-        if (files.length > $("#frame").prop("max")) {
-            project.cutout = files.length - 1
-            $("#frame").prop("max", project.cutout );
-            $("#frametotal").html(project.cutout + 1);
-            $("#timeline").slider({max: (project.cutout)});
+    console.log(project.cutout);
+    $("#frame").prop("max", project.cutout);
+    $("#frametotal").html(project.cutout-1);
+    $("#timeline").slider({max: (project.cutout)});
 
-
-        } else {
-
-            if (this.imgsB == undefined || this.imgsA.length >= this.imgsB.length) {
-                project.cutout = this.imgsA.length - 1
-                $("#frame").prop("max", project.cutout);
-                $("#frametotal").html(project.cutout-1);
-                $("#timeline").slider({max: (project.cutout)});
-            } else {
-                project.cutout = this.imgsB.length - 1
-                $("#frame").prop("max", project.cutout);
-                $("#frametotal").html(project.cutout+1);
-                $("#timeline").slider({max: (project.cutout)});
-            }
-        }
 
 
         this.setBackground();
@@ -1256,6 +1242,8 @@ $(document).ready(function () {
 
              var manifestName = "showtime.json";
             // read the content of the file with JSZip
+            try
+            {
             project.zip = new JSZip(f);
             manifest = project.zip.file(manifestName);
             if (manifest) {
@@ -1321,10 +1309,15 @@ $(document).ready(function () {
                 sequence = startSequence;
                 project.setBackground();
                 //goToNextFrame()
-                //startPlaying()
+                startPlaying();
             } else {
                 alert("No Manifest found...");
             }
+            }
+        catch(err) {
+            console.log(err);
+            $('#frameFileName').html('ER:(');
+        }
 
 
 
@@ -1488,7 +1481,7 @@ $(document).ready(function () {
         range: "min",
         /* value: $( "#frame" ).val(),*/
         min: 1,
-        max: project.cutout,
+        max: Math.max(project.imgsA.length, project.imgsB.length),
         //range:true,
         slide: function (event, ui) {
             if (!project.slave)
