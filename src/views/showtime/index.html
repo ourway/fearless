@@ -42,11 +42,14 @@
 					<div>Upload Images</div>
 					<input type="file" multiple="multiple" name="files" id="fileUpload" class="upload">
 				</div>
+				<div ng-show="!slave" class="fileUpload button radius">
+					<div>Upload Video</div>
+					<input type="file" name="videofile" id="videoUpload" class="upload">
+				</div>
 				<div ng-show="!slave" class="fileLoad button radius">
 					<div>Load Project ZIP</div>
 					<input type="file" id="import" class="load">
                 </div>
-
 
 			<div id="extraControls">
                 <button id="mastermode" ng-click="masterme()" ng-class="{'current':master, 'slave':slave}" class="fileSave button ">{{modetext}}</button>
@@ -82,14 +85,18 @@
                     <strong >{{asset.last_updated_by}}</strong>
                     version: <span >{{asset.version}}</span>
                 </span>
+
+
                 </div>
 
+            <video id="myvid" width="1"></video>
 
 			<div id="canvasDiv" >
                 <canvas style="padding:10px;" id="progressChart" width="128" height="128"></canvas>
 			<span id="frameFileName"></span>
 				<img id="sequenceImage" src="./images/placeholder.png">
 				<canvas id="canvas" width="960" height="540"></canvas>
+				<canvas id="vidcanvas" width="960" height="540" style="display:none"></canvas>
 			</div>
 		</div><!-- END canvasWrapper -->
         </td><td style="padding-left: 10px;vertical-align: top;width:30%">
@@ -116,8 +123,7 @@
         </div>
 		<div id="controls">
 			<div id="timeline"></div>
-            <div onmousedown="return false" id="thumbnails">
-
+            <div id="thumbnails">
 
             </div>
 			<div ng-show="!slave" id="timelineControls">

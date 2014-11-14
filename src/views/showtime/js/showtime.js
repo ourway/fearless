@@ -43,6 +43,17 @@ function pad(num, size) {
     while (s.length < size) s = "0" + s;
     return s;
 }
+
+var convertDataURL2binaryArray = function(dataURL){
+
+    var blobBin = atob(dataURL.split(',')[1]);
+    var array = [];
+    for(var i = 0; i < blobBin.length; i++) {
+        array.push(blobBin.charCodeAt(i));
+    }
+    return new Uint8Array(array)
+}
+
 /*Draw a Stroke from the last position to the current position.*/
 function updateCanvas(thisMouseX, thisMouseY) {
 
@@ -124,6 +135,12 @@ function canvasInit() {
             updateCanvas(thisMouseX, thisMouseY);
             lastMouseX = thisMouseX;
             lastMouseY = thisMouseY;
+        }
+        if (e.shiftKey && !project.slave)
+        {
+            x = e.offsetX;
+            percent = x/currentWidth;
+            goToFrame(Math.round(project.imgsAdata.length * percent));
         }
     });
 
@@ -221,6 +238,7 @@ function startPlaying(f) {
 
 function convertImgToBase64(data) {
 
+    //console.log(data)
 
     var img = new Image();
 
@@ -391,7 +409,6 @@ function showtime() {
     /////////////////////////////////////////////////////////////////
     this.addThumb = function(data){
         img = new Image()
-
         img.onload = function(){
         ratio = this.width/this.height;
         tWidth = 96;
@@ -433,6 +450,7 @@ function showtime() {
 
                         reader.onload = function (e) {
                             var dataURL = reader.result;
+                            //console.log(dataURL);
 
                             $("#sequenceImage").prop("src", convertImgToBase64(dataURL));
 
@@ -453,7 +471,10 @@ function showtime() {
                         $("#sequenceImage").prop("src", this.imgsAdata[f]);
 
                         if (!this.thumbstate[f])
+                        {
+                            //console.log('here');
                             this.addThumb(this.imgsAdata[f]);
+                        }
 
                     }
 
@@ -607,13 +628,107 @@ function showtime() {
 //////////////////////////////////////////////////
     ////////////// read files  ///////////////////
 
+    
+    this.makeVideo = function(file){
+        var reader = new FileReader();
+            project.imgsAdata = {};
+            var videoconverted = [];
+            var lastframe = null;
+            var count = 0;
+
+        reader.onload = function (e) {
+            var dataURL = reader.result;
+            sourceVid=document.getElementById('myvid');
+            sourceVid.src=dataURL;
+            var hCanvas = document.getElementById('vidcanvas');
+            var show = document.getElementById("sequenceImage");
+            //canvas.width = currentWidth;
+            //canvas.height = currentHeight;
+            var hContext = hCanvas.getContext('2d');
+            sourceVid.addEventListener('play', function() {
+                runAnalysis();
+            });
+
+            var runAnalysis = function() {
+
+            if (sourceVid.paused || sourceVid.ended) {
+                return
+            }
+            
+            frameSave();
+                if (window.requestAnimationFrame) {
+                    requestAnimationFrame(runAnalysis);
+                } else {
+                    setTimeout(runAnalysis, 0);
+                }
+            };
+
+            var frameSave = function()
+            {
+                //hCanvas.width = sourceVid.videoWidth;
+                //hCanvas.height = sourceVid.videoHeight;
+                  //hContext.drawImage(sourceVid, 0, 0, sourceVid.videoWidth, sourceVid.videoHeight);
+                hContext.drawImage(sourceVid,0,0,sourceVid.videoWidth, sourceVid.videoHeight, 0,0,hCanvas.width,hCanvas.height);
+                  
+                frame = hCanvas.toDataURL('image/jpeg');
+                if (frame && lastframe!=frame)
+                {
+                    show.src = frame;
+                    lastframe = frame;
+                    project.imgsAdata[count] = frame;
+                    //goToFrame(count);
+                    fblob = convertDataURL2binaryArray(frame);
+                    count +=1;
+                    videoconverted.push(new File([fblob], pad(count)+'.jpg', {type: 'image/jpeg'}));
+                    $('#frameFileName').html(pad(count, 4));
+                    progressPyChart.segments[0].value = count;
+                    progressPyChart.segments[1].value = sourceVid.duration*fps - count;
+                    progressPyChart.update();
+                    //project.addThumb(frame);
+
+                }
+
+                  //duration = imgsData.length - 1
+                  //if (frame != imgsData[duration]) 
+                  //      imgsData.push(frame);
+                  //var frame  = hContext.getImageData(0, 0, sourceVid.videoWidth, sourceVid.videoHeight);
+                  //console.log(frame);
+                      //length = data.length;
+            };
+
+
+
+            sourceVid.addEventListener('ended', function() {
+                project.setFiles(videoconverted);
+                progressPyChart.segments[0].value = 1;
+                progressPyChart.segments[1].value = videoconverted.length;
+                progressPyChart.update();
+
+                    //clearInterval(project.vit);
+            });
+
+            sourceVid.addEventListener('loadeddata', function() {
+                sourceVid.playbackRate = .5;
+                sourceVid.play();
+            }
+
+            );
+
+
+//myvid.source
+            //console.log(dataURL);
+        }
+        reader.readAsDataURL(file);
+    }
+
 
     this.setFiles = function (files) {
         var info;
         switch (sequence) {
             case 1:
                 this.imgsA = files;
-                this.imgsAdata = {};
+                if (!this.imgsAdata)
+                    this.imgsAdata = {};
                 info = this.generateSeqStats(sequence);
 
                 this.setPlayerSize()
@@ -624,7 +739,8 @@ function showtime() {
                 break
             case 2:
                 this.imgsB = files;
-                this.imgsBdata = {};
+                if (!this.imgsBdata)
+                    this.imgsBdata = {};
                 info = this.generateSeqStats(sequence);
                 if (info) {
                     $("#bInfo").html(info);
@@ -837,12 +953,17 @@ $(document).ready(function () {
         canvas.onmouseup = function () {
             project.save();
         };
+
         $("#fileUpload").change(function () {
 
             project.setFiles(this.files);
 
         });
+        $("#videoUpload").change(function () {
 
+            project.makeVideo(this.files[0]);
+
+        });
         /*
          Make a preivew of the nib in the nibCanvase and make a snapshot of the nib for the hover nib image.
          */
@@ -1317,14 +1438,7 @@ $(document).ready(function () {
     });
 
 
-$('#canvas').mousemove(function(event) {
-        if (event.shiftKey && !project.slave)
-        {
-            x = event.offsetX;
-            percent = x/960;
-            goToFrame(Math.round(project.imgsAdata.length * percent));
-        }
-});
+
 
 
 

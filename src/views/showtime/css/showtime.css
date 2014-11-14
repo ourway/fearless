@@ -53,10 +53,20 @@ p {
 	outline: 1px solid rgba(255,255,255,.1);
 	cursor: crosshair;
 }
+#myvid{
+opacity:0;
+}
 #canvas 
 {
 	position:absolute;
 	z-index: 1000;
+	margin:auto;
+	width:100%;
+}
+#vidcanvas 
+{
+	position:absolute;
+	z-index: 1001;
 	margin:auto;
 	width:100%;
 }
@@ -373,10 +383,7 @@ button:focus {outline:0;}
 	margin-left: 1em;
 }
 #detailinfo{
-position: absolute;
 z-index: 1;
-margin-top: 1px;
-margin-left: 4px;
 color:#ccc;
 }
 #canvasToggle {
