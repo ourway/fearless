@@ -52,7 +52,7 @@ def Authenticate(req, resp, params):
             ...
 
     '''
-    return
+    #return
     ip = req.env.get('HTTP_X_FORWARDED_FOR')
     free_services = ['/api/auth/signup', '/api/auth/login',
                      '/api/things', '/api/auth/activate', '/api/auth/reactivate',

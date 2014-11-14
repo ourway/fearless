@@ -140,7 +140,9 @@ function canvasInit() {
         {
             x = e.offsetX;
             percent = x/currentWidth;
-            goToFrame(Math.round(project.imgsAdata.length * percent));
+            goal = Math.round(project.imgsA.length * percent);
+            if (goal != project.currentFrame())
+                goToFrame(goal);
         }
     });
 
@@ -631,12 +633,32 @@ function showtime() {
     
     this.makeVideo = function(file){
         var reader = new FileReader();
-            project.imgsAdata = {};
+            if (!project.imgsAdata)
+                project.imgsAdata = {};
+            if (project.imgsBdata)
+                project.imgsBdata = {};
             var videoconverted = [];
             var lastframe = null;
             var count = 0;
 
-        reader.onload = function (e) {
+        reader.onprogress = function(evt){
+           if (evt.lengthComputable)
+           {  //evt.loaded the bytes browser receive
+              //evt.total the total bytes seted by the header
+              //
+             var percentComplete = (evt.loaded / evt.total)*100;
+               progressPyChart.segments[0].value = percentComplete;
+               progressPyChart.segments[1].value = 100-percentComplete;
+        // Would update the first dataset's value of 'Green' to be 10
+               progressPyChart.update();
+               if (percentComplete>99)
+                   progressPyChart.segments[0].value = 0;
+
+
+             //$('#progressbar').progressbar( "option", "value", percentComplete );
+           }
+        }
+        reader.onloadend = function (e) {
             var dataURL = reader.result;
             sourceVid=document.getElementById('myvid');
             sourceVid.src=dataURL;
@@ -675,7 +697,13 @@ function showtime() {
                 {
                     show.src = frame;
                     lastframe = frame;
-                    project.imgsAdata[count] = frame;
+
+                    switch (sequence) {
+                        case 1:
+                            project.imgsAdata[count] = frame;
+                        case 2:
+                            project.imgsBdata[count] = frame;
+                    }
                     //goToFrame(count);
                     fblob = convertDataURL2binaryArray(frame);
                     count +=1;
@@ -751,21 +779,24 @@ function showtime() {
 
 
         if (files.length > $("#frame").prop("max")) {
-            $("#frame").prop("max", files.length - 1);
-            $("#frametotal").html(files.length);
-            $("#timeline").slider({max: (files.length - 1)});
+            project.cutout = files.length - 1
+            $("#frame").prop("max", project.cutout );
+            $("#frametotal").html(project.cutout + 1);
+            $("#timeline").slider({max: (project.cutout)});
 
 
         } else {
 
             if (this.imgsB == undefined || this.imgsA.length >= this.imgsB.length) {
-                $("#frame").prop("max", this.imgsA.length - 1);
-                $("#frametotal").html(this.imgsA.length);
-                $("#timeline").slider({max: (this.imgsA.length - 1)});
+                project.cutout = this.imgsA.length - 1
+                $("#frame").prop("max", project.cutout);
+                $("#frametotal").html(project.cutout-1);
+                $("#timeline").slider({max: (project.cutout)});
             } else {
-                $("#frame").prop("max", this.imgsB.length - 1);
-                $("#frametotal").html(this.imgsB.length);
-                $("#timeline").slider({max: (this.imgsB.length - 1)});
+                project.cutout = this.imgsB.length - 1
+                $("#frame").prop("max", project.cutout);
+                $("#frametotal").html(project.cutout+1);
+                $("#timeline").slider({max: (project.cutout)});
             }
         }
 
@@ -1421,7 +1452,7 @@ $(document).ready(function () {
     timeline = $("#timeline").slider({
         range: "min",
         /* value: $( "#frame" ).val(),*/
-        min: project.cutin,
+        min: 1,
         max: project.cutout,
         //range:true,
         slide: function (event, ui) {
