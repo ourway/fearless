@@ -445,6 +445,7 @@ function showtime() {
         switch (sequence) {
             case 1:
                 if (this.imgsA && this.imgsA[f]) {
+                    _name = this.imgsA[f].name;
                     $('#frameFileName').html(pad(f+1, 4));
 
                     if (!this.imgsAdata[f] && this.imgsA[f] instanceof Blob) {
@@ -452,7 +453,6 @@ function showtime() {
 
                         reader.onload = function (e) {
                             var dataURL = reader.result;
-                            //console.log(dataURL);
 
                             $("#sequenceImage").prop("src", convertImgToBase64(dataURL));
 
@@ -460,6 +460,15 @@ function showtime() {
                                 dataURL = convertImgToBase64(dataURL);
                                 project.imgsAdata[f] = dataURL;
                                 $("#sequenceImage").prop("src", dataURL);
+
+                                // background zipping
+                                //
+
+                                project.folderA.file(_name, dataURL.substr(dataURL.indexOf(',')+1), {base64: true});
+                                console.log('zipped: '+_name)
+                                //
+                                //
+                                //
                                 //_f = new File([project.imgsAdata[f]], _fn, {type: "image/jpeg"});
                                 //project.imgsA[f]=_f;
                             }
@@ -471,6 +480,12 @@ function showtime() {
 
                     } else if (this.imgsAdata && this.imgsAdata[f]) {
                         $("#sequenceImage").prop("src", this.imgsAdata[f]);
+                        if (!project.folderA.files['A/'+ _name])
+                        {
+                                project.folderA.file(_name, this.imgsAdata[f].substr(this.imgsAdata[f].indexOf(',')+1), {base64: true});
+                                console.log('zipped: '+_name)
+                        }
+
 
                         if (!this.thumbstate[f])
                         {
@@ -490,6 +505,7 @@ function showtime() {
             case 2:
 
                 if (this.imgsB && this.imgsB[f]) {
+                    _name = this.imgsB[f].name;
                     $('#frameFileName').html(pad(f+1, 4));
                     if (!this.imgsBdata[f] && this.imgsB[f] instanceof Blob) {
                         var reader = new FileReader();
@@ -501,6 +517,9 @@ function showtime() {
                                 dataURL = convertImgToBase64(dataURL);
                                 project.imgsBdata[f] = dataURL;
                                 $("#sequenceImage").prop("src", dataURL);
+                                
+                                project.folderB.file(_name, dataURL.substr(dataURL.indexOf(',')+1), {base64: true});
+                                console.log('zipped: '+_name)
                             }
 
                             updateCanvas();
@@ -509,7 +528,11 @@ function showtime() {
                         reader.readAsDataURL(this.imgsB[f]);
                     } else if (this.imgsBdata && this.imgsBdata[f]) {
                         $("#sequenceImage").prop("src", this.imgsBdata[f]);
-
+                        if (!project.folderB.files['B/'+ _name])
+                        {
+                                project.folderB.file(_name, this.imgsBdata[f].substr(this.imgsBdata[f].indexOf(',')+1), {base64: true});
+                                console.log('zipped: '+_name)
+                        }
                         if (!this.thumbstate[f])
                             this.addThumb(this.imgsAdata[f]);
                     }
@@ -752,6 +775,9 @@ function showtime() {
 
     this.setFiles = function (files) {
         var info;
+        project.zip = new JSZip();  // main zip file for background archiving
+        project.folderA = project.zip.folder("A");
+        project.folderB = project.zip.folder("B");
         switch (sequence) {
             case 1:
                 this.imgsA = files;
@@ -902,12 +928,15 @@ function showtime() {
 
     this.download = function (fullEncode, mode) {
 
-        var zip = new JSZip();
+        //var zip = new JSZip();
+        if (!project.zip)
+            project.zip = new JSZip();  // main zip file for background archiving
         dump = this.encode(fullEncode)
-        zip.file("showtime.json", dump);
+        project.zip.file("showtime.json", dump);
 
-        var img = zip.folder("frames");
+        var img = project.zip.folder("frames");
         for (var f = 0; f < this.frames.length; f++) {
+            $('#frameFileName').html(pad(f, 4));
             var fr = this.frames[f];
             if (fr != undefined) {
                 var imgN = new Image();
@@ -919,29 +948,35 @@ function showtime() {
 
         if (fullEncode) {
 
-            var img = zip.folder("A");
+            if (!project.folderA)
+                project.folderA = project.zip.folder("A");
+            //var img = zip.folder("A");
+            //
             for (var f = 0; f < this.imgsA.length; f++) {
-                var fr = this.imgsAdata[f];
-                if (fr != undefined) {
-                    var imgN = new Image();
-                    imgN.src = fr;
-                    img.file(this.imgsA[f].name, imgN.src.substr(imgN.src.indexOf(',') + 1), {base64: true});
-                }
+                $('#frameFileName').html(pad(f, 4));
+                //progressPyChart.segments[0].value = f;
+                //progressPyChart.segments[1].value = this.imgsA.length - f;
+                //progressPyChart.update();
+                var _name = this.imgsA[f].name;
+                if (!project.folderA.files['A/'+ _name])
+                    goToFrame(f);
+            }
+            if (!project.folderB)
+                project.folderB = project.zip.folder("B");
+            //var img = zip.folder("A");
+            for (var f = 0; f < this.imgsB.length; f++) {
+                $('#frameFileName').html(pad(f, 4));
+                var _name = this.imgsB[f].name;
+                if (!project.folderB.files['B/'+ _name])
+                    goToFrame(f);   
+                
             }
 
-            var img = zip.folder("B");
-            for (var f = 0; f < this.imgsB.length; f++) {
-                var fr = this.imgsBdata[f];
-                if (fr != undefined) {
-                    var imgN = new Image();
-                    imgN.src = fr;
-                    img.file(this.imgsB[f].name, imgN.src.substr(imgN.src.indexOf(',') + 1), {base64: true});
-                }
-            }
         }
 
-
-        var content = zip.generate({'type': 'blob'});
+        console.log('generating...');
+        var content = project.zip.generate({'type': 'blob'});
+        console.log('generated');
 
         if (mode == 1) {
             saveAs(content, this.projectName + ".zip");
@@ -961,7 +996,7 @@ function showtime() {
                         // And to view in firebug
                         data = JSON.parse(xmlHttpRequest.responseText);
                         project.latest_dump  = dump;
-                        location.reload();
+                        //location.reload();
 
                     }
                 }
@@ -1221,8 +1256,8 @@ $(document).ready(function () {
 
              var manifestName = "showtime.json";
             // read the content of the file with JSZip
-            var zip = new JSZip(f);
-            manifest = zip.file(manifestName);
+            project.zip = new JSZip(f);
+            manifest = project.zip.file(manifestName);
             if (manifest) {
 
                 var data = project.loadFromJson(manifest.asText());
@@ -1235,7 +1270,7 @@ $(document).ready(function () {
 
                     for (i = 0; i < data.A.length; i++) {
                         A = data.A[i];
-                        var tempA = zip.file("A/" + A.name);
+                        var tempA = project.zip.file("A/" + A.name);
 
                         if (tempA != undefined) {
 
@@ -1263,7 +1298,7 @@ $(document).ready(function () {
 
                     for (i = 0; i < data.B.length; i++) {
                         B = data.B[i];
-                        var tempB = zip.file("B/" + B.name);
+                        var tempB = project.zip.file("B/" + B.name);
 
                         if (tempB != undefined) {
 
