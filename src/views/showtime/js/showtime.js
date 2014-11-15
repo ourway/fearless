@@ -486,10 +486,13 @@ function showtime() {
 
                     } else if (this.imgsAdata && this.imgsAdata[f]) {
                         $("#sequenceImage").prop("src", this.imgsAdata[f]);
+                            //console.log(project.folderA.files)
                         if (!project.folderA.files['A/'+ _name])
+
                         {
                                 project.folderA.file(_name, this.imgsAdata[f].substr(this.imgsAdata[f].indexOf(',')+1), {base64: true});
                                 console.log('zipped: '+_name)
+                                console.log('here');
                         }
 
 
@@ -781,9 +784,12 @@ function showtime() {
 
     this.setFiles = function (files) {
         var info;
-        project.zip = new JSZip();  // main zip file for background archiving
-        project.folderA = project.zip.folder("A");
-        project.folderB = project.zip.folder("B");
+        if (!project.zip)
+        {
+            project.zip = new JSZip();  // main zip file for background archiving
+            project.folderA = project.zip.folder("A");
+            project.folderB = project.zip.folder("B");
+        }
         switch (sequence) {
             case 1:
                 this.imgsA = files;
@@ -1256,6 +1262,8 @@ $(document).ready(function () {
             try
             {
             project.zip = new JSZip(f);
+            project.folderA = project.zip.folder("A");
+            project.folderB = project.zip.folder("B");
             manifest = project.zip.file(manifestName);
             if (manifest) {
 

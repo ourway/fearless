@@ -84,8 +84,8 @@ class SyncShow:
                             #    command = None
                             #    frames = None
                         wsock.send(json.dumps({"master" : r.get('show_%s_master'%assetId),
-                                               "frame":frame, "command":command, "note":note,
-                                               "slide":slide, 'watchers':watchers}))
+                                        "frame":frame, "command":command, "note":note,
+                                        "slide":slide, 'watchers':watchers}))
 
 
 
