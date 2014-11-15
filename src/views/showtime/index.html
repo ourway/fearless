@@ -105,12 +105,10 @@
 
 
                 <div style="color:#ccc">
-                    <ul>
-                       <li style="list-style: None" ng-repeat="ua in userShows">
-                          <a href="#/{{ua.name}}" >{{ua.description || ua.name }}</a>
-
-                       </li>
-                    </ul>
+                    <div class="showsListDiv" ng-class="{'activeShow':name==ua.name}" ng-repeat="ua in userShows">
+                           <a href="#/{{ua.name}}" ><img ng-src="{{ua.thumbnail}}" alt="{{ua.name}} thumbnail" /></a>
+                           <span>{{ua.description || ua.name }}</span>
+                    </div>
 
                 </div>
             </div>

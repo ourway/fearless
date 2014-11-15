@@ -136,7 +136,26 @@ padding-right: 10px;
     z-index: 1;
     opacity:0.75;
 }
-
+.showsListDiv {
+padding:5px;
+padding-left:15px;
+margin:1px;
+margin-left:15px;
+border:1px solid #555;
+background:#333
+}
+.showsListDiv img{
+cursor:pointer;
+}
+.activeShow{
+background:rgb(0,155,255);
+}
+.showsListDiv span{
+position: absolute;
+margin-left:10px;;
+text-decoration:none;
+color:lightgrey;
+}
 /*CONTROLS*/
 #controls{
 	display:inline-block;

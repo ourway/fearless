@@ -94,7 +94,7 @@ session.commit()
     #import shutil
 #tj = Task.get_tree(session, json=True)
 
-proj.plan
+#proj.plan
 
 print session.query(Project).join(Task).all()
 

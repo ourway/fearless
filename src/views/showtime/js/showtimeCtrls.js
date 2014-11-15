@@ -44,17 +44,20 @@ $scope.$watch(function(){return $location.$$path},
         //project.command = 'window.location = ' + $location.$$path;
         if (project && project.showSyncWs)
         {
-            clearInterval(project.showSyncWsInterval.$$intervalId);
-            project.showSyncWs.close();  // close latest websocket connection
+            //clearInterval(project.showSyncWsInterval.$$intervalId);
+            //project.showSyncWs.close();  // close latest websocket connection
             //project.imgsA = {};
             $('#thumbnails .thmb').remove();
 
-            var project = new showtime();
+            //var project = new showtime();
 
             //project.AFromFile = false;
             //project.BFromFile = false;
             goToFrame(0);
             $scope.master = false;
+            $scope.slave = false;
+            $scope.modetext = 'MASTER';
+            $scope.command = null;
             //progressPyChart.update();
             //$('.thmb').fadeOut();
     
@@ -77,8 +80,8 @@ $scope.$watch(function(){return $location.$$path},
                 $scope.modetext = 'REVIEW';
             }
             }
-        $http.post('/api/auth/getUserInfo').success(function(result){
-
+            req = $http.post('/api/auth/getUserInfo');
+            req.success(function(result){
             if (result.message == 'ERROR'){
                 window.location = '/app/#/auth/login/' + btoa('showtime');
                 return
@@ -86,6 +89,7 @@ $scope.$watch(function(){return $location.$$path},
             else {
                     //$location.path(cur);
 
+                //project = new showtime()
                 $scope.user = result
                 loc = $location.$$path
                 name = loc.slice(1)
@@ -97,7 +101,12 @@ $scope.$watch(function(){return $location.$$path},
                 if (name.length==8){
                     $scope.loading = true;
                     $scope.name = name;
-                    $http.post('/api/asset/'+$scope.name+'.zip?name=true').success(function(assetInfo){
+                    req = $http.post('/api/asset/'+$scope.name+'.zip?name=true');
+                    req.error(function(resp){
+                        if (resp.title=='Authentication required')
+                            window.location = '/app/#/auth/login/' + btoa('showtime');
+                            })
+                    req.success(function(assetInfo){
 
 
                         if (assetInfo.url) {
@@ -106,12 +115,14 @@ $scope.$watch(function(){return $location.$$path},
                                     return false;
                                     //throw err; // or handle err
                                 }
+                                var project = new showtime();
                                 loadWithFile(data);
 
 
                                 $scope.asset = assetInfo;
 
-                                project.showSyncWs = new WebSocket("ws://"+$scope.user.server.ip+":5004/media/syncshow");
+                                if (!project.showSyncWs)
+                                    project.showSyncWs = new WebSocket("ws://"+$scope.user.server.ip+":5004/media/syncshow");
                                 project.showSyncWs.onopen = function() {
                                     project.assetId = $scope.asset.id;
                                 };
@@ -205,10 +216,9 @@ $scope.$watch(function(){return $location.$$path},
                 }
                 else {
                     $scope.name = makeid();
+                    $location.path($scope.name);
                 }
-                project = new showtime()
                 project.projectName = $scope.name;
-                $location.path($scope.name);
 
 
             showtimeUserInfos = Restangular.one('api', 'showtime').getList($scope.user.id);

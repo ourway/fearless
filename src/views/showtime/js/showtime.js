@@ -138,6 +138,7 @@ function canvasInit() {
         }
         if (e.shiftKey && !project.slave)
         {
+            clearInterval(playInterval);
             x = e.offsetX;
             percent = x/currentWidth;
             goal = Math.round(project.imgsA.length * percent);
@@ -427,6 +428,7 @@ function showtime() {
         ctx = canvas.getContext("2d");
         ctx.drawImage(this, 0, 0, tWidth, tHeight);
         finalFile = canvas.toDataURL('image/jpeg'); //Always convert to png
+        project.thumbnail = finalFile
         appendix = '<a class="thmbLink" onClick="goToFrame('+_f+')"><img class="thmb" id="thmb_'+ _f +'" src="' + finalFile + '"/></a>';
         $('#thumbnails').append(appendix);
         $("#thmb_"+_f).fadeIn();
@@ -806,7 +808,7 @@ function showtime() {
         }
 
 
-    console.log(project.cutout);
+    //console.log(project.cutout);
     $("#frame").prop("max", project.cutout);
     $("#frametotal").html(project.cutout-1);
     $("#timeline").slider({max: (project.cutout)});
@@ -960,9 +962,9 @@ function showtime() {
 
         }
 
-        console.log('generating...');
+        console.log('Generating zip file...');
         var content = project.zip.generate({'type': 'blob'});
-        console.log('generated');
+        console.log('Generated.');
 
         if (mode == 1) {
             saveAs(content, this.projectName + ".zip");
@@ -972,7 +974,10 @@ function showtime() {
             if (!desc)
                 alert('Please Describe your show')
             else {
+                
                 url = '/api/asset/save/showtime?collection='+this.projectName+'&name='+this.projectName+'.zip'+'&description='+desc;
+                if (project.thumbnail)
+                    url += '&thmb=' + encodeURIComponent(project.thumbnail)
                 var xmlHttpRequest = new XMLHttpRequest();
                 xmlHttpRequest.open("PUT", url, true);
                 // subscribe to this event before you send your request.
@@ -1562,6 +1567,9 @@ $(document).ready(function () {
 
 
 var project = new showtime();
+
+
+
 function goodbye(e) {
     if (!project.latest_dump || project.latest_dump != project.encode(true)) {
         if (!e) e = window.event;

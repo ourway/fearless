@@ -35,5 +35,6 @@ chmod-socket    = 666
 chmod-socket    = 666
 #daemonize=/home/project/log
 socket={dir}/etc/fearless_api.socket
-http=127.0.0.1:5002
+#http=127.0.0.1:5002
+buffer-size=32768
 stats=/tmp/statsockt

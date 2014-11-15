@@ -37,16 +37,19 @@ class Asset(IDMixin, Base):
     key = Column(String(32), nullable=False, unique=True)
     name = Column(String(128))
     description = Column(String(512))
+    thumbnail = Column(Text())
     ext = Column(String(32))
     content_type = Column(String(64))
     version = Column(Integer, default=1)  ## asset versioning
     task_id = Column(String(64))  # celery post processing task id
     ready = Column(Boolean, default=False)  # post processing
     users = relationship('User', backref='assets', secondary='users_assets')
+    owner = relationship('User', backref='owning_assets')
     modifiers = relationship('User', backref='modifying_assets', secondary='users_assets')
     repository = relationship('Repository', backref='assets')
     path = Column(String(512))  # relative to collection path, including name
     repository_id = Column(Integer, ForeignKey('repository.id'))
+    owner_id = Column(Integer, ForeignKey('user.id'))
     collection_id = Column(
         Integer, ForeignKey('collection.id'), nullable=False)
 

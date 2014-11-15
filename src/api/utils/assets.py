@@ -17,6 +17,7 @@ import time
 import hashlib
 from cStringIO import StringIO
 import falcon
+from urllib import unquote
 import os
 from helpers import commit
 from sys import stderr
@@ -25,7 +26,7 @@ from tasks import add_asset
 from tasks import STORAGE
 from opensource.contenttype import contenttype
 from utils.validators import checkPath
-from base64 import encode, decode
+from base64 import encode, decode, decodestring
 
 # from celery.result import AsyncResult
 from models import Asset, Repository, Collection, es, session, User
@@ -58,6 +59,8 @@ class AssetSave:
             uploader = 'anonymous'
             targetRepo = session.query(Repository).filter(Repository.name == 'public').first()
 
+        targetUser = session.query(User).filter(User.alias == uploader).first()
+        
         if not targetRepo:
             pr = session.query(Repository).filter(Repository.name == repo).first()
             if not pr:
@@ -80,6 +83,7 @@ class AssetSave:
 
         body = req.stream
         b64 = req.get_param('b64')
+        thumbnail = req.get_param('thmb')
         if targetRepo and body:
             name = req.get_param('name') or 'undefined.%s.raw' % _generate_id()
             assetExt = name.split('.')[-1]
@@ -94,7 +98,7 @@ class AssetSave:
             if not asset:
                 asset = Asset(key=bodyMd5, repository=targetRepo,
                               collection=collection, name=name,
-                              path=assetPath, ext=assetExt)
+                              path=assetPath, ext=assetExt, owner=targetUser)
                 session.add(asset)
             else:
                 asset.version += 1
@@ -105,10 +109,14 @@ class AssetSave:
 
 
             asset.key = bodyMd5
-            targetUser = session.query(User).filter(User.alias == uploader).first()
             if targetUser:
                 asset.modifiers.append(targetUser)
                 asset.users.append(targetUser)
+            if thumbnail:
+                thumbnail = unquote(thumbnail)
+                asset.thumbnail = thumbnail 
+
+                
                 #newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
                 #asset.task_id = newAsset.task_id
             resp.body = {'message': 'Asset created|updated', 'key': asset.key,
@@ -224,7 +232,8 @@ class GetAsset:
             resp.body = {'url':os.path.join('/static', target.url),
                          'size':sz, 'key':target.key, 'id':target.id,
                          'version':target.version, 'datetime':target.modified_on,
-                         'last_updated_by':modifier.alias, 'descripion':target.description}
+                         'last_updated_by':modifier.alias, 'descripion':target.description,
+                         'owner':target.owner.alias, 'thumbnail':target.thumbnail}
 
 
 
