@@ -47,13 +47,13 @@ $scope.$watch(function(){return $location.$$path},
             //project.imgsA = {};
             if (project.showSyncWs)
             {
-                $('#thumbnails .thmb').remove();
+                $('.thmb').fadeOut(400);
+                $timeout(function(){
+                $('#thumbnails .thmb').remove();}, 500);
 
                 //console.log($location.$$path)
                 //var project = new showtime();
 
-                project.imgsA = [];
-                project.imgsB = [];
                 project.imgsAdata = {};
                 project.imgsBdata = {};
                 project.thumbstate = [];
@@ -66,7 +66,6 @@ $scope.$watch(function(){return $location.$$path},
             }
             //$scope.command = null;
             //progressPyChart.update();
-            //$('.thmb').fadeOut();
     
         $scope.masterme = function(){
             if (!$scope.slave && $scope.master==false)
@@ -134,7 +133,6 @@ $scope.$watch(function(){return $location.$$path},
                                     project.showSyncWs = new WebSocket("ws://"+$scope.user.server.ip+":5004/media/syncshow");
                                 project.showSyncWs.onopen = function() {
                                     //
-                                };
                                 project.showSyncWs.onmessage = function (evt) {
                                         serverMessage = JSON.parse(evt.data);
                                         project.master = serverMessage.master;
@@ -213,6 +211,7 @@ $scope.$watch(function(){return $location.$$path},
                                 }, 1000/fps)
                                 $scope.loading = false;
                                 $scope.$apply()
+                                };
                             });
                          }
 

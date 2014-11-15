@@ -140,7 +140,7 @@ function canvasInit() {
         {
             clearInterval(playInterval);
             x = e.offsetX;
-            percent = x/currentWidth;
+            percent = x/project.width;
             goal = Math.round(project.imgsA.length * percent);
             if (goal != project.currentFrame())
                 goToFrame(goal);
@@ -169,7 +169,7 @@ function goToFrame(fr) {
     $("#timeline").slider({value: (fr * 1)});
 
     progressPyChart.segments[0].value = fr;
-    progressPyChart.segments[1].value = project.imgsA.length-fr-1;
+    progressPyChart.segments[1].value = project.imgsA.length-fr;
     progressPyChart.update();
 
 }
@@ -254,6 +254,8 @@ function convertImgToBase64(data) {
     img.src = data;
 
     var canvas = document.createElement('CANVAS');
+    currentWidth = img.width;
+    currentHeight = img.height;
     canvas.width = currentWidth;
     canvas.height = currentHeight;
     var ctx = canvas.getContext('2d');
@@ -349,6 +351,8 @@ function showtime() {
                   }
                 }
 
+        project.width = currentWidth;
+        project.height = currentHeight;
         canvas.width = currentWidth;
         canvas.height = currentHeight;
 
@@ -447,7 +451,7 @@ function showtime() {
         switch (sequence) {
             case 1:
                 if (this.imgsA && this.imgsA[f]) {
-                    _name = this.imgsA[f].name;
+                    _name = pad(f+1,4) + '.jpg';
                     $('#frameFileName').html(pad(f+1, 4));
 
                     if (!this.imgsAdata[f] && this.imgsA[f] instanceof Blob) {
@@ -507,7 +511,7 @@ function showtime() {
             case 2:
 
                 if (this.imgsB && this.imgsB[f]) {
-                    _name = this.imgsB[f].name;
+                    _name = pad(f+1,4) + '.jpg';
                     $('#frameFileName').html(pad(f+1, 4));
                     if (!this.imgsBdata[f] && this.imgsB[f] instanceof Blob) {
                         var reader = new FileReader();
@@ -620,7 +624,7 @@ function showtime() {
 
         out = "<p>Frames: " + (SeqUse.length) + "</p><ol start=\"1\">";
 
-        if (SeqUse && SeqUse[0] && SeqUse[0].name) {
+        if (SeqUse && SeqUse[0]) {
 
             for (var i = 0; i < SeqUse.length; i++) {
 
@@ -632,7 +636,7 @@ function showtime() {
                 if (this.frames && this.frames[i]) {
                     notestatus += " hasDrawing"
                 }
-                out += "<li id=\"seq_" + s + "_" + i + "\" class=\"seqClick seqnum_" + i + " " + notestatus + "\">" + SeqUse[i].name + "</li>";
+                out += "<li id=\"seq_" + s + "_" + i + "\" class=\"seqClick seqnum_" + i + " " + notestatus + "\">" + i+1 + "</li>";
             }
         } else {
             for (var i = 0; i < SeqUse.length; i++) {
@@ -732,7 +736,7 @@ function showtime() {
                     //goToFrame(count);
                     fblob = convertDataURL2binaryArray(frame);
                     count +=1;
-                    videoconverted.push(new File([fblob], pad(count)+'.jpg', {type: 'image/jpeg'}));
+                    videoconverted.push(new Blob([fblob], {type: 'image/jpeg'}));
                     $('#frameFileName').html(pad(count, 4));
                     progressPyChart.segments[0].value = count;
                     progressPyChart.segments[1].value = sourceVid.duration*fps - count;
@@ -753,8 +757,8 @@ function showtime() {
 
             sourceVid.addEventListener('ended', function() {
                 project.setFiles(videoconverted);
-                progressPyChart.segments[0].value = 1;
-                progressPyChart.segments[1].value = videoconverted.length;
+                progressPyChart.segments[0].value = 0;
+                progressPyChart.segments[1].value = videoconverted.length+1;
                 progressPyChart.update();
 
                     //clearInterval(project.vit);
@@ -829,10 +833,10 @@ function showtime() {
         if (this.frames && this.frames[f] && this.frames[f] != undefined) {
             var imgN = new Image();
             imgN.src = this.frames[f];
-            context.drawImage(imgN, 0, 0, currentWidth, currentHeight);
+            context.drawImage(imgN, 0, 0, project.width, project.height);
 
         } else {
-            context.clearRect(0, 0, currentWidth, currentHeight);
+            context.clearRect(0, 0, project.width, project.height);
 
         }
 
@@ -916,6 +920,7 @@ function showtime() {
 
     this.download = function (fullEncode, mode) {
 
+        $('#sequenceImage').attr('style', 'opacity:0.25');
         //var zip = new JSZip();
         if (!project.zip)
             project.zip = new JSZip();  // main zip file for background archiving
@@ -945,7 +950,7 @@ function showtime() {
                 //progressPyChart.segments[0].value = f;
                 //progressPyChart.segments[1].value = this.imgsA.length - f;
                 //progressPyChart.update();
-                var _name = this.imgsA[f].name;
+                var _name = pad(f,4) + '.jpg';
                 if (!project.folderA.files['A/'+ _name])
                     goToFrame(f);
             }
@@ -954,7 +959,7 @@ function showtime() {
             //var img = zip.folder("A");
             for (var f = 0; f < this.imgsB.length; f++) {
                 $('#frameFileName').html(pad(f, 4));
-                var _name = this.imgsB[f].name;
+                var _name = pad(f,4) + '.jpg';
                 if (!project.folderB.files['B/'+ _name])
                     goToFrame(f);   
                 
@@ -965,6 +970,7 @@ function showtime() {
         console.log('Generating zip file...');
         var content = project.zip.generate({'type': 'blob'});
         console.log('Generated.');
+        $('#sequenceImage').attr('style', 'opacity:1');
 
         if (mode == 1) {
             saveAs(content, this.projectName + ".zip");
@@ -987,7 +993,7 @@ function showtime() {
                         // And to view in firebug
                         data = JSON.parse(xmlHttpRequest.responseText);
                         project.latest_dump  = dump;
-                        //location.reload();
+                        location.reload();
 
                     }
                 }
@@ -1263,8 +1269,7 @@ $(document).ready(function () {
 
                     for (i = 0; i < data.A.length; i++) {
                         A = data.A[i];
-                        var tempA = project.zip.file("A/" + A.name);
-
+                        var tempA = project.zip.file("A/" + pad(i+1, 4)+'.jpg');
                         if (tempA != undefined) {
 
 
@@ -1291,7 +1296,7 @@ $(document).ready(function () {
 
                     for (i = 0; i < data.B.length; i++) {
                         B = data.B[i];
-                        var tempB = project.zip.file("B/" + B.name);
+                        var tempB = project.zip.file("B/" + pad(i+1, 4)+'.jpg');
 
                         if (tempB != undefined) {
 
@@ -1489,7 +1494,7 @@ $(document).ready(function () {
     timeline = $("#timeline").slider({
         range: "min",
         /* value: $( "#frame" ).val(),*/
-        min: 1,
+        min: 0,
         max: Math.max(project.imgsA.length, project.imgsB.length),
         //range:true,
         slide: function (event, ui) {

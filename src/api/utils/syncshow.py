@@ -25,7 +25,6 @@ class SyncShow:
         # resp.set_header('Set-Cookie','fig=newton; Max-Age=200')
         # print req.get_header('Cookie')
         wsock = req.env.get('wsgi.websocket')
-        client = req.env.get('HTTP_ORIGIN')
         #client = req.env.get('HTTP_X_FORWARDED_FOR')
         if wsock:
             while True:
@@ -45,6 +44,10 @@ class SyncShow:
                     want_to_be_master = data.get('i_want_to_be_master')
                     client = json.loads(showInfo).get('client') or req.env.get('HTTP_X_FORWARDED_FOR')
                     if assetId:
+                        
+                        if not str(client) in r.lrange('show_%s_watchers'%assetId, 0, -1):
+                            r.rpush('show_%s_watchers'%assetId, client)
+                            r.expire('show_%s_watchers'%assetId, 1)
                         master = r.get('show_%s_master'%assetId)
                         if want_to_be_master: # Asset is unlocked
                             if master and str(client) != master:  ## check if not other master
@@ -68,6 +71,7 @@ class SyncShow:
                         frame = r.get('show_%s_frame'%assetId)
                         note = r.get('show_%s_note'%assetId)
                         slide = r.get('show_%s_slide'%assetId)
+                        watchers = r.lrange('show_%s_watchers'%assetId, 0, -1)
                             #note = json.loads(note)
                         if r.getset('show_%s_%s_latest_command'% (assetId, client), command) == command:
                             command = None
@@ -80,7 +84,8 @@ class SyncShow:
                             #    command = None
                             #    frames = None
                         wsock.send(json.dumps({"master" : r.get('show_%s_master'%assetId),
-                                               "frame":frame, "command":command, "note":note, "slide":slide}))
+                                               "frame":frame, "command":command, "note":note,
+                                               "slide":slide, 'watchers':watchers}))
 
 
 
