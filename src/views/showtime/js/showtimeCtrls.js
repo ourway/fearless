@@ -128,11 +128,12 @@ $scope.$watch(function(){return $location.$$path},
 
 
                                 $scope.asset = assetInfo;
+                                project.assetId = $scope.asset.id;
 
                                 if (!project.showSyncWs)
                                     project.showSyncWs = new WebSocket("ws://"+$scope.user.server.ip+":5004/media/syncshow");
                                 project.showSyncWs.onopen = function() {
-                                    project.assetId = $scope.asset.id;
+                                    //
                                 };
                                 project.showSyncWs.onmessage = function (evt) {
                                         serverMessage = JSON.parse(evt.data);
