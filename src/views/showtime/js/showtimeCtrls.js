@@ -54,10 +54,10 @@ $scope.$watch(function(){return $location.$$path},
             //project.AFromFile = false;
             //project.BFromFile = false;
             goToFrame(0);
-            $scope.master = false;
+            //$scope.master = false;
             $scope.slave = false;
             $scope.modetext = 'MASTER';
-            $scope.command = null;
+            //$scope.command = null;
             //progressPyChart.update();
             //$('.thmb').fadeOut();
     
@@ -115,7 +115,7 @@ $scope.$watch(function(){return $location.$$path},
                                     return false;
                                     //throw err; // or handle err
                                 }
-                                var project = new showtime();
+                                //var project = new showtime();
                                 loadWithFile(data);
 
 
@@ -150,20 +150,20 @@ $scope.$watch(function(){return $location.$$path},
                                     
                                         if ($scope.user.id != project.master){
 
-                                            if (serverMessage.note){
-                                                //console.log(serverMessage.note)
+                                            if (serverMessage.note && serverMessage.note!='None'){
                                                 var note = serverMessage.note;
-                                                if (note == 'None')
-                                                    delete project.notes[JSON.parse(serverMessage.slide)]
-                                                else
                                                     project.notes[JSON.parse(serverMessage.slide)] = note;
-                                                project.getNotes();
                                             }
+                                            else
+                                                delete project.notes[JSON.parse(serverMessage.slide)]
                                             if (serverMessage.frame && serverMessage.frame != 'None'){
                                                 var frame = serverMessage.frame;
-                                                project.frames[JSON.parse(serverMessage.slide)] = frame;
-                                                project.getNotes();
+                                                    project.frames[JSON.parse(serverMessage.slide)] = frame;
                                             }
+                                            else
+                                                delete project.frames[JSON.parse(serverMessage.slide)]
+                                            project.getNotes();
+
                                         }
 
 

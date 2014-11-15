@@ -71,10 +71,10 @@ class SyncShow:
                             #note = json.loads(note)
                         if r.getset('show_%s_%s_latest_command'% (assetId, client), command) == command:
                             command = None
-                        if r.getset('show_%s_%s_latest_frame'% (assetId, client), frame) == frame:
-                            frame = None
-                        if r.getset('show_%s_%s_latest_note'% (assetId, client), note) == note:
-                            note = None
+                        #if r.getset('show_%s_%s_latest_frame'% (assetId, client), frame) == frame:
+                        #    frame = None
+                        #if r.getset('show_%s_%s_latest_note'% (assetId, client), note) == note:
+                        #    note = None
 
                         #if master == str(client): ## dont send command to its issuer
                             #    command = None

@@ -37,7 +37,7 @@ es = Elasticsearch()
 
 # db number 1 and 2 are for celery
 r = redis.StrictRedis(host='localhost', port=6379, db=3)
-r.flushdb()
+#r.flushdb()
 
 from db import session, engine, Base
 

@@ -983,7 +983,7 @@ function showtime() {
                 // subscribe to this event before you send your request.
                 xmlHttpRequest.onreadystatechange = function () {
                     if (xmlHttpRequest.readyState == 4) {
-                        //alert the user that a response now exists in the responseTest property.
+                        //alert the userme that a response now exists in the responseTest property.
                         // And to view in firebug
                         data = JSON.parse(xmlHttpRequest.responseText);
                         project.latest_dump  = dump;
@@ -1314,7 +1314,7 @@ $(document).ready(function () {
                 sequence = startSequence;
                 project.setBackground();
                 //goToNextFrame()
-                startPlaying();
+                //startPlaying();
             } else {
                 alert("No Manifest found...");
             }
@@ -1444,10 +1444,14 @@ $(document).ready(function () {
             note = $("#frameNotes").val();
             project.command = 'project.getNotes('+f+','+JSON.stringify(note)+')';
             project.setNote(f, note);
-            if (/^[\x00-\x7F]+$/.test(note) && note) //false
+            if (note)
+            {
+
+            if (/^[\x00-\x7F]+$/.test(note)) //false
                 $('#frameNotes').attr('style', 'direction:ltr');
             else
                 $('#frameNotes').attr('style', 'direction:rtl');
+            }
             //project.command = 'project.setNote('+ f +', "'+ note +'")';
 
         });
