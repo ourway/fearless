@@ -42,26 +42,32 @@ function makeid()
 $scope.$watch(function(){return $location.$$path},
     function(){
         //project.command = 'window.location = ' + $location.$$path;
-        if (project && project.showSyncWs)
-        {
             //clearInterval(project.showSyncWsInterval.$$intervalId);
             //project.showSyncWs.close();  // close latest websocket connection
             //project.imgsA = {};
-            $('#thumbnails .thmb').remove();
+            if (project.showSyncWs)
+            {
+                $('#thumbnails .thmb').remove();
 
-            //var project = new showtime();
+                //console.log($location.$$path)
+                //var project = new showtime();
 
-            //project.AFromFile = false;
-            //project.BFromFile = false;
-            goToFrame(0);
-            //$scope.master = false;
-            $scope.slave = false;
-            $scope.modetext = 'MASTER';
+                project.imgsA = [];
+                project.imgsB = [];
+                project.imgsAdata = {};
+                project.imgsBdata = {};
+                project.thumbstate = [];
+                //project.BFromFile = false;
+
+                goToFrame(0);
+                $scope.master = false;
+                $scope.slave = false;
+                $scope.modetext = 'MASTER';
+            }
             //$scope.command = null;
             //progressPyChart.update();
             //$('.thmb').fadeOut();
     
-        }
         $scope.masterme = function(){
             if (!$scope.slave && $scope.master==false)
             {
@@ -101,6 +107,8 @@ $scope.$watch(function(){return $location.$$path},
                 if (name.length==8){
                     $scope.loading = true;
                     $scope.name = name;
+                    //var project = new showtime();
+                    project.projectName = $scope.name;
                     req = $http.post('/api/asset/'+$scope.name+'.zip?name=true');
                     req.error(function(resp){
                         if (resp.title=='Authentication required')
@@ -216,9 +224,9 @@ $scope.$watch(function(){return $location.$$path},
                 }
                 else {
                     $scope.name = makeid();
+                    project.projectName = $scope.name;
                     $location.path($scope.name);
                 }
-                project.projectName = $scope.name;
 
 
             showtimeUserInfos = Restangular.one('api', 'showtime').getList($scope.user.id);
