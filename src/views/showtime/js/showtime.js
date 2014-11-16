@@ -55,6 +55,15 @@ function pad(num, size) {
     return s;
 }
 
+function addText(c, text, x, y, fontSize, opacity){
+    var ctx = c.getContext("2d");
+    ctx.fillStyle = "#ccc";
+    ctx.globalAlpha = opacity;
+    ctx.font = fontSize + "px monospace";
+    ctx.fillText(text,x,y);
+    ctx.globalAlpha = 1;
+    return null;
+}
 
 function timestamp(f) {
     //f = f*20;
@@ -319,6 +328,42 @@ function toggleChannelButtons() {
 };
 
 
+function updateImageSize(originalWidth, originalHeight){
+    var maxWidth = 960,
+        maxHeight = 540,
+        currentWidth = originalWidth,
+        currentHeight = originalHeight;
+    console.log(currentHeight)
+
+    if (currentWidth > currentHeight) {
+      if (currentWidth > maxWidth) {
+        currentHeight *= maxWidth / currentWidth;
+        currentWidth = maxWidth;
+      }
+    }
+    else {
+      if (currentHeight > maxHeight) {
+        currentWidth *= maxHeight / currentHeight;
+        currentHeight = maxHeight;
+      }
+    }
+
+    project.width = currentWidth;
+    project.height = currentHeight;
+    canvas.width = currentWidth;
+    canvas.height = currentHeight;
+    console.log(currentHeight)
+
+    $("#canvasDiv").css("width", currentWidth + 'px');
+    $("#canvasDiv").css("height", currentHeight + 'px');
+
+    $("#canvas").css("width", currentWidth + 'px');
+    $("#canvas").css("height", currentHeight + 'px');
+
+    $("#sequenceImage").css("width", canvas.width + 'px');
+    $("#sequenceImage").css("height", canvas.height + 'px');
+}
+
 /*Class for storing the Sequence Data.*/
 function showtime() {
     this.projectName = "";
@@ -358,37 +403,7 @@ function showtime() {
         var img1 = new Image();
         img1.onload = function() {
             // this
-                var maxWidth = 960,
-                    maxHeight = 540,
-                    currentWidth = this.width,
-                    currentHeight = this.height;
-
-                if (currentWidth > currentHeight) {
-                  if (currentWidth > maxWidth) {
-                    currentHeight *= maxWidth / currentWidth;
-                    currentWidth = maxWidth;
-                  }
-                }
-                else {
-                  if (currentHeight > maxHeight) {
-                    currentWidth *= maxHeight / currentHeight;
-                    currentHeight = maxHeight;
-                  }
-                }
-
-        project.width = currentWidth;
-        project.height = currentHeight;
-        canvas.width = currentWidth;
-        canvas.height = currentHeight;
-
-        $("#canvasDiv").css("width", currentWidth + 'px');
-        $("#canvasDiv").css("height", currentHeight + 'px');
-
-        $("#canvas").css("width", currentWidth + 'px');
-        $("#canvas").css("height", currentHeight + 'px');
-
-        $("#sequenceImage").css("width", canvas.width + 'px');
-        $("#sequenceImage").css("height", canvas.height + 'px');
+                updateImageSize(this.width, this.height);
         }
 
         img1.src = dataURL;
@@ -753,6 +768,8 @@ function showtime() {
                 if (sourceVid.readyState==4){
                     frameSave();
                 }
+                else
+                    console.log('wooooooowowowowoowoooooooooooo')
             });
 
 
@@ -761,32 +778,42 @@ function showtime() {
                 //hCanvas.width = sourceVid.videoWidth;
                 //hCanvas.height = sourceVid.videoHeight;
                   //hContext.drawImage(sourceVid, 0, 0, sourceVid.videoWidth, sourceVid.videoHeight);
-                hContext.drawImage(sourceVid,0,0,sourceVid.videoWidth, sourceVid.videoHeight, 0,0,hCanvas.width,hCanvas.height);
-                  
-                //project.encoder.add(hContext);  //make a video
+                if (!count)
+                {
+                    updateImageSize(sourceVid.videoWidth, sourceVid.videoHeight);
+                    hCanvas.width = project.width;
+                    hCanvas.height = project.height;
+                }
+                console.log(project.width, project.height);
+                console.log(hCanvas.height);
+                hContext.drawImage(sourceVid,0,0,sourceVid.videoWidth, sourceVid.videoHeight, 0,0,project.width,project.height);
+                addText(hCanvas, 'FearLess® ShowTime™', 10, hCanvas.height-16, 16, 0.5);
+                addText(hCanvas, 'Asset ID: '+ project.projectName + ' | ' + timestamp(count+1), 10, hCanvas.height-36, 10, 1);
+                project.encoder.add(hContext);  //make a video
                 frame = hCanvas.toDataURL('image/webp');
-                    show.src = frame;
 
-                    switch (sequence) {
-                        case 1:
-                            project.imgsAdata[count] = frame;
-                        case 2:
-                            project.imgsBdata[count] = frame;
+                show.src = frame;
+
+                switch (sequence) {
+                    case 1:
+                        project.imgsAdata[count] = frame;
+                    case 2:
+                        project.imgsBdata[count] = frame;
+                }
+                //goToFrame(count);
+                fblob = convertDataURL2binaryArray(frame);
+                project.cutout = Math.floor(sourceVid.duration*fps);
+                project.addThumb(frame, count);
+                videoconverted.push(new Blob([fblob], {type: 'image/webp'}));
+                $('#frameFileName').html(pad(count+1, 4));
+                progressPyChart.segments[0].value = count+1;
+                progressPyChart.segments[1].value = project.cutout - count + 1;
+                progressPyChart.update();
+                count +=1;
+                if (!sourceVid.ended)
+                    {
+                    sourceVid.currentTime = sourceVid.currentTime + 1/fps;
                     }
-                    //goToFrame(count);
-                    fblob = convertDataURL2binaryArray(frame);
-                    project.cutout = Math.floor(sourceVid.duration*fps);
-                    project.addThumb(frame, count);
-                    videoconverted.push(new Blob([fblob], {type: 'image/webp'}));
-                    $('#frameFileName').html(pad(count+1, 4));
-                    progressPyChart.segments[0].value = count+1;
-                    progressPyChart.segments[1].value = project.cutout - count + 1;
-                    progressPyChart.update();
-                    count +=1;
-                    if (!sourceVid.ended)
-                        {
-                        sourceVid.currentTime = sourceVid.currentTime + 1/fps;
-                        }
                     //project.addThumb(frame);
 
 
@@ -806,6 +833,7 @@ function showtime() {
                 progressPyChart.segments[0].value = 0;
                 progressPyChart.segments[1].value = videoconverted.length+1;
                 progressPyChart.update();
+                project.video = project.encoder.compile();
 
                     //clearInterval(project.vit);
             });
