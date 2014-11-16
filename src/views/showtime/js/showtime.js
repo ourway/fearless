@@ -285,7 +285,7 @@ function convertImgToBase64(data) {
     canvas.height = currentHeight;
     var ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0, currentWidth, currentHeight);
-    dataURL = canvas.toDataURL("image/jpeg");
+    dataURL = canvas.toDataURL("image/webp");
     canvas = null;
     img = null;
     return dataURL;
@@ -462,7 +462,7 @@ function showtime() {
         canvas.height = tHeight ;
         ctx = canvas.getContext("2d");
         ctx.drawImage(this, 0, 0, tWidth, tHeight);
-        finalFile = canvas.toDataURL('image/jpeg'); //Always convert to png
+        finalFile = canvas.toDataURL('image/webp'); //Always convert to png
         project.thumbnail = finalFile
         appendix = '<a class="thmbLink" id="thmbA_'+ _f +'" onClick="goToFrame('+_f+')"><img class="thmb" id="thmb_'+ _f +'" src="' + finalFile + '"/></a>';
         $('#thumbnails').append(appendix);
@@ -484,14 +484,13 @@ function showtime() {
         switch (sequence) {
             case 1:
                 if (this.imgsA && this.imgsA[f]) {
-                    _name = pad(f+1,4) + '.jpg';
+                    _name = pad(f+1,4) + '.webp';
 
                     if (!this.imgsAdata[f] && this.imgsA[f] instanceof Blob) {
                         var reader = new FileReader();
 
                         reader.onload = function (e) {
                             var dataURL = reader.result;
-
                             $("#sequenceImage").prop("src", convertImgToBase64(dataURL));
 
                             if (project.imgsAdata && project.imgsAdata[f] == undefined) {
@@ -524,7 +523,6 @@ function showtime() {
                         {
                                 project.folderA.file(_name, this.imgsAdata[f].substr(this.imgsAdata[f].indexOf(',')+1), {base64: true});
                                 console.log('zipped: '+_name)
-                                console.log('here');
                         }
 
 
@@ -546,7 +544,7 @@ function showtime() {
             case 2:
 
                 if (this.imgsB && this.imgsB[f]) {
-                    _name = pad(f+1,4) + '.jpg';
+                    _name = pad(f+1,4) + '.webp';
                     if (!this.imgsBdata[f] && this.imgsB[f] instanceof Blob) {
                         var reader = new FileReader();
 
@@ -695,6 +693,7 @@ function showtime() {
 
     
     this.makeVideo = function(file){
+        project.encoder = new Whammy.Video(fps); 
         var reader = new FileReader();
             if (!project.imgsAdata)
                 project.imgsAdata = {};
@@ -730,23 +729,11 @@ function showtime() {
             //canvas.width = currentWidth;
             //canvas.height = currentHeight;
             var hContext = hCanvas.getContext('2d');
-            sourceVid.addEventListener('play', function() {
-                runAnalysis();
+            sourceVid.addEventListener('timeupdate', function() {
+                console.log('here')
+                frameSave();
             });
 
-            var runAnalysis = function() {
-
-            if (sourceVid.paused || sourceVid.ended) {
-                return
-            }
-            
-            frameSave();
-                if (window.requestAnimationFrame) {
-                    requestAnimationFrame(runAnalysis);
-                } else {
-                    setTimeout(runAnalysis, 0);
-                }
-            };
 
             var frameSave = function()
             {
@@ -755,11 +742,9 @@ function showtime() {
                   //hContext.drawImage(sourceVid, 0, 0, sourceVid.videoWidth, sourceVid.videoHeight);
                 hContext.drawImage(sourceVid,0,0,sourceVid.videoWidth, sourceVid.videoHeight, 0,0,hCanvas.width,hCanvas.height);
                   
-                frame = hCanvas.toDataURL('image/jpeg');
-                if (frame && lastframe!=frame)
-                {
+                //project.encoder.add(hContext);  //make a video
+                frame = hCanvas.toDataURL('image/webp');
                     show.src = frame;
-                    lastframe = frame;
 
                     switch (sequence) {
                         case 1:
@@ -769,17 +754,20 @@ function showtime() {
                     }
                     //goToFrame(count);
                     fblob = convertDataURL2binaryArray(frame);
-                    count +=1;
                     project.cutout = Math.floor(sourceVid.duration*fps);
                     project.addThumb(frame, count);
-                    videoconverted.push(new Blob([fblob], {type: 'image/jpeg'}));
-                    $('#frameFileName').html(pad(count, 4));
-                    progressPyChart.segments[0].value = count;
-                    progressPyChart.segments[1].value = project.cutout - count;
+                    videoconverted.push(new Blob([fblob], {type: 'image/webp'}));
+                    $('#frameFileName').html(pad(count+1, 4));
+                    progressPyChart.segments[0].value = count+1;
+                    progressPyChart.segments[1].value = project.cutout - count + 1;
                     progressPyChart.update();
+                    count +=1;
+                    if (!sourceVid.ended)
+                        {
+                        sourceVid.currentTime = sourceVid.currentTime + 1/fps;
+                        }
                     //project.addThumb(frame);
 
-                }
 
                   //duration = imgsData.length - 1
                   //if (frame != imgsData[duration]) 
@@ -801,8 +789,9 @@ function showtime() {
             });
 
             sourceVid.addEventListener('loadeddata', function() {
-                sourceVid.playbackRate = .5;
-                sourceVid.play();
+                //sourceVid.playbackRate = .2;
+                //sourceVid.play();
+                sourceVid.currentTime = 0;  //start update time
             }
 
             );
@@ -989,7 +978,7 @@ function showtime() {
                 //progressPyChart.segments[0].value = f;
                 //progressPyChart.segments[1].value = this.imgsA.length - f;
                 //progressPyChart.update();
-                var _name = pad(f,4) + '.jpg';
+                var _name = pad(f,4) + '.webp';
                 if (!project.folderA.files['A/'+ _name])
                     goToFrame(f);
             }
@@ -998,7 +987,7 @@ function showtime() {
             //var img = zip.folder("A");
             for (var f = 0; f < this.imgsB.length; f++) {
                 $('#frameFileName').html(pad(f, 4));
-                var _name = pad(f,4) + '.jpg';
+                var _name = pad(f,4) + '.webp';
                 if (!project.folderB.files['B/'+ _name])
                     goToFrame(f);   
                 
@@ -1313,11 +1302,11 @@ $(document).ready(function () {
 
                     for (i = 0; i < data.A.length; i++) {
                         A = data.A[i];
-                        var tempA = project.zip.file("A/" + pad(i+1, 4)+'.jpg');
+                        var tempA = project.zip.file("A/" + pad(i+1, 4)+'.webp');
                         if (tempA != undefined) {
 
 
-                            newImgs[i] = "data:" + 'image/jpeg' + ";base64," + btoa(tempA.asBinary());
+                            newImgs[i] = "data:" + 'image/webp' + ";base64," + btoa(tempA.asBinary());
 
                         }
                     }
@@ -1340,7 +1329,7 @@ $(document).ready(function () {
 
                     for (i = 0; i < data.B.length; i++) {
                         B = data.B[i];
-                        var tempB = project.zip.file("B/" + pad(i+1, 4)+'.jpg');
+                        var tempB = project.zip.file("B/" + pad(i+1, 4)+'.webp');
 
                         if (tempB != undefined) {
 
