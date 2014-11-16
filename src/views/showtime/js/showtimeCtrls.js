@@ -50,10 +50,14 @@ $scope.$watch(function(){return $location.$$path},
                 $('.thmb').fadeOut(400);
                 $timeout(function(){
                 $('#thumbnails .thmb').remove();}, 500);
-
+                
                 //console.log($location.$$path)
                 //var project = new showtime();
-
+                //location.reload()
+                project.imgsA = [];
+                project.imgsB = [];
+                project.zip = null;
+                project.video = null;
                 project.imgsAdata = {};
                 project.imgsBdata = {};
                 project.thumbstate = [];

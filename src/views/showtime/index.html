@@ -79,7 +79,7 @@
 
 
 
-            <div id="canvasWrapper" style="margin-top: -25px;">
+            <div id="canvasWrapper" >
             
                 <div ng-if="asset.version" id="detailinfo">
                 <span >
@@ -103,12 +103,12 @@
 		</div><!-- END canvasWrapper -->
         </td><td style="padding-left: 10px;vertical-align: top;width:30%">
 
-            <div id="sidebar" style="margin:auto;width:250px;border-left: 1px solid #303030;min-height:200px">
+            <div id="sidebar" >
 
 
                 <div style="color:#ccc">
                     <div class="showsListDiv" ng-class="{'activeShow':name==ua.name}" ng-repeat="ua in userShows">
-                           <a href="#/{{ua.name}}" ><img ng-src="{{ua.thumbnail}}" alt="{{ua.name}} thumbnail" /></a>
+                           <a href="#/{{ua.name}}" ><img class="showListThmbs" height="48" ng-src="{{ua.thumbnail}}" alt="{{ua.name}} thumbnail" /></a>
                            <span>{{ua.description || ua.name }}</span>
                     </div>
 

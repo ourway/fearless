@@ -14,6 +14,25 @@ a:active {color:#13aff0;} /* selected link e14d43 2373cc */
   display: none !important;
 }
 
+::-webkit-scrollbar {
+    width: 4px;
+    background-color: #111;
+}
+::-webkit-scrollbar-track {
+    background-color: #333;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #444;
+}
+::-webkit-scrollbar-botton {
+    background-color: #ccc;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background-color: #777;
+}
+
+
 body {
 	background-color: #222;
 	position:relative;
@@ -42,19 +61,34 @@ color:grey;
 }
 #canvasWrapper
 {
+    margin-top: -25px;
+min-height: 640px;
 	width: 100%;
 	/*background: url('../images/background.png') #1c1d1e repeat;*/
 	padding: 2em;
 
+}
+.showListThmbs{
+
+box-shadow: 1px 1px 5px #000;
+}
+#sidebar {
+overflow: auto;
+height: 540px;
+/* margin: auto; */
+width: 80%;
+padding:4px;
+padding-right:0px;
+box-shadow: inset 1px 1px 20px #111;
 }
 #canvasDiv
 {
 	margin: auto;
 	position:relative;
 	width: 960px;
-	height: 540px;
 	outline: 1px solid rgba(255,255,255,.1);
 	cursor: crosshair;
+
 }
 #myvid{
 opacity:0;
@@ -65,6 +99,7 @@ opacity:0;
 	z-index: 1000;
 	margin:auto;
 	width:100%;
+    box-shadow: inset 1px 1px 10px #111;
 }
 #vidcanvas 
 {
@@ -79,7 +114,7 @@ opacity:0;
 	z-index:0;
 	width:auto;
 	height:auto;
-    box-shadow: 2px 15px 50px #111;
+    box-shadow: 2px 2px 20px #111;
 
 }
 }
@@ -157,9 +192,9 @@ box-shadow: inset 3px 2px 4px rgba(0, 0, 0, 0.9);
 padding:5px;
 padding-left:15px;
 margin:1px;
-margin-left:15px;
-border:1px solid #555;
-background:#333
+background:#333;
+height: 64px;
+box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 1);
 }
 .showsListDiv img{
 cursor:pointer;
@@ -168,7 +203,7 @@ cursor:pointer;
 background:rgb(0,155,255);
 }
 .showsListDiv span{
-position: absolute;
+vertical-align: top;
 margin-left:10px;;
 text-decoration:none;
 color:lightgrey;

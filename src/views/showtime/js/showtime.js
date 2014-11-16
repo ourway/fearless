@@ -703,7 +703,7 @@ function showtime() {
                 if (this.frames && this.frames[i]) {
                     notestatus += " hasDrawing"
                 }
-                out += "<li id=\"seq_" + s + "_" + i + "\" class=\"seqClick seqnum_" + i + " " + notestatus + "\">" + i+1 + "</li>";
+                out += "<li id=\"seq_" + s + "_" + i + "\" class=\"seqClick seqnum_" + i + " " + notestatus + "\">" + (project.notes[i] || '') + "</li>";
             }
         } else {
             for (var i = 0; i < SeqUse.length; i++) {
