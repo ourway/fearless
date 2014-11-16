@@ -38,12 +38,36 @@ var allowKBD = true;
 /*Image paths*/
 var imageUrl = "../images/hideicon.svg";
 
+function sort_thumbs(){
+   $(".thmbLink").sort(function (a, b) {
+        return (parseInt(a.id.split('_')[1])) > (parseInt(b.id.split('_')[1])) ? 1 : -1;
+    }).appendTo("#thumbnails");
+   
+
+    }
+
+
+
+
 function pad(num, size) {
     var s = num+"";
     while (s.length < size) s = "0" + s;
     return s;
 }
 
+
+function timestamp(f) {
+    //f = f*20;
+    _seconds = Math.floor(f/fps);  // 127
+    minutes = Math.floor(_seconds/60);
+    seconds = _seconds % 60;
+    //minute = 
+    fr = f%fps;
+    result = '00:' + pad(minutes,2) + ':' + pad(seconds, 2 )+ '.' + pad(fr, 2); 
+    //console.log(result);
+    return result;
+
+    }
 var convertDataURL2binaryArray = function(dataURL){
 
     var blobBin = atob(dataURL.split(',')[1]);
@@ -171,6 +195,7 @@ function goToFrame(fr) {
     progressPyChart.segments[0].value = fr;
     progressPyChart.segments[1].value = project.imgsA.length-fr;
     progressPyChart.update();
+    //timestamp(fr+4);
 
 }
 
@@ -383,7 +408,7 @@ function showtime() {
         $("#bInfo").html("");
         $("#sequenceImage").prop('src', '');
         $("#frame").prop("max", 0);
-        $("#frametotal").html(1);
+        $("#frametotal").html(timestamp(1));
         $("#timeline").slider({max: 1});
     }
 
@@ -414,14 +439,20 @@ function showtime() {
 //////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////
-    this.addThumb = function(data){
+    this.addThumb = function(data, frameNumber){
+        
+
+
         img = new Image()
         img.onload = function(){
         ratio = this.width/this.height;
         tWidth = 96;
         tHeight= tWidth/ratio;
-        skips = Math.ceil(project.imgsA.length/(($(window).width()-200)/tWidth))
-        _f = project.currentFrame()
+        skips = Math.ceil(project.cutout/(($(window).width()-200)/tWidth))
+        if (!frameNumber)
+            _f = project.currentFrame();
+        else
+            _f = frameNumber;
         if (_f%skips) {
             project.thumbstate[_f] = true;
             return null;
@@ -433,11 +464,12 @@ function showtime() {
         ctx.drawImage(this, 0, 0, tWidth, tHeight);
         finalFile = canvas.toDataURL('image/jpeg'); //Always convert to png
         project.thumbnail = finalFile
-        appendix = '<a class="thmbLink" onClick="goToFrame('+_f+')"><img class="thmb" id="thmb_'+ _f +'" src="' + finalFile + '"/></a>';
+        appendix = '<a class="thmbLink" id="thmbA_'+ _f +'" onClick="goToFrame('+_f+')"><img class="thmb" id="thmb_'+ _f +'" src="' + finalFile + '"/></a>';
         $('#thumbnails').append(appendix);
         $("#thmb_"+_f).fadeIn();
         project.thumbstate[_f] = true;
         canvas = null;
+        sort_thumbs();
         }
         img.src = data;
         img=null;
@@ -446,13 +478,13 @@ function showtime() {
 
     this.setBackground = function () {
         var f = this.currentFrame();
-
-        $('#frameFileFum').html((Number(f)) + 1);
+        ts = timestamp(Number(f)+1);
+        $('#frameFileFum').html(ts);
+        $('#frameFileName').html('<span>'+pad(f+1, 4)+'</span><br><span id="timestamp">'+ ts +'</span>');
         switch (sequence) {
             case 1:
                 if (this.imgsA && this.imgsA[f]) {
                     _name = pad(f+1,4) + '.jpg';
-                    $('#frameFileName').html(pad(f+1, 4));
 
                     if (!this.imgsAdata[f] && this.imgsA[f] instanceof Blob) {
                         var reader = new FileReader();
@@ -515,7 +547,6 @@ function showtime() {
 
                 if (this.imgsB && this.imgsB[f]) {
                     _name = pad(f+1,4) + '.jpg';
-                    $('#frameFileName').html(pad(f+1, 4));
                     if (!this.imgsBdata[f] && this.imgsB[f] instanceof Blob) {
                         var reader = new FileReader();
 
@@ -739,10 +770,12 @@ function showtime() {
                     //goToFrame(count);
                     fblob = convertDataURL2binaryArray(frame);
                     count +=1;
+                    project.cutout = Math.floor(sourceVid.duration*fps);
+                    project.addThumb(frame, count);
                     videoconverted.push(new Blob([fblob], {type: 'image/jpeg'}));
                     $('#frameFileName').html(pad(count, 4));
                     progressPyChart.segments[0].value = count;
-                    progressPyChart.segments[1].value = sourceVid.duration*fps - count;
+                    progressPyChart.segments[1].value = project.cutout - count;
                     progressPyChart.update();
                     //project.addThumb(frame);
 
@@ -820,7 +853,7 @@ function showtime() {
 
     //console.log(project.cutout);
     $("#frame").prop("max", project.cutout);
-    $("#frametotal").html(project.cutout-1);
+    $("#frametotal").html(timestamp(project.cutout + 1));
     $("#timeline").slider({max: (project.cutout)});
 
 
@@ -1210,6 +1243,9 @@ $(document).ready(function () {
                 playInterval = undefined;
                 startPlaying();
             }
+            
+        $("#frametotal").html(timestamp(project.cutout + 1));
+        project.setBackground();
 
         });
         $(window).resize(function(){
@@ -1468,6 +1504,8 @@ $(document).ready(function () {
             //project.command = 'project.setNote('+ f +', "'+ note +'")';
 
         });
+
+
 
         $("#info").click(function (e) {
             if (($(e.target)).hasClass("seqClick")) {

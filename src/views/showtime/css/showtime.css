@@ -28,6 +28,9 @@ p {
 	color: white;
 	margin-left: .5em;
 }
+#frametotal{
+color:grey;
+}
 #pageWrapper {
 	position:relative;
 	/*width: 1200px;*/
@@ -130,6 +133,20 @@ border-radius: 3px;
 padding-left: 10px;
 padding-right: 10px;
 }
+#timestamp{
+font-size: 10px;
+position: absolute;
+margin-left: -32px;
+margin-top: -30px;
+color:#000;
+}
+
+.ui-widget-header {
+color: rgb(0,155,255);
+box-shadow: inset 3px 2px 4px rgba(0, 0, 0, 0.9);
+}
+
+
 #progressChart{
     margin-top: 8px;
     position: absolute;
@@ -167,9 +184,11 @@ color:lightgrey;
     padding-left:1px;
     border:1px solid #333;
     opacity: 0.75;
+    vertical-align: middle;
 }
 .thmbLink{
     cursor: pointer;
+    vertical-align: middle;
 }
 .thmbLink :hover {
     opacity:1;
@@ -179,6 +198,10 @@ color:lightgrey;
 position: relative;
 padding-left:24px;
 padding-right:24px;
+box-shadow: inset 9px 1px 9px rgba(0, 0, 0, 0.9);
+padding-top: 5px;
+padding-bottom: 5px;
+min-height: 64px;
 /* bottom: 5px; */
 }
 #timeline{
