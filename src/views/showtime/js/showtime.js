@@ -486,6 +486,16 @@ function showtime() {
                 if (this.imgsA && this.imgsA[f]) {
                     _name = pad(f+1,4) + '.webp';
 
+                    if (!this.imgsAdata[f] && this.imgsA[f].type) {
+                        var tempA = project.zip.file("A/" + pad(f+1, 4)+'.webp');
+                        if (tempA)
+                            {
+                                this.imgsAdata[f] = "data:" + 'image/webp' + ";base64," + btoa(tempA.asBinary());
+                                $("#sequenceImage").prop("src", this.imgsAdata[f]);
+                                if (!this.thumbstate[f])
+                                    this.addThumb(this.imgsAdata[f]);
+                            }
+                        }
                     if (!this.imgsAdata[f] && this.imgsA[f] instanceof Blob) {
                         var reader = new FileReader();
 
@@ -545,6 +555,16 @@ function showtime() {
 
                 if (this.imgsB && this.imgsB[f]) {
                     _name = pad(f+1,4) + '.webp';
+                    if (!this.imgsBdata[f] && this.imgsB[f].type) {
+                        var tempB = project.zip.file("B/" + pad(f+1, 4)+'.webp');
+                        if (tempB)
+                            {
+                                this.imgsBdata[f] = "data:" + 'image/webp' + ";base64," + btoa(tempB.asBinary());
+                                $("#sequenceImage").prop("src", this.imgsBdata[f]);
+                                if (!this.thumbstate[f])
+                                    this.addThumb(this.imgsBdata[f]);
+                            }
+                        }
                     if (!this.imgsBdata[f] && this.imgsB[f] instanceof Blob) {
                         var reader = new FileReader();
 
@@ -701,8 +721,8 @@ function showtime() {
                 project.imgsBdata = {};
             var videoconverted = [];
             var lastframe = null;
-            var count = 0;
 
+                var count = 0;
         reader.onprogress = function(evt){
            if (evt.lengthComputable)
            {  //evt.loaded the bytes browser receive
@@ -730,8 +750,9 @@ function showtime() {
             //canvas.height = currentHeight;
             var hContext = hCanvas.getContext('2d');
             sourceVid.addEventListener('timeupdate', function() {
-                console.log('here')
-                frameSave();
+                if (sourceVid.readyState==4){
+                    frameSave();
+                }
             });
 
 
@@ -781,6 +802,7 @@ function showtime() {
 
             sourceVid.addEventListener('ended', function() {
                 project.setFiles(videoconverted);
+                sourceVid.src = '';
                 progressPyChart.segments[0].value = 0;
                 progressPyChart.segments[1].value = videoconverted.length+1;
                 progressPyChart.update();
@@ -789,9 +811,9 @@ function showtime() {
             });
 
             sourceVid.addEventListener('loadeddata', function() {
-                //sourceVid.playbackRate = .2;
-                //sourceVid.play();
-                sourceVid.currentTime = 0;  //start update time
+                if (sourceVid.readyState==4){
+                    sourceVid.currentTime = 0;  //start update time
+                }
             }
 
             );
@@ -1293,20 +1315,18 @@ $(document).ready(function () {
             if (manifest) {
 
                 var data = project.loadFromJson(manifest.asText());
-
                 var startSequence = sequence;
 
                 if (data.A.length > 0) {
 
                     var newImgs = [];
 
-                    for (i = 0; i < data.A.length; i++) {
-                        A = data.A[i];
+                    for (i = 0; i < 1; i++) {
+                        //A = data.A[i];
                         var tempA = project.zip.file("A/" + pad(i+1, 4)+'.webp');
-                        if (tempA != undefined) {
-
-
+                        if (tempA) {
                             newImgs[i] = "data:" + 'image/webp' + ";base64," + btoa(tempA.asBinary());
+
 
                         }
                     }
@@ -1327,7 +1347,7 @@ $(document).ready(function () {
 
                     var newImgs = [];
 
-                    for (i = 0; i < data.B.length; i++) {
+                    for (i = 0; i < 1; i++) {
                         B = data.B[i];
                         var tempB = project.zip.file("B/" + pad(i+1, 4)+'.webp');
 
