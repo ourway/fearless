@@ -59,6 +59,9 @@ color:grey;
 	margin-left: auto;
 	margin-right:auto;
 }
+#fxCanvas{
+display:none;
+}
 #canvasWrapper
 {
     margin-top: -25px;

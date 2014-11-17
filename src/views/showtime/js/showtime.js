@@ -65,6 +65,20 @@ function addText(c, text, x, y, fontSize, opacity){
     return null;
 }
 
+
+function postProcess(dataURL, f){
+    Caman("#fxCanvas", dataURL, function () {
+      this.exposure(-10);
+      this.render(function () {
+        img = this.toBase64();
+        project.imgsAdata[f] = img;
+        $('#sequenceImage')[0].src = img;
+        //this.brightness(1);
+      });
+
+    });
+}
+
 function timestamp(f) {
     //f = f*20;
     _seconds = Math.floor(f/fps);  // 127
@@ -173,12 +187,14 @@ function canvasInit() {
         {
             clearInterval(playInterval);
             x = e.offsetX;
-            percent = x/project.width;
-            goal = Math.round(project.imgsA.length * percent);
+            w = $("#canvas").width();
+            l = project.imgsA.length;
+            percent = (x*l)/w;
+            goal = Math.round(percent);
             if (goal != project.currentFrame())
                 {
                 goToFrame(goal);
-                project.command = 'goToFrame('+ goal +')';
+                project.command = 'f='+ goal +';';
                 }
         }
     });
@@ -199,9 +215,9 @@ function canvasInit() {
 function goToFrame(fr) {
     $("#frame").val(fr * 1);
     //project.command = 'goToFrame('+fr+')';
-    project.setBackground();
     context.clearRect(0, 0, canvas.width, canvas.height);
     project.getNotes();
+    project.setBackground();
     $("#timeline").slider({value: (fr * 1)});
     ts = timestamp(Number(fr)+1);
     $('#frameFileFum').html(ts);
@@ -510,11 +526,12 @@ function showtime() {
                             {
                                 this.imgsAdata[f] = "data:" + 'image/webp' + ";base64," + btoa(tempA.asBinary());
                                 $("#sequenceImage").prop("src", this.imgsAdata[f]);
+                                //postProcess(_data, f);
                                 if (!this.thumbstate[f])
                                     this.addThumb(this.imgsAdata[f]);
                             }
                         }
-                    if (!this.imgsAdata[f] && this.imgsA[f] instanceof Blob) {
+                    else if (!this.imgsAdata[f] && this.imgsA[f] instanceof Blob) {
                         var reader = new FileReader();
 
                         reader.onload = function (e) {
@@ -583,7 +600,7 @@ function showtime() {
                                     this.addThumb(this.imgsBdata[f]);
                             }
                         }
-                    if (!this.imgsBdata[f] && this.imgsB[f] instanceof Blob) {
+                    else if (!this.imgsBdata[f] && this.imgsB[f] instanceof Blob) {
                         var reader = new FileReader();
 
                         reader.onload = function (e) {
@@ -786,6 +803,7 @@ function showtime() {
                     hCanvas.width = project.width;
                     hCanvas.height = project.height;
                 }
+
                 /*
                 new QRCode(document.getElementById("qrcode"), {
                     text: "http://jindo.dev.naver.com/collie",
@@ -1086,7 +1104,6 @@ function showtime() {
                     }
                 }
                 xmlHttpRequest.send(content);
-                project.command = 'setTimeout(function(){location.reload();goToFrame('+project.currentFrame()+');}, 1000)';
                 setTimeout(function(){
                     project.command = 'goToFrame('+project.currentFrame()+')';
                 }, 1000)
@@ -1170,7 +1187,19 @@ $(document).ready(function () {
         $("#canvasDiv").mousemove(function (e) {
             showNibAtEvent(e);
         });
-
+        $("#thumbnails").mousemove(function (e) {
+            x = e.clientX;
+            w = $("#timeline").width();
+            l = project.imgsA.length;
+            percent = (x*l)/w;
+            goal = Math.round(percent);
+            if (goal != project.currentFrame())
+                {
+                goToFrame(goal);
+                project.command = 'f='+ goal +';';
+                }
+            //console.log(goal);
+        });
         $("#canvasDiv").mouseleave(function (e) {
             nib.style.display = "none";
         });
@@ -1294,8 +1323,8 @@ $(document).ready(function () {
                 startPlaying();
             }
             
-        $("#frametotal").html(timestamp(project.cutout + 1));
-        project.setBackground();
+            $("#frametotal").html(timestamp(project.cutout + 1));
+            project.setBackground();
 
         });
         $(window).resize(function(){
@@ -1360,24 +1389,37 @@ $(document).ready(function () {
 
                     var newImgs = [];
 
-                    for (i = 0; i < 1; i++) {
                         //A = data.A[i];
-                        var tempA = project.zip.file("A/" + pad(i+1, 4)+'.webp');
+                        var tempA = project.zip.file("A/" + pad(1, 4)+'.webp');
                         if (tempA) {
-                            newImgs[i] = "data:" + 'image/webp' + ";base64," + btoa(tempA.asBinary());
+                            newImgs[0] = "data:" + 'image/webp' + ";base64," + btoa(tempA.asBinary());
                             ts = timestamp(1);
                             $('#frameFileFum').html(ts);
                             $('#frameFileName').html('<span>'+pad(fr, 4)+'</span><br><span id="timestamp">'+ ts +'</span>');
 
                         }
-                    }
 
                     if (newImgs.length > 0) {
                         sequence = 1;
                         project.setFiles(data.A);
                         project.imgsAdata = newImgs;
-
                         project.setCurrentWidthFromImageSource(project.imgsAdata[0]);
+                        project.latestImageExtracted = 0;
+                        project.thumbInterval = setInterval(function(){
+                            var _A = project.zip.file("A/" + pad(project.latestImageExtracted+1, 4)+'.webp');
+                            if (_A)
+                                {
+                                _d = "data:" + 'image/webp' + ";base64," + btoa(_A.asBinary());
+                                project.imgsAdata[project.latestImageExtracted] = _d;
+                                if (!project.thumbstate[project.latestImageExtracted])
+                                    {
+                                    project.addThumb(_d, project.latestImageExtracted);
+                                    }
+                                }
+                            project.latestImageExtracted +=1;
+                            if (project.latestImageExtracted==data.A.length)
+                                clearInterval(project.thumbInterval);
+                                }, 1000/(fps*5));
                     }
 
 
@@ -1388,19 +1430,16 @@ $(document).ready(function () {
 
                     var newImgs = [];
 
-                    for (i = 0; i < 1; i++) {
-                        B = data.B[i];
-                        var tempB = project.zip.file("B/" + pad(i+1, 4)+'.webp');
+                        var tempB = project.zip.file("B/" + pad(1, 4)+'.webp');
 
                         if (tempB != undefined) {
 
 
-                            newImgs[i] = "data:" + B.type + ";base64," + btoa(tempB.asBinary());
+                            newImgs[0] = "data:" + B.type + ";base64," + btoa(tempB.asBinary());
 
                         }
 
 
-                    }
 
 
                     if (newImgs.length > 0) {
@@ -1597,7 +1636,7 @@ $(document).ready(function () {
         slide: function (event, ui) {
             if (!project.slave)
             {
-                project.command = 'goToFrame('+ ui.value +')';
+                project.command = 'f=' + project.currentFrame() + ';';
                 goToFrame(ui.value);
                 progressPyChart.segments[0].value = ui.value;
                 progressPyChart.segments[1].value = project.imgsA.length-ui.value-1;
@@ -1624,22 +1663,26 @@ $(document).ready(function () {
 
                 case 37: //LEFT ARROW
                     e.preventDefault();
+                    project.command = 'f='+project.currentFrame() + ';';
                     goToLastFrame();
 
                     break;
                 case 65: //A: strafe left in video games
                     e.preventDefault();
+                    project.command = 'f='+project.currentFrame() + ';';
                     goToLastFrame();
 
                     break;
 
                 case 39: //RIGHT ARROW
                     e.preventDefault();
+                    project.command = 'f='+project.currentFrame() + ';';
                     goToNextFrame(false);
 
                     break;
                 case 68: //D: strafe left in video games
                     e.preventDefault();
+                    project.command = 'f='+project.currentFrame() + ';';
                     goToNextFrame(false);
 
                     break;
