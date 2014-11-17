@@ -133,11 +133,13 @@ def remove_asset(name):
 
 
 @app.task
-def send_envelope(to, subject, message, attach=None):
+def send_envelope(to, cc, bcc, subject, message, attach=None):
     envelope = Envelope(
         from_addr=(u'farsheed.ashouri@gmail.com',
-                   u'Pooyamehr PMS'),
+                   u'Pooyamehr Fearless Notification'),
         to_addr=to,
+        cc_addr=cc,
+        bcc_addr=bcc,
         subject=subject,
         html_body=message
     )

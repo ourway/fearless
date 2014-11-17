@@ -65,3 +65,19 @@ def punish(self, req, resp):
         resp.body = {
             'message': 'error', 'info': 'You need to wait!', 'wait': 5}
         return
+
+
+
+def get_params(stream, flat=True):
+    '''Return a string out of url params for query
+    '''
+    if not stream:
+        return {}
+    data = stream.read()
+    if not data:
+        return {}
+    stream = json.loads(data)
+    if not flat:
+        return stream
+    l = ','.join(['%s="%s"' % (i, stream[i]) for i in stream])
+    return l

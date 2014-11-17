@@ -31,23 +31,10 @@ from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
     Verify, Reactivate, Reset, Logout, GetUserInfo
 from utils.showtime import GetUserShows
+from utils.helpers import get_params
 
 tables = [i for i in av if i[0] in ascii_uppercase]
 
-
-def get_params(stream, flat=True):
-    '''Return a string out of url params for query
-    '''
-    if not stream:
-        return {}
-    data = stream.read()
-    if not data:
-        return {}
-    stream = json.loads(data)
-    if not flat:
-        return stream
-    l = ','.join(['%s="%s"' % (i, stream[i]) for i in stream])
-    return l
 
 
 class ThingsResource:
