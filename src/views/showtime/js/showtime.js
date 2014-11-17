@@ -475,6 +475,24 @@ function showtime() {
 //////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////
+    //
+    this.addToWebm = function(data){
+        img = new Image();
+        img.onload = function(){
+        var canvas = document.createElement('canvas');
+        canvas.width = this.width;
+        canvas.height = this.height;
+        ctx = canvas.getContext("2d");
+        ctx.drawImage(this, 0, 0);
+        project.encoder.add(canvas);
+        //finalFile = canvas.toDataURL('image/webp'); //Always convert to png
+        //console.log(finalFile);
+        }
+        img.src = data;
+        img=null;
+    }
+
+
     this.addThumb = function(data, frameNumber){
         
 
@@ -482,14 +500,20 @@ function showtime() {
         img = new Image()
         img.onload = function(){
         ratio = this.width/this.height;
-        tWidth = 96;
+        tWidth = 64;
         tHeight= tWidth/ratio;
-        skips = Math.ceil(project.cutout/(($(window).width()-200)/tWidth))
+        padding_leftS = $('#thumbnails').css('padding-left');
+        padding_rightS = $('#thumbnails').css('padding-right');
+        padding_left = parseInt(padding_leftS.substr(0,padding_leftS.search('px')));
+        padding_right = parseInt(padding_rightS.substr(0,padding_rightS.search('px')));
+        padding = padding_left + padding_right;
+        project.ThumbsCount = Math.ceil(($('#thumbnails').width()-padding)/(tWidth+2));
+        skips = Math.ceil(project.cutout/project.ThumbsCount);
         if (!frameNumber)
             _f = project.currentFrame();
         else
             _f = frameNumber;
-        if (_f%skips) {
+        if (_f%skips || _f/skips<1) {
             project.thumbstate[_f] = true;
             return null;
         }
@@ -748,7 +772,6 @@ function showtime() {
 
     
     this.makeVideo = function(file){
-        project.encoder = new Whammy.Video(fps); 
         var reader = new FileReader();
             if (!project.imgsAdata)
                 project.imgsAdata = {};
@@ -884,6 +907,7 @@ function showtime() {
 
     this.setFiles = function (files) {
         var info;
+        project.encoder = new Whammy.Video(fps); 
         if (!project.zip)
         {
             project.zip = new JSZip();  // main zip file for background archiving
@@ -1187,17 +1211,30 @@ $(document).ready(function () {
         $("#canvasDiv").mousemove(function (e) {
             showNibAtEvent(e);
         });
+        project.latestThumbOver = 0;
         $("#thumbnails").mousemove(function (e) {
             x = e.clientX;
             w = $("#timeline").width();
             l = project.imgsA.length;
             percent = (x*l)/w;
             goal = Math.round(percent);
+            target = e.target.id;
+            //Tgoal = goal;
+            if (target != 'thumbnails'){
+                _f = parseInt(target.split('_')[1]);
+                if (project.currentFrame() != _f && target != project.latestThumbOver)
+                    {
+                    //goToFrame(_f);
+                    //Tgoal = _f;
+                    project.latestThumbOver = target;
+                     }
+            
             if (goal != project.currentFrame())
                 {
                 goToFrame(goal);
                 project.command = 'f='+ goal +';';
                 }
+            }
             //console.log(goal);
         });
         $("#canvasDiv").mouseleave(function (e) {
@@ -1406,6 +1443,7 @@ $(document).ready(function () {
                         project.setCurrentWidthFromImageSource(project.imgsAdata[0]);
                         project.latestImageExtracted = 0;
                         project.thumbInterval = setInterval(function(){
+                            
                             var _A = project.zip.file("A/" + pad(project.latestImageExtracted+1, 4)+'.webp');
                             if (_A)
                                 {
@@ -1414,12 +1452,16 @@ $(document).ready(function () {
                                 if (!project.thumbstate[project.latestImageExtracted])
                                     {
                                     project.addThumb(_d, project.latestImageExtracted);
+                                    //project.addToWebm(_d);
                                     }
                                 }
                             project.latestImageExtracted +=1;
                             if (project.latestImageExtracted==data.A.length)
+                                {
                                 clearInterval(project.thumbInterval);
-                                }, 1000/(fps*5));
+                                //project.video = project.encoder.compile();
+                                }
+                            }, 1000/(fps*5));
                     }
 
 

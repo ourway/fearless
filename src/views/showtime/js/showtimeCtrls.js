@@ -61,6 +61,8 @@ $scope.$watch(function(){return $location.$$path},
                 project.imgsAdata = {};
                 project.imgsBdata = {};
                 project.thumbstate = [];
+                clearInterval(project.thumbInterval);
+                clearInterval(playInterval);
                 //project.BFromFile = false;
 
                 //goToFrame(0);

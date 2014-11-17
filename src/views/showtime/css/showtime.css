@@ -236,7 +236,7 @@ display:none;
     vertical-align: middle;
 }
 .thmbLink{
-    cursor: pointer;
+    cursor: pointer; 
     vertical-align: middle;
 }
 .thmbLink :hover {
@@ -245,10 +245,9 @@ display:none;
 }
 #thumbnails{
 position: relative;
-padding-left:24px;
-padding-right:24px;
+padding-left:9px;
 box-shadow: inset 9px 1px 9px rgba(0, 0, 0, 0.9);
-padding-top: 5px;
+padding-top: 10px;
 padding-bottom: 5px;
 min-height: 64px;
 /* bottom: 5px; */
