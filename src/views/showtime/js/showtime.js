@@ -770,6 +770,7 @@ function showtime() {
             var hContext = hCanvas.getContext('2d');
             sourceVid.addEventListener('timeupdate', function() {
                 show.src = frameSave();
+                return null;
             });
 
 
@@ -840,6 +841,7 @@ function showtime() {
                 progressPyChart.segments[0].value = 0;
                 progressPyChart.segments[1].value = videoconverted.length+1;
                 progressPyChart.update();
+                return null
                 //project.video = project.encoder.compile();
 
                     //clearInterval(project.vit);
@@ -848,6 +850,7 @@ function showtime() {
             sourceVid.addEventListener('loadeddata', function() {
                 if (sourceVid.readyState==4){
                     sourceVid.currentTime = 0;  //start update time
+                    return null;
                 }
             }
 
@@ -1035,7 +1038,7 @@ function showtime() {
                 //progressPyChart.segments[0].value = f;
                 //progressPyChart.segments[1].value = this.imgsA.length - f;
                 //progressPyChart.update();
-                var _name = pad(f,4) + '.webp';
+                var _name = pad(f+1,4) + '.webp';
                 if (!project.folderA.files['A/'+ _name])
                     goToFrame(f);
             }
@@ -1044,7 +1047,7 @@ function showtime() {
             //var img = zip.folder("A");
             for (var f = 0; f < this.imgsB.length; f++) {
                 $('#frameFileName').html(pad(f, 4));
-                var _name = pad(f,4) + '.webp';
+                var _name = pad(f+1,4) + '.webp';
                 if (!project.folderB.files['B/'+ _name])
                     goToFrame(f);   
                 
