@@ -176,7 +176,10 @@ function canvasInit() {
             percent = x/project.width;
             goal = Math.round(project.imgsA.length * percent);
             if (goal != project.currentFrame())
+                {
                 goToFrame(goal);
+                project.command = 'goToFrame('+ goal +')';
+                }
         }
     });
 
@@ -195,12 +198,14 @@ function canvasInit() {
 
 function goToFrame(fr) {
     $("#frame").val(fr * 1);
-    project.command = 'goToFrame('+fr+')';
+    //project.command = 'goToFrame('+fr+')';
     project.setBackground();
     context.clearRect(0, 0, canvas.width, canvas.height);
     project.getNotes();
     $("#timeline").slider({value: (fr * 1)});
-
+    ts = timestamp(Number(fr)+1);
+    $('#frameFileFum').html(ts);
+    $('#frameFileName').html('<span>'+pad(fr+1, 4)+'</span><br><span id="timestamp">'+ ts +'</span>');
     progressPyChart.segments[0].value = fr;
     progressPyChart.segments[1].value = project.imgsA.length-fr;
     progressPyChart.update();
@@ -261,14 +266,16 @@ function goToLastFrame() {
 
 /*Create an interval object to play the sequence at the correct rate.*/
 function startPlaying(f) {
-    if (f)
-        goToFrame(f);
+    //if (f)
+    //    goToFrame(f);
     //project.command='startPlaying('+project.currentFrame()+')';
     if (playInterval == undefined) { //only start the interval if it isn't already playing
         playInterval = setInterval(function () {
-            goToNextFrame(true)
+            goToNextFrame(true);
 
         }, (1000 / fps));
+
+        project.command = 'startPlaying('+ f +')';
     }
 }
 
@@ -333,7 +340,6 @@ function updateImageSize(originalWidth, originalHeight){
         maxHeight = 540,
         currentWidth = originalWidth,
         currentHeight = originalHeight;
-    console.log(currentHeight)
 
     if (currentWidth > currentHeight) {
       if (currentWidth > maxWidth) {
@@ -352,7 +358,6 @@ function updateImageSize(originalWidth, originalHeight){
     project.height = currentHeight;
     canvas.width = currentWidth;
     canvas.height = currentHeight;
-    console.log(currentHeight)
 
     $("#canvasDiv").css("width", currentWidth + 'px');
     $("#canvasDiv").css("height", currentHeight + 'px');
@@ -493,9 +498,7 @@ function showtime() {
 
     this.setBackground = function () {
         var f = this.currentFrame();
-        ts = timestamp(Number(f)+1);
-        $('#frameFileFum').html(ts);
-        $('#frameFileName').html('<span>'+pad(f+1, 4)+'</span><br><span id="timestamp">'+ ts +'</span>');
+
         switch (sequence) {
             case 1:
                 if (this.imgsA && this.imgsA[f]) {
@@ -784,12 +787,23 @@ function showtime() {
                     hCanvas.width = project.width;
                     hCanvas.height = project.height;
                 }
-                console.log(project.width, project.height);
-                console.log(hCanvas.height);
+                /*
+                new QRCode(document.getElementById("qrcode"), {
+                    text: "http://jindo.dev.naver.com/collie",
+                    width: 96,
+                    height: 96,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                    });
+                qr = $('#qrcode canvas')[0];
+                */
                 hContext.drawImage(sourceVid,0,0,sourceVid.videoWidth, sourceVid.videoHeight, 0,0,project.width,project.height);
+                //hContext.globalAlpha = 0.5
+                //hContext.drawImage(qr,project.width-96,project.height-96);
                 addText(hCanvas, 'FearLess® ShowTime™', 10, hCanvas.height-16, 16, 0.5);
                 addText(hCanvas, 'Asset ID: '+ project.projectName + ' | ' + timestamp(count+1), 10, hCanvas.height-36, 10, 1);
-                project.encoder.add(hContext);  //make a video
+                //project.encoder.add(hContext);  //make a video
                 frame = hCanvas.toDataURL('image/webp');
 
                 show.src = frame;
@@ -833,7 +847,7 @@ function showtime() {
                 progressPyChart.segments[0].value = 0;
                 progressPyChart.segments[1].value = videoconverted.length+1;
                 progressPyChart.update();
-                project.video = project.encoder.compile();
+                //project.video = project.encoder.compile();
 
                     //clearInterval(project.vit);
             });
@@ -1271,6 +1285,7 @@ $(document).ready(function () {
 
                 clearInterval(playInterval);
                 playInterval = undefined;
+                project.command = 'clearInterval(playInterval);playInterval = undefined;goToFrame('+project.currentFrame()+')';
             }
             return false;
         });
@@ -1354,7 +1369,9 @@ $(document).ready(function () {
                         var tempA = project.zip.file("A/" + pad(i+1, 4)+'.webp');
                         if (tempA) {
                             newImgs[i] = "data:" + 'image/webp' + ";base64," + btoa(tempA.asBinary());
-
+                            ts = timestamp(1);
+                            $('#frameFileFum').html(ts);
+                            $('#frameFileName').html('<span>'+pad(fr, 4)+'</span><br><span id="timestamp">'+ ts +'</span>');
 
                         }
                     }
@@ -1398,7 +1415,8 @@ $(document).ready(function () {
 
                 }
                 sequence = startSequence;
-                project.setBackground();
+                goToFrame(0);
+
                 //goToNextFrame()
                 //startPlaying();
             } else {
@@ -1406,7 +1424,7 @@ $(document).ready(function () {
             }
             }
         catch(err) {
-            console.log(err);
+            alert(err);
             $('#frameFileName').html('ER:(');
         }
 
@@ -1583,6 +1601,7 @@ $(document).ready(function () {
         slide: function (event, ui) {
             if (!project.slave)
             {
+                project.command = 'goToFrame('+ ui.value +')';
                 goToFrame(ui.value);
                 progressPyChart.segments[0].value = ui.value;
                 progressPyChart.segments[1].value = project.imgsA.length-ui.value-1;
@@ -1632,9 +1651,11 @@ $(document).ready(function () {
                     e.preventDefault();
                     if (playInterval == undefined) {
                         startPlaying();
+                        project.command = 'startPlaying('+project.currentFrame()+')';
                     } else {
                         clearInterval(playInterval);
                         playInterval = undefined;
+                        project.command = 'clearInterval(playInterval);playInterval = undefined;goToFrame('+project.currentFrame()+')';
                     }
 
 

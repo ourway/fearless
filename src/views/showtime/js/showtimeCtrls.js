@@ -45,7 +45,7 @@ $scope.$watch(function(){return $location.$$path},
             //clearInterval(project.showSyncWsInterval.$$intervalId);
             //project.showSyncWs.close();  // close latest websocket connection
             //project.imgsA = {};
-            if (project.showSyncWs)
+            if (project && project.showSyncWs)
             {
                 $('.thmb').fadeOut(400);
                 $timeout(function(){
@@ -63,7 +63,7 @@ $scope.$watch(function(){return $location.$$path},
                 project.thumbstate = [];
                 //project.BFromFile = false;
 
-                goToFrame(0);
+                //goToFrame(0);
                 $scope.master = false;
                 $scope.slave = false;
                 $scope.modetext = 'MASTER';
@@ -78,9 +78,6 @@ $scope.$watch(function(){return $location.$$path},
                 //project.master = true;
                 project.slave = false;
                 $scope.modetext = 'MASTER';
-                $timeout(function(){
-                        project.command = 'goToFrame(' + project.currentFrame() + ')';
-                    }, 500);
             }
             else
             {
@@ -178,10 +175,12 @@ $scope.$watch(function(){return $location.$$path},
                                         }
 
 
-                                        if (($scope.user.id != project.master) && (serverMessage.command != project.command) && serverMessage.command != 'None')
+                                        if ($scope.slave && (serverMessage.command != project.command) && serverMessage.command != 'None')
                                         {
                                             project.command = serverMessage.command;
                                             //console.log(serverMessage.command);
+                                            
+                                            goToFrame(JSON.parse(serverMessage.slide));
                                             eval(serverMessage.command)  // server tels me what to do
 
                                         
@@ -199,20 +198,20 @@ $scope.$watch(function(){return $location.$$path},
                                         if (project.assetId)
                                         {
                                             if ($scope.master){
-                                                f = project.currentFrame()
+                                                f = project.currentFrame();
                                                 frame =  project.frames[f];
                                                     dataToSend = JSON.stringify({'id':project.assetId,
                                                         'command':project.command, 'client':$scope.user.id,
                                                         'frame':frame,
                                                         'slide': f,
-                                                        'i_want_to_be_master':$scope.master, 'note':project.notes[f]});
+                                                        'i_want_to_be_master':true, 'note':project.notes[f]});
                                             }
                                             else
                                                 dataToSend = JSON.stringify({'id':project.assetId, 'client':$scope.user.id});
                                             
                                             project.showSyncWs.send(dataToSend)
                                         }
-                                }, 1000/fps)
+                                }, 250)
                                 $scope.loading = false;
                                 $scope.$apply()
                                 };
@@ -224,13 +223,26 @@ $scope.$watch(function(){return $location.$$path},
 
 
                     })
+                    /*
+                    $('#qrcode canvas, #qrcode img').remove();
+                     xx = new QRCode(document.getElementById("qrcode"), {
+                                        text: window.location.href,
+                                        width: 256,
+                                        render:'table',
+                                        height: 256,
+                                        colorDark : "#222",
+                                        colorLight : "#ffffff",
+                                        correctLevel : QRCode.CorrectLevel.H
+                                        });
+                    */
                     // here I should try to load data from asset server
                 }
                 else {
                     $scope.name = makeid();
                     project.projectName = $scope.name;
                     $location.path($scope.name);
-                }
+
+                                    }
 
 
             showtimeUserInfos = Restangular.one('api', 'showtime').getList($scope.user.id);

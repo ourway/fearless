@@ -103,13 +103,16 @@
 		</div><!-- END canvasWrapper -->
         </td><td style="padding-left: 10px;vertical-align: top;width:30%">
 
+        <div ><a id="qrcode"></a></div>
+<br/>
+<br/>
             <div id="sidebar" >
 
 
                 <div style="color:#ccc">
                     <div class="showsListDiv" ng-class="{'activeShow':name==ua.name}" ng-repeat="ua in userShows">
-                           <a href="#/{{ua.name}}" ><img class="showListThmbs" height="48" ng-src="{{ua.thumbnail}}" alt="{{ua.name}} thumbnail" /></a>
-                           <span>{{ua.description || ua.name }}</span>
+                           <a title="{{ua.description || ua.name }}" href="#/{{ua.name}}" ><img class="showListThmbs" height="54" width="96" ng-src="{{ua.thumbnail}}" alt="{{ua.name}} thumbnail" /></a>
+                           <p></p>
                     </div>
 
                 </div>
@@ -120,7 +123,7 @@
           </td></tr>
         </table>
         </div>
-		<div id="controls">
+        <div id="controls">
 			<div id="timeline"></div>
             <div id="thumbnails"></div>
 			<div ng-show="!slave" id="timelineControls">
@@ -216,6 +219,7 @@
     <script src='../js/vendor/angular-cookies.min.js'></script>
     <script src='../js/vendor/restangular.min.js'></script>
     <script src='../js/vendor/Chart.min.js'></script>
+    <script src='../js/vendor/qrcode.min.js'></script>
     <script type="text/javascript" src='js/showtimeCtrls.js'> </script>
 	<script src='js/spectrum.js'></script>
 	<script src='js/slider.js'></script>
