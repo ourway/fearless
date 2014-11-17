@@ -12,7 +12,7 @@
 var canvas;
 var context;
 var currentWidth = 960;
-var currentHeight = 540;
+var currentHeight = 480;
 var timeline;
 
 /*Drawing Vars*/
@@ -353,7 +353,7 @@ function toggleChannelButtons() {
 
 function updateImageSize(originalWidth, originalHeight){
     var maxWidth = 960,
-        maxHeight = 540,
+        maxHeight = 480,
         currentWidth = originalWidth,
         currentHeight = originalHeight;
 
@@ -1229,12 +1229,12 @@ $(document).ready(function () {
                     project.latestThumbOver = target;
                      }
             
+            }
             if (goal != project.currentFrame())
                 {
                 goToFrame(goal);
                 project.command = 'f='+ goal +';';
                 }
-            }
             //console.log(goal);
         });
         $("#canvasDiv").mouseleave(function (e) {

@@ -35,6 +35,7 @@ class User(IDMixin, Base):
     '''
     email = Column(String(64), unique=True, nullable=False)
     password = Column(PasswordType(schemes=['pbkdf2_sha512']), nullable=False)
+    avatar = Column(Text())
     token = Column(String(64), default=getUUID, unique=True)
     firstname = Column(String(64), nullable=True)
     alias = Column(String(64), nullable=True, unique=True)
@@ -42,6 +43,8 @@ class User(IDMixin, Base):
     lastLogIn = Column(DateTime)
     age = Column(Integer)
     efficiency = Column(Float(precision=3), default=0.75)
+    cell = Column(String(16))
+    address = Column(String(512))
     daily_working_hours = Column(Integer, default=8)
     off_days = Column(String(32), default='fri')
     latest_session_id = Column(String(64))

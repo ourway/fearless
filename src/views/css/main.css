@@ -8,9 +8,10 @@
   display: none !important;
 }
 
-
-
-
+#profileImageDiv :hover{
+    opacity: .75;
+    cursor:pointer;
+}
 
 
 

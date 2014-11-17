@@ -63,6 +63,7 @@ $scope.$watch(function(){return $location.$$path},
                 project.thumbstate = [];
                 clearInterval(project.thumbInterval);
                 clearInterval(playInterval);
+                project.latestImageExtracted = 0;
                 //project.BFromFile = false;
 
                 //goToFrame(0);

@@ -32,6 +32,7 @@ class Mailer(object):
         message = stream.get('message')
         attach = stream.get('attach')
         if subject and to and message:
+            message += '<br/><br/>Yours,<br/>fearless&trade; team.'
             mail = send_envelope.delay(to, subject, message, attach)
             data = {'message': 'ok', 'task_id': mail.task_id}
         else:

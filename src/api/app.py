@@ -17,6 +17,7 @@ from falcon_patch import falcon
 import importlib
 from utils.helpers import commit, jsonify
 import urlparse
+from urllib import unquote
 from string import ascii_uppercase
 import ujson as json
 from utils.assets import AssetSave, ListAssets, GetAsset
@@ -25,6 +26,7 @@ from gevent import wsgi
 from models import __all__ as av
 from models import *
 import uwsgi
+
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
     Verify, Reactivate, Reset, Logout, GetUserInfo
@@ -33,16 +35,18 @@ from utils.showtime import GetUserShows
 tables = [i for i in av if i[0] in ascii_uppercase]
 
 
-def get_params(url, flat=True):
+def get_params(stream, flat=True):
     '''Return a string out of url params for query
     '''
-    urlinfo = urlparse.urlparse(url)
-    params = urlparse.parse_qs(urlinfo.query)
-    for param in params:
-        params[param] = params[param][0]
+    if not stream:
+        return {}
+    data = stream.read()
+    if not data:
+        return {}
+    stream = json.loads(data)
     if not flat:
-        return params
-    l = ','.join(['%s="%s"' % (i, params[i]) for i in params])
+        return stream
+    l = ','.join(['%s="%s"' % (i, stream[i]) for i in stream])
     return l
 
 
@@ -97,7 +101,7 @@ class DB:
     def on_put(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
-        query_params = get_params(req.uri)
+        query_params = get_params(req.stream)
         insert_cmd = '{t}({q})'.format(t=table, q=query_params)
         try:
             new = eval(insert_cmd)
@@ -111,18 +115,22 @@ class DB:
         # commit()
 
     @falcon.after(commit)
-    def on_patch(self, req, resp, **kw):
+    def on_post(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
+        if len(args)<5:
+            resp.status = falcon.HTTP_400
+            return
         id = args[4]
         # lets get the table data
         query = 'session.query({t}).filter({t}.id=={id})'.format(
             t=table, id=int(id))
         result = eval(query)
         ##
-        query_params = get_params(req.uri, flat=False)
-        result.update(query_params)
-        resp.status = falcon.HTTP_202
+        query_params = get_params(req.stream, flat=False)
+        if result.update(query_params):
+            resp.status = falcon.HTTP_202
+            resp.body = {'message':'updated'}
         #query = 'result({q})'.format(q=query_params)
         # print eval(query)
 

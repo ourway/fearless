@@ -9,6 +9,11 @@ fearlessApp.factory('authFactory', function($resource) {
 
 
 
+
+
+
+
+
 	fearlessApp.config(function($routeProvider, $locationProvider) {
 		$routeProvider
 
@@ -52,6 +57,42 @@ fearlessApp.factory('authFactory', function($resource) {
                 templateUrl: 'pages/auth/profile.html',
                 controller: 'profileCtrl'
             })		 })
+
+
+
+function updateImageSize(img, maxWidth, maxHeight){
+        currentWidth = img.width,
+        currentHeight = img.height;
+
+    if (currentWidth > currentHeight) {
+      if (currentWidth > maxWidth) {
+        currentHeight *= maxWidth / currentWidth;
+        currentWidth = maxWidth;
+      }
+    }
+    else {
+      if (currentHeight > maxHeight) {
+        currentWidth *= maxHeight / currentHeight;
+        currentHeight = maxHeight;
+      }
+    }
+
+        var canvas = document.createElement('canvas');
+        canvas.width = currentWidth
+        canvas.height = currentHeight ;
+        ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, currentWidth, currentHeight);
+
+        result = canvas.toDataURL('image/webp');
+        canvas.width = canvas.width;
+        return result;
+}
+
+
+
+
+
+
 
 
 	// create the controller and inject Angular's $scope
@@ -104,8 +145,10 @@ fearlessApp.factory('authFactory', function($resource) {
                 setTimeout(function(){$scope.login_wait=null}, resp.wait);
                if (resp.message=='success' && $scope.loginInfo.action=='login') //green light
                     {
-                        $cookies.userid = resp.id;
-                        $cookies.username = resp.firstname;
+                        localStorage.setItem('userid', resp.id);
+                        localStorage.setItem('username', resp.firstname);
+                        if (resp.avatar != 'null')
+                            localStorage.setItem('avatar', resp.avatar);
                         $scope.userInfo.username = resp.firstname;
                         $scope.userInfo.userid = resp.id;
                         $('#loginSubmitButton').text('Done!')
@@ -146,8 +189,9 @@ fearlessApp.factory('authFactory', function($resource) {
 
     // logout actions
     $scope.doLogout = function(){
-            $cookies.userid = '';
-            $cookies.username = '';
+            localStorage.setItem('userid', '');
+            localStorage.setItem('username', '');
+            localStorage.setItem('avatar', '');
             $scope.userInfo.logged_in = false;
             $scope.userInfo.username = null;
             $scope.userInfo.userid = null;
@@ -157,8 +201,8 @@ fearlessApp.factory('authFactory', function($resource) {
         }
     //Check if user is logged in
     $scope.is_logged_in = function(){
-        var userid = $cookies.userid;
-        var username = $cookies.username;
+        var userid = localStorage.getItem('userid');
+        var username = localStorage.getItem('username');
        if (userid && username)
             {
                 $scope.userInfo.username = username;
@@ -226,8 +270,73 @@ fearlessApp.controller('pmsCtrl', function($scope, $http, $location){
 
 });
 
-fearlessApp.controller('profileCtrl', function($scope, $http, $location){
+fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $location){
+        
+        userInfoReq = $http.get('/api/db/user/'+$scope.$parent.userInfo.userid);
+        userInfoReq.success(function(resp){
+            delete resp.password;
+            delete resp.created_on;
+            delete resp.modified_on;
+            delete resp.lastLogIn;
+            delete resp.latest_session_id;
+            delete resp.token;
+            //console.log(resp);
+           $scope.user = resp; 
+
+            });
+
+
+        getAvatar = function(){
+            av = localStorage.getItem('avatar');
+            if (av != 'null')
+                return av;
+            else
+                return 'images/user_man-512.png';
+            };
+        $scope.profilePic = getAvatar();
+        $scope.fileNameChanged = function(e){
+        
+            if (!e.files.length)
+                return null;
+        
+            picFile = e.files[0];
+            reader = new FileReader();
+            reader.onloadend = function(){
+                picDataURL = reader.result;
+                // lets create a new iimage
+                img = new Image();
+                img.onload = function(){
+                    
+                    _pic = updateImageSize(this, 400, 200);
+                    $scope.user.avatar=_pic;
+                    $scope.$apply();
+                            
+
+
+                    //$('#ProfilePicImg')[0].src = profilePic;
+                }
+                img.src = picDataURL;
+
+            }
+            reader.readAsDataURL(picFile);
+        }
+
+    $scope.updateUserInformation = function(){
+        x = $http.post('/api/db/user/'+$scope.$parent.userInfo.userid, $scope.user); //send it
+        x.success(function(resp){
+                $scope.$parent.userInfo.username = $scope.user.firstname;
+                localStorage.setItem('avatar', $scope.user.avatar);
+                localStorage.setItem('username', $scope.user.firstname);
+                mail = {};
+                mail['message'] = 'Hello <b>'+ $scope.user.firstname +'</b>!<br/>'
+                mail['message']+= 'Your profile information updated successfully.<br/>';
+                mail['message']+= 'Visit your profile <a href="'+ location.href +'"><b>here</b></a>.';
+                mail['to'] = $scope.user.email;
+                mail['subject'] = 'Fearless profile';
+                //console.log(mail)
+                m = $http.post('/api/sendmail', mail);
+                });
+    }
 
 });
-
 

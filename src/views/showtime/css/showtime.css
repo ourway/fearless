@@ -440,6 +440,12 @@ button:focus {outline:0;}
 	display: inline-block;
 	margin-left: 1em;
 }
+#container table{
+
+width: 100%;
+background: #1D1D1D;
+border: 1px solid #333;
+}
 .fileUpload input.upload {
 	position: absolute;
 	top: 0;

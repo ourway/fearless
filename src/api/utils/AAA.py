@@ -161,7 +161,7 @@ class Login:
                     '{ip}|"{u}" loggin in from web"'.format(u=target.email, ip=ip))
                 resp.body = {'message': 'success',
                                         'firstname': target.firstname,
-                                        'id': target.id}
+                             'id': target.id, 'avatar':target.avatar}
             else:
 
                 logger.warning('{ip}|{u} tried to login from web without activation"'.format(
