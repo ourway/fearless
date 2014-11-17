@@ -739,6 +739,7 @@ function showtime() {
                 project.imgsBdata = {};
             var videoconverted = [];
             var lastframe = null;
+            var frame = null;
 
                 var count = 0;
         reader.onprogress = function(evt){
@@ -768,11 +769,7 @@ function showtime() {
             //canvas.height = currentHeight;
             var hContext = hCanvas.getContext('2d');
             sourceVid.addEventListener('timeupdate', function() {
-                if (sourceVid.readyState==4){
-                    frameSave();
-                }
-                else
-                    console.log('wooooooowowowowoowoooooooooooo')
+                show.src = frameSave();
             });
 
 
@@ -781,6 +778,7 @@ function showtime() {
                 //hCanvas.width = sourceVid.videoWidth;
                 //hCanvas.height = sourceVid.videoHeight;
                   //hContext.drawImage(sourceVid, 0, 0, sourceVid.videoWidth, sourceVid.videoHeight);
+
                 if (!count)
                 {
                     updateImageSize(sourceVid.videoWidth, sourceVid.videoHeight);
@@ -796,8 +794,7 @@ function showtime() {
                     colorLight : "#ffffff",
                     correctLevel : QRCode.CorrectLevel.H
                     });
-                qr = $('#qrcode canvas')[0];
-                */
+                qr = $('#qrcode canvas')[0]; */
                 hContext.drawImage(sourceVid,0,0,sourceVid.videoWidth, sourceVid.videoHeight, 0,0,project.width,project.height);
                 //hContext.globalAlpha = 0.5
                 //hContext.drawImage(qr,project.width-96,project.height-96);
@@ -805,8 +802,11 @@ function showtime() {
                 addText(hCanvas, 'Asset ID: '+ project.projectName + ' | ' + timestamp(count+1), 10, hCanvas.height-36, 10, 1);
                 //project.encoder.add(hContext);  //make a video
                 frame = hCanvas.toDataURL('image/webp');
-
-                show.src = frame;
+                if (frame == lastframe)
+                {
+                    sourceVid.currentTime = sourceVid.currentTime + 1/fps;
+                    return null;
+                }
 
                 switch (sequence) {
                     case 1:
@@ -823,20 +823,13 @@ function showtime() {
                 progressPyChart.segments[0].value = count+1;
                 progressPyChart.segments[1].value = project.cutout - count + 1;
                 progressPyChart.update();
+                lastframe = frame;
                 count +=1;
                 if (!sourceVid.ended)
                     {
                     sourceVid.currentTime = sourceVid.currentTime + 1/fps;
                     }
-                    //project.addThumb(frame);
-
-
-                  //duration = imgsData.length - 1
-                  //if (frame != imgsData[duration]) 
-                  //      imgsData.push(frame);
-                  //var frame  = hContext.getImageData(0, 0, sourceVid.videoWidth, sourceVid.videoHeight);
-                  //console.log(frame);
-                      //length = data.length;
+            return frame;
             };
 
 
