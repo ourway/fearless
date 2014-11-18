@@ -306,13 +306,11 @@ function convertImgToBase64(data) {
 
 
 
-
-
     img.src = data;
 
     var canvas = document.createElement('CANVAS');
-    currentWidth = img.width;
-    currentHeight = img.height;
+    //currentWidth = img.width;
+    //currentHeight = img.height;
     canvas.width = currentWidth;
     canvas.height = currentHeight;
     var ctx = canvas.getContext('2d');
@@ -524,7 +522,7 @@ function showtime() {
         ctx.drawImage(this, 0, 0, tWidth, tHeight);
         finalFile = canvas.toDataURL('image/webp'); //Always convert to png
         project.thumbnail = finalFile
-        appendix = '<a class="thmbLink" id="thmbA_'+ _f +'" onClick="goToFrame('+_f+')"><img class="thmb" id="thmb_'+ _f +'" src="' + finalFile + '"/></a>';
+        appendix = '<a class="thmbLink" id="thmbA_'+ _f +'" onClick="goToFrame('+_f+');project.command=\'var a = '+_f+'\';"><img class="thmb" id="thmb_'+ _f +'" src="' + finalFile + '"/></a>';
         $('#thumbnails').append(appendix);
         $("#thmb_"+_f).fadeIn();
         project.thumbstate[_f] = true;
