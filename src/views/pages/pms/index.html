@@ -1,6 +1,104 @@
-<div class="container" ng-init="init()">
+<div class="container" >
+    <br/>
 
 
 
+			
+			<div class="modal fade" id="projectAddModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title" id="myModalLabel">
+								Create A new project
+							</h4>
+						</div>
+                        <div class="modal-body">
+
+			<form class="form-horizontal" role="form">
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Project Name</label>
+					<div class="col-sm-6">
+                        <input type="text" class="form-control" placeholder="New project name. Must be unique" ng-model="newProjectName" />
+					</div>
+				</div>
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Start Date</label>
+					<div class="col-sm-6">
+                        <input type="date" class="form-control" ng-model="newProjectStartDate" />
+					</div>
+				</div>
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">End Date</label>
+					<div class="col-sm-6">
+						<input type="date" class="form-control" ng-model="newProjectEndDate" />
+					</div>
+				</div>
+
+			</form>
+
+
+
+
+
+
+
+						</div>
+						<div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> 
+                            <button type="button" class="btn btn-primary">Create new project</button>
+						</div>
+					</div>
+					
+				</div>
+				
+			</div>
+
+
+			<div class="btn-group">
+                <button id="projectAddButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add</button>
+                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-eye-open"></em> Report</button> 
+                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
+                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
+			</div>
+
+    <br/>
+    <br/>
+
+
+	<div class=" ">
+		<div class="col-md-10 column">
+    <div id="projectGrid" ui-grid="gridOptions" class="grid"></div>
 
 </div>
+</div>
+	<div class="">
+		<div class="col-md-2 column">
+<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+                        
+					</h3>
+				</div>
+				<div class="panel-body">
+                    <ul>
+
+                    </ul>
+				</div>
+				<div class="panel-footer">
+                    <a href="#/help/pms">Need Help?<a/>
+				</div>
+</div>
+</div>
+
+</div>
+
+<script>
+    $(document).ready(function(){
+        
+        $('#projectAddButton').click(function(){
+            $('#projectAddModal').modal('show');
+        }); 
+    });
+
+</script>

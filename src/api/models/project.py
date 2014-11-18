@@ -52,6 +52,7 @@ class Project(IDMixin, Base):
     # 0-active, 1-pending, 2-stopped, 3-finished
     status = Column(Integer, default=0)
     name = Column(String(64), unique=True, nullable=False)
+    description = Column(Text())
     client_id = Column(Integer, ForeignKey("client.id"))
     start = Column(DateTime, nullable=False, default=now)
     end = Column(DateTime, nullable=False)
@@ -70,7 +71,7 @@ class Project(IDMixin, Base):
     sequences = relationship('Sequence', backref='project')
     tickets = association_proxy('tk', 'Ticket')
     rep = relationship("Report", secondary=lambda: project_reports, backref='project')
-    reports = association_proxy('rep', 'id')
+    reports = association_proxy('rep', 'id') # when we refer to reports, id will be returned.
 
 
 
@@ -105,6 +106,8 @@ class Project(IDMixin, Base):
         templateFile = os.path.join(
             os.path.dirname(__file__), '../templates/project.tjp')
         t = Template(filename=templateFile)
+        if not self.tasks:
+            return
         task = self.tasks[0]
         resources = list()
         tasks = list()

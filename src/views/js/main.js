@@ -1,4 +1,4 @@
-var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'ngCookies', 'restangular']);
+var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'ngCookies', 'restangular', 'ui.grid']);
 
 fearlessApp.factory('authFactory', function($resource) {
   return $resource('/api/auth/:what',
@@ -7,7 +7,18 @@ fearlessApp.factory('authFactory', function($resource) {
   );
 });
 
-
+function timeConverter(UNIX_timestamp){
+ var a = new Date(UNIX_timestamp*1000);
+ var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+     var year = a.getFullYear();
+     var month = months[a.getMonth() - 1];
+     var date = a.getDate();
+     var hour = a.getHours();
+     var min = a.getMinutes();
+     var sec = a.getSeconds();
+     var time = date +  month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+     return time;
+ }
 
 
 
@@ -50,13 +61,21 @@ fearlessApp.factory('authFactory', function($resource) {
             .when('/pms', {
 
                 templateUrl: 'pages/pms/index.html',
-                controller: 'pmsCtrl'
+                controller: 'projectCtrl'
             })
             .when('/profile', {
 
                 templateUrl: 'pages/auth/profile.html',
                 controller: 'profileCtrl'
-            })		 })
+            })		
+             .when('/report', {
+
+                templateUrl: 'pages/crew/report.html',
+                controller: 'reportCtrl'
+            })
+
+	
+    })
 
 
 
@@ -286,14 +305,6 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
             });
 
 
-        getAvatar = function(){
-            av = localStorage.getItem('avatar');
-            if (av != 'null')
-                return av;
-            else
-                return 'images/user_man-512.png';
-            };
-        $scope.profilePic = getAvatar();
         $scope.fileNameChanged = function(e){
         
             if (!e.files.length)
@@ -307,7 +318,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
                 img = new Image();
                 img.onload = function(){
                     
-                    _pic = updateImageSize(this, 400, 200);
+                    _pic = updateImageSize(this, 300, 300);
                     $scope.user.avatar=_pic;
                     $scope.$apply();
                             
@@ -339,4 +350,67 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
     }
 
 });
+
+
+
+
+
+
+fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $location){
+
+        });
+
+fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $location){
+
+    $scope.gridOptions = {
+        data: 'myData',
+        enableFiltering: true,
+        enableSorting:true,
+        enablePinning: true,
+        columnDefs: [
+                    { field: "name", displayName : 'Project', width: 200,
+                    cellTemplate: '<div>  <a class="btn" href="#pms/{{row.entity.id}}"><span class="glyphicon glyphicon-folder-close"></span> {{row.entity.name}}</a></div>'
+                    },
+                    { field: "calculate_number_of_tasks", displayName : 'Tasks', enableFiltering: true, enableSorting:true, width:70,
+                    
+                    cellTemplate: '<div style="padding:5px"><span style="opacity:0.5" class="glyphicon glyphicon-tag"></span><Span> {{row.entity.calculate_number_of_tasks}}</span></div>'
+                    },
+                    { field: "duration", enableFiltering: true, enableSorting:true, width:100,
+                    cellTemplate: '<div style="padding:5px"><span style="opacity:0.5" class="glyphicon glyphicon-road"></span><Span> {{row.entity.duration}}</span></div>'
+                    },
+                    { field: "start", enableFiltering: false, enableSorting:true, width:155,
+                    cellTemplate: '<div style="padding:5px"><span style="opacity:0.5" class="glyphicon glyphicon-calendar"></span><Span> {{row.entity.start}}</span></div>'
+                    },
+                    { field: "end", enableFiltering: false, enableSorting:true, width:155,
+                    cellTemplate: '<div style="padding:5px"><span style="opacity:0.5" class="glyphicon glyphicon-calendar"></span><Span> {{row.entity.end}}</span></div>'
+                    },
+                    { field: "description", enableFiltering: true, enableSorting:false, width:190 },
+                    { field: "id", enableFiltering: false, enableSorting:false, width:45 },
+
+                ] 
+        };
+
+         $scope.myData = [ ];
+
+        $scope.getLeader = function(id){
+            console.log(id)
+            $http.get('/api/db/user/'+id+'?field=alias').success(function(r){
+                    console.log(r)}
+                );
+        }
+
+        _pR = $http.get('/api/db/project');
+        _pR.success(function(resp){
+            // Lets fix some problems:
+            for (i=0;i<resp.length;i++){
+                resp[i].duration = Math.round((resp[i].end - resp[i].start)/(3600*24)) + ' days';
+                    
+                resp[i].start = timeConverter(resp[i].start);
+                resp[i].end = timeConverter(resp[i].end);
+                resp[i].created_on = timeConverter(resp[i].start);
+                resp[i].modified_on = timeConverter(resp[i].start);
+            }
+            $scope.myData = resp;
+            });
+        });
 

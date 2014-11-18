@@ -58,7 +58,7 @@
 		<div class="col-md-4 column">
 
                      <div class="panel" id="profileImageDiv" ng-if="true" onclick="document.getElementById('selectedProfilePicFile').click();">
-                         <img ng-src="{{user.avatar}}" id="ProfilePicImg"
+                         <img ng-src="{{user.avatar || 'images/user_man-512.png'}}" id="ProfilePicImg"
                         class="img-responsive img-rounded center-block img-thumbnail" alt="default icon">
                         <input type="file" id="selectedProfilePicFile" 
                         onchange="angular.element(this).scope().fileNameChanged(this)"

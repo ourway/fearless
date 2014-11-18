@@ -205,8 +205,8 @@ class Signup:
 
             activation_link = host + \
                 '/api/auth/activate?token=' + newuser.token
-            send_envelope.delay(email, 'Account Activation',
-                                'Hi <strong>{u}</strong>! Please <a href="{l}">Activate</a> your account.'.format(u=newuser.firstname.title(),
+            send_envelope.delay(email, [], [], 'Account Activation',
+                                'Hi <strong>{u}</strong>! Please <a class="btn-primary" href="{l}">Activate your account</a>.'.format(u=newuser.firstname.title(),
                                                                                                                   l=activation_link))
 
             logger.info(

@@ -13,7 +13,9 @@
     cursor:pointer;
 }
 
-
+#projectGrid {
+    height: auto;
+  }
 
 
 

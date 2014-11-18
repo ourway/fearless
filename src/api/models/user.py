@@ -38,7 +38,7 @@ class User(IDMixin, Base):
     avatar = Column(Text())
     token = Column(String(64), default=getUUID, unique=True)
     firstname = Column(String(64), nullable=True)
-    alias = Column(String(64), nullable=True, unique=True)
+    alias = Column(String(64), nullable=True)
     lastname = Column(String(64), nullable=True)
     lastLogIn = Column(DateTime)
     age = Column(Integer)
