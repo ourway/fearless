@@ -543,8 +543,7 @@ function showtime() {
             case 1:
                 if (this.imgsA && this.imgsA[f]) {
                     _name = pad(f+1,4) + '.webp';
-
-                    if (!this.imgsAdata[f] && this.imgsA[f].type) {
+                    if (!this.imgsAdata[f] && !this.imgsA[f] instanceof Blob) {
                         var tempA = project.zip.file("A/" + pad(f+1, 4)+'.webp');
                         if (tempA)
                             {
@@ -1232,8 +1231,8 @@ $(document).ready(function () {
             }
             if (goal != project.currentFrame())
                 {
-                goToFrame(goal);
-                project.command = 'f='+ goal +';';
+                //goToFrame(goal); TODO
+                //project.command = 'f='+ goal +';';
                 }
             //console.log(goal);
         });
