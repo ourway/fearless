@@ -298,7 +298,6 @@ function startPlaying(f) {
 
 function convertImgToBase64(data) {
 
-    //console.log(data)
 
     var img = new Image();
 
@@ -311,10 +310,15 @@ function convertImgToBase64(data) {
     var canvas = document.createElement('CANVAS');
     //currentWidth = img.width;
     //currentHeight = img.height;
-    canvas.width = currentWidth;
-    canvas.height = currentHeight;
+    updateImageSize(img.width, img.height);
+    canvas.width = project.width;
+    canvas.height = project.height;
     var ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, currentWidth, currentHeight);
+    //ctx.drawImage(img, 0, 0, currentWidth, currentHeight);
+    //console.log(project.width);
+    ctx.drawImage(img,0,0,img.width, img.height, 0,0,project.width,project.height);
+    addText(canvas, 'FearLess® ShowTime™', 10, canvas.height-16, 16, 0.5);
+    addText(canvas, 'Asset ID: '+ project.projectName + ' | ' + timestamp(project.currentFrame()+1), 10, canvas.height-36, 10, 1);
     dataURL = canvas.toDataURL("image/webp");
     canvas = null;
     img = null;
@@ -511,7 +515,7 @@ function showtime() {
             _f = project.currentFrame();
         else
             _f = frameNumber;
-        if (_f%skips || _f/skips<1) {
+        if ((_f%skips || _f/skips<1) && _f!=0) {
             project.thumbstate[_f] = true;
             return null;
         }
@@ -563,7 +567,11 @@ function showtime() {
                                 dataURL = convertImgToBase64(dataURL);
                                 project.imgsAdata[f] = dataURL;
                                 $("#sequenceImage").prop("src", dataURL);
-
+                                if (!project.thumbstate || !project.thumbstate[f])
+                                    {
+                                        //console.log('here');
+                                        project.addThumb(dataURL);
+                                    }
                                 // background zipping
                                 //
 
@@ -939,6 +947,7 @@ function showtime() {
         }
 
 
+
     //console.log(project.cutout);
     $("#frame").prop("max", project.cutout);
     $("#frametotal").html(timestamp(project.cutout + 1));
@@ -946,7 +955,8 @@ function showtime() {
 
 
 
-        this.setBackground();
+        //this.setBackground();
+        goToNextFrame(true)
 
 
     };
