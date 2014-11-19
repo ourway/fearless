@@ -35,8 +35,8 @@ Have a nice day!
 
 '''
 
-data['to'] = ['Hamid Lak <hamid2177@gmail.com>', 'Ali Shahdaad <alishahdad1353@yahoo.com>' ]
-#data['to'] = ['Farsheed Ashouri <farsheed.ashouri@yahoo.com>']
+#data['to'] = ['Hamid Lak <hamid2177@gmail.com>', 'Ali Shahdaad <alishahdad1353@yahoo.com>' ]
+data['to'] = ['Farsheed Ashouri <farsheed.ashouri@gmail.com>']
 data['subject'] = 'A letter to Pooyamehr managers'
 
 r = requests.post(url, data=json.dumps(data), auth=HTTPBasicAuth('rodmena@me.com', 'rrferl'))

@@ -36,6 +36,9 @@ def commit(req, resp):
         resp.body = e
 
 
+
+
+
 def jsonify(self, resp):
     '''Everything is json here'''
     if isinstance(resp.body, associationproxy._AssociationList):

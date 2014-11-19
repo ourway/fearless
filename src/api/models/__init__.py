@@ -78,7 +78,7 @@ def init():
 
     role_actions = ['create', 'see', 'delete', 'edit']
     role_areas_managers = ['project', 'shot', 'sequence', 'collection',
-                        'task', 'repository']
+                        'task', 'repository', 'database']
     role_areas_users = ['tag', 'asset', 'ticket', 'report', 'scene', 'page']
     roles = session.query(Role).all()
     for act in role_actions:

@@ -32,10 +32,12 @@ from envelopes import Envelope, GMailSMTP
 from utils.validators import email_validator
 from opensource.contenttype import contenttype
 # riak bucket for our files
+from mako.template import Template
 from models import session, es, Asset, Repository
 from utils.fagit import GIT
 from sqlalchemy.exc import IntegrityError  # for exception handeling
-
+from mako.template import Template
+templates_folder = os.path.join(os.path.dirname(__file__), 'templates')
 # BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 # BACKEND_URL = 'amqp'
 # BACKEND_URL = 'redis://localhost:6379/0'
@@ -134,6 +136,10 @@ def remove_asset(name):
 
 @app.task
 def send_envelope(to, cc, bcc, subject, message, attach=None):
+
+    _et = os.path.join(templates_folder, 'email.html')
+    ET = Template(filename=_et)
+    M = ET.render(message=message, subject=subject)
     envelope = Envelope(
         from_addr=(u'farsheed.ashouri@gmail.com',
                    u'Pooyamehr Fearless Notification'),
@@ -141,7 +147,7 @@ def send_envelope(to, cc, bcc, subject, message, attach=None):
         cc_addr=cc,
         bcc_addr=bcc,
         subject=subject,
-        html_body=message
+        html_body=M
     )
 
     if attach and os.path.isfile(attach):

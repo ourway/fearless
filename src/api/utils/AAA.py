@@ -27,12 +27,27 @@ from base64 import encodestring, decodestring
 from urllib import quote_plus, unquote_plus
 import falcon
 from tasks import send_envelope
+from functools import wraps
+
 
 logger = setup_logger('auth', 'authentication.log')
 
 
 def getANewSessionId():
     return str(hmac.HMAC(key=str(uuid.uuid4()), digestmod=hashlib.sha1).hexdigest())
+
+
+def Authorize(action):
+    def request_checked(func):
+        def _f(self, req, resp, *args, **kw):
+            u = getUserInfoFromSession(req)
+            print u
+            if isAuthorizedTo(u.get('id'), action):
+                return func(self, req, resp, *args, **kw)
+            else:
+                raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
+        return _f
+    return request_checked
 
 
 def Authenticate(req, resp, params):
@@ -195,12 +210,14 @@ class Signup:
         olduser = session.query(User).filter(
             User.email == email).first()
         if not olduser:
+            userGroup = session.query(Group).filter(Group.name=='users').first()
             newuser = User(email=email,
                            password=form.get('password'),
                            firstname=form.get('firstname'),
                            lastname=form.get('lastname'),
                            token=str(uuid.uuid4()))
 
+            newuser.grps.append(userGroup)  ## default users group 
             session.add(newuser)
 
             activation_link = host + \
@@ -361,3 +378,26 @@ class GetUserInfo:
     @falcon.after(commit)
     def on_post(self, req, resp):
         resp.body = getUserInfoFromSession(req)
+
+
+def isAuthorizedTo(userId, actionName):
+    '''authorization function'''
+    target = session.query(User).filter(User.id == userId).first()
+    if not target:
+        return
+
+    if target.id == 1: # first user has access to everything
+        return True
+
+    for userGroup in target.grps: # grps is access to gourp objects
+        for role in userGroup.rls: # rls is access to role object 
+            if actionName == role.name:
+                return True
+
+
+
+
+
+
+
+

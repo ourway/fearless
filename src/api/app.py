@@ -29,21 +29,21 @@ import uwsgi
 
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
-    Verify, Reactivate, Reset, Logout, GetUserInfo
+    Verify, Reactivate, Reset, Logout, GetUserInfo, Authorize
 from utils.showtime import GetUserShows
 from utils.helpers import get_params
 
 tables = [i for i in av if i[0] in ascii_uppercase]
 
 
-
 class ThingsResource:
-
+    #@Authorize('create_collection')
     def on_get(self, req, resp):
         """Handles GET requests"""
+        req.env['hooooooo'] = 'gooooooooo'
         # resp.set_header('Set-Cookie','fig=newton; Max-Age=200')
         # print req.get_header('Cookie')
-        resp.body = "ok"
+        resp.body = "okokokoko"
 
 
 class DB:
@@ -51,6 +51,7 @@ class DB:
     '''Restfull API for database
     '''
 
+    #@Authorize('see_db')
     def on_get(self, req, resp, **kw):
 
         args = req.path.split('/')
