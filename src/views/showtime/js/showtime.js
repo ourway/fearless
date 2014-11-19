@@ -138,13 +138,14 @@ var convertDataURL2binaryArray = function(dataURL){
 }
 
 /*Draw a Stroke from the last position to the current position.*/
-function updateCanvas(thisMouseX, thisMouseY) {
+function updateCanvas(thisMouseX, thisMouseY, commandMode) {
 
     context.lineWidth = nibSize;
-    context.beginPath();
-    context.moveTo(lastMouseX, lastMouseY);
-    context.lineTo(thisMouseX, thisMouseY);
-    context.closePath();
+    if (!commandMode){
+        context.beginPath();
+        context.moveTo(lastMouseX, lastMouseY);
+        context.lineTo(thisMouseX, thisMouseY);
+        context.closePath();
     context.globalAlpha = opacity;
 
 
@@ -166,13 +167,17 @@ function updateCanvas(thisMouseX, thisMouseY) {
         context.strokeStyle = paintColor;
     }
 
+    }
 
     context.stroke();
 
 
     context.restore();
     context.globalAlpha = 1;
-
+    
+    //project.command = 'context.stroke();context.restore();'
+    if (!commandMode)
+        project.command = 'updateCanvas('+ lastMouseX +','+ lastMouseY +', true);';
 }
 
 
@@ -219,7 +224,6 @@ function canvasInit() {
             var thisMouseX = e.pageX - $('#canvas').offset().left;
             var thisMouseY = e.pageY - $('#canvas').offset().top;
             updateCanvas(thisMouseX, thisMouseY);
-            project.command = 'updateCanvas('+ thisMouseX +','+ thisMouseY +');';
             lastMouseX = thisMouseX;
             lastMouseY = thisMouseY;
         }
