@@ -174,17 +174,19 @@ $scope.$watch(function(){return $location.$$path},
                                     
                                         if ($scope.user.id != project.master){
 
-                                            if (serverMessage.note && serverMessage.note!='None'){
+                                            if (serverMessage.note && serverMessage.note!='None' && serverMessage.note != 'KEEP'){
                                                 var note = serverMessage.note;
                                                     project.notes[JSON.parse(serverMessage.slide)] = note;
                                             }
-                                            else
+                                            else if (serverMessage.note && serverMessage.note    != 'KEEP')
                                                 delete project.notes[JSON.parse(serverMessage.slide)]
-                                            if (serverMessage.frame && serverMessage.frame != 'None'){
+
+
+                                            if (serverMessage.frame && serverMessage.frame != 'None' && serverMessage.frame != 'KEEP'){
                                                 var frame = serverMessage.frame;
                                                     project.frames[JSON.parse(serverMessage.slide)] = frame;
                                             }
-                                            else
+                                            else if (serverMessage.frame && serverMessage.frame != 'KEEP')
                                                 delete project.frames[JSON.parse(serverMessage.slide)]
                                             project.getNotes();
 
@@ -197,7 +199,8 @@ $scope.$watch(function(){return $location.$$path},
                                             //console.log(serverMessage.command);
                                             
                                             goToFrame(JSON.parse(serverMessage.slide));
-                                            eval(serverMessage.command)  // server tels me what to do
+                                            eval(serverMessage.command)
+                                                // server tels me what to do
 
                                         
                                             //console.log(serverMessage.command, project.command);
@@ -227,7 +230,7 @@ $scope.$watch(function(){return $location.$$path},
                                             
                                             project.showSyncWs.send(dataToSend)
                                         }
-                                }, 250)
+                                }, 100)
                                 $scope.loading = false;
                                 $scope.$apply()
                                 };

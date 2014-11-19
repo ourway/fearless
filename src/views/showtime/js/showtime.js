@@ -48,6 +48,42 @@ function sort_thumbs(){
 
 
 
+        function setPreview() {
+            var preview = document.getElementById('brushPreview');
+
+            preview.width = (nibSize);
+            preview.height = (nibSize);
+
+
+            previewContext = preview.getContext("2d");
+
+            var centerX = preview.width / 2;
+            var centerY = preview.height / 2;
+            var radius = nibSize / 2;
+
+            if (activeTool == "eraser") {
+                previewContext.fillStyle = 'white';
+
+            } else {
+
+                previewContext.fillStyle = paintColor;
+            }
+            previewContext.globalAlpha = opacity;
+            previewContext.beginPath();
+            switch (nibShape) {
+                case "square":
+                    previewContext.rect(0, 0, nibSize, nibSize);
+                    break;
+                default:
+                    previewContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+            }
+
+
+            previewContext.fill();
+            nib.src = preview.toDataURL();
+
+        }
+
 
 function pad(num, size) {
     var s = num+"";
@@ -139,6 +175,7 @@ function updateCanvas(thisMouseX, thisMouseY) {
 
 }
 
+
 /*Initialize Canvas Event Handlers.*/
 function canvasInit() {
 
@@ -148,6 +185,8 @@ function canvasInit() {
     context = canvas.getContext("2d");
 
     $('#canvas').mousedown(function (e) {
+
+
 
         lastMouseX = e.pageX - $('#canvas').offset().left;
         lastMouseY = e.pageY - $('#canvas').offset().top;
@@ -180,6 +219,7 @@ function canvasInit() {
             var thisMouseX = e.pageX - $('#canvas').offset().left;
             var thisMouseY = e.pageY - $('#canvas').offset().top;
             updateCanvas(thisMouseX, thisMouseY);
+            project.command = 'updateCanvas('+ thisMouseX +','+ thisMouseY +');';
             lastMouseX = thisMouseX;
             lastMouseY = thisMouseY;
         }
@@ -1172,41 +1212,7 @@ $(document).ready(function () {
         /*
          Make a preivew of the nib in the nibCanvase and make a snapshot of the nib for the hover nib image.
          */
-        function setPreview() {
-            var preview = document.getElementById('brushPreview');
 
-            preview.width = (nibSize);
-            preview.height = (nibSize);
-
-
-            previewContext = preview.getContext("2d");
-
-            var centerX = preview.width / 2;
-            var centerY = preview.height / 2;
-            var radius = nibSize / 2;
-
-            if (activeTool == "eraser") {
-                previewContext.fillStyle = 'white';
-
-            } else {
-
-                previewContext.fillStyle = paintColor;
-            }
-            previewContext.globalAlpha = opacity;
-            previewContext.beginPath();
-            switch (nibShape) {
-                case "square":
-                    previewContext.rect(0, 0, nibSize, nibSize);
-                    break;
-                default:
-                    previewContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-            }
-
-
-            previewContext.fill();
-            nib.src = preview.toDataURL();
-
-        }
 
         nib = $("#nibImage")[0];
         setPreview();
