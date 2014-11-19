@@ -20,7 +20,7 @@ import urlparse
 from urllib import unquote
 from string import ascii_uppercase
 import ujson as json
-from utils.assets import AssetSave, ListAssets, GetAsset
+from utils.assets import AssetSave, ListAssets, GetAsset, DeleteAsset
 from utils.reports import Mailer
 from gevent import wsgi
 from models import __all__ as av
@@ -125,6 +125,9 @@ class DB:
     def on_delete(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
+        if len(args)<5:
+            resp.status = falcon.HTTP_400
+            return
         id = args[4]
         # lets get the table data
         query = 'session.query({t}).filter({t}.id=={id})'.format(
@@ -160,6 +163,7 @@ app.add_route('/api/auth/getUserInfo', GetUserInfo())
 app.add_route('/api/asset/save/{repo}', AssetSave())
 app.add_route('/api/asset', ListAssets())
 app.add_route('/api/asset/{key}', GetAsset())
+app.add_route('/api/asset/delete/{id}', DeleteAsset())
 app.add_route('/api/showtime/{userid}', GetUserShows())
 app.add_route('/api/sendmail', Mailer())
 

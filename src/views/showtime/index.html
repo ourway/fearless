@@ -58,7 +58,10 @@
                 <button id="mastermode" ng-click="masterme()" ng-class="{'current':master, 'slave':slave}" class="fileSave button ">{{modetext}}</button>
             </div>
 
-				<button  ng-show="!slave" id="download" class="fileSave button radiusLeft">Download</button>
+				<button  ng-show="!slave" id="download" class="fileSave button">Download</button>
+                <button  ng-show="!slave && delete" id="delete" 
+                    ng-click="deleteShow()"
+                    class="fileSave button radiusRight warn">Delete</button>
                 <button ng-show="!slave" id="save" class="fileSave button radiusLeft">save</button>
 				<input ng-show="!slave" type="text" id="description" required="required" class="stopKBD radiusRight" ng-model="asset.descripion" placeholder="desciption">
                 <div ng-show="!slave" style="display:none">

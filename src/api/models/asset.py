@@ -45,7 +45,7 @@ class Asset(IDMixin, Base):
     ready = Column(Boolean, default=False)  # post processing
     users = relationship('User', backref='assets', secondary='users_assets')
     owner = relationship('User', backref='owning_assets')
-    modifiers = relationship('User', backref='modifying_assets', secondary='users_assets')
+    modifiers = relationship('User', viewonly=True,  backref='modifying_assets', secondary='users_assets')
     repository = relationship('Repository', backref='assets')
     path = Column(String(512))  # relative to collection path, including name
     repository_id = Column(Integer, ForeignKey('repository.id'))

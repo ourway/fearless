@@ -236,7 +236,19 @@ class GetAsset:
                          'owner':target.owner.alias, 'thumbnail':target.thumbnail}
 
 
+class DeleteAsset:
+    @falcon.after(commit)
+    def on_delete(self, req, resp, id):
+        target = session.query(Asset).filter(Asset.id == id).first()
+        userInfo = getUserInfoFromSession(req)
+        if userInfo.get('id') == target.owner.id:
+            session.delete(target)
+            resp.status = falcon.HTTP_202
 
+        
+
+
+        
 class ListAssets:
 
     def on_get(self, req, resp):

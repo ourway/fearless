@@ -545,7 +545,7 @@ function showtime() {
             case 1:
                 if (this.imgsA && this.imgsA[f]) {
                     _name = pad(f+1,4) + '.webp';
-                    if (!this.imgsAdata[f] && !this.imgsA[f] instanceof Blob) {
+                    if (!this.imgsAdata[f] && project.zip.file("A/" + pad(f+1, 4)+'.webp')) {
                         var tempA = project.zip.file("A/" + pad(f+1, 4)+'.webp');
                         if (tempA)
                             {
@@ -851,7 +851,8 @@ function showtime() {
                 frame = hCanvas.toDataURL('image/webp');
                 if (frame == lastframe)
                 {
-                    sourceVid.currentTime = sourceVid.currentTime + 1/fps;
+                    console.log('same')
+                    sourceVid.currentTime = sourceVid.currentTime + (1/fps);
                     return null;
                 }
 
@@ -1280,6 +1281,8 @@ $(document).ready(function () {
             nibSize = this.value;
             setPreview()
         });
+
+
 
         $("#toolMarker").click(function () {
             activeTool = "marker";

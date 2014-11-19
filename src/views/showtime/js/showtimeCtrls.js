@@ -26,6 +26,7 @@ function makeid()
              $scope.hey = function(){
                  console.log($scope.asset);
              }
+
              $scope.timeConverter = function(UNIX_timestamp){
              var a = new Date(UNIX_timestamp*1000);
              var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -38,7 +39,14 @@ function makeid()
                  var time = date + month + year + '-' + hour + ':' + min;
                  return time;
              }
+            
+            $scope.deleteShow = function(){
+                if (confirm('Sure you want to delete this show?') && $scope.asset.id)
+                {
 
+                    $http.delete('/api/asset/delete/'+$scope.asset.id)
+                }
+            }
 $scope.$watch(function(){return $location.$$path},
     function(){
         //project.command = 'window.location = ' + $location.$$path;
@@ -47,9 +55,9 @@ $scope.$watch(function(){return $location.$$path},
             //project.imgsA = {};
             if (project && project.showSyncWs)
             {
-                $('.thmb').fadeOut(400);
+                $('.thmb').fadeOut(100);
                 $timeout(function(){
-                $('#thumbnails .thmb').remove();}, 500);
+                $('#thumbnails .thmb').remove();}, 200);
                 
                 //console.log($location.$$path)
                 //var project = new showtime();
@@ -131,6 +139,9 @@ $scope.$watch(function(){return $location.$$path},
 
 
                                 $scope.asset = assetInfo;
+                                if (assetInfo.owner == $scope.user.alias)
+                                    $scope.delete = true;
+
                                 project.assetId = $scope.asset.id;
 
                                 if (!project.showSyncWs)
