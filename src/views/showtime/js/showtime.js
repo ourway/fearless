@@ -814,7 +814,9 @@ function showtime() {
             //canvas.height = currentHeight;
             var hContext = hCanvas.getContext('2d');
             sourceVid.addEventListener('timeupdate', function() {
-                show.src = frameSave();
+                _sfd = frameSave()
+                if (_sfd)
+                    show.src = _sfd;
                 return null;
             });
 
@@ -843,18 +845,22 @@ function showtime() {
                     });
                 qr = $('#qrcode canvas')[0]; */
                 hContext.drawImage(sourceVid,0,0,sourceVid.videoWidth, sourceVid.videoHeight, 0,0,project.width,project.height);
+
+                // may be extra step, but needed to prevents duplicates...
+                frame = hCanvas.toDataURL('image/webp');
+                if (frame == lastframe)
+                {
+                    sourceVid.currentTime = sourceVid.currentTime + 1/60;
+                    return null;
+                }
+
+                lastframe = frame;
                 //hContext.globalAlpha = 0.5
                 //hContext.drawImage(qr,project.width-96,project.height-96);
                 addText(hCanvas, 'FearLess® ShowTime™', 10, hCanvas.height-16, 16, 0.5);
                 addText(hCanvas, 'Asset ID: '+ project.projectName + ' | ' + timestamp(count+1), 10, hCanvas.height-36, 10, 1);
                 //project.encoder.add(hContext);  //make a video
                 frame = hCanvas.toDataURL('image/webp');
-                if (frame == lastframe)
-                {
-                    console.log('same')
-                    sourceVid.currentTime = sourceVid.currentTime + (1/fps);
-                    return null;
-                }
 
                 switch (sequence) {
                     case 1:
@@ -871,11 +877,10 @@ function showtime() {
                 progressPyChart.segments[0].value = count+1;
                 progressPyChart.segments[1].value = project.cutout - count + 1;
                 progressPyChart.update();
-                lastframe = frame;
                 count +=1;
                 if (!sourceVid.ended)
                     {
-                    sourceVid.currentTime = sourceVid.currentTime + 1/fps;
+                    sourceVid.currentTime = sourceVid.currentTime + 1/60;
                     }
             return frame;
             };

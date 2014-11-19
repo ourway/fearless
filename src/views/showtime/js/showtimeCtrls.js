@@ -44,7 +44,9 @@ function makeid()
                 if (confirm('Sure you want to delete this show?') && $scope.asset.id)
                 {
 
-                    $http.delete('/api/asset/delete/'+$scope.asset.id)
+                    _dr = $http.delete('/api/asset/delete/'+$scope.asset.id);
+                    _dr.success(function(m)
+                            {});
                 }
             }
 $scope.$watch(function(){return $location.$$path},
