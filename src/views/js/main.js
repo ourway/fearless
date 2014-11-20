@@ -293,6 +293,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
         
         userInfoReq = $http.get('/api/db/user/'+$scope.$parent.userInfo.userid);
         userInfoReq.success(function(resp){
+            resp = resp[0]
             delete resp.password;
             delete resp.created_on;
             delete resp.modified_on;
@@ -361,7 +362,8 @@ fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $locati
         });
 
 fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $location){
-
+    
+    //$scope.newProjectStartDate = new Date();
     $scope.gridOptions = {
         data: 'myData',
         enableFiltering: true,
@@ -400,6 +402,11 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
         }
 
         _pR = $http.get('/api/db/project');
+
+        _pR.error(function(resp){
+               if (resp.title == 'Not Authorized')
+                    $location.path('401')
+                } )
         _pR.success(function(resp){
             // Lets fix some problems:
             for (i=0;i<resp.length;i++){
@@ -412,5 +419,26 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
             }
             $scope.myData = resp;
             });
+
+
+        $scope.createNewProject = function(){
+           sd = $scope.newProjectStartDate;
+           ed = $scope.newProjectEndDate;
+           pn = $scope.newProjectName;
+           pl = $scope.newProjectLeader;
+           data = {start:sd, end:ed, name:pn, lead:pl}
+           $http.put('/api/db/project', data)
+
+           
+        }
+
+        $scope.getResources = function(){
+            $http.get('/api/db/user').success(function(resp){
+                    console.log(resp)
+                    $scope.resources = resp;
+                    });
+        }
+
+
         });
 

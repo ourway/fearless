@@ -77,9 +77,8 @@ def init():
     user_group = session.query(Group).filter(Group.name=='users').first()
 
     role_actions = ['create', 'see', 'delete', 'edit']
-    role_areas_managers = ['project', 'shot', 'sequence', 'collection',
-                        'task', 'repository', 'database']
-    role_areas_users = ['tag', 'asset', 'ticket', 'report', 'scene', 'page']
+    role_areas_managers = ['project', 'collection', 'repository', 'database']
+    role_areas_users = ['tag', 'asset', 'ticket', 'shot', 'sequence', 'report', 'scene', 'page', 'task', 'user']
     roles = session.query(Role).all()
     for act in role_actions:
         for area in role_areas_managers + role_areas_users:
@@ -94,6 +93,7 @@ def init():
     read_roles = session.query(Role).filter(Role.name.like('see%')).all()
     users_group = session.query(Group).filter(Group.name=='users').first()
     for role in read_roles:
+        print role
         users_group.rls.append(role)
 
     profile_files_repository = session.query(Repository).filter(Repository.name == 'profiles').first()

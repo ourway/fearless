@@ -27,9 +27,12 @@ from models import __all__ as av
 from models import *
 import uwsgi
 
+
+
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
-    Verify, Reactivate, Reset, Logout, GetUserInfo, Authorize
+    Verify, Reactivate, Reset, Logout, GetUserInfo, Authorize, \
+    getUserInfoFromSession, isAuthorizedTo
 from utils.showtime import GetUserShows
 from utils.helpers import get_params
 
@@ -55,18 +58,30 @@ class DB:
     def on_get(self, req, resp, **kw):
 
         args = req.path.split('/')
-        table = args[3].title()
+        table = args[3]
+        u = getUserInfoFromSession(req)
+        if not isAuthorizedTo(u.get('id'), 'see_%s'%table):
+            raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         key = req.get_param('key') or 'id'
-
+        table = table.title()
+        show = req.get_param('show')
         if len(args) == 5:
             id = args[4]
             query = 'session.query({t}).filter({t}.{key}=="{id}")'.format(
                 t=table, id=id, key=key)
 
-            data = eval(query).first()
-        else:
-            query = 'session.query({t})'.format(t=table)
             data = eval(query).all()
+        else:
+            if not show:
+                query = 'session.query({t})'.format(t=table)
+            else:
+                query = 'session.query({t}.{f})'.format(t=table, f=show)
+            
+            try:
+                data = eval(query).all()
+            except (AttributeError):
+                data = None
+
 
 
         field = req.get_param('field')
@@ -89,23 +104,26 @@ class DB:
     def on_put(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
+        u = getUserInfoFromSession(req)
+        if not isAuthorizedTo(u.get('id'), 'create_%s'%table):
+            raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         query_params = get_params(req.stream)
         insert_cmd = '{t}({q})'.format(t=table, q=query_params)
-        try:
-            new = eval(insert_cmd)
-            resp.status = falcon.HTTP_201
-            session.add(new)
-            data = repr(new)
-            resp.body = json.dumps(json.loads(data))
-        except TypeError, e:
-            resp.status = falcon.HTTP_400
-            resp.body = json.dumps(e)
+        print insert_cmd
+        new = eval(insert_cmd)
+        resp.status = falcon.HTTP_201
+        session.add(new)
+        data = repr(new)
+        resp.body = json.dumps(json.loads(data))
         # commit()
 
     @falcon.after(commit)
     def on_post(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
+        #u = getUserInfoFromSession(req)
+        #if not isAuthorizedTo(u.get('id'), 'update_%s'%table):
+        #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         if len(args)<5:
             resp.status = falcon.HTTP_400
             return
@@ -126,6 +144,9 @@ class DB:
     def on_delete(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
+        #u = getUserInfoFromSession(req)
+        #if not isAuthorizedTo(u.get('id'), 'delete_%s'%table):
+        #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         if len(args)<5:
             resp.status = falcon.HTTP_400
             return
@@ -133,7 +154,7 @@ class DB:
         # lets get the table data
         query = 'session.query({t}).filter({t}.id=={id})'.format(
             t=table, id=int(id))
-        result = eval(query).first()
+        result = eval(query).all()
         ##
         session.delete(result)
         resp.status = falcon.HTTP_202

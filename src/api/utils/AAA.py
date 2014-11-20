@@ -41,7 +41,6 @@ def Authorize(action):
     def request_checked(func):
         def _f(self, req, resp, *args, **kw):
             u = getUserInfoFromSession(req)
-            print u
             if isAuthorizedTo(u.get('id'), action):
                 return func(self, req, resp, *args, **kw)
             else:
@@ -391,7 +390,7 @@ def isAuthorizedTo(userId, actionName):
 
     for userGroup in target.grps: # grps is access to gourp objects
         for role in userGroup.rls: # rls is access to role object 
-            if actionName == role.name:
+            if actionName.lower() == role.name.lower():
                 return True
 
 

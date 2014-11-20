@@ -15,7 +15,7 @@
 						</div>
                         <div class="modal-body">
 
-			<form class="form-horizontal" role="form">
+			<form class="form-horizontal" ng-init="getResources()" role="form">
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Project Name</label>
 					<div class="col-sm-6">
@@ -25,14 +25,23 @@
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Start Date</label>
 					<div class="col-sm-6">
-                        <input type="date" class="form-control" ng-model="newProjectStartDate" />
+                        <input type="date" min="2014-11-20" max="2020-1-1" class="form-control" ng-model="newProjectStartDate" required/>
 					</div>
 				</div>
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">End Date</label>
 					<div class="col-sm-6">
-						<input type="date" class="form-control" ng-model="newProjectEndDate" />
+						<input type="date" min="2014-11-20" max="2020-1-1" class="form-control" ng-model="newProjectEndDate" required />
 					</div>
+				</div>
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Leader</label>
+					<div class="col-sm-6">
+                    <select class="form-control" ng-model="newProjectLeader">
+                        <option ng-repeat="resource in resources" value="{{resource.id}}">{{resource.firstname}} {{resource.lastname}}</option>
+                    </select>
+
+                </div>
 				</div>
 
 			</form>
@@ -46,7 +55,8 @@
 						</div>
 						<div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> 
-                            <button type="button" class="btn btn-primary">Create new project</button>
+                            <button type="button" ng-show="newProjectStartDate && newProjectEndDate && newProjectName && newProjectLeader" 
+                                ng-click="createNewProject()" class="btn btn-primary">Create new project</button>
 						</div>
 					</div>
 					

@@ -219,14 +219,9 @@ function canvasInit() {
 
     });
 
-    $('#canvas').mousemove(function (e) {
-        if (paint == true) {
-            var thisMouseX = e.pageX - $('#canvas').offset().left;
-            var thisMouseY = e.pageY - $('#canvas').offset().top;
-            updateCanvas(thisMouseX, thisMouseY);
-            lastMouseX = thisMouseX;
-            lastMouseY = thisMouseY;
-        }
+
+
+    $('#canvasDiv').mousemove(function (e) {
         if (e.shiftKey && !project.slave)
         {
             clearInterval(playInterval);
@@ -241,6 +236,17 @@ function canvasInit() {
                 project.command = 'f='+ goal +';';
                 }
         }
+        });
+
+    $('#canvas').mousemove(function (e) {
+        if (paint == true) {
+            var thisMouseX = e.pageX - $('#canvas').offset().left;
+            var thisMouseY = e.pageY - $('#canvas').offset().top;
+            updateCanvas(thisMouseX, thisMouseY);
+            lastMouseX = thisMouseX;
+            lastMouseY = thisMouseY;
+        }
+
     });
 
     $('#canvas').mouseup(function (e) {
