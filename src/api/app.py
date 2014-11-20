@@ -26,6 +26,7 @@ from gevent import wsgi
 from models import __all__ as av
 from models import *
 import uwsgi
+from sqlalchemy import desc
 
 
 
@@ -73,9 +74,9 @@ class DB:
             data = eval(query).all()
         else:
             if not show:
-                query = 'session.query({t})'.format(t=table)
+                query = 'session.query({t}).order_by(desc({t}.modified_on))'.format(t=table)
             else:
-                query = 'session.query({t}.{f})'.format(t=table, f=show)
+                query = 'session.query({t}.{f}).order_by(desc({t}.modified_on))'.format(t=table, f=show)
             
             try:
                 data = eval(query).all()

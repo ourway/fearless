@@ -81,20 +81,23 @@ class AssetSave:
             session.add(collection)
 
 
+        
         body = req.stream
         b64 = req.get_param('b64')
         thumbnail = req.get_param('thmb')
+        attach_to = req.get_param('attach_to')
         if targetRepo and body:
             name = req.get_param('name') or 'undefined.%s.raw' % _generate_id()
             assetExt = name.split('.')[-1]
-            assetPath = contenttype(name).split(';')[0].replace('x-', '') or ''
+            content_type = contenttype(name)
+            assetPath = content_type.split(';')[0].replace('x-', '') or ''
             tempraryStoragePath = path.join(targetRepo.path, collection.path,
                                             assetPath, name)
 
             name, bodyMd5 = safeCopyAndMd5(body, tempraryStoragePath, b64=b64)
             asset = session.query(Asset).filter(
                 Asset.repository == targetRepo).filter(Asset.collection == collection)\
-                        .filter(Asset.name==name).first()
+                        .filter(Asset.key==bodyMd5).first()
             if not asset:
                 asset = Asset(key=bodyMd5, repository=targetRepo,
                               collection=collection, name=name,
@@ -115,6 +118,13 @@ class AssetSave:
             if thumbnail:
                 thumbnail = unquote(thumbnail)
                 asset.thumbnail = thumbnail 
+
+
+            if attach_to:
+                parent_id = int(attach_to)
+                parent = session.query(Asset).filter(Asset.id == parent_id).first()
+                asset.attached_to.append(parent)
+
 
                 
                 #newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
@@ -143,7 +153,9 @@ def safeCopyAndMd5(fileobj, destinationPath, b64=False):
         ext = 'raw'
     checkPath(destDir)
     if path.isfile(destinationPath):
-        os.remove(destinationPath)
+        basename = 'C.' + basename
+        destinationPath = os.path.join(destDir, basename)
+        #os.remove(destinationPath)
     f = open(destinationPath, 'wb')
     md5 = hashlib.md5()
     if b64:
@@ -229,11 +241,15 @@ class GetAsset:
         if target:
             sz = os.path.getsize(target.full_path)
             modifier = target.modifiers[-1]
+            attachments = [{'name':i.name, 'url':i.url, 
+                            'description':i.description, 
+                            'thumbnail':i.thumbnail, 'content_type':i.content_type} for i in target.attachments]
             resp.body = {'url':os.path.join('/static', target.url),
                          'size':sz, 'key':target.key, 'id':target.id,
                          'version':target.version, 'datetime':target.modified_on,
                          'last_updated_by':modifier.alias, 'descripion':target.description,
-                         'owner':target.owner.alias, 'thumbnail':target.thumbnail}
+                         'owner':target.owner.alias, 'thumbnail':target.thumbnail, 
+                         'attachments':attachments}
 
 
 class DeleteAsset:

@@ -2,7 +2,15 @@ var fearlessShowtimeApp = angular.module('fearlessShowtimeApp', ['ngResource', '
 
 
 
+var convertDataURL2binaryArray = function(dataURL){
 
+    var blobBin = atob(dataURL.split(',')[1]);
+    var array = [];
+    for(var i = 0; i < blobBin.length; i++) {
+        array.push(blobBin.charCodeAt(i));
+    }
+    return new Uint8Array(array)
+}
 
 function makeid()
 {
@@ -274,11 +282,43 @@ $scope.$watch(function(){return $location.$$path},
                 }
             })
 
+            $scope.showAttachments = [{"name":"attach 1","id":1,"description":"happy", "url":"/static/downloadme.zip"}]
+
 
         }
         })
 
                     });
+    
+    $scope.attachment_added = function(e){
+        files = e.files;
+        for (var i = 0, f; f = files[i]; i++){
+            reader = new FileReader();
+            reader.onload = function(e) {
+                data = convertDataURL2binaryArray(reader.result);
+                //var img = new Image()
+                //var attach_thumb_canvas = document.createElement('canvas');
+                //attach_thumb_canvas.width = 48
+                //attach_thumb_canvas.height = 48 ;
+                //ctx = attach_thumb_canvas.getContext("2d");
+                //ctx.drawImage(this, 0, 0, tWidth, tHeight);
+                //finalFile = attach_thumb_canvas.toDataURL('image/webp'); //Always convert to png
 
+                $http.put('/api/asset/save/showtimeAttachments?collection='+project.projectName+'_attachments&name='
+                        +name+'&attach_to='+$scope.asset.id, data, {transformRequest: []} )
+                
+            }
+            name = f.name;
+
+            reader.readAsDataURL(f);
+        }
+    }
+
+    $scope.validate_display_name = function(name){
+        if (name.length>25)
+            return name.substr(0, 25) + '...';
+        else
+            return name;
+    };
 ///////////////////////////////////////end///////////////////
     });

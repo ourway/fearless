@@ -86,14 +86,24 @@ padding: 27px
 #qrcode{
 display:inline;
 }
-#sidebar {
-overflow: auto;
-/* height: 540px; */
+.sidebar {
+overflow-y: scroll;
+max-height: 300px;
 margin: auto;
 width: 85%;
 padding: 4px;
 /* padding-right: 14px; */
 box-shadow: inset 1px 1px 20px #111;
+}
+.attchments{
+    padding:5px;
+}
+.attchments img{
+vertical-align: middle;
+}
+
+.attchments a{
+    padding:5px;
 }
 #canvasDiv
 {

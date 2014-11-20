@@ -22,6 +22,7 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from mixin import IDMixin, Base
 from utils.fagit import GIT
+from opensource.contenttype import contenttype
 
 users_assets = Table('users_assets', Base.metadata,
                      Column('id', Integer, primary_key=True),
@@ -29,12 +30,21 @@ users_assets = Table('users_assets', Base.metadata,
                      Column('asset_id', Integer, ForeignKey('asset.id'))
                      )
 
+assets_assets = Table('assets_assets', Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column('asset_a_id', Integer, ForeignKey('asset.id')),
+                     Column('asset_b_id', Integer, ForeignKey('asset.id'))
+                     )
+
+
+
 
 class Asset(IDMixin, Base):
 
     '''Groups for membership management
     '''
-    key = Column(String(32), nullable=False, unique=True)
+    id = Column( Integer, primary_key=True)  # over-ride mixin version. because of remote_side
+    key = Column(String(32), nullable=False)
     name = Column(String(128))
     description = Column(String(512))
     thumbnail = Column(Text())
@@ -50,16 +60,26 @@ class Asset(IDMixin, Base):
     path = Column(String(512))  # relative to collection path, including name
     repository_id = Column(Integer, ForeignKey('repository.id'))
     owner_id = Column(Integer, ForeignKey('user.id'))
-    collection_id = Column(
-        Integer, ForeignKey('collection.id'), nullable=False)
+    #parent_id = Column(Integer, ForeignKey("asset.id"))
+    asset_id = Column(Integer, ForeignKey("asset.id"))
+    attachments = relationship("Asset", secondary=assets_assets,
+                           primaryjoin=id == assets_assets.c.asset_a_id,
+                           secondaryjoin=id == assets_assets.c.asset_b_id,
+                           backref='attached_to')
 
+    collection_id = Column( Integer, ForeignKey('collection.id'), nullable=False)
+
+
+    @validates('name')
+    def find_type(self, key, name):
+        self.content_type = contenttype(name)
+        return name
 
     @validates('collection_id')
     def check_file(self, key, collection_id):
         if not os.path.isfile(self.full_path):
             raise ValueError(
                 'Asset %s:* %s * is not available on Storage!' % (self.key, self.full_path))
-
         return collection_id
 
     @validates('version')

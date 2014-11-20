@@ -10,7 +10,6 @@ from mixin import Base
 #db_path = ':memory:'
 #db_path = 'database/studio.db'
 db_path = os.path.join( os.path.dirname(__file__), '../database/studio.db')
-print db_path
 
 try:
     db_dir = os.path.dirname(db_path)

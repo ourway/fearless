@@ -110,7 +110,7 @@
         <div ><a id="qrcode"></a></div>
 <br/>
 <br/>
-            <div ng-show="userShows" id="sidebar" >
+            <div ng-show="userShows" class="sidebar" style="height:auto" >
 
 
                 <div style="color:#ccc">
@@ -121,7 +121,25 @@
 
                 </div>
             </div>
+            <br/>
+            <div ng-show="asset.id" style="width:85%;margin:auto;margin-top:20px;cursor:pointer">
+                <a onclick="document.getElementById('attachUpload').click();">Attach Files to this show</a>
+                <input type="file" multiple="multiple" name="Attach_files" 
+                onchange="angular.element(this).scope().attachment_added(this)"
+                id="attachUpload" class="upload" style="display:none">
+            </div>
+            <br/>
+            <div ng-show="asset.attachments" class="sidebar" >
+                
+                <div ng-repeat="sa in asset.attachments" class="attchments">
+                    <img ng-src="{{sa.thumbnail || '../images/icons/P_Movie.svg.png'}}" width="48" height="48"/>
+                    <a title="{{sa.name}}" ng-href="/static/{{sa.url}}">{{validate_display_name(sa.name)}}</a>
+                </div>
 
+                <div style="color:#ccc">
+
+                </div>
+            </div>
 
 
           </td></tr>

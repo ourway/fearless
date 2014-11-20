@@ -84,7 +84,7 @@ class Project(IDMixin, Base):
     @validates('start')
     def _check_start(self, key, data):
         if data == 'now':
-            return datetime.datetime.utcnow()
+            data = datetime.datetime.utcnow()
         result = convert_to_datetime(data)
         if not self.end:
             # set a default end time for project! 3 months
@@ -92,8 +92,10 @@ class Project(IDMixin, Base):
         return result
 
     @validates('end')
-    def _check_start(self, key, data):
+    def _check_end(self, key, data):
         result = convert_to_datetime(data)
+        #if self.start and data<=self.start:
+        ##    result = self.start + datetime.timedelta(days=31*3)
         return result
 
     @validates('rep')
@@ -138,3 +140,9 @@ class Project(IDMixin, Base):
             print 'not available'
 
         return data
+
+def plan_project(mapper, connection, target):
+    target.plan
+
+
+event.listen(Project, 'before_insert', plan_project)

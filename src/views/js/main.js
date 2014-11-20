@@ -401,24 +401,26 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
                 );
         }
 
-        _pR = $http.get('/api/db/project');
+        $scope.getProjData = function(){
+            _pR = $http.get('/api/db/project');
 
-        _pR.error(function(resp){
-               if (resp.title == 'Not Authorized')
-                    $location.path('401')
-                } )
-        _pR.success(function(resp){
-            // Lets fix some problems:
-            for (i=0;i<resp.length;i++){
-                resp[i].duration = Math.round((resp[i].end - resp[i].start)/(3600*24)) + ' days';
-                    
-                resp[i].start = timeConverter(resp[i].start);
-                resp[i].end = timeConverter(resp[i].end);
-                resp[i].created_on = timeConverter(resp[i].start);
-                resp[i].modified_on = timeConverter(resp[i].start);
-            }
-            $scope.myData = resp;
-            });
+            _pR.error(function(resp){
+                   if (resp.title == 'Not Authorized')
+                        $location.path('401')
+                    } )
+            _pR.success(function(resp){
+                // Lets fix some problems:
+                for (i=0;i<resp.length;i++){
+                    resp[i].duration = Math.round((resp[i].end - resp[i].start)/(3600*24)) + ' days';
+                        
+                    resp[i].start = timeConverter(resp[i].start);
+                    resp[i].end = timeConverter(resp[i].end);
+                    resp[i].created_on = timeConverter(resp[i].start);
+                    resp[i].modified_on = timeConverter(resp[i].start);
+                }
+                $scope.myData = resp;
+                });
+        }
 
 
         $scope.createNewProject = function(){
@@ -426,15 +428,22 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
            ed = $scope.newProjectEndDate;
            pn = $scope.newProjectName;
            pl = $scope.newProjectLeader;
-           data = {start:sd, end:ed, name:pn, lead:pl}
-           $http.put('/api/db/project', data)
+           data = {start:sd, end:ed, name:pn, lead_id:pl}
+           $http.put('/api/db/project', data).success(function(resp){
+                   $scope.getProjData();
+                    $scope.newProjectStartDate = null;
+                    $scope.newProjectEndDate = null;
+                    $scope.newProjectName=null;
+                    $scope.newProjectLeader=null;
+                   $('#projectAddModal').modal('hide');
+                   
+                   });
 
            
         }
 
         $scope.getResources = function(){
             $http.get('/api/db/user').success(function(resp){
-                    console.log(resp)
                     $scope.resources = resp;
                     });
         }

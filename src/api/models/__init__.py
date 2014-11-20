@@ -66,7 +66,6 @@ Base.metadata.create_all(engine)
 def init():
     '''set some defaults values. Like admin role and group, managers, etc...
     '''
-    print '*'*25 , 'Initializing database', '*'*25
     groups = session.query(Group).all()
     for gr in ['managers', 'users', 'clients', 'guests'] :
         if not gr in [i.name for i in groups]:
@@ -93,7 +92,6 @@ def init():
     read_roles = session.query(Role).filter(Role.name.like('see%')).all()
     users_group = session.query(Group).filter(Group.name=='users').first()
     for role in read_roles:
-        print role
         users_group.rls.append(role)
 
     profile_files_repository = session.query(Repository).filter(Repository.name == 'profiles').first()
@@ -102,7 +100,6 @@ def init():
         session.add(profile_files_repository)
 
     session.commit()
-    print '*'*25 , '*********************', '*'*25
 
 
 init()
