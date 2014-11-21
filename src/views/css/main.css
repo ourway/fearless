@@ -17,6 +17,18 @@
     height: auto;
   }
 
+#projectNameDiv
+{
+    margin:5px;
+    border:1px solid #ccc;
+    padding:5px;
+    height:200px;
+}
+#projectDetailDiv{
+     margin:5px;
+    min-height:200px;
+
+}
 
 
 

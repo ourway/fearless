@@ -67,7 +67,10 @@ def init():
     '''set some defaults values. Like admin role and group, managers, etc...
     '''
     groups = session.query(Group).all()
-    for gr in ['managers', 'users', 'clients', 'guests'] :
+    departements = ['animation', 'rigging', 'character', 'storyboard', 'voice', 'sound', 'texture', 'layout', 'editorial', 'technical',
+                    'story', 'rendering', 'compositing', 'lighting', 'dynamics', 'stereoscopic', 'staff', 'management', 'directing', 'art']
+
+    for gr in ['managers', 'users', 'clients', 'guests'] + departements :
         if not gr in [i.name for i in groups]:
             new = Group(gr, role=gr[:-1])
             session.add(new)

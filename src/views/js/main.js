@@ -11,7 +11,7 @@ function timeConverter(UNIX_timestamp){
  var a = new Date(UNIX_timestamp*1000);
  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
      var year = a.getFullYear();
-     var month = months[a.getMonth() - 1];
+     var month = months[a.getMonth()];
      var date = a.getDate();
      var hour = a.getHours();
      var min = a.getMinutes();
@@ -62,6 +62,11 @@ function timeConverter(UNIX_timestamp){
 
                 templateUrl: 'pages/pms/index.html',
                 controller: 'projectCtrl'
+            })
+            .when('/pms/:projId', {
+
+                templateUrl: 'pages/pms/detail.html',
+                controller: 'projectDetailCtrl'
             })
             .when('/profile', {
 
@@ -451,3 +456,21 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
 
         });
 
+
+
+
+fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
+            $scope.projId = $routeParams.projId;
+            projectDetails = $http.get('/api/project/'+$scope.projId);
+            projectDetails.success(function(resp){
+                resp.tasks = Object.keys(resp.tasks)
+                $scope.project = resp;
+                })
+
+            projectReport = $http.get('/api/project/report/'+$scope.projId);
+            projectReport.success(function(resp){
+                $('#projectDetailDiv').html(resp.report);
+                $('.tj_table_frame').fadeIn();
+                })
+
+        });

@@ -1,0 +1,67 @@
+<style>
+table {
+border-collapse: inherit;
+border-spacing: 0;
+}
+.tj_table_frame{
+display:none;
+box-shadow: 1px 1px 33px #ccc;
+}
+.offduty {
+background-color: rgba(184, 170, 189, 0.49);
+white-space: nowrap;
+position: absolute;
+}
+.taskbar {
+background-color: #36B0D5;
+position: absolute;
+}
+.tabhead {
+white-space: nowrap;
+background-color: #E6E6E6;
+color: #373737;
+text-align: center;
+}
+.tj_table_header_cell {
+padding: 1px 5px 1px 3px;
+white-space: nowrap;
+border-spacing: 0px;
+color: #000000;
+overflow: hidden;
+}
+.tj_table {
+background-color: rgba(54, 176, 213, 0.35);
+margin: 0px;
+border-spacing: 1px;
+}
+
+</style>
+
+<div class="container">
+    <br/>
+	<div class="row clearfix">
+
+		<div class="col-md-12 column">
+			<div class="btn-group">
+                <button id="projectAddButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
+                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-eye-open"></em> Report</button> 
+                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
+                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
+			</div>
+    <br/>
+    <br/>
+			<div class="row clearfix">
+                <div class="col-md-2 column">
+                    <div id="projectNameDiv">
+                        <span class="plabel">
+                            {{project.name}}
+
+                        </span>
+                    </div>
+				</div>
+				<div class="col-md-10 column">
+                    <div id="projectDetailDiv"></div>
+				</div>
+		</div>
+	</div>
+</div>

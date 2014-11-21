@@ -1,12 +1,12 @@
 project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strftime('%Y-%m-%d')} - ${project.end.strftime('%Y-%m-%d')} {
     timingresolution 60min
     #dailyworkinghours 7.45
-    workinghours mon 09:15 - 13:00, 14:00 - 18:00
-    workinghours tue 09:15 - 13:00, 14:00 - 18:00
-    workinghours wed 09:15 - 13:00, 14:00 - 18:00
-    workinghours thu off
-    workinghours sat 09:15 - 13:00, 14:00 - 18:00
-    workinghours sun 09:15 - 13:00, 14:00 - 18:00
+    workinghours mon 09:00 - 13:00, 14:00 - 18:00
+    workinghours tue 09:00 - 13:00, 14:00 - 18:00
+    workinghours wed 09:00 - 13:00, 14:00 - 18:00
+    workinghours thu 09:00 - 13:00
+    workinghours sat 09:00 - 13:00, 14:00 - 18:00
+    workinghours sun 09:00 - 13:00, 14:00 - 18:00
     workinghours fri off
 
     timeformat "%m/%d:%H-%M"
@@ -31,14 +31,14 @@ project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strf
 
 
 
-taskreport breakdown "PMS"{
+taskreport breakdown "PMS_${project.id}"{
             formats csv
             timeformat "%Y-%m-%d-%H:%M"
-            columns id, start, end
+                columns line,  name, opentasks, start, end,  managers, effort, effortdone, effortleft, criticalness, duration
                 taskreport breakdown "report_${project.id}"{
                     formats html
                     timeformat "%m-%d:%H"
-                    columns name, start, end, chart { scale day }, managers
+                    columns line, name, start, end, duration,effort,  chart { scale day width 500 }
                 }
         }
 

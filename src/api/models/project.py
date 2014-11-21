@@ -61,7 +61,7 @@ class Project(IDMixin, Base):
         'Task', backref='project',
         cascade="all, delete-orphan")
     users = relationship('User', backref='projects', secondary='project_users')
-    lead_id = Column(Integer, ForeignKey("user.id"))
+    lead_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     working_days = Column(String(128), default='sat 09:00 - 18:00,')
     lead = relationship('User', backref='leads')
     director = relationship('User', backref='directs')
@@ -70,8 +70,9 @@ class Project(IDMixin, Base):
     tk = relationship('Ticket', backref='project')
     sequences = relationship('Sequence', backref='project')
     tickets = association_proxy('tk', 'Ticket')
+    #project_id = Column(Integer, ForeignKey('project.id'))
     rep = relationship("Report", secondary=lambda: project_reports, backref='project')
-    reports = association_proxy('rep', 'id') # when we refer to reports, id will be returned.
+    reports = association_proxy('rep', 'body') # when we refer to reports, id will be returned.
 
 
 
@@ -127,22 +128,25 @@ class Project(IDMixin, Base):
             f.write(data)
 
         tj3 = sh.tj3
-        tj3(plan_path, o='/tmp')
-        report_path = '/tmp/report_%s.html'%self.id
-        if os.path.isfile(report_path):
-            report = open(report_path)
-            root = etree.parse(report)
-            main_table = root.xpath('//table')[0]
-            tosave = etree.tostring(main_table)
-            self.reports.append(tosave)
-            session.commit()
-        else:
-            print 'not available'
+        tj = tj3(plan_path, o='/tmp')
+        if not tj.stderr:
+            report_path = '/tmp/report_%s.html'%self.id
+            if os.path.isfile(report_path):
+                report = open(report_path)
+                root = etree.parse(report)
+                main_table = root.xpath('//table')[0]
+                tosave = etree.tostring(main_table)
+                self.reports.append(tosave)
+                session.commit()
+            else:
+                print 'not available'
 
-        return data
+            return data
+        else:
+            print tj.stderr
 
 def plan_project(mapper, connection, target):
     target.plan
 
 
-event.listen(Project, 'before_insert', plan_project)
+#event.listen(Project, 'after_insert', plan_project)

@@ -35,6 +35,7 @@ from utils.AAA import Login, Signup, Authenticate,\
     Verify, Reactivate, Reset, Logout, GetUserInfo, Authorize, \
     getUserInfoFromSession, isAuthorizedTo
 from utils.showtime import GetUserShows
+from utils.project import GetProjectDetails, GetProjectLatestReport
 from utils.helpers import get_params
 
 tables = [i for i in av if i[0] in ascii_uppercase]
@@ -188,6 +189,8 @@ app.add_route('/api/asset', ListAssets())
 app.add_route('/api/asset/{key}', GetAsset())
 app.add_route('/api/asset/delete/{id}', DeleteAsset())
 app.add_route('/api/showtime/{userid}', GetUserShows())
+app.add_route('/api/project/{id}', GetProjectDetails())
+app.add_route('/api/project/report/{id}', GetProjectLatestReport())
 app.add_route('/api/sendmail', Mailer())
 
 

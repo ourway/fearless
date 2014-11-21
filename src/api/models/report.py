@@ -45,6 +45,6 @@ class Report(IDMixin, Base):
     @property
     def body(self):
         b = base64.decodestring(self.data)
-        data = {'body': bz2.decompress(b)}
+        data = bz2.decompress(b)
         return data
 

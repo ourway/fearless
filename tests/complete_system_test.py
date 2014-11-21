@@ -19,10 +19,12 @@ user2 = User(email='farsheed.ashouri@gmail.com', password='rrferl', active=True)
 ''' Our main project '''
 proj = Project(name='Fearless project 1')
 proj2  = Project(name='fuooo')
-proj.end = '2014-11-30'
-proj2.end = '2014-12-30'
+proj.end = '2015-5-30'
+proj2.end = '2015-12-30'
 #proj.tickets.append('i am a ticket')
 proj.lead = user2
+proj2.lead = user1
+
 
 '''OK, Not assign relations'''
 
@@ -82,6 +84,8 @@ animate.depends.append(rig)
 animate.resources.append(user2)
 
 
+
+
 #task1.start = '2014-1-1'
 rig.duration= 18
 
@@ -92,14 +96,15 @@ model.duration= 15
 session.add_all([model, user1, user2, proj, client, repo1, nuke_section, maya_section, rig, research, cleanup, sellme])
 session.commit()
     #import shutil
-#tj = Task.get_tree(session, json=True)
+#print animate.get_tree(session, json=True)
 
-#proj.plan
+proj.plan
 
-print session.query(Project).join(Task).all()
+
+#print session.query(Project).join(Task).all()
 
 session.commit()
-
+print proj.reports
 
     #print maya_section.assets
     #shutil.copyfileobj(maya_section.archive, open('maya_section.tar', 'w'))
