@@ -1,5 +1,5 @@
 project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strftime('%Y-%m-%d')} - ${project.end.strftime('%Y-%m-%d')} {
-    timingresolution 60min
+    timingresolution 5min
     #dailyworkinghours 7.45
     workinghours mon 09:00 - 13:00, 14:00 - 18:00
     workinghours tue 09:00 - 13:00, 14:00 - 18:00
@@ -8,12 +8,22 @@ project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strf
     workinghours sat 09:00 - 13:00, 14:00 - 18:00
     workinghours sun 09:00 - 13:00, 14:00 - 18:00
     workinghours fri off
-
     timeformat "%m/%d:%H-%M"
     scenario plan "Plan" {
         scenario delayed "Delayed"
         }
 }
+
+    rate 390.0
+    #leaves holiday "Good Friday" 2002-03-29
+
+    account cost "Project Cost" {
+      account dev "Development"
+      account doc "Documentation"
+    }
+    account rev "Payments"
+
+    balance cost rev
 
     resource members "project ${project.name} members" {
     % for resource in resources:
@@ -38,7 +48,7 @@ taskreport breakdown "PMS_${project.id}"{
                 taskreport breakdown "report_${project.id}"{
                     formats html
                     timeformat "%m-%d:%H"
-                    columns line, name, start, end, duration,effort,  chart { scale day width 500 }
+                    columns bsi, name, start, end, duration, effortleft {scale hour},  chart { scale day width 500 }
                 }
         }
 

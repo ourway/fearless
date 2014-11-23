@@ -35,7 +35,8 @@ from utils.AAA import Login, Signup, Authenticate,\
     Verify, Reactivate, Reset, Logout, GetUserInfo, Authorize, \
     getUserInfoFromSession, isAuthorizedTo
 from utils.showtime import GetUserShows
-from utils.project import GetProjectDetails, GetProjectLatestReport
+from utils.project import GetProjectDetails, GetProjectLatestReport, \
+        ListProjects, AddProject, AddTask
 from utils.helpers import get_params
 
 tables = [i for i in av if i[0] in ascii_uppercase]
@@ -111,13 +112,13 @@ class DB:
             raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         query_params = get_params(req.stream)
         insert_cmd = '{t}({q})'.format(t=table, q=query_params)
-        print insert_cmd
         new = eval(insert_cmd)
         resp.status = falcon.HTTP_201
         session.add(new)
         data = repr(new)
         resp.body = json.dumps(json.loads(data))
         # commit()
+
 
     @falcon.after(commit)
     def on_post(self, req, resp, **kw):
@@ -189,8 +190,11 @@ app.add_route('/api/asset', ListAssets())
 app.add_route('/api/asset/{key}', GetAsset())
 app.add_route('/api/asset/delete/{id}', DeleteAsset())
 app.add_route('/api/showtime/{userid}', GetUserShows())
-app.add_route('/api/project/{id}', GetProjectDetails())
+app.add_route('/api/project', ListProjects())
+app.add_route('/api/project/add', AddProject())
+app.add_route('/api/project/get/{id}', GetProjectDetails())
 app.add_route('/api/project/report/{id}', GetProjectLatestReport())
+app.add_route('/api/task/add/{projId}', AddTask())
 app.add_route('/api/sendmail', Mailer())
 
 

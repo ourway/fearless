@@ -29,33 +29,9 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 
 task_users = Table('task_users', Base.metadata,
                    Column('id', Integer, primary_key=True),
-                   Column('task_id', Integer, ForeignKey('task.id')),
-                   Column('user_id', Integer, ForeignKey('user.id'))
+                   Column('task_id', Integer, ForeignKey('task.id'), primary_key=True),
+                   Column('user_id', Integer, ForeignKey('user.id'), primary_key=True)
                    )
-
-
-task_alt_users = Table('task_alt_users', Base.metadata,
-                       Column('id', Integer, primary_key=True),
-                       Column('task_id', Integer, ForeignKey('task.id')),
-                       Column('user_id', Integer, ForeignKey('user.id'))
-                       )
-
-task_watchers = Table("task_watchers", Base.metadata,
-                      Column('id', Integer, primary_key=True),
-                      Column(
-                          "task_id", Integer, ForeignKey("task.id"), primary_key=True),
-                      Column(
-                          "watcher_id", Integer, ForeignKey("user.id"), primary_key=True)
-                      )
-
-
-task_responsible = Table("task_responsible", Base.metadata,
-                         Column('id', Integer, primary_key=True),
-                         Column(
-                             "task_id", Integer, ForeignKey("task.id"), primary_key=True),
-                         Column(
-                             "responsible_id", Integer, ForeignKey("user.id"), primary_key=True)
-                         )
 
 task_relations = Table(
     'task_relations', Base.metadata,
@@ -75,17 +51,20 @@ class Task(IDMixin, Base, BaseNestedSets):
     title = Column(String(64), unique=True, nullable=False)
     start = Column(DateTime, nullable=False, default=now)
     end = Column(DateTime, nullable=False)
-    duration = Column(Float(precision=3), nullable=False, default=0)
+    duration = Column(Float(precision=3), default=0)
+    effort = Column(Float(precision=3), nullable=False, default=0)
+    length = Column(Float(precision=3), default=0)
     parent_id = Column(Integer, ForeignKey("task.id"))
 
     resources = relationship('User', backref='tasks', secondary='task_users')
     alternative_resources = relationship(
-        'User', backref='alternative_for', secondary='task_alt_users')
+        'User', backref='alternative_for', secondary='task_users')
     watchers = relationship(
-        'User', backref='watches', secondary='task_watchers')
+        'User', backref='watches', secondary='task_users')
     responsibles = relationship(
-        'User', backref='responsible_of', secondary='task_responsible')
-    priority = Column(Integer, default=5)
+        'User', backref='responsible_of', secondary='task_users')
+    priority = Column(Integer, default=500)
+    complete = Column(Integer, default=0)
     version = relationship('Version', backref='task')
     #task = relationship('Task', backref='parent')
     ######### GOLDEN SOLUSION : Nested tree  for task to task relations ######
@@ -115,6 +94,13 @@ class Task(IDMixin, Base, BaseNestedSets):
         # print key, task
         return task
 
+    @validates('responsibles')
+    def update_resources(self, key, data):
+        if not data in self.resources:
+            self.resources.append(data)
+        return data
+
+
     @property
     def go(self):
         return 5
@@ -131,17 +117,17 @@ class Task(IDMixin, Base, BaseNestedSets):
         start = convert_to_datetime(self.start)
         delta = end - start
         self.end_set = True
-        if not hasattr(self, 'duration_set'):
+        if not hasattr(self, 'effort_set'):
             self. duration = delta.days * 24 + delta.seconds / 3600.0
 
         return end
 
-    @validates('duration')
+    @validates('effort')
     def _update_end(self, key, data):
         if not self.start:
             self.start = now()
         delta = datetime.timedelta(hours=data)
-        self.duration_set = True
+        self.effort_set = True
         if not hasattr(self, 'end_set'):
             self.end = self.start + delta
         return data
@@ -150,7 +136,7 @@ class Task(IDMixin, Base, BaseNestedSets):
 
 @event.listens_for(Task, 'before_insert')
 def receive_before_insert(mapper, connection, target):
-    target.duration = target.duration or 0
+    target.effort = target.effort or 0
 
     # ... (event handling logic) ...
 

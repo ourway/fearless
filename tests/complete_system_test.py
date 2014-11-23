@@ -61,7 +61,7 @@ sellme = Task(title="sell")
 fock = Task(title="gogo", project=proj2)
 fock.resources.append(user1)
 sellme.resources.append(user2)
-sellme.duration = 70
+sellme.effort = 7
 sellme.project = proj
 rig.resources.append(user1)
 model = Task(title="model")
@@ -82,12 +82,12 @@ research.resources.append(user1)
 rig.depends.append(model)
 animate.depends.append(rig)
 animate.resources.append(user2)
-
+animate.effort = 16
 
 
 
 #task1.start = '2014-1-1'
-rig.duration= 18
+rig.effort= 18
 
 #task2.start = '2014-2-1'
 model.duration= 15

@@ -37,14 +37,79 @@ border-spacing: 1px;
 
 </style>
 
-<div class="container">
+<div class="container" ng-init="getProjectDetails()">
     <br/>
 	<div class="row clearfix">
 
+
+
+
+			<div class="modal fade" id="taskAddModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title" id="myModalLabel">
+								Create a new task
+							</h4>
+						</div>
+                        <div class="modal-body">
+
+			<form class="form-horizontal" ng-init="getResources()" role="form">
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Task title</label>
+					<div class="col-sm-6">
+                        <input type="text" class="form-control" placeholder="New task name" ng-model="newTaskTitle" />
+					</div>
+				</div>
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Effort</label>
+					<div class="col-sm-6">
+                        <input type="number" min="1" max="24" class="form-control" placeholder="How many hours?" ng-model="newTaskEffort" required/>
+					</div>
+				</div>
+
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Task Manager</label>
+					<div class="col-sm-6">
+                    <select class="form-control" placeholder="Who's running the task?" ng-model="newTaskManager">
+                        <option ng-repeat="resource in resources" value="{{resource.id}}">{{resource.firstname}} {{resource.lastname}}</option>
+                    </select>
+                </div>
+                </div>
+
+			</form>
+
+
+						</div>
+						<div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" ng-show="newTaskTitle && newTaskEffort && newTaskManager"
+                                ng-click="createNewTask()" class="btn btn-primary">Create new project</button>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 		<div class="col-md-12 column">
 			<div class="btn-group">
-                <button id="projectAddButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
-                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-eye-open"></em> Report</button> 
+                <button id="taskAddButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
+                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-pencil"></em> Edit</button>
+                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-eye-open"></em> Report</button>
                 <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
                 <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
 			</div>
@@ -65,3 +130,14 @@ border-spacing: 1px;
 		</div>
 	</div>
 </div>
+
+
+<script>
+    $(document).ready(function(){
+        
+        $('#taskAddButton').click(function(){
+            $('#taskAddModal').modal('show');
+        }); 
+    });
+
+</script>

@@ -20,8 +20,14 @@ depends = list()
     % if task.resources:
         allocate ${','.join([i.alias for i in task.resources])}
     % endif
-    % if task.duration and not task.children:
-        effort ${task.duration}h
+    % if task.effort and not task.children:
+        effort ${task.effort}h
+    % endif
+    % if task.priority:
+        priority ${task.priority}
+    % endif
+    % if task.complete:
+        complete ${task.complete}
     % endif
     %if not task.depends and not task.parent:
         start ${task.start.strftime('%Y-%m-%d')}
@@ -29,10 +35,8 @@ depends = list()
     % if depends:
         depends ${'.'.join(depends[::-1])}
     % endif
-
     % if subtask:
         ${subtask}
     % endif
     }
-
 

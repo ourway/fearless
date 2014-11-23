@@ -103,7 +103,7 @@ class Project(IDMixin, Base):
     def compress_report(self, key, data):
         return data
 
-    @property
+    #@property
     def plan(self):
         # lets select just one task
         templateFile = os.path.join(
@@ -118,8 +118,9 @@ class Project(IDMixin, Base):
             target = each.get('node')
             if target.project == self:
                 resources.extend(target.resources)
-                tasks.append(target.tjp_task)
-
+                tasks.append(target.responsibles)
+        
+        return tasks
         plan_path = '/tmp/_Fearless_project_%s.tjp' % self.id
         report_path = '/tmp/report.html'
         data = t.render(
@@ -127,7 +128,7 @@ class Project(IDMixin, Base):
         with open(plan_path, 'w') as f:
             f.write(data)
 
-        tj3 = sh.tj3
+        tj3 = sh.Command('/usr/local/bin/tj3')
         tj = tj3(plan_path, o='/tmp')
         if not tj.stderr:
             report_path = '/tmp/report_%s.html'%self.id
@@ -145,8 +146,8 @@ class Project(IDMixin, Base):
         else:
             print tj.stderr
 
-def plan_project(mapper, connection, target):
-    target.plan
+#def plan_project(mapper, connection, target):
+#    target.plan
 
 
 #event.listen(Project, 'after_insert', plan_project)

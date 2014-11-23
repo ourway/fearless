@@ -407,7 +407,7 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
         }
 
         $scope.getProjData = function(){
-            _pR = $http.get('/api/db/project');
+            _pR = $http.get('/api/project');
 
             _pR.error(function(resp){
                    if (resp.title == 'Not Authorized')
@@ -443,8 +443,6 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
                    $('#projectAddModal').modal('hide');
                    
                    });
-
-           
         }
 
         $scope.getResources = function(){
@@ -461,7 +459,8 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
 
 fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
             $scope.projId = $routeParams.projId;
-            projectDetails = $http.get('/api/project/'+$scope.projId);
+            $scope.getProjectDetails = function(){
+            projectDetails = $http.get('/api/project/get/'+$scope.projId);
             projectDetails.success(function(resp){
                 resp.tasks = Object.keys(resp.tasks)
                 $scope.project = resp;
@@ -472,5 +471,28 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $('#projectDetailDiv').html(resp.report);
                 $('.tj_table_frame').fadeIn();
                 })
+            }
+
+        $scope.getResources = function(){
+            $http.get('/api/db/user').success(function(resp){
+                    $scope.resources = resp;
+                    });
+        }
+
+        $scope.createNewTask = function(){
+           te = $scope.newTaskEffort;
+           tt = $scope.newTaskTitle;
+           tm = $scope.newTaskManager;
+           data = {'effort':te, 'title':tt, 'responsible':tm}
+           $http.put('/api/task/add/'+$scope.projId, data).success(function(resp){
+                    $scope.getProjectDetails();
+                    $scope.newTaskEffort = null;
+                    $scope.newTaskTitle=null;
+                    $scope.newTaskManager=null;
+                   $('#taskAddModal').modal('hide');
+                   
+                   });
+        }
+        
 
         });
