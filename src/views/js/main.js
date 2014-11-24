@@ -462,13 +462,21 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.getProjectDetails = function(){
             projectDetails = $http.get('/api/project/get/'+$scope.projId);
             projectDetails.success(function(resp){
-                resp.tasks = Object.keys(resp.tasks)
-                $scope.project = resp;
+                if (resp!='null')
+                    {
+                        resp.tasks = Object.keys(resp.tasks)
+                        $scope.project = resp;
+                    }
+                else
+                    $location.path('/pms')
                 })
-
+            $scope.generateReport('report');
+            }
+            $scope.generateReport = function(mode){
+            $('.tj_table_frame').fadeOut();
             projectReport = $http.get('/api/project/report/'+$scope.projId);
             projectReport.success(function(resp){
-                $('#projectDetailDiv').html(resp.report);
+                $('#projectDetailDiv').html(resp[mode]);
                 $('.tj_table_frame').fadeIn();
                 })
             }
@@ -483,15 +491,25 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
            te = $scope.newTaskEffort;
            tt = $scope.newTaskTitle;
            tm = $scope.newTaskManager;
-           data = {'effort':te, 'title':tt, 'responsible':tm}
+           td = $scope.newTaskDepends;
+           data = {'effort':te, 'title':tt, 'resource':tm, 'depends':td}
            $http.put('/api/task/add/'+$scope.projId, data).success(function(resp){
                     $scope.getProjectDetails();
                     $scope.newTaskEffort = null;
                     $scope.newTaskTitle=null;
                     $scope.newTaskManager=null;
                    $('#taskAddModal').modal('hide');
+                    $scope.getTasksList();
                    
                    });
+        }
+
+        $scope.getTasksList = function(){
+            $http.get('/api/task/list/'+$scope.projId).success(function(resp){
+                    $scope.tasks = resp;
+                });
+
+
         }
         
 

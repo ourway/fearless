@@ -58,6 +58,7 @@ def jsonify(self, resp):
             except:
                 data = resp.body
         finally:
+
             resp.body = str(data)
 
 

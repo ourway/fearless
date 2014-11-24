@@ -29,16 +29,14 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 
 task_users = Table('task_users', Base.metadata,
                    Column('id', Integer, primary_key=True),
-                   Column('task_id', Integer, ForeignKey('task.id'), primary_key=True),
-                   Column('user_id', Integer, ForeignKey('user.id'), primary_key=True)
+                   Column('task_id', Integer, ForeignKey('task.id')),
+                   Column('user_id', Integer, ForeignKey('user.id'))
                    )
 
 task_relations = Table(
     'task_relations', Base.metadata,
-    Column('task_a_id', Integer, ForeignKey('task.id'),
-           primary_key=True),
-    Column('task_b_id', Integer, ForeignKey('task.id'),
-           primary_key=True))
+    Column('task_a_id', Integer, ForeignKey('task.id')),
+    Column('task_b_id', Integer, ForeignKey('task.id')))
 
 
 class Task(IDMixin, Base, BaseNestedSets):
@@ -48,11 +46,11 @@ class Task(IDMixin, Base, BaseNestedSets):
     id = Column(
         Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     project_id = Column(Integer, ForeignKey("project.id"), nullable=False)
-    title = Column(String(64), unique=True, nullable=False)
+    title = Column(String(64), nullable=False)
     start = Column(DateTime, nullable=False, default=now)
     end = Column(DateTime, nullable=False)
     duration = Column(Float(precision=3), default=0)
-    effort = Column(Float(precision=3), nullable=False, default=0)
+    effort = Column(Float(precision=3), nullable=False, default=1)
     length = Column(Float(precision=3), default=0)
     parent_id = Column(Integer, ForeignKey("task.id"))
 
@@ -78,7 +76,7 @@ class Task(IDMixin, Base, BaseNestedSets):
     def __repr__(self):
         return self.title
 
-    @property
+    #@property
     def tjp_task(self):
         templateFile = os.path.join(
             os.path.dirname(__file__), '../templates/task.tjp')

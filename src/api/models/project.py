@@ -92,6 +92,14 @@ class Project(IDMixin, Base):
             self.end = result + datetime.timedelta(days=31 * 3)
         return result
 
+
+    @validates('tasks')
+    def recalculate_end(self, key, data):
+        print data
+        return data
+
+
+
     @validates('end')
     def _check_end(self, key, data):
         result = convert_to_datetime(data)
@@ -118,9 +126,9 @@ class Project(IDMixin, Base):
             target = each.get('node')
             if target.project == self:
                 resources.extend(target.resources)
-                tasks.append(target.responsibles)
+                tasks.append(target.tjp_task())
         
-        return tasks
+        #return tasks
         plan_path = '/tmp/_Fearless_project_%s.tjp' % self.id
         report_path = '/tmp/report.html'
         data = t.render(
@@ -131,13 +139,14 @@ class Project(IDMixin, Base):
         tj3 = sh.Command('/usr/local/bin/tj3')
         tj = tj3(plan_path, o='/tmp')
         if not tj.stderr:
-            report_path = '/tmp/report_%s.html'%self.id
-            if os.path.isfile(report_path):
-                report = open(report_path)
-                root = etree.parse(report)
-                main_table = root.xpath('//table')[0]
-                tosave = etree.tostring(main_table)
-                self.reports.append(tosave)
+            for i in ['ResourceGraph', 'report']:
+                html_path = '/tmp/%s_%s.html' % (i, self.id)
+                if os.path.isfile(html_path):
+                    report = open(html_path)
+                    root = etree.parse(report)
+                    main_table = root.xpath('//table')[0]
+                    tosave = etree.tostring(main_table)
+                    self.reports.append(tosave)
                 session.commit()
             else:
                 print 'not available'

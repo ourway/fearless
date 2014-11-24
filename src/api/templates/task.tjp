@@ -7,16 +7,16 @@ depends = list()
     <%
         if dependency == task.parent:
             continue
-        depends.append('%s_%s'% (dependency.title, dependency.id))
+        depends.append('%s_%s'% (dependency.title.replace(' ', '_'), dependency.id))
         target = dependency
         while True:
             parent = target.parent
             if not parent: break
-            depends.append('%s_%s'% (parent.title, parent.id))
+            depends.append('%s_%s'% (parent.title.replace(' ','_'), parent.id))
             target = target.parent
     %>
 % endfor
-    task ${task.title}_${task.id} "${task.title.title()}_${task.id}" {
+    task ${task.title.replace(' ', '_')}_${task.id} "${task.title.title()}" {
     % if task.resources:
         allocate ${','.join([i.alias for i in task.resources])}
     % endif
@@ -33,7 +33,7 @@ depends = list()
         start ${task.start.strftime('%Y-%m-%d')}
     % endif
     % if depends:
-        depends ${'.'.join(depends[::-1])}
+        depends ${task.project.name.replace(' ','_') + '.' + '.'.join(depends[::-1])}
     % endif
     % if subtask:
         ${subtask}

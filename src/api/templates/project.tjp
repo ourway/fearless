@@ -27,16 +27,18 @@ project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strf
 
     resource members "project ${project.name} members" {
     % for resource in resources:
-        resource ${resource.alias} "${resource.email}" {
+        resource ${resource.alias} "${resource.alias}" {
                 efficiency ${resource.efficiency}
                 rate ${resource.rate}
             }
     % endfor
     }
-
-    % for task in tasks:
-        ${task}
-    % endfor
+    task ${project.name.replace(' ', '_')} "${project.name.title()}" {
+        start  ${project.start.strftime('%Y-%m-%d')}
+        % for task in tasks:
+            ${task}
+        % endfor
+    }
 
 
 
@@ -60,7 +62,7 @@ taskreport breakdown "PMS_${project.id}"{
 
 resourcereport resourceGraph "" {
   scenarios delayed
-  headline "Resource Allocation For Sprint Project 1"
+  headline "Resource Allocation For ${project.name.title()}"
   columns no, name, effort, start, end, status, chart {scale day width 400}
   loadunit hours
   # We only like to show leaf tasks for leaf resources.

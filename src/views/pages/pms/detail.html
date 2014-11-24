@@ -44,7 +44,7 @@ border-spacing: 1px;
 
 
 
-			<div class="modal fade" id="taskAddModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal fade" id="taskAddModal" role="dialog" ng-init="getTasksList()" aria-labelledby="myModalLabel" aria-hidden="true">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -75,7 +75,16 @@ border-spacing: 1px;
                     <select class="form-control" placeholder="Who's running the task?" ng-model="newTaskManager">
                         <option ng-repeat="resource in resources" value="{{resource.id}}">{{resource.firstname}} {{resource.lastname}}</option>
                     </select>
+                     </div>
                 </div>
+
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Depends On</label>
+					<div class="col-sm-6">
+                    <select class="form-control" placeholder="Who's running the task?" ng-model="newTaskDepends">
+                        <option ng-repeat="task in tasks" value="{{task.id}}">{{task.title}}</option>
+                    </select>
+                     </div>
                 </div>
 
 			</form>
@@ -109,8 +118,8 @@ border-spacing: 1px;
 			<div class="btn-group">
                 <button id="taskAddButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
                 <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-pencil"></em> Edit</button>
-                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-eye-open"></em> Report</button>
-                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
+                <button class="btn btn-default" ng-click="generateReport('report')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Report</button>
+                <button class="btn btn-default" ng-click="generateReport('resource')" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
                 <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
 			</div>
     <br/>

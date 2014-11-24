@@ -25,15 +25,18 @@ class GetProjectDetails:
     #@Authorize('see_project')
     def on_get(self, req, resp, id):
         project = session.query(Project).filter(Project.id==id).first()
-        resp.body = {'name':project.name, 'tasks':dict.fromkeys(project.tasks, True),
+        if project:
+            resp.body = {'name':project.name, 'tasks':dict.fromkeys(project.tasks, True),
                      'id':project.id, 'leader':project.lead.fullname}
 
 
 class ListProjects:
     def on_get(self, req, resp):
+        print 'ok1'
         user = getUserInfoFromSession(req)
+
         if user.get('id') != 1:
-            project = session.query(Project).filter(Project.lead_id==user.get('id')).order_by(desc(Project.modified_on)).all()
+            project = session.query(Project).order_by(desc(Project.modified_on)).all()
         else:
             project = session.query(Project).order_by(desc(Project.modified_on)).all()
 
@@ -61,9 +64,10 @@ class GetProjectLatestReport:
     #@Authorize('see_project')
     def on_get(self, req, resp, id):
         project = session.query(Project).filter(Project.id==id).first()
-        print project.plan() ## first let it plan
-        if project.reports:
-            resp.body = {'report':project.reports[-1]}
+        if project:
+            project.plan() ## first let it plan
+            if project.reports:
+                resp.body = {'report':project.reports[-1], 'resource':project.reports[-2]}
 
 
 class AddTask:
@@ -71,16 +75,35 @@ class AddTask:
     def on_put(self, req, resp, projId):
         user = getUserInfoFromSession(req)
         taskData = get_params(req.stream, flat=False)
+        resources, depends, manager, effort = list(), list(), 0, 0
         title = taskData.get('title')
-        effort = int(taskData.get('effort'))
-        responsible_id = int(taskData.get('responsible'))
+        if taskData.get('effort'): effort = int(taskData.get('effort'))
+
         #print responsible_id
-        responsible = session.query(User).filter(User.id==responsible_id).first()
-        print responsible
         newTask = Task(title=title, effort=effort)
-        session.add(newTask)
-        newTask.responsibles.append(responsible)
         newTask.project_id = int(projId)
+        if taskData.get('resource'): resources = taskData.get('resource').split(',')
+        if taskData.get('depends'): depends = taskData.get('depends').split(',')
+        if taskData.get('manager'): manager = int(taskData.get('manager'))
+        for i in resources:
+            resource = session.query(User).filter(User.id==int(i)).first()
+            newTask.resources.append(resource)
+        for i in depends:
+            depend = session.query(Task).filter(Task.id==int(i)).first()
+            newTask.depends.append(depend)
+        #depend = session.query(Task).filter(Task.id==depends).first()
+        #newTask.depends.append(depend)
+        session.add(newTask)
+
+
+class ListTasks:
+    def on_get(self, req, resp, projId):
+        user = getUserInfoFromSession(req)
+        project = session.query(Project).filter(Project.id==projId).first()
+        if project:
+            resp.body = [{'title':i.title, 'id':i.id} for i in project.tasks]
+
+
 
 
 
