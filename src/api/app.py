@@ -36,7 +36,7 @@ from utils.AAA import Login, Signup, Authenticate,\
     getUserInfoFromSession, isAuthorizedTo
 from utils.showtime import GetUserShows
 from utils.project import GetProjectDetails, GetProjectLatestReport, \
-        ListProjects, AddProject, AddTask, ListTasks
+        ListProjects, AddProject, AddTask, ListTasks, GetTask
 from utils.helpers import get_params
 
 tables = [i for i in av if i[0] in ascii_uppercase]
@@ -63,8 +63,8 @@ class DB:
         args = req.path.split('/')
         table = args[3]
         u = getUserInfoFromSession(req)
-        if not isAuthorizedTo(u.get('id'), 'see_%s'%table):
-            raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
+        #if not isAuthorizedTo(u.get('id'), 'see_%s'%table):
+        #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         key = req.get_param('key') or 'id'
         table = table.title()
         show = req.get_param('show')
@@ -108,8 +108,8 @@ class DB:
         args = req.path.split('/')
         table = args[3].title()
         u = getUserInfoFromSession(req)
-        if not isAuthorizedTo(u.get('id'), 'create_%s'%table):
-            raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
+        #if not isAuthorizedTo(u.get('id'), 'create_%s'%table):
+        #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         query_params = get_params(req.stream)
         insert_cmd = '{t}({q})'.format(t=table, q=query_params)
         new = eval(insert_cmd)
@@ -196,6 +196,7 @@ app.add_route('/api/project/get/{id}', GetProjectDetails())
 app.add_route('/api/project/report/{id}', GetProjectLatestReport())
 app.add_route('/api/task/add/{projId}', AddTask())
 app.add_route('/api/task/list/{projId}', ListTasks())
+app.add_route('/api/task/{taskId}', GetTask())
 app.add_route('/api/sendmail', Mailer())
 
 

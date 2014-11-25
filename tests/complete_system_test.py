@@ -14,8 +14,12 @@ import copy
 '''We have a client'''
 client = Client(name='pooyamehr')
 ''' Lets create few users '''
-user1 = User(email='rodmena@me.com', password='rrferl', active=True, firstname='Farsheed', lastname='Ashouri')
-user2 = User(email='farsheed.ashouri@gmail.com', password='rrferl', active=True)
+user1 = User(email='farsheed.ashouri@gmail.com', password='rrferl', active=True, firstname='admin2', lastname='admin2')
+user2 = User(email='farshee.d.ashouri@gmail.com', password='rrferl', active=True, firstname='david', lastname='janson')
+user4 = User(email='fars.heed.ashouri@gmail.com', password='rrferl', active=True, firstname='scott', lastname='anderson')
+user5 = User(email='farshe.ed.ashouri@gmail.com', password='rrferl', active=True, firstname='david', lastname='cameron')
+user6 = User(email='farsheed.a.shouri@gmail.com', password='rrferl', active=True, firstname='peter', lastname='jackson')
+user7 = User(email='farsheed.ash.ouri@gmail.com', password='rrferl', active=True, firstname='alfred', lastname='hichi')
 ''' Our main project '''
 proj = Project(name='Fearless project 1')
 proj2  = Project(name='fuooo')
@@ -93,7 +97,7 @@ rig.effort= 18
 model.duration= 15
 
 
-session.add_all([model, user1, user2, proj, client, repo1, nuke_section, maya_section, rig, research, cleanup, sellme])
+session.add_all([model, user1, user2, user4, user5, user6, user7, proj, client, repo1, nuke_section, maya_section, rig, research, cleanup, sellme])
 session.commit()
     #import shutil
 #print animate.get_tree(session, json=True)

@@ -27,7 +27,7 @@ project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strf
 
     resource members "project ${project.name} members" {
     % for resource in resources:
-        resource ${resource.alias} "${resource.alias}" {
+        resource ${resource.alias} "${resource.firstname} ${resource.lastname}" {
                 efficiency ${resource.efficiency}
                 rate ${resource.rate}
             }
@@ -46,15 +46,15 @@ project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strf
 taskreport breakdown "PMS_${project.id}"{
             formats csv
             timeformat "%Y-%m-%d-%H:%M"
-                columns line,  name, opentasks, start, end,  managers, effort, effortdone, effortleft, criticalness, duration
+                columns line,  name, opentasks, start, end,  managers, effort, effortdone, effortleft, criticalness, duration, complete
                 taskreport breakdown "report_${project.id}"{
                     formats html
                     timeformat "%m-%d:%H"
-                    columns bsi, name, start, end, duration, effortleft {scale hour},  chart { scale day width 500 }
+                    columns bsi, name, start, end, duration, complete,  chart { scale day width 500 }
                 }
         }
 
-  textreport "ResourceGraph_${project.id}" {
+  textreport "resource_${project.id}" {
     formats html
     title "Resource Graph"
     center '<[report id="resourceGraph"]>'
@@ -63,7 +63,7 @@ taskreport breakdown "PMS_${project.id}"{
 resourcereport resourceGraph "" {
   scenarios delayed
   headline "Resource Allocation For ${project.name.title()}"
-  columns no, name, effort, start, end, status, chart {scale day width 400}
+  columns bsi, name, effort, start, end, status, chart {scale day width 400}
   loadunit hours
   # We only like to show leaf tasks for leaf resources.
     hidetask ~(isleaf() & isleaf_())

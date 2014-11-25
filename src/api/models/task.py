@@ -33,6 +33,26 @@ task_users = Table('task_users', Base.metadata,
                    Column('user_id', Integer, ForeignKey('user.id'))
                    )
 
+task_watchers = Table('task_watchers', Base.metadata,
+                   Column('id', Integer, primary_key=True),
+                   Column('task_id', Integer, ForeignKey('task.id')),
+                   Column('user_id', Integer, ForeignKey('user.id'))
+                   )
+
+task_responsible = Table('task_responsible', Base.metadata,
+                   Column('id', Integer, primary_key=True),
+                   Column('task_id', Integer, ForeignKey('task.id')),
+                   Column('user_id', Integer, ForeignKey('user.id'))
+                   )
+
+task_alternative = Table('task_alternative', Base.metadata,
+                   Column('id', Integer, primary_key=True),
+                   Column('task_id', Integer, ForeignKey('task.id')),
+                   Column('user_id', Integer, ForeignKey('user.id'))
+                   )
+
+
+
 task_relations = Table(
     'task_relations', Base.metadata,
     Column('task_a_id', Integer, ForeignKey('task.id')),
@@ -56,11 +76,11 @@ class Task(IDMixin, Base, BaseNestedSets):
 
     resources = relationship('User', backref='tasks', secondary='task_users')
     alternative_resources = relationship(
-        'User', backref='alternative_for', secondary='task_users')
+        'User', backref='alternative_for', secondary='task_alternative')
     watchers = relationship(
-        'User', backref='watches', secondary='task_users')
+        'User', backref='watches', secondary='task_watchers')
     responsibles = relationship(
-        'User', backref='responsible_of', secondary='task_users')
+        'User', backref='responsible_of', secondary='task_responsible')
     priority = Column(Integer, default=500)
     complete = Column(Integer, default=0)
     version = relationship('Version', backref='task')
@@ -73,15 +93,15 @@ class Task(IDMixin, Base, BaseNestedSets):
                            backref='dependent_of')
     ##########################################################################
 
-    def __repr__(self):
-        return self.title
+    #def __repr__(self):
+    #    return self.title
 
     #@property
     def tjp_task(self):
         templateFile = os.path.join(
             os.path.dirname(__file__), '../templates/task.tjp')
         t = Template(filename=templateFile)
-        subtask = '\n'.join([i.tjp_task for i in self.children])
+        subtask = '\n'.join([i.tjp_task() for i in self.children])
         return t.render(task=self, subtask=subtask)
 
     def dump(self, _indent=0):

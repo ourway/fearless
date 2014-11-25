@@ -9,14 +9,14 @@ fearlessApp.factory('authFactory', function($resource) {
 
 function timeConverter(UNIX_timestamp){
  var a = new Date(UNIX_timestamp*1000);
- var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+ //var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
      var year = a.getFullYear();
-     var month = months[a.getMonth()];
+     var month = a.getMonth();
      var date = a.getDate();
      var hour = a.getHours();
      var min = a.getMinutes();
      var sec = a.getSeconds();
-     var time = date +  month + ' ' + year + ' ' + hour + ':' + min + ':' + sec ;
+     var time = year+ '-' +month + '-' + date
      return time;
  }
 
@@ -508,9 +508,22 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $http.get('/api/task/list/'+$scope.projId).success(function(resp){
                     $scope.tasks = resp;
                 });
-
-
         }
-        
+
+        $scope.taskDetail = function(taskId) {
+            //console.log(taskId);
+            $http.get('/api/task/'+taskId).success(function(resp){
+                    $scope.editTaskInfo = resp;
+                    resp.start = timeConverter(resp.start)
+                    resp.end = timeConverter(resp.end)
+                    
+                    });
+            $('#taskDetailModal').modal('show');
+            }
+    $scope.updateTask = function(taskId){
+
+        $http.post('/api/task/update/'+taskId, $scope.editTaskInfo);
+    
+    } 
 
         });

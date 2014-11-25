@@ -95,7 +95,8 @@ class Project(IDMixin, Base):
 
     @validates('tasks')
     def recalculate_end(self, key, data):
-        print data
+        if not data.start:
+            data.start = self.start
         return data
 
 
@@ -137,9 +138,22 @@ class Project(IDMixin, Base):
             f.write(data)
 
         tj3 = sh.Command('/usr/local/bin/tj3')
-        tj = tj3(plan_path, o='/tmp')
+        try:
+            tj = tj3(plan_path, o='/tmp')
+        except Exception,e:
+            #print type(repr(e))
+            if 'did not fit' in repr(e):
+                self.reports.append('Some Tasks Does not fit in time frame!')
+                self.reports.append('Some Tasks Does not fit in time frame!')
+            elif 'has not been marked as scheduled' in repr(e):
+                self.reports.append('Can not schedule one of tasks. Please edit your plan.')
+                self.reports.append('Can not schedule one of tasks. Please edit your plan.')
+            else:
+                self.reports.append(repr(e))
+                self.reports.append(repr(e))
+            return
         if not tj.stderr:
-            for i in ['ResourceGraph', 'report']:
+            for i in ['resource', 'report']:
                 html_path = '/tmp/%s_%s.html' % (i, self.id)
                 if os.path.isfile(html_path):
                     report = open(html_path)
@@ -147,13 +161,14 @@ class Project(IDMixin, Base):
                     main_table = root.xpath('//table')[0]
                     tosave = etree.tostring(main_table)
                     self.reports.append(tosave)
+                else:
+                    print 'not available'
+
                 session.commit()
-            else:
-                print 'not available'
 
             return data
         else:
-            print tj.stderr
+            return tj.stderr
 
 #def plan_project(mapper, connection, target):
 #    target.plan

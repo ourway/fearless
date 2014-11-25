@@ -7,8 +7,18 @@ border-spacing: 0;
 display:none;
 box-shadow: 1px 1px 33px #ccc;
 }
+.taskbarframe {
+background-color: #000000;
+position: absolute;
+box-shadow: 0px 0px 28px #8FB4C7;
+}
+.depline {
+background-color: #C3C3C3;
+position: absolute;
+box-shadow: 0px 1px 1px #000000;
+}
 .offduty {
-background-color: rgba(184, 170, 189, 0.49);
+background-color: rgba(185, 206, 219, 1);
 white-space: nowrap;
 position: absolute;
 }
@@ -29,10 +39,19 @@ border-spacing: 0px;
 color: #000000;
 overflow: hidden;
 }
+.free {
+background-color: #D7FFA5;
+position: absolute;
+}
+
 .tj_table {
 background-color: rgba(54, 176, 213, 0.35);
 margin: 0px;
 border-spacing: 1px;
+}
+.busy {
+background-color: #C399FF;
+position: absolute;
 }
 
 </style>
@@ -81,7 +100,8 @@ border-spacing: 1px;
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Depends On</label>
 					<div class="col-sm-6">
-                    <select class="form-control" placeholder="Who's running the task?" ng-model="newTaskDepends">
+                    <select class="form-control" ng-model="newTaskDepends">
+                        <option value=""></option>
                         <option ng-repeat="task in tasks" value="{{task.id}}">{{task.title}}</option>
                     </select>
                      </div>
@@ -94,7 +114,7 @@ border-spacing: 1px;
 						<div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             <button type="button" ng-show="newTaskTitle && newTaskEffort && newTaskManager"
-                                ng-click="createNewTask()" class="btn btn-primary">Create new project</button>
+                                ng-click="createNewTask()" class="btn btn-primary">Create new task</button>
 						</div>
 					</div>
 
@@ -105,6 +125,61 @@ border-spacing: 1px;
 
 
 
+
+
+
+			<div class="modal fade" id="taskDetailModal" role="dialog" ng-init="getTasksList()" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title" id="myModalLabel">
+								Task Edit Area
+							</h4>
+						</div>
+                        <div class="modal-body">
+
+			<form class="form-horizontal" role="form">
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Task title</label>
+					<div class="col-sm-6">
+                        <input type="text" class="form-control" placeholder="Task name" ng-model="editTaskInfo.title" />
+					</div>
+				</div>
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Start</label>
+					<div class="col-sm-6">
+                        <input type="date" class="form-control" placeholder="Task start date" ng-model="editTaskInfo.start" />
+					</div>
+				</div>
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">end</label>
+					<div class="col-sm-6">
+                        <input type="date" class="form-control" placeholder="Task end date" ng-model="editTaskInfo.end" />
+					</div>
+                </div>
+
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Effort</label>
+					<div class="col-sm-6">
+                        <input type="number" class="form-control" placeholder="Task effort" ng-model="editTaskInfo.effort" />
+					</div>
+                </div>
+
+			</form>
+
+
+						</div>
+						<div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button"
+                                ng-click="updateTask(editTaskInfo.id)" class="btn btn-primary">Update task</button>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
 
 
 
@@ -126,11 +201,11 @@ border-spacing: 1px;
     <br/>
 			<div class="row clearfix">
                 <div class="col-md-2 column">
-                    <div id="projectNameDiv">
-                        <span class="plabel">
-                            {{project.name}}
+                    <div id="tasksDiv">
+                        <ol>
+                            <li ng-click="taskDetail(task.id)" class="taskA" ng-repeat="task in tasks"><a id="{{task.id}}" >{{task.title}}</a></li>
+                        </ol>
 
-                        </span>
                     </div>
 				</div>
 				<div class="col-md-10 column">
@@ -143,10 +218,18 @@ border-spacing: 1px;
 
 <script>
     $(document).ready(function(){
-        
+
         $('#taskAddButton').click(function(){
             $('#taskAddModal').modal('show');
-        }); 
+        });
+
+
+
+
+
     });
 
+
 </script>
+
+

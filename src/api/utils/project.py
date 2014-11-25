@@ -19,6 +19,7 @@ import falcon
 from helpers import get_params
 from sqlalchemy import desc
 from utils.helpers import commit, jsonify
+import datetime
 
 
 class GetProjectDetails:
@@ -32,14 +33,12 @@ class GetProjectDetails:
 
 class ListProjects:
     def on_get(self, req, resp):
-        print 'ok1'
         user = getUserInfoFromSession(req)
 
         if user.get('id') != 1:
             project = session.query(Project).order_by(desc(Project.modified_on)).all()
         else:
             project = session.query(Project).order_by(desc(Project.modified_on)).all()
-
 
         resp.body = project
 
@@ -78,10 +77,16 @@ class AddTask:
         resources, depends, manager, effort = list(), list(), 0, 0
         title = taskData.get('title')
         if taskData.get('effort'): effort = int(taskData.get('effort'))
-
+        start = taskData.get('start')
         #print responsible_id
         newTask = Task(title=title, effort=effort)
-        newTask.project_id = int(projId)
+        project = session.query(Project).filter(Project.id==int(projId)).first()
+        if not start:
+            newTask.start = project.start
+        else:
+            newTask.start = start
+            
+        newTask.project = project
         if taskData.get('resource'): resources = taskData.get('resource').split(',')
         if taskData.get('depends'): depends = taskData.get('depends').split(',')
         if taskData.get('manager'): manager = int(taskData.get('manager'))
@@ -102,6 +107,24 @@ class ListTasks:
         project = session.query(Project).filter(Project.id==projId).first()
         if project:
             resp.body = [{'title':i.title, 'id':i.id} for i in project.tasks]
+
+
+class GetTask:
+    def on_get(self, req, resp, taskId):
+        task = session.query(Task).filter(Task.id==taskId).first()
+        resp.body = {'title':task.title, 'id':task.id, 'start':task.start, 
+                     'end':task.end, 'effort':task.effort, 
+                     'depends':[{'name':i.title, 'id':i.id} for i in task.depends],
+                     'dependent_of':[{'name':i.title, 'id':i.id} for i in task.dependent_of],
+                     'resources':[{'fullname':i.fullname, 'id':i.id} for i in task.resources],
+                     'watchers':[{'fullname':i.fullname, 'id':i.id} for i in task.watchers],
+                     'alternative_resources':[{'fullname':i.fullname, 'id':i.id} for i in task.alternative_resources],
+                     'responsibles':[{'fullname':i.fullname, 'id':i.id} for i in task.responsibles],
+                     'priority':task.priority,
+                     'complete':task.complete,
+                     'duration':task.duration
+                     }
+
 
 
 
