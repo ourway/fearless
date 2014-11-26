@@ -32,6 +32,10 @@ background-color: #E6E6E6;
 color: #373737;
 text-align: center;
 }
+.progressbar {
+background-color: #510062;
+position: absolute;
+}
 .tj_table_header_cell {
 padding: 1px 5px 1px 3px;
 white-space: nowrap;
@@ -128,7 +132,7 @@ position: absolute;
 
 
 
-			<div class="modal fade" id="taskDetailModal" role="dialog" ng-init="getTasksList()" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal fade" id="taskDetailModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
@@ -165,6 +169,14 @@ position: absolute;
                         <input type="number" class="form-control" placeholder="Task effort" ng-model="editTaskInfo.effort" />
 					</div>
                 </div>
+            	<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Complete</label>
+					<div class="col-sm-6">
+                        <div class="input-group-addon">{{editTaskInfo.complete}}</div>
+                        <input type="range" class="form-control" min="0" max="100" placeholder="Task effort" ng-model="editTaskInfo.complete" />
+					</div>
+                </div>
+
 
 			</form>
 
@@ -209,7 +221,9 @@ position: absolute;
                     </div>
 				</div>
 				<div class="col-md-10 column">
-                    <div id="projectDetailDiv"></div>
+                    <div id="projectDetailContainer">
+                        <div id="projectDetailDiv"></div>
+                    </div>
 				</div>
 		</div>
 	</div>

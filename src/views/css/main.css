@@ -33,6 +33,14 @@
 cursor:pointer;
 }
 
+#projectDetailContainer{
+    width:100%;
+    min-height: 580px;
+    background: url('../images/loading_3.gif') no-repeat center;
+    background-size: 164px 128px;
+    background-position: 40% 10%;
+}
+
 
 
 

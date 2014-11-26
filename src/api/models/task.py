@@ -67,11 +67,13 @@ class Task(IDMixin, Base, BaseNestedSets):
         Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     project_id = Column(Integer, ForeignKey("project.id"), nullable=False)
     title = Column(String(64), nullable=False)
+    note = Column(String(256))  ## task note
     start = Column(DateTime, nullable=False, default=now)
     end = Column(DateTime, nullable=False)
     duration = Column(Float(precision=3), default=0)
     effort = Column(Float(precision=3), nullable=False, default=1)
     length = Column(Float(precision=3), default=0)
+    milestone = Column(Boolean, default=False) # is task a milestone?
     parent_id = Column(Integer, ForeignKey("task.id"))
 
     resources = relationship('User', backref='tasks', secondary='task_users')
@@ -126,19 +128,26 @@ class Task(IDMixin, Base, BaseNestedSets):
     @validates('start')
     def _check_start(self, key, data):
         if data == 'now':
-            return datetime.datetime.utcnow()
-        return convert_to_datetime(data)
+            data = datetime.datetime.utcnow()
+        else:
+            data =  convert_to_datetime(data)
+        if self.project:
+            data = max(data, self.project.start)
+        return data
 
     @validates('end')
     def _check_end(self, key, data):
         end = convert_to_datetime(data)
         start = convert_to_datetime(self.start)
+        data = max(start, end)  ## if any errors in end
         delta = end - start
         self.end_set = True
         if not hasattr(self, 'effort_set'):
             self. duration = delta.days * 24 + delta.seconds / 3600.0
 
-        return end
+        if self.project:
+            data = min(data, self.project.end)
+        return data
 
     @validates('effort')
     def _update_end(self, key, data):
@@ -161,14 +170,14 @@ def receive_before_insert(mapper, connection, target):
 
 @event.listens_for(Task, 'after_insert')
 def receive_before_insert(mapper, connection, target):
-    pass
-    # print task.title
+    #pass
+    print target.title
     # ... (update task confighandling logic) ...
 
 
-def schedule(mapper, connection, target):
-    pass
-    # print target
+#def schedule(mapper, connection, target):
+
+    #target.project.plan()
 
 
-event.listen(Task, 'after_insert', schedule)
+#event.listen(Task, 'after_insert', schedule)

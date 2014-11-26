@@ -7,21 +7,35 @@ fearlessApp.factory('authFactory', function($resource) {
   );
 });
 
+
+function pad(num, size) {
+    var s = num+"";
+    while (s.length < size) s = "0" + s;
+    return s;
+}
+
+
 function timeConverter(UNIX_timestamp){
  var a = new Date(UNIX_timestamp*1000);
  //var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
      var year = a.getFullYear();
-     var month = a.getMonth();
+     var month = a.getMonth() + 1;
      var date = a.getDate();
      var hour = a.getHours();
      var min = a.getMinutes();
      var sec = a.getSeconds();
-     var time = year+ '-' +month + '-' + date
+     var time = year+ '-' + pad(month,2) + '-' + pad(date,2)
      return time;
  }
 
-
-
+var TITLE = 'TITLE';
+    function TagToTip(a, b,c){
+        task = c.toLowerCase();
+        target  = $(".taskA:contains('"+ task + "') a");
+        if (target.length)
+            target[0].click();
+        //console.log(angular.element('#projectDetailContainer').scope.taskInfo);
+    }
 
 
 
@@ -470,10 +484,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 else
                     $location.path('/pms')
                 })
-            $scope.generateReport('report');
-            }
+
             $scope.generateReport = function(mode){
-            $('.tj_table_frame').fadeOut();
+            $('.tj_table_frame').fadeOut(2000);
             projectReport = $http.get('/api/project/report/'+$scope.projId);
             projectReport.success(function(resp){
                 $('#projectDetailDiv').html(resp[mode]);
@@ -481,7 +494,10 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 })
             }
 
-        $scope.getResources = function(){
+            $scope.generateReport('report');
+            }
+
+    $scope.getResources = function(){
             $http.get('/api/db/user').success(function(resp){
                     $scope.resources = resp;
                     });
@@ -513,17 +529,27 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         $scope.taskDetail = function(taskId) {
             //console.log(taskId);
             $http.get('/api/task/'+taskId).success(function(resp){
-                    $scope.editTaskInfo = resp;
-                    resp.start = timeConverter(resp.start)
-                    resp.end = timeConverter(resp.end)
-                    
+                resp.start = timeConverter(Math.max(resp.start, resp.project_start));
+                resp.end = timeConverter(Math.min(resp.end, resp.project_end));
+                $scope.editTaskInfo = resp;
+                console.log(resp);
+                $('#taskDetailModal').modal('show');
+
                     });
-            $('#taskDetailModal').modal('show');
             }
     $scope.updateTask = function(taskId){
 
-        $http.post('/api/task/update/'+taskId, $scope.editTaskInfo);
+        $http.post('/api/task/update/'+taskId, $scope.editTaskInfo).then(function(resp){
+
+            $scope.getTasksList();
+            $scope.generateReport('report');
+            $scope.editTaskInfo = {};
+            $('#taskDetailModal').modal('hide');
+
+        });
     
-    } 
+    }
+
+
 
         });

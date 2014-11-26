@@ -14,6 +14,37 @@ project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strf
         }
 }
 
+
+% for vy in xrange(2014,2021):
+    vacation "Martyrdom of Imam Reza" ${vy}-1-2
+    vacation "Birthday of Muhammad and Imam Sadeq" ${vy}-1-19
+    vacation "Revolution Day" ${vy}-2-11
+    vacation "Nourooz" ${vy}-3-20 - ${vy}-3-25
+    vacation "Islamic Republic Day" ${vy}-4-1
+    vacation "Nature Day" ${vy}-4-2
+    vacation "Martyrdom of Fatima" ${vy}-4-3
+    vacation "Birthday of Imam Ali" ${vy}-5-13
+    vacation "Prophet's Ascension" ${vy}-5-27
+    vacation "Anniversary of Khomeini's Death" ${vy}-6-4
+    vacation "Revolt of Khordad 15" ${vy}-6-5
+    vacation "Imam Mahdi's birthday" ${vy}-7-13
+    vacation "June Solstice" ${vy}-7-21
+    vacation "Martyrdom of Imam Ali" ${vy}-8-19
+    vacation "Eid-e-Fetr (End of Ramadan)" ${vy}-8-29 - ${vy}-8-30
+    vacation "Martyrdom of Imam Sadeq" ${vy}-9-22
+    vacation "September equinox" ${vy}-9-23
+    vacation "Eid-e-Ghorban (Feast of Sacrifice)" ${vy}-10-5
+    vacation "Eid-al-Ghadir" ${vy}-10-13
+    vacation "Tassoua/Ashoura" ${vy}-11-26
+    vacation "Arbaeen" ${vy}-12-13
+    vacation "December Solstice / Demise of Prophet Muhammad" ${vy}-12-21
+    vacation "Martyrdom of Imam Reza" ${vy}-12-23
+% endfor
+
+
+
+
+
     rate 390.0
     #leaves holiday "Good Friday" 2002-03-29
 
@@ -45,10 +76,12 @@ project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strf
 
 taskreport breakdown "PMS_${project.id}"{
             formats csv
+            loadunit hours
             timeformat "%Y-%m-%d-%H:%M"
                 columns line,  name, opentasks, start, end,  managers, effort, effortdone, effortleft, criticalness, duration, complete
                 taskreport breakdown "report_${project.id}"{
                     formats html
+                    loadunit hours
                     timeformat "%m-%d:%H"
                     columns bsi, name, start, end, duration, complete,  chart { scale day width 500 }
                 }

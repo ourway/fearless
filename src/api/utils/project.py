@@ -122,8 +122,39 @@ class GetTask:
                      'responsibles':[{'fullname':i.fullname, 'id':i.id} for i in task.responsibles],
                      'priority':task.priority,
                      'complete':task.complete,
-                     'duration':task.duration
+                     'duration':task.duration,
+                     'project_start':task.project.start,
+                     'project_end':task.project.end
                      }
+
+class UpdateTask:
+    @falcon.after(commit)
+    def on_post(self, req,resp, taskId):
+        user = getUserInfoFromSession(req)
+        taskData = get_params(req.stream, flat=False)
+        resources = taskData.get('resources')
+        responsibles = taskData.get('responsibles')
+        alternative_resources = taskData.get('alternative_resources')
+        watchers = taskData.get('watchers')
+        depends = taskData.get('depends')
+        complete = int(taskData.get('complete'))
+        effort = int(taskData.get('effort'))
+        start = str(taskData.get('start'))
+        end = str(taskData.get('end'))
+        title = taskData.get('title')
+        _id = int(taskData.get('id'))
+        priority = taskData.get('priority')
+        target = session.query(Task).filter(Task.id==_id).first()
+        if target:
+            target.title = title
+            target.start = start
+            target.end = end
+            target.effort = effort
+            target.complete = complete
+            resp.body = {'message':'Task Updated'}
+        else:
+            resp.status = falcon.HTTP_404
+            resp.body = {'message':'Task Not Found'}
 
 
 

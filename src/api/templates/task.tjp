@@ -1,6 +1,5 @@
 <%
-if not (task.resources or task.children):
-    return
+
 depends = list()
 %>
 % for dependency in task.depends:
@@ -17,6 +16,12 @@ depends = list()
     %>
 % endfor
     task ${task.title.replace(' ', '_')}_${task.id} "${task.title.title()}" {
+    % if (task.milestone and not task.children and not task.effort) or not (task.resources or task.children or task.effort):
+        milestone
+    % endif
+    % if task.note:
+        note "${task.note}"
+    % endif
     % if task.resources:
         allocate ${','.join([i.alias for i in task.resources])}
     % endif

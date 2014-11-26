@@ -50,6 +50,8 @@ def convert_to_datetime(inp):
         format = '%Y-%m-%d:%H-%M-%S'
         fmtlen = (length * 3) - 1
         fmt = format[:fmtlen]
+        #inp = '-'.join(map(str, map( int, inp.split(';')[0].split('-'))) )
+        #print inp, fmt
         return datetime.datetime.strptime(inp, fmt)
 
 

@@ -36,7 +36,7 @@ from utils.AAA import Login, Signup, Authenticate,\
     getUserInfoFromSession, isAuthorizedTo
 from utils.showtime import GetUserShows
 from utils.project import GetProjectDetails, GetProjectLatestReport, \
-        ListProjects, AddProject, AddTask, ListTasks, GetTask
+        ListProjects, AddProject, AddTask, ListTasks, GetTask, UpdateTask
 from utils.helpers import get_params
 
 tables = [i for i in av if i[0] in ascii_uppercase]
@@ -197,6 +197,7 @@ app.add_route('/api/project/report/{id}', GetProjectLatestReport())
 app.add_route('/api/task/add/{projId}', AddTask())
 app.add_route('/api/task/list/{projId}', ListTasks())
 app.add_route('/api/task/{taskId}', GetTask())
+app.add_route('/api/task/update/{taskId}', UpdateTask())
 app.add_route('/api/sendmail', Mailer())
 
 

@@ -97,6 +97,17 @@ class Project(IDMixin, Base):
     def recalculate_end(self, key, data):
         if not data.start:
             data.start = self.start
+
+        for task in self.tasks:
+            if task.start < self.start:
+                task.start = self.start
+            if task.end < task.start:
+                task.end = max(task.start, task.end)
+        task_ends = [i.end for i in self.tasks]
+        if task_ends and max(task_ends) > self.end:
+            self.end = max(task_ends)
+        if data.end and data.end > self.end:
+            self.end = data.end
         return data
 
 
@@ -139,7 +150,7 @@ class Project(IDMixin, Base):
 
         tj3 = sh.Command('/usr/local/bin/tj3')
         try:
-            tj = tj3(plan_path, o='/tmp')
+            tj = tj3(plan_path, o='/tmp', c=8)
         except Exception,e:
             #print type(repr(e))
             if 'did not fit' in repr(e):
@@ -148,9 +159,15 @@ class Project(IDMixin, Base):
             elif 'has not been marked as scheduled' in repr(e):
                 self.reports.append('Can not schedule one of tasks. Please edit your plan.')
                 self.reports.append('Can not schedule one of tasks. Please edit your plan.')
+            elif 'must be within the project time frame' in repr(e):
+                self.reports.append('Longer than planned! Edit tasks or edit project')
+                self.reports.append('Longer than planned! Edit tasks or edit project')
+
             else:
                 self.reports.append(repr(e))
                 self.reports.append(repr(e))
+
+            session.commit()
             return
         if not tj.stderr:
             for i in ['resource', 'report']:
