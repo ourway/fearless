@@ -131,23 +131,33 @@ class Task(IDMixin, Base, BaseNestedSets):
             data = datetime.datetime.utcnow()
         else:
             data =  convert_to_datetime(data)
-        if self.project:
-            data = max(data, self.project.start)
+        if self.project and self.project.end:
+            data = min(data, self.project.end)
+
+        if data == self.project.end and self.effort:
+            data = data - datetime.timedelta(hours=self.effort*4) ## approximate fix
+
         return data
+
+
 
     @validates('end')
     def _check_end(self, key, data):
         end = convert_to_datetime(data)
         start = convert_to_datetime(self.start)
         data = max(start, end)  ## if any errors in end
-        delta = end - start
+        if self.project and self.project.end:
+            data = min(data, self.project.end)
+
+
+
+        delta = data - start
         self.end_set = True
         if not hasattr(self, 'effort_set'):
             self. duration = delta.days * 24 + delta.seconds / 3600.0
-
-        if self.project:
-            data = min(data, self.project.end)
         return data
+
+
 
     @validates('effort')
     def _update_end(self, key, data):

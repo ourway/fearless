@@ -95,6 +95,8 @@ class Project(IDMixin, Base):
 
     @validates('tasks')
     def recalculate_end(self, key, data):
+        if not self.start and self.end:
+            return data
         if not data.start:
             data.start = self.start
 
@@ -103,11 +105,12 @@ class Project(IDMixin, Base):
                 task.start = self.start
             if task.end < task.start:
                 task.end = max(task.start, task.end)
-        task_ends = [i.end for i in self.tasks]
-        if task_ends and max(task_ends) > self.end:
-            self.end = max(task_ends)
-        if data.end and data.end > self.end:
-            self.end = data.end
+        if self.end:
+            task_ends = [i.end for i in self.tasks]
+            if task_ends and max(task_ends) > self.end:
+                self.end = max(task_ends)
+            if data.end and data.end > self.end:
+                self.end = data.end
         return data
 
 

@@ -88,7 +88,7 @@ position: absolute;
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Effort</label>
 					<div class="col-sm-6">
-                        <input type="number" min="1" max="24" class="form-control" placeholder="How many hours?" ng-model="newTaskEffort" required/>
+                        <input type="number" min="1" max="96" class="form-control" placeholder="How many hours?" ng-model="newTaskEffort" required/>
 					</div>
 				</div>
 
@@ -169,7 +169,7 @@ position: absolute;
                         <input type="number" class="form-control" placeholder="Task effort" ng-model="editTaskInfo.effort" />
 					</div>
                 </div>
-            	<div class="form-group">
+            	<div ng-show="editTaskInfo.effort" class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Complete</label>
 					<div class="col-sm-6">
                         <div class="input-group-addon">{{editTaskInfo.complete}}</div>

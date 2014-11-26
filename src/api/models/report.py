@@ -22,8 +22,8 @@ import base64
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
-from mixin import IDMixin, Base
-
+from mixin import IDMixin, Base, db_files_path, getUUID
+import os
 
 class Report(IDMixin, Base):
 
@@ -38,13 +38,16 @@ class Report(IDMixin, Base):
 
     @validates('data')
     def compress_body(self, key, data):
+        self.uuid = getUUID()
         c = bz2.compress(data)
-        result = base64.encodestring(c)
-        return result
+        #result = base64.encodestring(c)
+        with open(os.path.join(db_files_path, self.uuid), 'wb') as f:
+            f.write(c)
+        return self.uuid
 
     @property
     def body(self):
-        b = base64.decodestring(self.data)
-        data = bz2.decompress(b)
+        with open(os.path.join(db_files_path, self.uuid), 'rb') as f:
+            data = bz2.decompress(f.read())
         return data
 

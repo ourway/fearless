@@ -13,6 +13,7 @@ Clean code is much better than Cleaner comments!
 '''
 
 
+import os
 import datetime
 import ujson as json
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
@@ -27,7 +28,9 @@ now = datetime.datetime.utcnow
 
 Base = declarative_base()
 logger = setup_logger('model', 'model.log')
-
+db_files_path = os.path.join( os.path.dirname(__file__), '../database/files')
+if not os.path.isdir(db_files_path):
+    os.makedirs(db_files_path)
 
 def get_session():
     from models import session
@@ -64,6 +67,7 @@ class IDMixin(object):
     #__table_args__ = {'mysql_engine': 'InnoDB'}
     #__mapper_args__= {'always_refresh': True}
     id = Column(Integer, primary_key=True)
+    uuid = Column(String(64), default=getUUID)
     created_on = Column(DateTime, default=now)
     modified_on = Column(
         DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)

@@ -150,7 +150,8 @@ class UpdateTask:
             target.start = start
             target.end = end
             target.effort = effort
-            target.complete = complete
+            if effort:
+                target.complete = complete
             resp.body = {'message':'Task Updated'}
         else:
             resp.status = falcon.HTTP_404

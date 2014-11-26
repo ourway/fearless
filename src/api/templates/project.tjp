@@ -83,7 +83,7 @@ taskreport breakdown "PMS_${project.id}"{
                     formats html
                     loadunit hours
                     timeformat "%m-%d:%H"
-                    columns bsi, name, start, end, duration, complete,  chart { scale day width 500 }
+                    columns bsi, name, start, end, effort, complete,  chart { scale day width 500 }
                 }
         }
 
@@ -95,8 +95,7 @@ taskreport breakdown "PMS_${project.id}"{
 
 resourcereport resourceGraph "" {
   scenarios delayed
-  headline "Resource Allocation For ${project.name.title()}"
-  columns bsi, name, effort, start, end, status, chart {scale day width 400}
+  columns bsi, name, effort, start, end, status, chart {scale day width 500}
   loadunit hours
   # We only like to show leaf tasks for leaf resources.
     hidetask ~(isleaf() & isleaf_())
