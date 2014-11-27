@@ -4,7 +4,7 @@ import os
 from sqlalchemy import create_engine  # for database
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_mptt import mptt_sessionmaker
-
+from sqlalchemy.pool import SingletonThreadPool
 from mixin import Base
 
 #db_path = ':memory:'
@@ -18,7 +18,7 @@ try:
 except OSError:
     pass
 
-engine = create_engine('sqlite:///%s' % db_path, echo=False, encoding='utf-8')
+engine = create_engine('sqlite:///%s' % db_path, echo=False, encoding='utf-8', poolclass=SingletonThreadPool)
 #engine.raw_connection().connection.text_factory = str
 Session = mptt_sessionmaker(sessionmaker(bind=engine))
 session = Session()

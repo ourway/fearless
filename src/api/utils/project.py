@@ -79,14 +79,12 @@ class AddTask:
         if taskData.get('effort'): effort = int(taskData.get('effort'))
         start = taskData.get('start')
         #print responsible_id
-        newTask = Task(title=title, effort=effort)
         project = session.query(Project).filter(Project.id==int(projId)).first()
         if not start:
-            newTask.start = project.start
-        else:
-            newTask.start = start
-            
-        newTask.project = project
+           start = project.start
+
+        newTask = Task(title=title, effort=effort, project=project, start=start)
+
         if taskData.get('resource'): resources = taskData.get('resource').split(',')
         if taskData.get('depends'): depends = taskData.get('depends').split(',')
         if taskData.get('manager'): manager = int(taskData.get('manager'))

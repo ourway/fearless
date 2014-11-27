@@ -532,7 +532,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 resp.start = timeConverter(Math.max(resp.start, resp.project_start));
                 resp.end = timeConverter(Math.min(resp.end, resp.project_end));
                 $scope.editTaskInfo = resp;
-                console.log(resp);
+                //console.log(resp);
                 $('#taskDetailModal').modal('show');
 
                     });

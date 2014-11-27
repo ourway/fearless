@@ -4,7 +4,7 @@ project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strf
     workinghours mon 09:00 - 13:00, 14:00 - 18:00
     workinghours tue 09:00 - 13:00, 14:00 - 18:00
     workinghours wed 09:00 - 13:00, 14:00 - 18:00
-    workinghours thu 09:00 - 13:00
+    workinghours thu 09:00 - 13:00, 14:00 - 18:00
     workinghours sat 09:00 - 13:00, 14:00 - 18:00
     workinghours sun 09:00 - 13:00, 14:00 - 18:00
     workinghours fri off
@@ -83,7 +83,8 @@ taskreport breakdown "PMS_${project.id}"{
                     formats html
                     loadunit hours
                     timeformat "%m-%d:%H"
-                    columns bsi, name, start, end, effort, complete,  chart { scale day width 500 }
+                    columns bsi, name, start, end, effort, duration, complete,  chart { scale day width 600 }
+
                 }
         }
 
@@ -95,7 +96,7 @@ taskreport breakdown "PMS_${project.id}"{
 
 resourcereport resourceGraph "" {
   scenarios delayed
-  columns bsi, name, effort, start, end, status, chart {scale day width 500}
+  columns bsi, name, effort, start, end, status, chart {scale day width 600}
   loadunit hours
   # We only like to show leaf tasks for leaf resources.
     hidetask ~(isleaf() & isleaf_())

@@ -134,9 +134,9 @@ class Task(IDMixin, Base, BaseNestedSets):
         if self.project and self.project.end:
             data = min(data, self.project.end)
 
-        if data == self.project.end and self.effort:
-            data = data - datetime.timedelta(hours=self.effort*4) ## approximate fix
-
+        if self.project:
+            if data == self.project.end and self.effort:
+                data = data - datetime.timedelta(hours=self.effort*4) ## approximate fix
         return data
 
 
