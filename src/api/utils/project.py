@@ -74,6 +74,7 @@ class AddTask:
     def on_put(self, req, resp, projId):
         user = getUserInfoFromSession(req)
         taskData = get_params(req.stream, flat=False)
+        print taskData
         resources, depends, manager, effort = list(), list(), 0, 0
         title = taskData.get('title')
         if taskData.get('effort'): effort = int(taskData.get('effort'))
@@ -85,14 +86,17 @@ class AddTask:
 
         newTask = Task(title=title, effort=effort, project=project, start=start)
 
-        if taskData.get('resource'): resources = taskData.get('resource').split(',')
-        if taskData.get('depends'): depends = taskData.get('depends').split(',')
+        if taskData.get('resources'): resources = map(int, taskData.get('resources'))
+        if taskData.get('depends'): depends = map(int, taskData.get('depends'))
         if taskData.get('manager'): manager = int(taskData.get('manager'))
         for i in resources:
-            resource = session.query(User).filter(User.id==int(i)).first()
+            resource = session.query(User).filter(User.id==i).first()
             newTask.resources.append(resource)
+        if manager:
+            manager = session.query(User).filter(User.id==manager).first()
+            newTask.responsibles.append(resource)
         for i in depends:
-            depend = session.query(Task).filter(Task.id==int(i)).first()
+            depend = session.query(Task).filter(Task.id==i).first()
             newTask.depends.append(depend)
         #depend = session.query(Task).filter(Task.id==depends).first()
         #newTask.depends.append(depend)
@@ -112,8 +116,8 @@ class GetTask:
         task = session.query(Task).filter(Task.id==taskId).first()
         resp.body = {'title':task.title, 'id':task.id, 'start':task.start, 
                      'end':task.end, 'effort':task.effort, 
-                     'depends':[{'name':i.title, 'id':i.id} for i in task.depends],
-                     'dependent_of':[{'name':i.title, 'id':i.id} for i in task.dependent_of],
+                     'depends':[{'title':i.title, 'id':i.id} for i in task.depends],
+                     'dependent_of':[{'title':i.title, 'id':i.id} for i in task.dependent_of],
                      'resources':[{'fullname':i.fullname, 'id':i.id} for i in task.resources],
                      'watchers':[{'fullname':i.fullname, 'id':i.id} for i in task.watchers],
                      'alternative_resources':[{'fullname':i.fullname, 'id':i.id} for i in task.alternative_resources],

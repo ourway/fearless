@@ -9,7 +9,7 @@ project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} -
     workinghours sat 09:00 - 13:00, 14:00 - 18:00
     workinghours sun 09:00 - 13:00, 14:00 - 18:00
     workinghours fri off
-    timeformat "%Y-%m-%d %H-%M"
+    timeformat "%y-%m-%d %H-%M"
     scenario plan "Plan" {
         scenario delayed "Delayed"
         }
@@ -82,7 +82,7 @@ taskreport breakdown "PMS_${project.id}"{
                 taskreport breakdown1 "plan_${project.id}"{
                     formats html
                     loadunit hours
-                    columns name, start, end, effortleft, criticalness {title "Importance"}, complete {title "Progress"}, chart { scale day width 500 }
+                    columns name, start, end, effortleft, criticalness {title "Importance"}, complete {title "Progress"}, chart { scale day width 100 }
                     sorttasks plan.criticalness.up
                 }
                 taskreport breakdown2 "guntt_${project.id}"{

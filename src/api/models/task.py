@@ -180,8 +180,8 @@ def receive_before_insert(mapper, connection, target):
 
 @event.listens_for(Task, 'after_insert')
 def receive_before_insert(mapper, connection, target):
-    #pass
-    print target.title
+    pass
+    #print target.title
     # ... (update task confighandling logic) ...
 
 

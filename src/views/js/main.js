@@ -528,7 +528,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
            tt = $scope.newTaskTitle;
            tm = $scope.newTaskManager;
            td = $scope.newTaskDepends;
-           data = {'effort':te, 'title':tt, 'resource':tm, 'depends':td}
+           tr = $scope.newTaskResources;
+           data = {'effort':te, 'title':tt, 'manager':tm, 'depends':td, 'resources': tr}
            $http.put('/api/task/add/'+$scope.projId, data).success(function(resp){
                     $scope.getProjectDetails();
                     $scope.newTaskEffort = null;
