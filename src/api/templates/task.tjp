@@ -7,18 +7,21 @@ isMilestone = False
     <%
         if dependency == task.parent:
             continue
-        depends.append('_%s'% (dependency.id))
+        hr = []
+        hr.append(str(dependency.id))
         target = dependency
         while True:
             parent = target.parent
-            if not parent: break
-            depends.append('_%s'% (parent.id))
+            if not parent:
+                break
+            hr.append(str(parent.id))
             target = target.parent
+        depends.append('__%s._%s' % (dependency.project.id, '._'.join(hr[::-1])))
     %>
 % endfor
     task _${task.id} "${task.title.title()}" {
     % if not task.children and not task.parent and not task.effort:
-        <% 
+        <%
           isMilestone = True
         %>
         milestone
@@ -47,10 +50,11 @@ isMilestone = False
         end ${task.end.strftime('%Y-%m-%d')}
     % endif
     % if depends:
-        depends __${str(task.project.id) + '.' + '.'.join(depends[::-1])}
+        depends ${','.join(depends[::-1])}
     % endif
     % if subtask:
         ${subtask}
     % endif
     }
+
 

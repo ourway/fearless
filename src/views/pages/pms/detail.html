@@ -1,22 +1,30 @@
 <style>
 table {
-border-collapse: inherit;
+border-collapse: 0px;
 border-spacing: 0;
 }
-.tj_table_frame{
-display:none;
-box-shadow: 1px 1px 33px #ccc;
+
+
+.tj_table_frame {
+margin-left: auto;
+margin-right: auto;
+text-align: center;
+background-color: #9a9a9a;
+margin-top: 15px;
+margin-bottom: 15px;
+box-shadow: 1px 1px 17px #000D1A;
+border: 7px solid #E0E0E0;
+border-radius: 2px;
+border-spacing: 0px;
+font-size: 13px;
 }
+
 .taskbarframe {
 background-color: #000000;
 position: absolute;
 box-shadow: 0px 0px 28px #8FB4C7;
 }
-.depline {
-background-color: #C3C3C3;
-position: absolute;
-box-shadow: 0px 1px 1px #000000;
-}
+
 .offduty {
 background-color: rgba(185, 206, 219, 1);
 white-space: nowrap;
@@ -49,7 +57,7 @@ position: absolute;
 }
 
 .tj_table {
-background-color: rgba(54, 176, 213, 0.35);
+background-color: rgba(54, 153, 213, 0.76);
 margin: 0px;
 border-spacing: 1px;
 }
@@ -57,7 +65,30 @@ border-spacing: 1px;
 background-color: #C399FF;
 position: absolute;
 }
+/*
+.taskcell1{
+border-right: 1px solid #57BEDD;
+border-bottom: 1px solid #57BEDD;
+}
 
+.taskcell2{
+border-right: 1px solid #57BEDD;
+border-bottom: 1px solid #57BEDD;
+}
+.resourcecell1{
+border-right: 1px solid #57BEDD;
+border-bottom: 1px solid #57BEDD;
+
+}
+.resourcecell2{
+border-right: 1px solid #57BEDD;
+border-bottom: 1px solid #57BEDD;
+}
+.tabcell{
+border-right: 1px solid #57BEDD;
+border-bottom: 1px solid #57BEDD;
+}
+*/
 </style>
 
 <div class="container" ng-init="getProjectDetails()">
@@ -196,7 +227,6 @@ position: absolute;
                     <select class="form-control" ng-model="newTaskDepends">
                         <option value=""></option>
                         <option ng-repeat="depend in editTaskInfo.depends" value="{{depend.id}}">{{depend.title}}</option>
-                        <input />
                     </select>
                      </div>
                 </div>

@@ -82,7 +82,7 @@ taskreport breakdown "PMS_${project.id}"{
                 taskreport breakdown1 "plan_${project.id}"{
                     formats html
                     loadunit hours
-                    columns name, start, end, effortleft, criticalness {title "Importance"}, complete {title "Progress"}, chart { scale day width 100 }
+                    columns name, start, end, effortleft, criticalness {title "Importance"}, complete {title "Progress"}, chart { scale day width 300 }
                     sorttasks plan.criticalness.up
                 }
                 taskreport breakdown2 "guntt_${project.id}"{
