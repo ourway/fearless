@@ -1,5 +1,6 @@
-project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strftime('%Y-%m-%d')} - ${project.end.strftime('%Y-%m-%d')} {
+project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} - ${project.end.strftime('%Y-%m-%d')} {
     timingresolution 5min
+    now  ${now.strftime('%Y-%m-%d')}
     #dailyworkinghours 7.45
     workinghours mon 09:00 - 13:00, 14:00 - 18:00
     workinghours tue 09:00 - 13:00, 14:00 - 18:00
@@ -8,7 +9,7 @@ project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strf
     workinghours sat 09:00 - 13:00, 14:00 - 18:00
     workinghours sun 09:00 - 13:00, 14:00 - 18:00
     workinghours fri off
-    timeformat "%m/%d:%H-%M"
+    timeformat "%Y-%m-%d %H-%M"
     scenario plan "Plan" {
         scenario delayed "Delayed"
         }
@@ -58,13 +59,13 @@ project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strf
 
     resource members "project ${project.name} members" {
     % for resource in resources:
-        resource ${resource.alias} "${resource.firstname} ${resource.lastname}" {
+        resource _${resource.id} "${resource.firstname} ${resource.lastname}" {
                 efficiency ${resource.efficiency}
                 rate ${resource.rate}
             }
     % endfor
     }
-    task ${project.name.replace(' ', '_')} "${project.name.title()}" {
+    task __${project.id} "${project.name.title()}" {
         start  ${project.start.strftime('%Y-%m-%d')}
         % for task in tasks:
             ${task}
@@ -77,14 +78,18 @@ project ${project.name.replace(' ', '_')} "${project.name}" ${project.start.strf
 taskreport breakdown "PMS_${project.id}"{
             formats csv
             loadunit hours
-            timeformat "%Y-%m-%d-%H:%M"
-                columns line,  name, opentasks, start, end,  managers, effort, effortdone, effortleft, criticalness, duration, complete
-                taskreport breakdown "report_${project.id}"{
+                columns line,  name, opentasks, start, end,  managers, effort, effortdone, effortleft, criticalness, duration, complete, efficiency
+                taskreport breakdown1 "plan_${project.id}"{
                     formats html
                     loadunit hours
-                    timeformat "%m-%d:%H"
-                    columns bsi, name, start, end, effort, duration, complete,  chart { scale day width 600 }
-
+                    columns name, start, end, effortleft, criticalness {title "Importance"}, complete {title "Progress"}, chart { scale day width 500 }
+                    sorttasks plan.criticalness.up
+                }
+                taskreport breakdown2 "guntt_${project.id}"{
+                    formats html
+                    loadunit hours
+                    columns name, chart { scale hour width 800 }, complete {title "Progress"}
+                    sorttasks plan.criticalness.up
                 }
         }
 
@@ -96,9 +101,9 @@ taskreport breakdown "PMS_${project.id}"{
 
 resourcereport resourceGraph "" {
   scenarios delayed
-  columns bsi, name, effort, start, end, status, chart {scale day width 600}
+  columns bsi, name, effort, status, chart {scale day width 600}
   loadunit hours
   # We only like to show leaf tasks for leaf resources.
     hidetask ~(isleaf() & isleaf_())
-  sorttasks plan.start.up
+  sorttasks plan.criticalness.down
 }

@@ -1,29 +1,35 @@
 <%
 
 depends = list()
+isMilestone = False
 %>
 % for dependency in task.depends:
     <%
         if dependency == task.parent:
             continue
-        depends.append('%s_%s'% (dependency.title.replace(' ', '_'), dependency.id))
+        depends.append('_%s'% (dependency.id))
         target = dependency
         while True:
             parent = target.parent
             if not parent: break
-            depends.append('%s_%s'% (parent.title.replace(' ','_'), parent.id))
+            depends.append('_%s'% (parent.id))
             target = target.parent
     %>
 % endfor
-    task ${task.title.replace(' ', '_')}_${task.id} "${task.title.title()}" {
-    % if (task.milestone and not task.children and not task.effort) or not (task.resources or task.children or task.effort):
+    task _${task.id} "${task.title.title()}" {
+    % if not task.children and not task.parent and not task.effort:
+        <% 
+          isMilestone = True
+        %>
         milestone
+        start ${task.end.strftime('%Y-%m-%d')}
+        end ${task.end.strftime('%Y-%m-%d')}
     % endif
     % if task.note:
         note "${task.note}"
     % endif
     % if task.resources:
-        allocate ${','.join([i.alias for i in task.resources])}
+        allocate ${','.join(['_'+str(i.id) for i in task.resources])}
     % endif
     % if task.effort and not task.children:
         effort ${task.effort}h
@@ -34,11 +40,14 @@ depends = list()
     % if task.complete:
         complete ${task.complete}
     % endif
-    %if not task.depends and not task.parent:
+    %if not task.depends and not task.parent and not isMilestone:
         start ${task.start.strftime('%Y-%m-%d')}
     % endif
+    %if not task.children and not task.effort and not isMilestone:
+        end ${task.end.strftime('%Y-%m-%d')}
+    % endif
     % if depends:
-        depends ${task.project.name.replace(' ','_') + '.' + '.'.join(depends[::-1])}
+        depends __${str(task.project.id) + '.' + '.'.join(depends[::-1])}
     % endif
     % if subtask:
         ${subtask}

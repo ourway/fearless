@@ -153,8 +153,8 @@ class Task(IDMixin, Base, BaseNestedSets):
 
         delta = data - start
         self.end_set = True
-        if not hasattr(self, 'effort_set'):
-            self. duration = delta.days * 24 + delta.seconds / 3600.0
+        #if not hasattr(self, 'effort_set'):
+        #    self.duration = delta.days * 24 + delta.seconds / 3600.0
         return data
 
 

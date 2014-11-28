@@ -147,7 +147,8 @@ class Project(IDMixin, Base):
         plan_path = '/tmp/_Fearless_project_%s.tjp' % self.id
         report_path = '/tmp/report.html'
         data = t.render(
-            project=self, resources=set(resources), tasks=set(tasks))
+            project=self, resources=set(resources), tasks=set(tasks), now=now())
+        data = data.encode('utf-8')
         with open(plan_path, 'w') as f:
             f.write(data)
 
@@ -156,24 +157,12 @@ class Project(IDMixin, Base):
             tj = tj3(plan_path, o='/tmp', c=8)
         except Exception,e:
             #print type(repr(e))
-            if 'did not fit' in repr(e):
-                self.reports.append('Some Tasks Does not fit in time frame!')
-                self.reports.append('Some Tasks Does not fit in time frame!')
-            elif 'has not been marked as scheduled' in repr(e):
-                self.reports.append('Can not schedule one of tasks. Please edit your plan.')
-                self.reports.append('Can not schedule one of tasks. Please edit your plan.')
-            elif 'must be within the project time frame' in repr(e):
-                self.reports.append('Longer than planned! Edit tasks or edit project')
-                self.reports.append('Longer than planned! Edit tasks or edit project')
-
-            else:
-                self.reports.append(repr(e))
-                self.reports.append(repr(e))
-
+            for i in xrange(3):
+                self.reports.append('<br/>'.join(repr(e).split('\\n')[17:]).replace('\\x1b[31m', '<b>').replace('\\x1b[0m','</b>'))
             session.commit()
             return
         if not tj.stderr:
-            for i in ['resource', 'report']:
+            for i in ['resource', 'plan', 'guntt']:
                 html_path = '/tmp/%s_%s.html' % (i, self.id)
                 if os.path.isfile(html_path):
                     report = open(html_path)

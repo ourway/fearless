@@ -88,7 +88,7 @@ position: absolute;
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Effort</label>
 					<div class="col-sm-6">
-                        <input type="number" min="1" max="96" class="form-control" placeholder="How many hours?" ng-model="newTaskEffort" required/>
+                        <input type="number" min="0" max="96" class="form-control" placeholder="How many hours?" ng-init="newTaskEffort=0" ng-model="newTaskEffort" required/>
 					</div>
 				</div>
 
@@ -117,7 +117,7 @@ position: absolute;
 						</div>
 						<div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" ng-show="newTaskTitle && newTaskEffort && newTaskManager"
+                            <button type="button" ng-show="newTaskTitle && newTaskManager"
                                 ng-click="createNewTask()" class="btn btn-primary">Create new task</button>
 						</div>
 					</div>
@@ -166,7 +166,7 @@ position: absolute;
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Effort</label>
 					<div class="col-sm-6">
-                        <input type="number" class="form-control" placeholder="Task effort" ng-model="editTaskInfo.effort" />
+                        <input type="number" min="0" max="96" class="form-control" placeholder="Task effort" ng-model="editTaskInfo.effort" />
 					</div>
                 </div>
             	<div ng-show="editTaskInfo.effort" class="form-group">
@@ -205,7 +205,8 @@ position: absolute;
 			<div class="btn-group">
                 <button id="taskAddButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
                 <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-pencil"></em> Edit</button>
-                <button class="btn btn-default" ng-click="generateReport('report')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Guntt Chart</button>
+                <button class="btn btn-default" ng-click="generateReport('plan')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</button>
+                <button class="btn btn-default" ng-click="generateReport('guntt')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Guntt Chart</button>
                 <button class="btn btn-default" ng-click="generateReport('resource')" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
                 <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
 			</div>

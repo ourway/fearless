@@ -311,7 +311,8 @@ fearlessApp.controller('pmsCtrl', function($scope, $http, $location){
 fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $location){
         
         userInfoReq = $http.get('/api/db/user/'+$scope.$parent.userInfo.userid);
-        userInfoReq.success(function(resp){
+        userInfoReq.success(function(resp, b, c, d){
+        console.log(resp, b, c, d);
             resp = resp[0]
             delete resp.password;
             delete resp.created_on;
@@ -322,6 +323,9 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
             //console.log(resp);
            $scope.user = resp; 
 
+            });
+        userInfoReq.error(function(a, b, c, d){
+                console.log(a, b, c, d);
             });
 
 
@@ -462,7 +466,10 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
         $scope.getResources = function(){
             $http.get('/api/db/user').success(function(resp){
                     $scope.resources = resp;
-                    });
+                    }).error(function(resp, status){
+                        if (status == 401)
+                            $location.path('auth/login');
+                        });
         }
 
 
@@ -487,14 +494,27 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
             $scope.generateReport = function(mode){
             $('.tj_table_frame').fadeOut(2000);
+            data = localStorage.getItem('project_'+$scope.projId+'_' + mode);
+            if ($scope.replan || !data){
             projectReport = $http.get('/api/project/report/'+$scope.projId);
             projectReport.success(function(resp){
+                localStorage.setItem('project_'+$scope.projId+'_plan', resp.plan);
+                localStorage.setItem('project_'+$scope.projId+'_guntt', resp.guntt);
+                localStorage.setItem('project_'+$scope.projId+'_resource', resp.resource);
                 $('#projectDetailDiv').html(resp[mode]);
                 $('.tj_table_frame').fadeIn();
                 })
+                if ($scope.replan)
+                    $scope.replan = false;
             }
+            else{
+                data = localStorage.getItem('project_'+$scope.projId+'_' + mode);
+                $('#projectDetailDiv').html(data);
+                $('.tj_table_frame').fadeIn();
+            }
+         }
 
-            $scope.generateReport('report');
+            $scope.generateReport('plan');
             }
 
     $scope.getResources = function(){
@@ -516,6 +536,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     $scope.newTaskManager=null;
                    $('#taskAddModal').modal('hide');
                     $scope.getTasksList();
+                    $scope.replan = true;
+                    $scope.generateReport('plan');
                    
                    });
         }
@@ -542,7 +564,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         $http.post('/api/task/update/'+taskId, $scope.editTaskInfo).then(function(resp){
 
             $scope.getTasksList();
-            $scope.generateReport('report');
+            $scope.replan = true;
+            $scope.generateReport('plan');
             $scope.editTaskInfo = {};
             $('#taskDetailModal').modal('hide');
 

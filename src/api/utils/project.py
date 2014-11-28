@@ -66,7 +66,7 @@ class GetProjectLatestReport:
         if project:
             project.plan() ## first let it plan
             if project.reports:
-                resp.body = {'report':project.reports[-1], 'resource':project.reports[-2]}
+                resp.body = {'guntt':project.reports[-1], 'plan':project.reports[-2], 'resource':project.reports[-3]}
 
 
 class AddTask:
