@@ -16,7 +16,10 @@ function pad(num, size) {
 
 
 function timeConverter(UNIX_timestamp){
- var a = new Date(UNIX_timestamp*1000);
+    if (UNIX_timestamp)
+        var a = new Date(UNIX_timestamp*1000);
+    else
+        var a = new Date();
  //var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
      var year = a.getFullYear();
      var month = a.getMonth() + 1;
@@ -387,6 +390,7 @@ fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $locati
 fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $location){
     
     //$scope.newProjectStartDate = new Date();
+    $scope.timeConverter = timeConverter;
     $scope.gridOptions = {
         data: 'myData',
         enableFiltering: true,
@@ -480,6 +484,7 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
 
 fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
             $scope.projId = $routeParams.projId;
+            $scope.timeConverter = timeConverter;
             $scope.getProjectDetails = function(){
             projectDetails = $http.get('/api/project/get/'+$scope.projId);
             projectDetails.success(function(resp){
@@ -494,13 +499,15 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
             $scope.generateReport = function(mode){
             $('.tj_table_frame').fadeOut(2000);
-            data = localStorage.getItem('project_'+$scope.projId+'_' + mode);
+            getprefix = 'project_'+ $scope.projId+ '_' + timeConverter() + '_';
+            data = localStorage.getItem(getprefix +  mode);
             if ($scope.replan || !data){
+            console.log('getting')
             projectReport = $http.get('/api/project/report/'+$scope.projId);
             projectReport.success(function(resp){
-                localStorage.setItem('project_'+$scope.projId+'_plan', resp.plan);
-                localStorage.setItem('project_'+$scope.projId+'_guntt', resp.guntt);
-                localStorage.setItem('project_'+$scope.projId+'_resource', resp.resource);
+                localStorage.setItem(getprefix + 'plan', resp.plan);
+                localStorage.setItem(getprefix + 'guntt', resp.guntt);
+                localStorage.setItem(getprefix + 'resource', resp.resource);
                 $('#projectDetailDiv').html(resp[mode]);
                 $('.tj_table_frame').fadeIn();
                 })
@@ -508,7 +515,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     $scope.replan = false;
             }
             else{
-                data = localStorage.getItem('project_'+$scope.projId+'_' + mode);
+                data = localStorage.getItem(getprefix + mode);
                 $('#projectDetailDiv').html(data);
                 $('.tj_table_frame').fadeIn();
             }
@@ -524,12 +531,23 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         }
 
         $scope.createNewTask = function(){
+           if ($scope.newTaskIsMilestone)
+           {
+                $scope.newTaskEffort = 0;
+                $scope.newTaskResources = [];
+                $scope.newTaskStart = $scope.newTaskEnd;
+            }
            te = $scope.newTaskEffort;
            tt = $scope.newTaskTitle;
            tm = $scope.newTaskManager;
            td = $scope.newTaskDepends;
            tr = $scope.newTaskResources;
-           data = {'effort':te, 'title':tt, 'manager':tm, 'depends':td, 'resources': tr}
+           ted = $scope.newTaskEnd;
+           ts = $scope.newTaskStart;
+
+           console.log($scope.newTaskIsMilestone);
+           data = {'effort':te, 'title':tt, 'manager':tm, 'depends':td, 
+                    'resources': tr, 'start':ts, 'end':ted, 'milestone':$scope.newTaskIsMilestone}
            $http.put('/api/task/add/'+$scope.projId, data).success(function(resp){
                     $scope.getProjectDetails();
                     $scope.newTaskEffort = null;
@@ -549,13 +567,47 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 });
         }
 
+        $scope.isCurrenclyDependentOf = function(task){
+            if (!$scope.editTaskInfo || !task || !$scope.editTaskInfo.depends)
+                return false
+            for (i=0;i<$scope.editTaskInfo.depends.length;i++)
+            {
+                t = $scope.editTaskInfo.depends[i];
+                if (t.id == task)
+                {
+                    //$scope.editTaskInfo.updatedDepends.push(t.id);
+                    return true
+                }
+            }
+                
+        };
+
+        $scope.isCurrenclyResource = function(resource){
+            if (!$scope.editTaskInfo || !resource || !$scope.editTaskInfo.resources)
+                return false
+            for (i=0;i<$scope.editTaskInfo.resources.length;i++)
+            {
+                t = $scope.editTaskInfo.resources[i];
+                if (t.id == resource)
+                {
+                    //$scope.editTaskInfo.updatedResources.push(t.id);
+                    return true
+                }
+            }
+        }
+
+
         $scope.taskDetail = function(taskId) {
             //console.log(taskId);
             $http.get('/api/task/'+taskId).success(function(resp){
                 resp.start = timeConverter(Math.max(resp.start, resp.project_start));
                 resp.end = timeConverter(Math.min(resp.end, resp.project_end));
                 $scope.editTaskInfo = resp;
-                //console.log(resp);
+                $scope.editTaskInfo.updatedResources = [];
+                $scope.editTaskInfo.updatedDepends = [];
+                $scope.editTaskInfo.updatedResponsibles = [];
+                $scope.editTaskInfo.updatedWatchers= [];
+                $scope.editTaskInfo.updatedAlternativeResources= [];
                 $('#taskDetailModal').modal('show');
 
                     });

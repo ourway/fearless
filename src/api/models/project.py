@@ -97,6 +97,10 @@ class Project(IDMixin, Base):
     def recalculate_end(self, key, data):
         if not self.start and self.end:
             return data
+
+        if self.end<self.start:
+            self.end = self.start + datetime.timedelta(days=31 * 3)
+
         if not data.start:
             data.start = self.start
 
@@ -150,6 +154,7 @@ class Project(IDMixin, Base):
             project=self, resources=set(resources), tasks=set(tasks), now=now())
         data = data.encode('utf-8')
         with open(plan_path, 'w') as f:
+
             f.write(data)
 
         tj3 = sh.Command('/usr/local/bin/tj3')
@@ -161,23 +166,24 @@ class Project(IDMixin, Base):
                 self.reports.append('<br/>'.join(repr(e).split('\\n')[17:]).replace('\\x1b[31m', '<b>').replace('\\x1b[0m','</b>'))
             session.commit()
             return
-        if not tj.stderr:
-            for i in ['resource', 'plan', 'guntt']:
-                html_path = '/tmp/%s_%s.html' % (i, self.id)
-                if os.path.isfile(html_path):
-                    report = open(html_path)
-                    root = etree.parse(report)
-                    main_table = root.xpath('//table')[0]
-                    tosave = etree.tostring(main_table)
-                    self.reports.append(tosave)
-                else:
-                    print 'not available'
+        #if not tj.stderr:
+        for i in ['resource', 'plan', 'guntt']:
+            html_path = '/tmp/%s_%s.html' % (i, self.id)
+            if os.path.isfile(html_path):
+                report = open(html_path)
+                root = etree.parse(report)
+                main_table = root.xpath('//table')[0]
+                tosave = etree.tostring(main_table)
+                self.reports.append(tosave)
+            else:
+                print 'not available'
 
-                session.commit()
+            session.commit()
 
-            return data
-        else:
-            return tj.stderr
+        print tj.stderr
+        return True
+        #else:
+        #return tj.stderr
 
 #def plan_project(mapper, connection, target):
 #    target.plan

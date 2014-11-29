@@ -74,30 +74,34 @@ class AddTask:
     def on_put(self, req, resp, projId):
         user = getUserInfoFromSession(req)
         taskData = get_params(req.stream, flat=False)
-        print taskData
         resources, depends, manager, effort = list(), list(), 0, 0
         title = taskData.get('title')
         if taskData.get('effort'): effort = int(taskData.get('effort'))
         start = taskData.get('start')
+        end = taskData.get('end')
         #print responsible_id
         project = session.query(Project).filter(Project.id==int(projId)).first()
         if not start:
            start = project.start
+        else:
+            start = str(start)
 
         newTask = Task(title=title, effort=effort, project=project, start=start)
+        if end:
+            newTask.end = str(end)
 
         if taskData.get('resources'): resources = map(int, taskData.get('resources'))
         if taskData.get('depends'): depends = map(int, taskData.get('depends'))
         if taskData.get('manager'): manager = int(taskData.get('manager'))
         for i in resources:
             resource = session.query(User).filter(User.id==i).first()
-            newTask.resources.append(resource)
+            if resource: newTask.resources.append(resource)
         if manager:
             manager = session.query(User).filter(User.id==manager).first()
-            newTask.responsibles.append(resource)
+            if manager: newTask.responsibles.append(manager)
         for i in depends:
             depend = session.query(Task).filter(Task.id==i).first()
-            newTask.depends.append(depend)
+            if depend: newTask.depends.append(depend)
         #depend = session.query(Task).filter(Task.id==depends).first()
         #newTask.depends.append(depend)
         session.add(newTask)
@@ -133,19 +137,22 @@ class UpdateTask:
     @falcon.after(commit)
     def on_post(self, req,resp, taskId):
         user = getUserInfoFromSession(req)
+        resources, depends, responsibles, effort , alternative_resources = list(), list(), list(), 0, list()
         taskData = get_params(req.stream, flat=False)
-        resources = taskData.get('resources')
-        responsibles = taskData.get('responsibles')
-        alternative_resources = taskData.get('alternative_resources')
-        watchers = taskData.get('watchers')
-        depends = taskData.get('depends')
+        print taskData
+        if taskData.get('resources'): resources = taskData.get('updatedResources')
+        if taskData.get('responsibles'): responsibles = taskData.get('updatedResponsibles')
+        if taskData.get('depends'): depends = taskData.get('updatedDepends')
+        if taskData.get('alternative_resources'): alternative_resources = taskData.get('alternative_resources')
+        if taskData.get('watchers'): watchers = taskData.get('watchers')
+
         complete = int(taskData.get('complete'))
         effort = int(taskData.get('effort'))
         start = str(taskData.get('start'))
         end = str(taskData.get('end'))
         title = taskData.get('title')
         _id = int(taskData.get('id'))
-        priority = taskData.get('priority')
+        priority = int(taskData.get('priority'))
         target = session.query(Task).filter(Task.id==_id).first()
         if target:
             target.title = title
@@ -154,6 +161,17 @@ class UpdateTask:
             target.effort = effort
             if effort:
                 target.complete = complete
+            if resources:
+                target.resources = []
+            for i in resources:
+                resource = session.query(User).filter(User.id==int(i)).first()
+                if resource: target.resources.append(resource)
+            if depends:
+                target.depends = []
+            for i in depends:
+                depend = session.query(Task).filter(Task.id==int(i)).first()
+                if depend: target.depends.append(depend)
+            
             resp.body = {'message':'Task Updated'}
         else:
             resp.status = falcon.HTTP_404

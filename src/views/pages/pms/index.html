@@ -22,16 +22,16 @@
                         <input type="text" class="form-control" placeholder="New project name. Must be unique" ng-model="newProjectName" />
 					</div>
 				</div>
-				<div class="form-group">
+				<div class="form-group" ng-init="newProjectStartDate=timeConverter()">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Start Date</label>
 					<div class="col-sm-6">
-                        <input type="date" min="2014-11-20" max="2020-1-1" class="form-control" ng-model="newProjectStartDate" required/>
+                        <input type="date" class="form-control" ng-model="newProjectStartDate" required/>
 					</div>
 				</div>
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">End Date</label>
 					<div class="col-sm-6">
-						<input type="date" min="2014-11-20" max="2020-1-1" class="form-control" ng-model="newProjectEndDate" required />
+						<input type="date" class="form-control" ng-model="newProjectEndDate" required />
 					</div>
 				</div>
 				<div class="form-group">
