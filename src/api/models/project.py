@@ -145,6 +145,9 @@ class Project(IDMixin, Base):
             target = each.get('node')
             if target.project == self:
                 resources.extend(target.resources)
+                for i in target.resources:
+                    if not i in target.project.users:
+                        target.project.users.append(i)
                 tasks.append(target.tjp_task())
         
         #return tasks
@@ -163,7 +166,9 @@ class Project(IDMixin, Base):
         except Exception,e:
             #print type(repr(e))
             for i in xrange(3):
-                self.reports.append('<br/>'.join(repr(e).split('\\n')[17:]).replace('\\x1b[31m', '<b>').replace('\\x1b[0m','</b>'))
+                _d = '<br/>'.join(repr(e).split('\\n')[17:]).replace('\\x1b[31m', '<b>').replace('\\x1b[0m','</b>').split('\\x1b[35m')
+                if len(_d)>1:
+                    self.reports.append(_d[1])
             session.commit()
             return
         #if not tj.stderr:

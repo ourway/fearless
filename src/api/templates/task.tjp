@@ -10,13 +10,19 @@ isMilestone = False
         hr = []
         hr.append(str(dependency.id))
         target = dependency
+        level = 0
         while True:
             parent = target.parent
             if not parent:
+                #parent = target
                 break
+            level +=1
             hr.append(str(parent.id))
             target = target.parent
-        depends.append('__%s._%s' % (dependency.project.id, '._'.join(hr[::-1])))
+        if (dependency.title != target.title) or not task.parent:
+            depends.append('__%s._%s' % (dependency.project.id, '._'.join(hr[::-1])))
+        else:
+            print target.title, task.title, dependency.title, parent, level
     %>
 % endfor
     task _${task.id} "${task.title.title()}" {

@@ -128,6 +128,7 @@ class GetTask:
                      'responsibles':[{'fullname':i.fullname, 'id':i.id} for i in task.responsibles],
                      'priority':task.priority,
                      'complete':task.complete,
+                     'uuid':task.uuid,
                      'duration':task.duration,
                      'project_start':task.project.start,
                      'project_end':task.project.end
@@ -140,11 +141,11 @@ class UpdateTask:
         resources, depends, responsibles, effort , alternative_resources = list(), list(), list(), 0, list()
         taskData = get_params(req.stream, flat=False)
         print taskData
-        if taskData.get('resources'): resources = taskData.get('updatedResources')
-        if taskData.get('responsibles'): responsibles = taskData.get('updatedResponsibles')
-        if taskData.get('depends'): depends = taskData.get('updatedDepends')
-        if taskData.get('alternative_resources'): alternative_resources = taskData.get('alternative_resources')
-        if taskData.get('watchers'): watchers = taskData.get('watchers')
+        if taskData.get('updatedResources'): resources = taskData.get('updatedResources')
+        if taskData.get('updatedResponsibles'): responsibles = taskData.get('updatedResponsibles')
+        if taskData.get('updatedDepends'): depends = taskData.get('updatedDepends')
+        if taskData.get('updatedAlternativeResources'): alternative_resources = taskData.get('updatedAlternativeResources')
+        if taskData.get('updatedWatchers'): watchers = taskData.get('updatedWatchers')
 
         complete = int(taskData.get('complete'))
         effort = int(taskData.get('effort'))
@@ -165,6 +166,8 @@ class UpdateTask:
                 target.resources = []
             for i in resources:
                 resource = session.query(User).filter(User.id==int(i)).first()
+                if not resource in target.project.users:
+                    target.project.users.append(resource)
                 if resource: target.resources.append(resource)
             if depends:
                 target.depends = []

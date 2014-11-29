@@ -257,7 +257,7 @@ border-bottom: 1px solid #57BEDD;
 					 <label for="inputPassword3" class="col-sm-4 control-label">Depends On</label>
 					<div class="col-sm-6">
                     <select class="form-control" ng-model="editTaskInfo.updatedDepends" multiple>
-                        <option value=""></option>
+                        <option value="0"></option>
                         <option ng-selected="isCurrenclyDependentOf(task.id)" ng-repeat="task in tasks" value="{{task.id}}">{{task.title}}</option>
                     </select>
                      </div>
@@ -278,7 +278,7 @@ border-bottom: 1px solid #57BEDD;
 						</div>
 						<div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" ng-show="editTaskInfo.updatedResources"
+                            <button type="button" ng-show="editTaskInfo.updatedResources || editTaskInfo.effort==0"
                                 ng-click="updateTask(editTaskInfo.id)" class="btn btn-primary">Update task</button>
 						</div>
 					</div>
@@ -310,7 +310,7 @@ border-bottom: 1px solid #57BEDD;
                 <div class="col-md-2 column">
                     <div id="tasksDiv">
                         <ol>
-                            <li ng-click="taskDetail(task.id)" class="taskA" ng-repeat="task in tasks"><a id="{{task.id}}" >{{task.title}}</a></li>
+                            <li ng-click="taskDetail(task.id)" title="{{task}}" class="taskA" ng-repeat="task in tasks"><a id="{{task.id}}" >{{task.title}}</a></li>
                         </ol>
 
                     </div>

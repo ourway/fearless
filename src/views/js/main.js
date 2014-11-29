@@ -501,8 +501,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $('.tj_table_frame').fadeOut(2000);
             getprefix = 'project_'+ $scope.projId+ '_' + timeConverter() + '_';
             data = localStorage.getItem(getprefix +  mode);
-            if ($scope.replan || !data){
-            console.log('getting')
+            //if ($scope.replan || !data){
+            if (1){
+            //console.log('getting')
             projectReport = $http.get('/api/project/report/'+$scope.projId);
             projectReport.success(function(resp){
                 localStorage.setItem(getprefix + 'plan', resp.plan);
@@ -521,7 +522,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             }
          }
 
-            $scope.generateReport('plan');
+            $scope.generateReport('guntt');
             }
 
     $scope.getResources = function(){
@@ -608,17 +609,22 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $scope.editTaskInfo.updatedResponsibles = [];
                 $scope.editTaskInfo.updatedWatchers= [];
                 $scope.editTaskInfo.updatedAlternativeResources= [];
+                resp.resources.forEach(function(e){$scope.editTaskInfo.updatedResources.push(e.id)});
+                resp.depends.forEach(function(e){$scope.editTaskInfo.updatedDepends.push(e.id)});
+                resp.responsibles.forEach(function(e){$scope.editTaskInfo.updatedResponsibles.push(e.id)});
+                resp.watchers.forEach(function(e){$scope.editTaskInfo.updatedWatchers.push(e.id)});
+                resp.alternative_resources.forEach(function(e){$scope.editTaskInfo.updatedAlternativeResources.push(e.id)});
                 $('#taskDetailModal').modal('show');
 
                     });
             }
     $scope.updateTask = function(taskId){
 
-        $http.post('/api/task/update/'+taskId, $scope.editTaskInfo).then(function(resp){
+        $http.post('/api/task/update/'+taskId, $scope.editTaskInfo).success(function(resp){
 
             $scope.getTasksList();
             $scope.replan = true;
-            $scope.generateReport('plan');
+            $scope.generateReport('guntt');
             $scope.editTaskInfo = {};
             $('#taskDetailModal').modal('hide');
 

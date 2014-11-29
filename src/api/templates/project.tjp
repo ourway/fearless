@@ -58,11 +58,21 @@ project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} -
     balance cost rev
 
     resource members "project ${project.name} members" {
-    % for resource in resources:
+    <% 
+        rlist = [] 
+    %>
+    % for t in project.tasks:
+        % for resource in t.resources:
+            % if not resource in rlist:
         resource _${resource.id} "${resource.firstname} ${resource.lastname}" {
                 efficiency ${resource.efficiency}
                 rate ${resource.rate}
+                <%
+                    rlist.append(resource)
+                %>
             }
+            % endif
+        % endfor
     % endfor
     }
     task __${project.id} "${project.name.title()}" {

@@ -14,12 +14,31 @@ import copy
 '''We have a client'''
 client = Client(name='pooyamehr')
 ''' Lets create few users '''
+
+
 user1 = User(email='farsheed.ashouri@gmail.com', password='rrferl', active=True, firstname='admin2', lastname='admin2')
-user2 = User(email='farshee.d.ashouri@gmail.com', password='rrferl', active=True, firstname='david', lastname='janson')
-user4 = User(email='fars.heed.ashouri@gmail.com', password='rrferl', active=True, firstname='scott', lastname='anderson')
-user5 = User(email='farshe.ed.ashouri@gmail.com', password='rrferl', active=True, firstname='david', lastname='cameron')
-user6 = User(email='farsheed.a.shouri@gmail.com', password='rrferl', active=True, firstname='peter', lastname='jackson')
-user7 = User(email='farsheed.ash.ouri@gmail.com', password='rrferl', active=True, firstname='alfred', lastname='hichi')
+user2 = User(email='mehdieyazdani@gmail.com', password='123456', active=True, firstname='Mehdi', lastname='Yazdani')
+user3 = User(email='mostafarayaneh@gmail.com', password='123456', active=True, firstname='Morteza', lastname='Gaamari')
+user4 = User(email='amirgholamzadeh@gmail.com', password='123456', active=True, firstname='Amir', lastname='Gholam Zadeh')
+user5 = User(email='mostafa_khaleghi64@yahoo.com', password='123456', active=True, firstname='Mostafa', lastname='Khalegi')
+user6 = User(email='hamedanime@gmail.com', password='123456', active=True, firstname='Hamed', lastname='Behroozi')
+user7 = User(email='shahriyar.shahramfar@gmail.com', password='123456', active=True, firstname='Bijan', lastname='Shahramfar')
+user8 = User(email='mhd.kheirandish@yahoo.com', password='123456', active=True, firstname='Mohammad', lastname='Kheirandish')
+user9 = User(email='mehrdadshahverdi81@gmail.com', password='123456', active=True, firstname='Mehrdad', lastname='Shahverdi')
+user10 = User(email='firoozeh.imany@gmail.com', password='123456', active=True, firstname='Firoozeh', lastname='Imani')
+user11 = User(email='parima.1367@yahoo.com', password='123456', active=True, firstname='Parima', lastname='Daliri')
+user12 = User(email='mina.nazaralhooee@gmail.com', password='123456', active=True, firstname='Mina', lastname='Nazari')
+user13 = User(email='arashentezami3d@gmail.com', password='123456', active=True, firstname='Arash', lastname='Entezami')
+user14 = User(email='zara.erfani@yahoo.com', password='123456', active=True, firstname='Zahra', lastname='Erfani')
+user15 = User(email='negarahmadi@gmail.com', password='123456', active=True, firstname='Negar', lastname='Ahmadi')
+user16 = User(email='merfanparsapour@yahoo.com', password='123456', active=True, firstname='Erfan', lastname='Parsapour')
+user17 = User(email='f.shamayel@gmail.com', password='123456', active=True, firstname='Farshad', lastname='Shamayel')
+user18 = User(email='amin.zarouni@gmail.com', password='123456', active=True, firstname='Amin', lastname='Zarouni')
+user19 = User(email='khalil66@gmail.com', password='123456', active=True, firstname='Khalil', lastname='Khaliliyan')
+user19 = User(email='hamid2117@gmail.com', password='123456', active=True, firstname='Hamid', lastname='Lak')
+user19 = User(email='mepayam@gmail.com', password='123456', active=True, firstname='Payam', lastname='Memar')
+
+
 ''' Our main project '''
 proj = Project(name='Fearless project 1')
 proj2  = Project(name='fuooo')
@@ -97,7 +116,11 @@ rig.effort= 18
 model.duration= 15
 
 
-session.add_all([model, user1, user2, user4, user5, user6, user7, proj, client, repo1, nuke_section, maya_section, rig, research, cleanup, sellme])
+session.add_all([model,
+                 user1, user2, user3, user4, user5, user6, user7, user8, user9,
+                 user10, user11, user12, user13, user14, user15, user16, user17,
+                 proj, client, repo1, nuke_section, maya_section, rig, research,
+                 cleanup, sellme])
 session.commit()
     #import shutil
 #print animate.get_tree(session, json=True)
