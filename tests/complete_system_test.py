@@ -35,8 +35,9 @@ user16 = User(email='merfanparsapour@yahoo.com', password='123456', active=True,
 user17 = User(email='f.shamayel@gmail.com', password='123456', active=True, firstname='Farshad', lastname='Shamayel')
 user18 = User(email='amin.zarouni@gmail.com', password='123456', active=True, firstname='Amin', lastname='Zarouni')
 user19 = User(email='khalil66@gmail.com', password='123456', active=True, firstname='Khalil', lastname='Khaliliyan')
-user19 = User(email='hamid2117@gmail.com', password='123456', active=True, firstname='Hamid', lastname='Lak')
-user19 = User(email='mepayam@gmail.com', password='123456', active=True, firstname='Payam', lastname='Memar')
+user20 = User(email='hamid2117@gmail.com', password='123456', active=True, firstname='Hamid', lastname='Lak')
+user21 = User(email='mepayam@gmail.com', password='123456', active=True, firstname='Payam', lastname='Memar')
+user22 = User(email='alishahdad1353@yahoo.com', password='123456', active=True, firstname='Ali', lastname='Shahdad')
 
 
 ''' Our main project '''
@@ -119,6 +120,7 @@ model.duration= 15
 session.add_all([model,
                  user1, user2, user3, user4, user5, user6, user7, user8, user9,
                  user10, user11, user12, user13, user14, user15, user16, user17,
+                 user18, user19, user20, user21, user22,
                  proj, client, repo1, nuke_section, maya_section, rig, research,
                  cleanup, sellme])
 session.commit()

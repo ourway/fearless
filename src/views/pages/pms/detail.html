@@ -3,7 +3,10 @@ table {
 border-collapse: 0px;
 border-spacing: 0;
 }
-
+    table { page-break-inside:auto }
+    tr    { page-break-inside:avoid; page-break-after:auto }
+    thead { display:table-header-group }
+    tfoot { display:table-footer-group }
 
 .tj_table_frame {
 margin-left: auto;
@@ -17,8 +20,10 @@ border: 7px solid #E0E0E0;
 border-radius: 2px;
 border-spacing: 0px;
 font-size: 13px;
+text-rendering: geometricPrecision;
+text-shadow: 1px 1px 3px #ccc;
+text-color: #fff;
 }
-
 .taskbarframe {
 background-color: #000000;
 position: absolute;
@@ -65,6 +70,10 @@ border-spacing: 1px;
 background-color: #C399FF;
 position: absolute;
 }
+.caltask1 {
+background-color: #FFEDA5;
+}
+
 /*
 .taskcell1{
 border-right: 1px solid #57BEDD;
@@ -122,16 +131,16 @@ border-bottom: 1px solid #57BEDD;
                         <input type="checkbox" class="form-control" placeholder="New task name" ng-model="newTaskIsMilestone" />
 					</div>
 				</div>
-				<div class="form-group" ng-show="!newTaskIsMilestone" ng-init="newTaskStart=timeConverter()">
+				<div class="form-group" ng-show="!newTaskIsMilestone" >
 					 <label for="inputEmail3" class="col-sm-4 control-label">Start</label>
 					<div class="col-sm-6">
                         <input type="date" class="form-control" placeholder="Task start date" ng-model="newTaskStart" />
 					</div>
 				</div>
-				<div class="form-group" ng-show="newTaskIsMilestone" ng-init="newTaskEnd=timeConverter()">
+				<div class="form-group" ng-show="newTaskIsMilestone">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Delivery</label>
 					<div class="col-sm-6">
-                        <input type="date" class="form-control" placeholder="Task start date" ng-model="newTaskEnd" />
+                        <input type="date" class="form-control" placeholder="Task End date" ng-model="newTaskEnd" />
 					</div>
 				</div>
 				<div class="form-group" ng-show="!newTaskIsMilestone">
@@ -174,7 +183,7 @@ border-bottom: 1px solid #57BEDD;
 					 <label for="inputPassword3" class="col-sm-4 control-label">Depends On</label>
 					<div class="col-sm-6">
                     <select class="form-control" ng-model="newTaskDepends" multiple>
-                        <option value=""></option>
+                        <option value="0"></option>
                         <option ng-repeat="task in tasks" value="{{task.id}}">{{task.title}}</option>
                     </select>
                      </div>
@@ -300,7 +309,7 @@ border-bottom: 1px solid #57BEDD;
                 <button id="taskAddButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
                 <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-pencil"></em> Edit</button>
                 <button class="btn btn-default" ng-click="generateReport('plan')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</button>
-                <button class="btn btn-default" ng-click="generateReport('guntt')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Guntt Chart</button>
+                <button class="btn btn-default" ng-click="generateReport('guntt')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Gantt Chart</button>
                 <button class="btn btn-default" ng-click="generateReport('resource')" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
                 <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
 			</div>

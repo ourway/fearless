@@ -551,13 +551,15 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     'resources': tr, 'start':ts, 'end':ted, 'milestone':$scope.newTaskIsMilestone}
            $http.put('/api/task/add/'+$scope.projId, data).success(function(resp){
                     $scope.getProjectDetails();
-                    $scope.newTaskEffort = null;
+                    $scope.newTaskEffort = 0;
                     $scope.newTaskTitle=null;
-                    $scope.newTaskManager=null;
+                    $scope.newTaskManager=0;
+                    $scope.newTaskDepends = [];
+                    $scope.newTaskResources = [];
                    $('#taskAddModal').modal('hide');
                     $scope.getTasksList();
                     $scope.replan = true;
-                    $scope.generateReport('plan');
+                    $scope.generateReport('guntt');
                    
                    });
         }

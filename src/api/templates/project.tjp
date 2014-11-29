@@ -11,7 +11,7 @@ project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} -
     workinghours fri off
     timeformat "%y-%m-%d %H-%M"
     scenario plan "Plan" {
-        scenario delayed "Delayed"
+        #scenario delayed "Delayed"
         }
 }
 
@@ -58,8 +58,8 @@ project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} -
     balance cost rev
 
     resource members "project ${project.name} members" {
-    <% 
-        rlist = [] 
+    <%
+        rlist = []
     %>
     % for t in project.tasks:
         % for resource in t.resources:
@@ -91,13 +91,13 @@ taskreport breakdown "PMS_${project.id}"{
                 columns line,  name, opentasks, start, end,  managers, effort, effortdone, effortleft, criticalness, duration, complete, efficiency
                 taskreport breakdown1 "plan_${project.id}"{
                     formats html
-                    loadunit hours
-                    columns name, start, end, effortleft, criticalness {title "Importance"}, complete {title "Progress"}, chart { scale week width 300 }
+                    loadunit longauto
+                    columns name, start, end, effortleft, alert, criticalness {title "Importance"}, complete {title "Progress"}, chart { scale week width 300 }
                     sorttasks plan.criticalness.up
                 }
                 taskreport breakdown2 "guntt_${project.id}"{
                     formats html
-                    loadunit hours
+                    loadunit longauto
                     columns name, chart { scale day width 800 }, complete {title "Progress"}
                     sorttasks plan.criticalness.up
                 }
@@ -110,10 +110,12 @@ taskreport breakdown "PMS_${project.id}"{
   }
 
 resourcereport resourceGraph "" {
-  scenarios delayed
-  columns bsi, name, effort, status, chart {scale day width 600}
+  scenarios plan
+  columns bsi, name, effort, status, chart {scale day width 400}
   loadunit hours
   # We only like to show leaf tasks for leaf resources.
     hidetask ~(isleaf() & isleaf_())
   sorttasks plan.criticalness.down
 }
+
+
