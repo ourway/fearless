@@ -145,11 +145,12 @@ export "MS-Project_${project.id}" {
 
 accountreport "ProfiAndLoss_${project.id}" {
   formats html
-  columns no, name, monthly
+  balance -
+  columns no, name, weekly
 }
 
 accountreport "ProfiAndLossCsv_${project.id}" {
   formats csv
   currencyformat "(" ")" "" "." 0
-  columns no, name, monthly
+  columns no, name, weekly
 }

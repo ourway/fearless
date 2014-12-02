@@ -194,9 +194,9 @@ border-bottom: 1px solid #57BEDD;
 
 						</div>
 						<div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" ng-show="newtask.title && newtask.manager"
-                                ng-click="createNewTask()" class="btn btn-primary">Create new task</button>
+                            <button type="button" class="btn btn-default" ng-click="resetNewtask()" data-dismiss="modal">Close</button>
+                            <button type="button" ng-disabled="!newtask.title || !newtask.manager"
+                                ng-click="createNewTask()" class="btn btn-success">Create new task</button>
 						</div>
 					</div>
 
@@ -214,7 +214,6 @@ border-bottom: 1px solid #57BEDD;
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
-							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 							<h4 class="modal-title" id="myModalLabel">
 								Task Edit Area
 							</h4>
@@ -234,8 +233,8 @@ border-bottom: 1px solid #57BEDD;
                         <input type="date" class="form-control" placeholder="Task start date" ng-model="editTaskInfo.start" />
 					</div>
 				</div>
-				<div class="form-group">
-					 <label for="inputEmail3" class="col-sm-4 control-label">end</label>
+				<div class="form-group" ng-show="editTaskInfo.effort==0">
+					 <label for="inputEmail3"  class="col-sm-4 control-label">end</label>
 					<div class="col-sm-6">
                         <input type="date" class="form-control" placeholder="Task end date" ng-model="editTaskInfo.end" />
 					</div>
@@ -287,6 +286,7 @@ border-bottom: 1px solid #57BEDD;
 						</div>
 						<div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" ng-click="deleteTask(editTaskInfo.id)" class="btn btn-danger" >Delete Task</button>
                             <button type="button" ng-show="editTaskInfo.updatedResources || editTaskInfo.effort==0"
                                 ng-click="updateTask(editTaskInfo.id)" class="btn btn-primary">Update task</button>
 						</div>
@@ -317,7 +317,7 @@ border-bottom: 1px solid #57BEDD;
     <br/>
     <br/>
 			<div class="row clearfix">
-                <div class="col-md-2 column">
+                <div class="col-md-4 column">
                     <div id="tasksDiv">
                         <ol>
                             <li ng-click="taskDetail(task.id)" title="{{task}}" class="taskA" ng-repeat="task in tasks"><a id="{{task.id}}" >{{task.title}}</a></li>
@@ -325,7 +325,7 @@ border-bottom: 1px solid #57BEDD;
 
                     </div>
 				</div>
-				<div class="col-md-10 column">
+				<div class="col-md-8 column">
                     <div id="projectDetailContainer">
                         <div id="projectDetailDiv"></div>
                     </div>

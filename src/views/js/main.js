@@ -491,6 +491,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $scope.newtask.start = timeConverter();
                 $scope.newtask.end = timeConverter();
                 $scope.newtask.priority = 500;
+                $scope.newtask.effort = null;
             }
             $scope.resetNewtask();
             $scope.getProjectDetails = function(){
@@ -625,9 +626,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     });
             }
     $scope.updateTask = function(taskId){
-
         $http.post('/api/task/update/'+taskId, $scope.editTaskInfo).success(function(resp){
-
             $scope.getTasksList();
             $scope.replan = true;
             $scope.generateReport();
@@ -635,9 +634,18 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $('#taskDetailModal').modal('hide');
 
         });
-    
     }
+    
+    $scope.deleteTask = function(taskId){
+        if (confirm('Are you sure you want to delete the task?'))
+            $http.delete('/api/task/delete/'+taskId).success(function(resp){
+                $scope.replan = true;
+                $scope.generateReport();
+                $scope.getTasksList();
+                $('#taskDetailModal').modal('hide');
+                    });
 
 
+    };
 
         });

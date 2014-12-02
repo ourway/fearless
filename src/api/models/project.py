@@ -137,6 +137,7 @@ class Project(IDMixin, Base):
             os.path.dirname(__file__), '../templates/project.tjp')
         t = Template(filename=templateFile)
         if not self.tasks:
+            self.rep = []
             return
         task = self.tasks[0]
         resources = list()

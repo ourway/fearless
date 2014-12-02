@@ -194,6 +194,18 @@ class UpdateTask:
             resp.status = falcon.HTTP_404
             resp.body = {'message':'Task Not Found'}
 
+class DeleteTask:
+    @falcon.after(commit)
+    def on_delete(self, req, resp, taskId):
+        user = getUserInfoFromSession(req)
+        target = session.query(Task).filter(Task.id==taskId).first()
+        if target:
+            session.delete(target)
+            resp.status = falcon.HTTP_202
+
+        else:
+            resp.status = falcon.HTTP_404
+
 
 
 
