@@ -485,6 +485,14 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
 fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
             $scope.projId = $routeParams.projId;
             $scope.timeConverter = timeConverter;
+            $scope.newtask = {};
+            $scope.resetNewtask = function(){
+                $scope.newtask = {};
+                $scope.newtask.start = timeConverter();
+                $scope.newtask.end = timeConverter();
+                $scope.newtask.priority = 500;
+            }
+            $scope.resetNewtask();
             $scope.getProjectDetails = function(){
             projectDetails = $http.get('/api/project/get/'+$scope.projId);
             projectDetails.success(function(resp){
@@ -498,17 +506,26 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 })
 
             $scope.generateReport = function(mode){
+            if (!mode)
+                {
+                if ($scope.mode)
+                    mode = $scope.mode;
+                else
+                    mode = 'plan';
+                }
+            $scope.mode=mode;
             $('.tj_table_frame').fadeOut(2000);
             getprefix = 'project_'+ $scope.projId+ '_' + timeConverter() + '_';
             data = localStorage.getItem(getprefix +  mode);
-            //if ($scope.replan || !data){
-            if (1){
+            if ($scope.replan || !data){
+            //if (1){
             //console.log('getting')
             projectReport = $http.get('/api/project/report/'+$scope.projId);
             projectReport.success(function(resp){
                 localStorage.setItem(getprefix + 'plan', resp.plan);
                 localStorage.setItem(getprefix + 'guntt', resp.guntt);
                 localStorage.setItem(getprefix + 'resource', resp.resource);
+                localStorage.setItem(getprefix + 'profitAndLoss', resp.profitAndLoss);
                 $('#projectDetailDiv').html(resp[mode]);
                 $('.tj_table_frame').fadeIn();
                 })
@@ -522,7 +539,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             }
          }
 
-            $scope.generateReport('guntt');
+            $scope.generateReport();
             }
 
     $scope.getResources = function(){
@@ -532,34 +549,21 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         }
 
         $scope.createNewTask = function(){
-           if ($scope.newTaskIsMilestone)
+           if ($scope.newtask.isMilestone)
            {
-                $scope.newTaskEffort = 0;
-                $scope.newTaskResources = [];
-                $scope.newTaskStart = $scope.newTaskEnd;
+                $scope.newtask.effort = 0;
+                $scope.newtask.resources = [];
+                $scope.newtask.start = $scope.newtask.end;
             }
-           te = $scope.newTaskEffort;
-           tt = $scope.newTaskTitle;
-           tm = $scope.newTaskManager;
-           td = $scope.newTaskDepends;
-           tr = $scope.newTaskResources;
-           ted = $scope.newTaskEnd;
-           ts = $scope.newTaskStart;
 
-           console.log($scope.newTaskIsMilestone);
-           data = {'effort':te, 'title':tt, 'manager':tm, 'depends':td, 
-                    'resources': tr, 'start':ts, 'end':ted, 'milestone':$scope.newTaskIsMilestone}
+
+           data = $scope.newtask;
            $http.put('/api/task/add/'+$scope.projId, data).success(function(resp){
-                    $scope.getProjectDetails();
-                    $scope.newTaskEffort = 0;
-                    $scope.newTaskTitle=null;
-                    $scope.newTaskManager=0;
-                    $scope.newTaskDepends = [];
-                    $scope.newTaskResources = [];
+                    $scope.resetNewtask();
                    $('#taskAddModal').modal('hide');
                     $scope.getTasksList();
                     $scope.replan = true;
-                    $scope.generateReport('guntt');
+                    $scope.generateReport();
                    
                    });
         }
@@ -626,7 +630,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
             $scope.getTasksList();
             $scope.replan = true;
-            $scope.generateReport('guntt');
+            $scope.generateReport();
             $scope.editTaskInfo = {};
             $('#taskDetailModal').modal('hide');
 

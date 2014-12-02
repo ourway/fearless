@@ -116,8 +116,8 @@ class Task(IDMixin, Base, BaseNestedSets):
 
     @validates('responsibles')
     def update_resources(self, key, data):
-        if not data in self.resources:
-            self.resources.append(data)
+        #if not data in self.resources:
+        #    self.resources.append(data)
         return data
 
 

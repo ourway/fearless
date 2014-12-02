@@ -66,7 +66,21 @@ class GetProjectLatestReport:
         if project:
             project.plan() ## first let it plan
             if project.reports:
-                resp.body = {'guntt':project.reports[-1], 'plan':project.reports[-2], 'resource':project.reports[-3]}
+                try:
+                    data = {'guntt':project.reports[-1], 'plan':project.reports[-2], 'resource':project.reports[-3], 
+                             'profitAndLoss':project.reports[-5], 'msproject': project.reports[-4] }
+                except IndexError:
+                    message = "We're busy planning your project. Please wait a bit or reload."
+                    data = {'guntt':message, 'plan':message, 'resource':message, 
+                             'profitAndLoss':message, 'msproject':message }
+
+                resp.body = data
+            else:
+                message = "There is no report available. Try adding some tasks."
+                data = {'guntt':message, 'plan':message, 'resource':message, 
+                             'profitAndLoss':message, 'msproject':message }
+
+
 
 
 class AddTask:

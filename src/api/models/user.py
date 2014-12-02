@@ -49,7 +49,7 @@ class User(IDMixin, Base):
     off_days = Column(String(32), default='fri')
     latest_session_id = Column(String(64))
     active = Column(Boolean, default=False)
-    rate = Column(Float(precision=5), default=1.850)
+    rate = Column(Float(precision=3), default=20000)
     reports = relationship('Report', backref='user')
     grps = relationship('Group', backref='users', secondary='users_groups')
     groups = association_proxy('grps', 'name')

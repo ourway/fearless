@@ -1,11 +1,13 @@
 project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} - ${project.end.strftime('%Y-%m-%d')} {
     timingresolution 5min
     now  ${now.strftime('%Y-%m-%d')}
+  currencyformat "(" ")" "," "." 0
+    
     #dailyworkinghours 7.45
     workinghours mon 09:00 - 13:00, 14:00 - 18:00
     workinghours tue 09:00 - 13:00, 14:00 - 18:00
     workinghours wed 09:00 - 13:00, 14:00 - 18:00
-    workinghours thu 09:00 - 13:00, 14:00 - 18:00
+    workinghours thu 09:00 - 13:00
     workinghours sat 09:00 - 13:00, 14:00 - 18:00
     workinghours sun 09:00 - 13:00, 14:00 - 18:00
     workinghours fri off
@@ -44,18 +46,31 @@ project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} -
 
 
 
+account resourceCost_${project.id} "Resource Cost" {
+  aggregate resources
+    <%
+        rlist = []
+    %>
+    % for t in project.tasks:
+        % for resource in t.resources:
+            % if not resource in rlist:
+        account _${resource.id} "${resource.firstname} ${resource.lastname}"
+                <%
+                    rlist.append(resource)
+                %>
+            % endif
+        % endfor
+    % endfor
+}
+account productCost_${project.id} "Product Cost" {
+  aggregate tasks
+}
+account customerPayments_${project.id} "Customer Payments" {
+
+}
+balance resourceCost_${project.id} customerPayments_${project.id}
 
 
-    rate 390.0
-    #leaves holiday "Good Friday" 2002-03-29
-
-    account cost "Project Cost" {
-      account dev "Development"
-      account doc "Documentation"
-    }
-    account rev "Payments"
-
-    balance cost rev
 
     resource members "project ${project.name} members" {
     <%
@@ -67,6 +82,7 @@ project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} -
         resource _${resource.id} "${resource.firstname} ${resource.lastname}" {
                 efficiency ${resource.efficiency}
                 rate ${resource.rate}
+                chargeset _${resource.id}
                 <%
                     rlist.append(resource)
                 %>
@@ -77,6 +93,7 @@ project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} -
     }
     task __${project.id} "${project.name.title()}" {
         start  ${project.start.strftime('%Y-%m-%d')}
+        chargeset productCost_${project.id}
         % for task in tasks:
             ${task}
         % endfor
@@ -88,7 +105,7 @@ project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} -
 taskreport breakdown "PMS_${project.id}"{
             formats csv
             loadunit hours
-                columns line,  name, opentasks, start, end,  managers, effort, effortdone, effortleft, criticalness, duration, complete, efficiency
+                columns id, line, name, opentasks, start, end, managers, effort, effortdone, effortleft, criticalness, duration, complete, efficiency
                 taskreport breakdown1 "plan_${project.id}"{
                     formats html
                     loadunit longauto
@@ -101,6 +118,9 @@ taskreport breakdown "PMS_${project.id}"{
                     columns name, chart { scale day width 800 }, complete {title "Progress"}
                     sorttasks plan.criticalness.up
                 }
+              #tracereport pb "Product Burndown" {
+              #  columns opentasks
+              #}
         }
 
   textreport "resource_${project.id}" {
@@ -111,11 +131,25 @@ taskreport breakdown "PMS_${project.id}"{
 
 resourcereport resourceGraph "" {
   scenarios plan
-  columns bsi, name, effort, status, chart {scale day width 400}
+  columns bsi, name, effortleft, complete {title "progress"}, chart {scale day width 400}
   loadunit hours
   # We only like to show leaf tasks for leaf resources.
     hidetask ~(isleaf() & isleaf_())
   sorttasks plan.criticalness.down
 }
 
+export "MS-Project_${project.id}" {
+  formats mspxml
+  loadunit days
+}
 
+accountreport "ProfiAndLoss_${project.id}" {
+  formats html
+  columns no, name, monthly
+}
+
+accountreport "ProfiAndLossCsv_${project.id}" {
+  formats csv
+  currencyformat "(" ")" "" "." 0
+  columns no, name, monthly
+}

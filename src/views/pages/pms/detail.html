@@ -9,6 +9,7 @@ border-spacing: 0;
     tfoot { display:table-footer-group }
 
 .tj_table_frame {
+line-height: 1;
 margin-left: auto;
 margin-right: auto;
 text-align: center;
@@ -19,7 +20,6 @@ box-shadow: 1px 1px 17px #000D1A;
 border: 7px solid #E0E0E0;
 border-radius: 2px;
 border-spacing: 0px;
-font-size: 13px;
 text-rendering: geometricPrecision;
 text-shadow: 1px 1px 3px #ccc;
 text-color: #fff;
@@ -122,38 +122,38 @@ border-bottom: 1px solid #57BEDD;
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Task title</label>
 					<div class="col-sm-6">
-                        <input type="text" class="form-control" placeholder="New task name" ng-model="newTaskTitle" />
+                        <input type="text" class="form-control" placeholder="New task name" ng-model="newtask.title" />
 					</div>
 				</div>
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Make task a milestone</label>
 					<div class="col-sm-6">
-                        <input type="checkbox" class="form-control" placeholder="New task name" ng-model="newTaskIsMilestone" />
+                        <input type="checkbox" class="form-control" placeholder="New task name" ng-model="newtask.isMilestone" />
 					</div>
 				</div>
-				<div class="form-group" ng-show="!newTaskIsMilestone" >
+				<div class="form-group" ng-show="!newtask.isMilestone" >
 					 <label for="inputEmail3" class="col-sm-4 control-label">Start</label>
 					<div class="col-sm-6">
-                        <input type="date" class="form-control" placeholder="Task start date" ng-model="newTaskStart" />
+                        <input type="date" class="form-control" placeholder="Task start date" ng-model="newtask.start" />
 					</div>
 				</div>
-				<div class="form-group" ng-show="newTaskIsMilestone">
+				<div class="form-group" ng-show="newtask.isMilestone">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Delivery</label>
 					<div class="col-sm-6">
-                        <input type="date" class="form-control" placeholder="Task End date" ng-model="newTaskEnd" />
+                        <input type="date" class="form-control" placeholder="Task End date" ng-model="newtask.end" />
 					</div>
 				</div>
-				<div class="form-group" ng-show="!newTaskIsMilestone">
+				<div class="form-group" ng-show="!newtask.isMilestone">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Effort</label>
 					<div class="col-sm-6">
-                        <input type="number" min="0" max="96" class="form-control" placeholder="How many hours?" ng-init="newTaskEffort=0" ng-model="newTaskEffort" required/>
+                        <input type="number" min="0" max="96" class="form-control" placeholder="How many hours?" ng-model="newtask.effort" required/>
 					</div>
 				</div>
 
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Task Manager</label>
 					<div class="col-sm-6">
-                    <select class="form-control" placeholder="Who's running the task?" ng-model="newTaskManager">
+                    <select class="form-control" placeholder="Who's running the task?" ng-model="newtask.manager">
                         <option ng-repeat="resource in resources" value="{{resource.id}}">{{resource.firstname}} {{resource.lastname}}</option>
                     </select>
                      </div>
@@ -161,19 +161,19 @@ border-bottom: 1px solid #57BEDD;
 
 
 
-				<div class="form-group" ng-show="!newTaskIsMilestone">
+				<div class="form-group" ng-show="!newtask.isMilestone">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Resources</label>
 					<div class="col-sm-6">
-                    <select class="form-control" placeholder="Who's running the task?" ng-model="newTaskResources" multiple>
+                    <select class="form-control" placeholder="Who's running the task?" ng-model="newtask.resources" multiple>
                         <option ng-repeat="resource in resources" value="{{resource.id}}">{{resource.firstname}} {{resource.lastname}}</option>
                     </select>
                      </div>
                 </div>
 
-				<div class="form-group" ng-init="newTaskPriority=500">
+				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Task Priority</label>
 					<div class="col-sm-6">
-                        <input type="number" min="1" max="1000" class="form-control" placeholder="How many hours?" ng-init="newTaskEffort=0" ng-model="newTaskPriority" required/>
+                        <input type="number" min="1" max="1000" class="form-control" placeholder="How many hours?" ng-init="newTaskEffort=0" ng-model="newtask.priority" required/>
 					</div>
 				</div>
 
@@ -182,7 +182,7 @@ border-bottom: 1px solid #57BEDD;
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Depends On</label>
 					<div class="col-sm-6">
-                    <select class="form-control" ng-model="newTaskDepends" multiple>
+                    <select class="form-control" ng-model="newtask.depends" multiple>
                         <option value="0"></option>
                         <option ng-repeat="task in tasks" value="{{task.id}}">{{task.title}}</option>
                     </select>
@@ -195,7 +195,7 @@ border-bottom: 1px solid #57BEDD;
 						</div>
 						<div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" ng-show="newTaskTitle && newTaskManager"
+                            <button type="button" ng-show="newtask.title && newtask.manager"
                                 ng-click="createNewTask()" class="btn btn-primary">Create new task</button>
 						</div>
 					</div>
@@ -311,7 +311,8 @@ border-bottom: 1px solid #57BEDD;
                 <button class="btn btn-default" ng-click="generateReport('plan')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</button>
                 <button class="btn btn-default" ng-click="generateReport('guntt')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Gantt Chart</button>
                 <button class="btn btn-default" ng-click="generateReport('resource')" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
-                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
+                <button class="btn btn-default" ng-click="generateReport('profitAndLoss')" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
+                <button class="btn btn-default" ng-click="replan=true;generateReport(mode)" type="button"><em class="glyphicon glyphicon-repeat"></em> </button>
 			</div>
     <br/>
     <br/>

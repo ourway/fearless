@@ -172,16 +172,19 @@ class Project(IDMixin, Base):
             session.commit()
             return
         #if not tj.stderr:
-        for i in ['resource', 'plan', 'guntt']:
+        for i in ['ProfiAndLoss', 'MS-Project', 'resource', 'plan', 'guntt']:
             html_path = '/tmp/%s_%s.html' % (i, self.id)
+            xml_path = '/tmp/%s_%s.xml' % (i, self.id)
             if os.path.isfile(html_path):
                 report = open(html_path)
                 root = etree.parse(report)
                 main_table = root.xpath('//table')[0]
                 tosave = etree.tostring(main_table)
                 self.reports.append(tosave)
+            elif os.path.isfile(xml_path):
+                self.reports.append(open(xml_path, 'rb').read())  # msproject file
             else:
-                print 'not available'
+                print '%s is not available' % html_path
 
             session.commit()
 
