@@ -516,7 +516,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 if ($scope.mode)
                     mode = $scope.mode;
                 else
-                    mode = 'plan';
+                    mode = 'guntt';
                 }
             $scope.mode=mode;
             $('.tj_table_frame').fadeOut(2000);
