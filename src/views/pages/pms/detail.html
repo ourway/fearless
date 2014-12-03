@@ -308,16 +308,16 @@ border-bottom: 1px solid #57BEDD;
 			<div class="btn-group">
                 <button id="taskAddButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
                 <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-pencil"></em> Edit</button>
-                <button class="btn btn-default" ng-click="generateReport('plan')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</button>
-                <button class="btn btn-default" ng-click="generateReport('guntt')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Gantt Chart</button>
-                <button class="btn btn-default" ng-click="generateReport('resource')" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
-                <button class="btn btn-default" ng-click="generateReport('profitAndLoss')" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
+                <button class="btn btn-default" ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" ng-class="{'active':mode=='plan'}" ng-click="generateReport('plan')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</button>
+                <button class="btn btn-default" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" ng-click="generateReport('guntt')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Gantt</button>
+                <button class="btn btn-default" ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}" ng-click="generateReport('resource')" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
+                <button class="btn btn-default" ng-class="{'active':mode=='profitAndLoss', 'btn-success':mode=='profitAndLoss'}" ng-click="generateReport('profitAndLoss')" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
                 <button class="btn btn-default" ng-click="replan=true;generateReport(mode)" type="button"><em class="glyphicon glyphicon-repeat"></em> </button>
 			</div>
     <br/>
     <br/>
 			<div class="row clearfix">
-                <div class="col-md-4 column">
+                <div class="col-sm-3 column">
                     <div id="tasksDiv">
                         <ol>
                             <li ng-click="taskDetail(task.id)" title="{{task}}" class="taskA" ng-repeat="task in tasks"><a id="{{task.id}}" >{{task.title}}</a></li>
