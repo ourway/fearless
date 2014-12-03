@@ -323,7 +323,6 @@ border-bottom: 1px solid #57BEDD;
                 <div class="col-md-3 column">
                         <input type="text" class="form-control" style="width:50%" placeholder="Filter Tasks" ng-model="filterTaskName" />
                         <br/>
-                <div class="col-sm-3 column">
                     <div id="tasksDiv">
                         <ol class="">
                             <li ng-click="taskDetail(task.id)" title="{{task}}" class="taskA" ng-repeat="task in tasks | orderBy:'title' | filter:filterTaskName ">
