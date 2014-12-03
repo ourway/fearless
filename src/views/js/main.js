@@ -33,8 +33,9 @@ function timeConverter(UNIX_timestamp){
 
 var TITLE = 'TITLE';
     function TagToTip(a, b,c){
-        task = c.toLowerCase();
-        target  = $(".taskA:contains('"+ task + "') a");
+        task = c;
+        console.log(task);
+        target  = $("[data-task-title*='" + task + "']")
         if (target.length)
             target[0].click();
         //console.log(angular.element('#projectDetailContainer').scope.taskInfo);

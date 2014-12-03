@@ -320,7 +320,7 @@ border-bottom: 1px solid #57BEDD;
 
 
 			<div class="row clearfix">
-                <div class="col-md-4 column">
+                <div class="col-md-3 column">
                         <input type="text" class="form-control" style="width:50%" placeholder="Filter Tasks" ng-model="filterTaskName" />
                         <br/>
                 <div class="col-sm-3 column">
@@ -328,7 +328,7 @@ border-bottom: 1px solid #57BEDD;
                         <ol class="">
                             <li ng-click="taskDetail(task.id)" title="{{task}}" class="taskA" ng-repeat="task in tasks | orderBy:'title' | filter:filterTaskName ">
                             
-                            <a class="btn-sm" style="color: #13560C;" ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" id="{{task.id}}" >{{task.title}}</a></li>
+                            <a class="btn-sm" style="color: #13560C;" data-task-title="{{task.title}}" ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" id="task_{{task.id}}" >{{task.title}}</a></li>
                         </ol>
 
                     </div>
