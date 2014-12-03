@@ -266,6 +266,7 @@ border-bottom: 1px solid #57BEDD;
 					<div class="col-sm-6">
                     <select class="form-control" ng-model="editTaskInfo.updatedDepends" multiple>
                         <option value="0"></option>
+
                         <option ng-selected="isCurrenclyDependentOf(task.id)" ng-repeat="task in tasks" value="{{task.id}}">{{task.title}}</option>
                     </select>
                      </div>
@@ -316,11 +317,17 @@ border-bottom: 1px solid #57BEDD;
 			</div>
     <br/>
     <br/>
+
+
 			<div class="row clearfix">
                 <div class="col-md-4 column">
+                        <input type="text" class="form-control" style="width:50%" placeholder="Filter Tasks" ng-model="filterTaskName" />
+                        <br/>
                     <div id="tasksDiv">
-                        <ol>
-                            <li ng-click="taskDetail(task.id)" title="{{task}}" class="taskA" ng-repeat="task in tasks"><a id="{{task.id}}" >{{task.title}}</a></li>
+                        <ol class="">
+                            <li ng-click="taskDetail(task.id)" title="{{task}}" class="taskA" ng-repeat="task in tasks | orderBy:'title' | filter:filterTaskName ">
+                            
+                            <a class="btn-sm" style="color: #13560C;" ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" id="{{task.id}}" >{{task.title}}</a></li>
                         </ol>
 
                     </div>

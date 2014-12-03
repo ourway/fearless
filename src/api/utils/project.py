@@ -126,7 +126,7 @@ class ListTasks:
         user = getUserInfoFromSession(req)
         project = session.query(Project).filter(Project.id==projId).first()
         if project:
-            resp.body = [{'title':i.title, 'id':i.id} for i in project.tasks]
+            resp.body = [{'title':i.title, 'id':i.id, 'dependent_of':[{'title':j.title} for j in i.dependent_of]} for i in project.tasks]
 
 
 class GetTask:

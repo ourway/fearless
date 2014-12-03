@@ -312,6 +312,7 @@ fearlessApp.controller('pmsCtrl', function($scope, $http, $location){
 });
 
 fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $location){
+        $rootScope.title = "Profile - Fearless";
         
         userInfoReq = $http.get('/api/db/user/'+$scope.$parent.userInfo.userid);
         userInfoReq.success(function(resp, b, c, d){
@@ -389,7 +390,9 @@ fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $locati
 
 fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $location){
     
-    //$scope.newProjectStartDate = new Date();
+    //$scope.newProjectStartDate = new Date();Centeral Auth
+    //Centeral Auth
+    $rootScope.title = "Projects - Fearless";
     $scope.timeConverter = timeConverter;
     $scope.gridOptions = {
         data: 'myData',
@@ -484,6 +487,7 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
 
 fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
             $scope.projId = $routeParams.projId;
+            $rootScope.title = "Project " + $scope.projId + " - Fearless";
             $scope.timeConverter = timeConverter;
             $scope.newtask = {};
             $scope.resetNewtask = function(){
@@ -629,6 +633,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         $http.post('/api/task/update/'+taskId, $scope.editTaskInfo).success(function(resp){
             $scope.getTasksList();
             $scope.replan = true;
+            $scope.getTasksList();
             $scope.generateReport();
             $scope.editTaskInfo = {};
             $('#taskDetailModal').modal('hide');
