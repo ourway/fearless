@@ -7,6 +7,12 @@ fearlessApp.factory('authFactory', function($resource) {
   );
 });
 
+function toTitleCase(str)
+{
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+
+
 
 function pad(num, size) {
     var s = num+"";
@@ -34,7 +40,7 @@ function timeConverter(UNIX_timestamp){
 var TITLE = 'TITLE';
     function TagToTip(a, b,c){
         task = c;
-        console.log(task);
+        console.log(toTitleCase(task));
         target  = $("[data-task-title*='" + task + "']")
         if (target.length)
             target[0].click();
@@ -488,6 +494,7 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
 
 fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
             $scope.projId = $routeParams.projId;
+            $scope.toTitleCase = toTitleCase;
             $rootScope.title = "Project " + $scope.projId + " - Fearless";
             $scope.timeConverter = timeConverter;
             $scope.newtask = {};
@@ -532,7 +539,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 localStorage.setItem(getprefix + 'guntt', resp.guntt);
                 localStorage.setItem(getprefix + 'resource', resp.resource);
                 localStorage.setItem(getprefix + 'profitAndLoss', resp.profitAndLoss);
-                $('#projectDetailDiv').html(resp[mode]);
+                data = resp[mode];
+                $scope.printable = data;
+                $('#projectDetailDiv').html(data);
                 $('.tj_table_frame').fadeIn();
                 })
                 if ($scope.replan)
@@ -540,11 +549,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             }
             else{
                 data = localStorage.getItem(getprefix + mode);
+                $scope.printable = data;
                 $('#projectDetailDiv').html(data);
                 $('.tj_table_frame').fadeIn();
             }
 
-            $scope.printable = data;
          }
 
 
@@ -634,6 +643,20 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $scope.editTaskInfo.updatedResponsibles = [];
                 $scope.editTaskInfo.updatedWatchers= [];
                 $scope.editTaskInfo.updatedAlternativeResources= [];
+                $scope.can_depend = JSON.parse(JSON.stringify($scope.tasks));
+                //lets clean tasks that this task is dependent_of
+                for (i in $scope.can_depend){
+                    if ($scope.can_depend[i].id == resp.id)
+                        $scope.can_depend.splice(i, 1);
+                }
+
+                for (i in $scope.can_depend){
+                    task = $scope.can_depend[i];
+                    for (depof in resp.dependent_of){
+                        if (resp.dependent_of[depof].id == task.id)
+                            $scope.can_depend.splice(i, 1);
+                    }
+                }
                 resp.resources.forEach(function(e){$scope.editTaskInfo.updatedResources.push(e.id)});
                 resp.depends.forEach(function(e){$scope.editTaskInfo.updatedDepends.push(e.id)});
                 resp.responsibles.forEach(function(e){$scope.editTaskInfo.updatedResponsibles.push(e.id)});

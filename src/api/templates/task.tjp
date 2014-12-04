@@ -20,7 +20,7 @@ isMilestone = False
             hr.append(str(parent.id))
             target = target.parent
         if (dependency.title != target.title) or not task.parent:
-            depends.append('__%s._%s' % (dependency.project.id, '._'.join(hr[::-1])))
+            depends.append('fearless.__%s._%s' % (dependency.project.id, '._'.join(hr[::-1])))
         else:
             print target.title, task.title, dependency.title, parent, level
     %>
