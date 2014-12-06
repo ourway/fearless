@@ -151,7 +151,7 @@ class Login:
             to login again and again, then the same
             cookie will be used
         '''
-        resp.set_header('set-cookie', 'session-id=%s; path=/; max-age=5; HttpOnly' %
+        resp.append_header('set-cookie', 'session-id=%s; path=/; max-age=5; HttpOnly' %
                         sid)  # this session is not yet saved
         # don't tell what's wrong!
         if not target or not target.password == form.get('password'):
@@ -165,8 +165,11 @@ class Login:
                 target.lastLogIn = now()
                 rem_time = 3600 * 24
                 # this session is not yet saved
-                resp.set_header(
+                resp.append_header('set-cookie', 'userid=%s; path=/; max-age=%s' % (str(target.id), rem_time) )
+                resp.append_header('set-cookie', 'username=%s; path=/; max-age=%s' % (str(target.firstname or target.alias), rem_time) )
+                resp.append_header(
                     'set-cookie', 'session-id=%s; path=/; max-age=%s; HttpOnly' % (sid, rem_time))
+
                 target.latest_session_id = hashed_sid
                 r.incr(hashed_sid, 1)  # add it to redis
                 r.expire(hashed_sid, rem_time)
@@ -357,6 +360,9 @@ class Logout:
             else:
                 logger.info('{ip}|logged out'.format(ip=ip))
                 target.latest_session_id = None
+
+            resp.append_header('set-cookie', 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
+            resp.append_header('set-cookie', 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
             resp.body = r.delete(hashed_sid)
 
 

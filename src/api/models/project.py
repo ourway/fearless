@@ -56,6 +56,12 @@ class Project(IDMixin, Base):
     client_id = Column(Integer, ForeignKey("client.id"))
     start = Column(DateTime, nullable=False, default=now)
     end = Column(DateTime, nullable=False)
+    duration = Column(Float(precision=3), default=0)
+    effort = Column(Float(precision=3), nullable=False, default=0)
+    effort_left = Column(Float(precision=3), default=0)
+    effort_done = Column(Float(precision=3), default=0)
+    length = Column(Float(precision=3), default=0)
+    complete = Column(Integer, default=0)
     client = relationship('Client', backref='projects')
     tasks = relationship(
         'Task', backref='project',
@@ -173,9 +179,10 @@ class Project(IDMixin, Base):
             session.commit()
             return
         #if not tj.stderr:
-        for i in ['ProfiAndLoss', 'MS-Project', 'resource', 'plan', 'guntt']:
+        for i in ['ProfiAndLoss', 'MS-Project', 'resource', 'plan', 'guntt', 'csv']:
             html_path = '/tmp/%s_%s.html' % (i, self.id)
             xml_path = '/tmp/%s_%s.xml' % (i, self.id)
+            csv_path = '/tmp/csv_%s.csv' % (self.id)
             if os.path.isfile(html_path):
                 report = open(html_path)
                 root = etree.parse(report)
@@ -184,6 +191,9 @@ class Project(IDMixin, Base):
                 self.reports.append(tosave)
             elif os.path.isfile(xml_path):
                 self.reports.append(open(xml_path, 'rb').read())  # msproject file
+            elif os.path.isfile(csv_path):
+                self.reports.append(open(csv_path, 'rb').read())  # msproject file
+
             else:
                 print '%s is not available' % html_path
 

@@ -71,7 +71,9 @@ class Task(IDMixin, Base, BaseNestedSets):
     start = Column(DateTime, nullable=False, default=now)
     end = Column(DateTime, nullable=False)
     duration = Column(Float(precision=3), default=0)
-    effort = Column(Float(precision=3), nullable=False, default=1)
+    effort = Column(Float(precision=3), nullable=False, default=0)
+    effort_left = Column(Float(precision=3), default=0)
+    effort_done = Column(Float(precision=3), default=0)
     length = Column(Float(precision=3), default=0)
     milestone = Column(Boolean, default=False) # is task a milestone?
     parent_id = Column(Integer, ForeignKey("task.id"))
@@ -174,6 +176,7 @@ class Task(IDMixin, Base, BaseNestedSets):
 
     @validates('effort')
     def _update_end(self, key, data):
+        if data: data = float(data)
         if not self.start:
             self.start = now()
         delta = datetime.timedelta(hours=data)
@@ -182,6 +185,10 @@ class Task(IDMixin, Base, BaseNestedSets):
             self.end = self.start + delta
         return data
 
+    @validates('complete')
+    def _check_complete(self, key, data):
+        if data: data = int(float(data))
+        return data
 
 
 @event.listens_for(Task, 'before_insert')

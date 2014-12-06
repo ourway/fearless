@@ -2,7 +2,7 @@ project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} -
     timingresolution 5min
     now  ${now.strftime('%Y-%m-%d')}
   currencyformat "(" ")" "," "." 0
-    
+   #timezone "Asia/Tehran" 
     #dailyworkinghours 7.45
     workinghours mon 09:00 - 13:00, 14:00 - 18:00
     workinghours tue 09:00 - 13:00, 14:00 - 18:00
@@ -104,35 +104,37 @@ balance resourceCost_${project.id} customerPayments_${project.id}
 
 
 
-taskreport breakdown "PMS_${project.id}"{
+taskreport breakdown "csv_${project.id}"{
             formats csv
             loadunit hours
-                columns id, line, name, opentasks, start, end, managers, effort, effortdone, gauge, effortleft, criticalness, duration, complete, efficiency
+                columns id, line, name, opentasks, start, end, managers, effort, resources,  effortdone, gauge, effortleft, criticalness, duration, complete, efficiency
                 taskreport breakdown1 "plan_${project.id}"{
                     formats html
                     loadunit longauto
                     columns name, start, end, effortleft, alert, gauge, criticalness {title "Importance"}, complete {title "Progress"}
                     sorttasks plan.criticalness.up
-                    taskroot fearless.__${project.id}
+                    taskroot fearless
                 }
                 taskreport breakdown2 "guntt_${project.id}"{
                     formats html
                     loadunit longauto
                     columns name, chart { scale day width 600 }, complete {title "Progress"}
                     sorttasks plan.criticalness.up
-                    taskroot fearless.__${project.id}
+                    taskroot fearless
                 }
               #tracereport pb "Product Burndown" {
               #  columns opentasks
               #}
         }
 
-  textreport "resource_${project.id}" {
+textreport "resource_${project.id}" {
     formats html
     title "Resource Graph"
     center '<[report id="resourceGraph"]>'
-    taskroot fearless.__${project.id}
+    taskroot fearless
   }
+
+
 
 resourcereport resourceGraph "" {
   scenarios plan
@@ -141,25 +143,25 @@ resourcereport resourceGraph "" {
   # We only like to show leaf tasks for leaf resources.
   hidetask ~(isleaf() & isleaf_())
   sorttasks plan.criticalness.down
-  taskroot fearless.__${project.id}
+  taskroot fearless
 }
 
 export "MS-Project_${project.id}" {
   formats mspxml
   loadunit days
-  taskroot fearless.__${project.id}
+  taskroot fearless
 }
 
 accountreport "ProfiAndLoss_${project.id}" {
   formats html
   balance -
   columns no, name, weekly
-  taskroot fearless.__${project.id}
+  taskroot fearless
 }
 
 accountreport "ProfiAndLossCsv_${project.id}" {
   formats csv
   currencyformat "(" ")" "" "." 0
   columns no, name, weekly
-  taskroot fearless.__${project.id}
+  taskroot fearless
 }

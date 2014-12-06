@@ -18,8 +18,9 @@ from AAA import Authorize, getUserInfoFromSession
 import falcon
 from helpers import get_params
 from sqlalchemy import desc
-from utils.helpers import commit, jsonify
+from utils.helpers import commit, jsonify, parse_tjcsv
 import datetime
+from cStringIO import StringIO
 
 
 class GetProjectDetails:
@@ -67,18 +68,52 @@ class GetProjectLatestReport:
             project.plan() ## first let it plan
             if project.reports:
                 try:
-                    data = {'guntt':project.reports[-1], 'plan':project.reports[-2], 'resource':project.reports[-3], 
-                             'profitAndLoss':project.reports[-5], 'msproject': project.reports[-4] }
+                    csvfile = StringIO()
+                    csvdata = project.reports[-1]
+                    csvfile.write(csvdata)
+                    jsondata = parse_tjcsv(csvfile)
+                    for each in jsondata:
+                        d =  jsondata[each]
+                        typ = d.get('type')
+                        if typ == 'task':
+                            taskid = int(d.get('taskid'))
+                            target = session.query(Task).filter(Task.id==taskid).first()
+                        elif typ == 'project':
+                            projectid = int(d.get('projectid'))
+                            target = session.query(Project).filter(project.id==projectid).first()
+                            print target
+                        if target: ## donble check
+                            start = d.get('start')
+                            end = d.get('end')
+                            duration = d.get('duration')
+                            complete = d.get('completion')
+                            if complete:
+                                complete = complete[:-1]
+                            effort = d.get('effort')
+                            effort_left = d.get('effort_left')
+                            effort_done = d.get('effort_done')
+
+                            if typ == 'task':
+                                target.start = start
+                                target.end = end
+                            target.complete = complete
+                            target.effort = effort
+                            target.effort_left = effort_left
+                            target.effort_done = effort_done
+                            target.duration = duration
+
+                    data = {'guntt':project.reports[-2], 'plan':project.reports[-3], 'resource':project.reports[-4], 
+                            'profitAndLoss':project.reports[-6], 'msproject': project.reports[-5], 'json': jsondata }
                 except IndexError:
                     message = "We're busy planning your project. Please wait a bit or reload."
                     data = {'guntt':message, 'plan':message, 'resource':message, 
-                             'profitAndLoss':message, 'msproject':message }
+                            'profitAndLoss':message, 'msproject':message, 'csv':message }
 
                 resp.body = data
             else:
                 message = "There is no report available. Try adding some tasks."
                 data = {'guntt':message, 'plan':message, 'resource':message, 
-                             'profitAndLoss':message, 'msproject':message }
+                        'profitAndLoss':message, 'msproject':message, 'csv':message }
 
 
 

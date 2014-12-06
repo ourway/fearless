@@ -41,7 +41,8 @@ class Response(falcon.response.Response):
                 for val in header[1]:
                     header_list.append((header[0], val))
 
-        return header_list + self.extra_headers
+        headers =  header_list + self.extra_headers
+        return headers
 
 
 class Request(falcon.request.Request):

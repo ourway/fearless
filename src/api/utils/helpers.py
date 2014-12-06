@@ -20,6 +20,8 @@ import commands
 import cStringIO
 from sqlalchemy.ext import associationproxy
 import datetime
+import time
+import csv
 
 
 def get_ip():
@@ -86,3 +88,40 @@ def get_params(stream, flat=True):
         return stream
     l = ','.join(['%s="%s"' % (i, stream[i]) for i in stream])
     return l
+
+
+def parse_tjcsv(csvfile):
+    csvfile.seek(0);
+    spamreader = csv.reader(csvfile, delimiter=';', quotechar='"')
+    keys = spamreader.next()
+    all = list(spamreader)
+    obj = {}
+    count = 0
+    for s in all:
+        idi = keys.index('Id')
+        _id = s[idi]
+        _id = _id.split('.')
+        tid = None
+        pid = None
+        typ = 'root'
+        if len(_id) == 2:
+            pid = _id[1][2:]
+            obj[count] = {'type':'project', 'projectid':pid}
+        elif len(_id)>2:
+            tid = _id[-1][1:]
+            obj[count] = {'type':'task', 'taskid':tid}
+        
+        for key in keys:
+            index = keys.index(key)
+            value = s[index].strip()
+            if key in ['Start', 'End']:
+                value = s[index]
+                format = '%y-%m-%d %H-%M'
+                dt = datetime.datetime.strptime(value, format)
+                value =  time.mktime(dt.timetuple())
+            if tid or pid:
+                obj[count][key.strip().lower()] = value
+        count += 1
+
+    return obj
+

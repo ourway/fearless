@@ -1,4 +1,4 @@
-var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'ngCookies', 'restangular', 'ui.grid']);
+var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular', 'ui.grid']);
 
 fearlessApp.factory('authFactory', function($resource) {
   return $resource('/api/auth/:what',
@@ -21,7 +21,7 @@ function pad(num, size) {
 }
 
 
-function timeConverter(UNIX_timestamp){
+function timeConverter(UNIX_timestamp, mode){
     if (UNIX_timestamp)
         var a = new Date(UNIX_timestamp*1000);
     else
@@ -34,6 +34,8 @@ function timeConverter(UNIX_timestamp){
      var min = a.getMinutes();
      var sec = a.getSeconds();
      var time = year+ '-' + pad(month,2) + '-' + pad(date,2)
+     if (mode)
+        var time = year+ '-' + pad(month,2) + '-' + pad(date,2) + ' ' + pad(hour, 2) + '-' + pad(min, 2)
      return time;
  }
 
@@ -144,7 +146,7 @@ function updateImageSize(img, maxWidth, maxHeight){
 
 
 	// create the controller and inject Angular's $scope
-	fearlessApp.controller('mainController', function($scope, $rootScope, $cookies,$http,
+	fearlessApp.controller('mainController', function($scope, $rootScope, $http,
                                                       $timeout, authFactory, $location, $routeParams) {
 		// create a message to display in our view
         $rootScope.title = "Centeral Auth - Fearless";
@@ -175,26 +177,26 @@ function updateImageSize(img, maxWidth, maxHeight){
 
 
     $scope.doLogin = function() {
+        
         if (validateEmail($scope.loginInfo.email) == false)
-            return null;
-
+                return null;
                 $scope.AuthRespInfo = null;
 
-        prom = authFactory.save({}, $scope.loginInfo, function(resp){
-                // Here we need an anomality prevention method:
+        prom = $http.post('/api/auth/login', $scope.loginInfo);
+        prom.success(function(resp){
                 $scope.login_wait = resp.wait;
                 $scope.AuthRespMessage = resp.message;
                 $scope.AuthRespInfo = resp.info;
                 if (resp.message == 'error') {
                     $scope.loginInfo.password = null;
                     $scope.enable_signup = true;
-
                 }
                 setTimeout(function(){$scope.login_wait=null}, resp.wait);
-               if (resp.message=='success' && $scope.loginInfo.action=='login') //green light
+
+
+               if (resp.message=='success') //green light
                     {
-                        localStorage.setItem('userid', resp.id);
-                        localStorage.setItem('username', resp.firstname);
+
                         if (resp.avatar != 'null')
                             localStorage.setItem('avatar', resp.avatar);
                         $scope.userInfo.username = resp.firstname;
@@ -220,10 +222,6 @@ function updateImageSize(img, maxWidth, maxHeight){
                         }
                     }
 
-            if (resp.message=='success' && $scope.loginInfo.action=='signup') //green light
-            {
-                window.location =  '#auth/login/?m=' + btoa(resp.info)  ;
-            }
             if (resp.message=='warning' && resp.not_active)
             {
                 $timeout(function(){
@@ -237,29 +235,32 @@ function updateImageSize(img, maxWidth, maxHeight){
 
     // logout actions
     $scope.doLogout = function(){
-            localStorage.setItem('userid', '');
-            localStorage.setItem('username', '');
+            $http.post('/api/auth/logout');
+            document.cookie = 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/'
+            document.cookie = 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/'
             localStorage.setItem('avatar', '');
             $scope.userInfo.logged_in = false;
             $scope.userInfo.username = null;
             $scope.userInfo.userid = null;
-            $http.post('/api/auth/logout');
             //$scope.userInfo.logged_in = true;
 
         }
     //Check if user is logged in
     $scope.is_logged_in = function(){
-        var userid = localStorage.getItem('userid');
-        var username = localStorage.getItem('username');
+        c = {};
+        document.cookie.split('; ').forEach(function(e){key = e.split('=')[0];value=e.split('=')[1];c[key]=value});
+        var userid = c.userid;
+        var username = c.username;
        if (userid && username)
             {
-                $scope.userInfo.username = username;
-                $scope.userInfo.userid = userid;
+                if (!$scope.userInfo.username)
+                    $scope.userInfo.username = username;
+                if (!$scope.userInfo.userid)
+                    $scope.userInfo.userid = userid;
                 $scope.userInfo.logged_in = true;
                 return true
             }
         else {
-        console.log(userid, username)
            // This is where I redirect user to login page if she/he is unauthenticated
               $scope.userInfo.username = null;
               $scope.userInfo.userid = null;

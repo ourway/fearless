@@ -45,6 +45,10 @@ def convert_to_datetime(inp):
     '''converts input string to a valid datetime object'''
     if isinstance(inp, datetime.datetime):
         return inp
+
+    elif isinstance(inp, (float, int)):  ## unix timestamp
+        return datetime.datetime.fromtimestamp(inp)
+
     elif isinstance(inp, str):
         ''' "2014-03-05-11-54" '''
         length = len(inp.split('-'))
