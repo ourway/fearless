@@ -1,4 +1,4 @@
-var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular', 'ui.grid']);
+var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular', 'ui.grid', 'ui.bootstrap']);
 
 fearlessApp.factory('authFactory', function($resource) {
   return $resource('/api/auth/:what',
@@ -103,6 +103,11 @@ var TITLE = 'TITLE';
 
                 templateUrl: 'pages/crew/report.html',
                 controller: 'reportCtrl'
+            })
+             .when('/ua', {
+
+                templateUrl: 'pages/auth/access.html',
+                controller: 'userAccessCtrl'
             })
 
 	
@@ -394,6 +399,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
 
 fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $location){
 
+
         });
 
 fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $location){
@@ -492,8 +498,67 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
 
 
 
+fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
+        $scope.getUsers = function(){
+            $http.get('/api/db/user').success(function(resp){
+                    $scope.users = resp;
+                    }).error(function(resp, status){
+                        if (status == 401)
+                            $location.path('auth/login');
+                        });
+        }
+
+
+        $scope.getRoles = function(){
+
+            $http.get('/api/db/role').success(function(resp){
+                    console.log(resp);
+                });
+
+        }
+        $scope.getGroups = function(){
+
+            $http.get('/api/db/group').success(function(resp){
+                    console.log(resp);
+                });
+
+        }
+
+        $scope.getUsers();
+        })
 
 fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
+            progressChartOptions = {
+                segmentShowStroke : false,
+                segmentStrokeColor : "#ccc",
+                segmentStrokeWidth : 1,
+                percentageInnerCutout : 0, // This is 0 for Pie charts
+                animationSteps : 100,
+                //animationEasing : "liner",
+                //animateRotate : true,
+                animateScale : false,
+                animation : true
+            }
+            var progressData = [
+                {
+                    value: 0,
+                    color:"#419641",
+                    highlight: "#58C758",
+                    label: "Complete"
+
+                },
+                 {
+                    value: 100,
+                    color:"#ccc",
+                    highlight: "#555",
+                    label: "Remaining"
+                },
+
+            ]
+
+            var ctx = $("#progressChart").get(0).getContext("2d");
+            var progressPyChart = new Chart(ctx).Pie(progressData, progressChartOptions);
+
             $scope.projId = $routeParams.projId;
             $scope.toTitleCase = toTitleCase;
             $rootScope.title = "Project " + $scope.projId + " - Fearless";
@@ -519,6 +584,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     $location.path('/pms')
                 })
 
+            getprefix = 'project_'+ $scope.projId+ '_' + timeConverter() + '_';
             $scope.generateReport = function(mode){
             if (!mode)
                 {
@@ -529,7 +595,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 }
             $scope.mode=mode;
             $('.tj_table_frame').fadeOut(2000);
-            getprefix = 'project_'+ $scope.projId+ '_' + timeConverter() + '_';
             data = localStorage.getItem(getprefix +  mode);
             if ($scope.replan || !data){
             //if (1){
@@ -537,6 +602,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             projectReport = $http.get('/api/project/report/'+$scope.projId);
             projectReport.success(function(resp){
                 localStorage.setItem(getprefix + 'plan', resp.plan);
+                localStorage.setItem(getprefix + 'json', JSON.stringify(resp.json));
                 localStorage.setItem(getprefix + 'guntt', resp.guntt);
                 localStorage.setItem(getprefix + 'resource', resp.resource);
                 localStorage.setItem(getprefix + 'profitAndLoss', resp.profitAndLoss);
@@ -544,6 +610,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $scope.printable = data;
                 $('#projectDetailDiv').html(data);
                 $('.tj_table_frame').fadeIn();
+                $scope.generateProgressChart();
+                $scope.getTasksList();
                 })
                 if ($scope.replan)
                     $scope.replan = false;
@@ -553,7 +621,10 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $scope.printable = data;
                 $('#projectDetailDiv').html(data);
                 $('.tj_table_frame').fadeIn();
+                $scope.generateProgressChart();
+                $scope.getTasksList();
             }
+            
 
          }
 
@@ -576,32 +647,31 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     $scope.resources = resp;
                     });
         }
-
-        $scope.createNewTask = function(){
-           if ($scope.newtask.isMilestone)
-           {
-                $scope.newtask.effort = 0;
-                $scope.newtask.resources = [];
-                $scope.newtask.start = $scope.newtask.end;
-            }
-
-
-           data = $scope.newtask;
-           $http.put('/api/task/add/'+$scope.projId, data).success(function(resp){
-                    $scope.resetNewtask();
-                   $('#taskAddModal').modal('hide');
-                    $scope.getTasksList();
-                    $scope.replan = true;
-                    $scope.generateReport();
-                   
-                   });
+    $scope.getTasksList = function(){
+        $http.get('/api/task/list/'+$scope.projId).success(function(resp){
+                $scope.tasks = resp;
+            });
+    }
+    $scope.createNewTask = function(){
+       if ($scope.newtask.isMilestone)
+       {
+            $scope.newtask.effort = 0;
+            $scope.newtask.resources = [];
+            $scope.newtask.start = $scope.newtask.end;
         }
 
-        $scope.getTasksList = function(){
-            $http.get('/api/task/list/'+$scope.projId).success(function(resp){
-                    $scope.tasks = resp;
-                });
-        }
+
+       data = $scope.newtask;
+       $http.put('/api/task/add/'+$scope.projId, data).success(function(resp){
+                $scope.resetNewtask();
+               $('#taskAddModal').modal('hide');
+                $scope.replan = true;
+                $scope.generateReport();
+               
+               });
+    }
+
+
 
         $scope.isCurrenclyDependentOf = function(task){
             if (!$scope.editTaskInfo || !task || !$scope.editTaskInfo.depends)
@@ -632,6 +702,23 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             }
         }
 
+        $scope.generateProgressChart = function(){
+            _data = localStorage.getItem(getprefix + 'json');
+            data = JSON.parse(_data);
+            complete = 0;
+            for (i in data)
+            {
+                info = data[i]
+               if (info.type == 'project'){
+                    complete = parseInt(info.completion.split('%')[0]);
+               }
+            }
+                progressPyChart.segments[0].value = complete;
+                progressPyChart.segments[1].value = 100-complete;
+                progressPyChart.update();
+
+
+        }
 
         $scope.taskDetail = function(taskId) {
             //console.log(taskId);

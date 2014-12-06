@@ -112,14 +112,14 @@ taskreport breakdown "csv_${project.id}"{
                     formats html
                     loadunit longauto
                     columns name, start, end, effortleft, alert, gauge, criticalness {title "Importance"}, complete {title "Progress"}
-                    sorttasks plan.criticalness.up
+                    sorttasks plan.start.up
                     taskroot fearless
                 }
                 taskreport breakdown2 "guntt_${project.id}"{
                     formats html
                     loadunit longauto
                     columns name, chart { scale day width 600 }, complete {title "Progress"}
-                    sorttasks plan.criticalness.up
+                    sorttasks plan.start.up
                     taskroot fearless
                 }
               #tracereport pb "Product Burndown" {
@@ -142,7 +142,7 @@ resourcereport resourceGraph "" {
   loadunit hours
   # We only like to show leaf tasks for leaf resources.
   hidetask ~(isleaf() & isleaf_())
-  sorttasks plan.criticalness.down
+  sorttasks plan.start.down
   taskroot fearless
 }
 

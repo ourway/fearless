@@ -90,10 +90,11 @@ class DB:
 
 
         field = req.get_param('field')
-        if field and len(args)==5:
+        if field:
             try:
-                data = eval('data.%s'%field)
-            except AttributeError:
+                data = [eval('i.%s'%field) for i in data]
+            except AttributeError, e:
+                print e
                 raise falcon.HTTPBadRequest('Bad Request', 'The requested field is not available for database')
             resp.body = data
             return

@@ -1,0 +1,23 @@
+
+
+    <div class="container">
+    	<div class="row clearfix">
+            <br/>
+                <div class="col-md-8 column usersUA">
+            <input placeholder="Filter users. Example: type yahoo for filtering users with yahoo! email" class="form-control" type="text" ng-model="filterUA" />
+            <div ng-repeat="user in users | orderBy:'firstname'| filter:filterUA" class="useracessDiv" >
+                <img ng-show="user.avatar" ng-src="{{user.avatar}}" width="100" class="pull-left img-responsive img-rounded center-block img-thumbnail"/>
+                <img ng-show="!user.avatar" ng-src="images/user_man-512.png" width="100" class="pull-left img-responsive img-rounded "/>
+                <div style="margin-left:110px;margin-top:10px;">
+                    <a href="#/user/{{user.id}}">{{user.firstname}} {{user.lastname}}</a><br/>
+                    <span class="glyphicon glyphicon-envelope"></span>  <a href="mailto:{{user.email}}"><span style="color:grey">{{user.email}}</span></a>
+                </div>
+            </div>
+            </div>
+
+
+        </div>
+
+    </div> <!-- /container -->
+
+

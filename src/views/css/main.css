@@ -35,7 +35,7 @@ cursor:pointer;
 
 #projectDetailContainer{
     width:100%;
-    min-height: 580px;
+    min-height: 100px;
 /*
     background: url('../images/loading_3.gif') no-repeat center;
     background-size: 164px 128px;
@@ -100,6 +100,24 @@ background: #FFFFDF;
 table { 
 border-collapse: inherit;
 border-spacing: 0px;
+}
+
+
+.useracessDiv{
+padding:5px;
+border-bottom:1px solid #ccc;
+min-height:110px;
+}
+
+.useracessDiv:last-of-type {
+padding:5px;
+border-bottom:0px solid #ccc;
+min-height:110px;
+}
+.useracessDiv:first-of-type {
+padding:5px;
+border-top:1px solid #34AFD5;
+min-height:110px;
 }
 
 

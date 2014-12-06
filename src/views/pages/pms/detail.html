@@ -336,17 +336,26 @@ border-bottom: 1px solid #57BEDD;
                         <br/>
                     <div id="tasksDiv">
                         <ol class="">
-                            <li ng-click="taskDetail(task.id)" title="{{task}}" class="taskA" ng-repeat="task in tasks | orderBy:'title' | filter:filterTaskName ">
+                            <li ng-click="taskDetail(task.id)" title="{{task}}" class="taskA" ng-repeat="task in tasks | orderBy:'start' | filter:filterTaskName ">
                             
                             <a class="btn-sm" style="color: #13560C;" data-task-title="{{toTitleCase(task.title)}}" ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" id="task_{{task.id}}" >{{toTitleCase(task.title)}}</a></li>
                         </ol>
 
                     </div>
 				</div>
-				<div class="col-md-8 column">
+				<div class="col-md-6 column">
                     <div id="projectDetailContainer">
                         <div id="projectDetailDiv"></div>
                     </div>
+
+			<div class="row clearfix">
+                <div class="col-md-3 column">
+  			        <div id="canvasDiv" >
+                        <canvas style="padding:10px;" id="progressChart" width="196" height="196"></canvas>		
+                    </div>
+				</div>
+                <div class="col-md-4 column"> </div>
+			</div>
 				</div>
 		</div>
 	</div>
