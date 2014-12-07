@@ -704,6 +704,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
         $scope.generateProgressChart = function(){
             _data = localStorage.getItem(getprefix + 'json');
+            if (!_data || _data=='undefined')
+                return null;
             data = JSON.parse(_data);
             complete = 0;
             for (i in data)

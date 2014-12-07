@@ -127,6 +127,7 @@ class AddTask:
         if taskData.get('effort'): effort = int(taskData.get('effort'))
         start = taskData.get('start')
         end = taskData.get('end')
+        priority = taskData.get('priority')
         #print responsible_id
         project = session.query(Project).filter(Project.id==int(projId)).first()
         if not start:
@@ -135,6 +136,7 @@ class AddTask:
             start = str(start)
 
         newTask = Task(title=title, effort=effort, project=project, start=start)
+        newTask.priority = priority
         if end:
             newTask.end = str(end)
 
@@ -200,12 +202,14 @@ class UpdateTask:
         start = str(taskData.get('start'))
         end = str(taskData.get('end'))
         title = taskData.get('title')
+        priority = taskData.get('priority')
         _id = int(taskData.get('id'))
         priority = int(taskData.get('priority'))
         target = session.query(Task).filter(Task.id==_id).first()
         if target:
             target.title = title
             target.start = start
+            target.priority = priority
             target.end = end
             target.effort = effort
             if effort:
