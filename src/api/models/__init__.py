@@ -72,7 +72,9 @@ def init():
 
     for gr in ['managers', 'users', 'clients', 'guests'] + departements :
         if not gr in [i.name for i in groups]:
-            new = Group(gr, role=gr[:-1])
+            new = Group(gr, role=gr[:-1], typ='general')
+            if gr in departements:
+                new.typ = 'departement'
             session.add(new)
 
     manager_group = session.query(Group).filter(Group.name=='managers').first()

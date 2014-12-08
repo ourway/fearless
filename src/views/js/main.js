@@ -98,8 +98,13 @@ var TITLE = 'TITLE';
 
                 templateUrl: 'pages/auth/profile.html',
                 controller: 'profileCtrl'
-            })		
-             .when('/report', {
+            })
+            .when('/user/:userId', {
+
+                templateUrl: 'pages/auth/profile.html',
+                controller: 'profileCtrl'
+            })
+            .when('/report', {
 
                 templateUrl: 'pages/crew/report.html',
                 controller: 'reportCtrl'
@@ -244,9 +249,7 @@ function updateImageSize(img, maxWidth, maxHeight){
             document.cookie = 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/'
             document.cookie = 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/'
             localStorage.setItem('avatar', '');
-            $scope.userInfo.logged_in = false;
-            $scope.userInfo.username = null;
-            $scope.userInfo.userid = null;
+            $scope.userInfo = {}; // Empty user info
             //$scope.userInfo.logged_in = true;
 
         }
@@ -267,9 +270,7 @@ function updateImageSize(img, maxWidth, maxHeight){
             }
         else {
            // This is where I redirect user to login page if she/he is unauthenticated
-              $scope.userInfo.username = null;
-              $scope.userInfo.userid = null;
-              $scope.userInfo.logged_in = false;
+              $scope.userInfo = {}
               next_page = btoa($location.$$path);
               if (next_page == 'Lw==')  // if its just a # sign
                 next_page = ''
@@ -324,12 +325,14 @@ fearlessApp.controller('pmsCtrl', function($scope, $http, $location){
 
 });
 
-fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $location){
+fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $location, $routeParams){
         $rootScope.title = "Profile - Fearless";
+        userId = $routeParams.userId;
+        if (!userId)
+            userId = $scope.$parent.userInfo.userid;
         
-        userInfoReq = $http.get('/api/db/user/'+$scope.$parent.userInfo.userid);
+        userInfoReq = $http.get('/api/db/user/'+userId);
         userInfoReq.success(function(resp, b, c, d){
-        console.log(resp, b, c, d);
             resp = resp[0]
             delete resp.password;
             delete resp.created_on;
@@ -374,8 +377,10 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
         }
 
     $scope.updateUserInformation = function(){
-        x = $http.post('/api/db/user/'+$scope.$parent.userInfo.userid, $scope.user); //send it
+        x = $http.post('/api/db/user/'+ userId, $scope.user); //send it
         x.success(function(resp){
+                if (!$routeParams.userId)
+                {
                 $scope.$parent.userInfo.username = $scope.user.firstname;
                 localStorage.setItem('avatar', $scope.user.avatar);
                 localStorage.setItem('username', $scope.user.firstname);
@@ -387,7 +392,8 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
                 mail['subject'] = 'Fearless profile';
                 //console.log(mail)
                 m = $http.post('/api/sendmail', mail);
-                });
+                }
+            });
     }
 
 });

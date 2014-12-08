@@ -380,9 +380,19 @@ def getUserInfoFromSession(req):
 
 
 class GetUserInfo:
-    @falcon.after(commit)
+    #@falcon.after(commit)
     def on_post(self, req, resp):
         resp.body = getUserInfoFromSession(req)
+
+class GetPermissions:
+    def on_get(self, req, resp, userId):
+        target = session.query(User).filter(User.id==int(userId)).first()
+        resp.body =  [i.rls for i in target.grps]
+
+
+
+
+
 
 
 def isAuthorizedTo(userId, actionName):
