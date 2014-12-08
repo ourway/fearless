@@ -305,7 +305,12 @@ $scope.$watch(function(){return $location.$$path},
                 //finalFile = attach_thumb_canvas.toDataURL('image/webp'); //Always convert to png
 
                 $http.put('/api/asset/save/showtimeAttachments?collection='+project.projectName+'_attachments&name='
-                        +name+'&attach_to='+$scope.asset.id, data, {transformRequest: []} )
+                        +name+'&attach_to='+$scope.asset.id, data, {transformRequest: []} ).success(function(){
+                            
+
+
+                            });
+
                 
             }
             name = f.name;
