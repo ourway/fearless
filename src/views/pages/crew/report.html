@@ -3,14 +3,32 @@
     <br/>
 	<div class="row clearfix">
         <div class="col-md-2 column">
-            <p>
-            Write your reports here. Must be longer than 25 characters and less than 1000 ones.
+            <p ng-if="persian" class="farsi">
+            گزارشات شما باید کمتر از ۱۰۰۰ حرف و بیشتر از ۲۵ حرف باشند. 
+            </p>
+            <p ng-if="!persian">
+            Your reports must be longer than 25 characters and less than 1000 ones.
             </p>
             <p class="alert">
             <b>{{report.messageCallBack}}</b>
             </p>
 		</div>
         <div class="col-md-8 column">
+
+				<div class="form-group">
+
+					<div ng-disabled="report.messageCallBack">
+                        <textarea ng-class="{'farsi':persian}" id="report_textarea" type="text" class="form-control" placeholder="{{repotPlaceholder}}" ng-model="report.body"></textarea>
+                        <br/>
+                        <button ng-if="persian" ng-disabled="!report.body || report.body.length<25 || report.body.length>1000" 
+                            type="submit" ng-click="sendReport()" class="pull-right farsi btn btn-primary">گزارش من را بفرست</button>
+                        <button ng-if="!persian" ng-disabled="!report.body || report.body.length<25 || report.body.length>1000"
+                            type="submit" ng-click="sendReport()" class="btn btn-primary">Send My Report</button>
+					</div>
+				</div>
+
+		</div>
+        <div class="col-md-2 column">
 			<div class="btn-group">
                 <button
                     ng-click="repotPlaceholder='Write your daily or hourly report here ...';persian=false;"
@@ -21,17 +39,6 @@
             </div>
             <br/>
             <br/>
-				<div class="form-group">
-
-					<div class="col-sm-6" ng-disabled="report.messageCallBack">
-                        <textarea ng-class="{'farsi':persian}" id="report_textarea" type="text" class="form-control" placeholder="{{repotPlaceholder}}" ng-model="report.body"></textarea>
-                        <br/>
-                        <button ng-disabled="!report.body || report.body.length<25 || report.body.length>1000" type="submit" ng-click="sendReport()" class="btn btn-primary">Send My Report</button>
-					</div>
-				</div>
-
-		</div>
-        <div class="col-md-2 column">
             <a href="#help/reports">Need help?</a>
 		</div>
 	</div>
