@@ -16,10 +16,12 @@ Clean code is much better than Cleaner comments!
 import falcon
 import ujson
 import hashlib
+from helpers import commit, get_ip, get_params
 from validators import email_validator
 from tasks import send_envelope
 import os
-from helpers import get_params
+from models import session, User, Report
+from AAA import getUserInfoFromSession
 
 
 class Mailer(object):
@@ -43,3 +45,17 @@ class Mailer(object):
         else:
             resp.status = falcon.HTTP_400
         resp.body = ujson.dumps(data)
+
+
+
+class AddReport:
+    @falcon.after(commit)
+    def on_put(self, req, resp, **kw):
+        u = getUserInfoFromSession(req)
+        targetUser = session.query(User).filter(User.id==u.get('id')).first()
+        data = get_params(req.stream, flat=False)
+        if data and data.get('body'):
+            targetUser.reports.append(data.get('body'))
+            resp.status = falcon.HTTP_202
+            resp.body = {'message':'OK'}
+

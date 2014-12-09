@@ -69,7 +69,10 @@ class GetProjectLatestReport:
             if project.reports:
                 try:
                     csvfile = StringIO()
-                    csvdata = project.reports[-1]
+                    csvdataid = project.reports[-1]
+                    csvdata = session.query(Report).filter(Report.id==csvdataid).first()
+                    if csvdata:
+                        csvdata = csvdata.body
                     csvfile.write(csvdata)
                     jsondata = parse_tjcsv(csvfile)
                     for each in jsondata:
@@ -101,7 +104,34 @@ class GetProjectLatestReport:
                             target.effort_done = effort_done
                             target.duration = duration
 
-                    data = {'guntt':project.reports[-2], 'plan':project.reports[-3], 'resource':project.reports[-4], 
+                    ganttdataid = project.reports[-2]
+                    ganttdata = session.query(Report).filter(Report.id==ganttdataid).first()
+                    if ganttdata:
+                        ganttdata = ganttdata.body
+
+                    plandataid = project.reports[-3]
+                    plandata = session.query(Report).filter(Report.id==plandataid).first()
+                    if plandata:
+                        csvdata = plandata.body
+
+
+                    resourcedataid = project.reports[-4]
+                    resourcedata = session.query(Report).filter(Report.id==resourcedataid).first()
+                    if resourcedata:
+                        resourcedata = resourcedata.body
+
+                    profitandlossid = project.reports[-6]
+                    profitandloss = session.query(Report).filter(Report.id==profitandlossid).first()
+                    if profitandloss:
+                        profitandloss = profitandloss.body
+
+                    msprojectid = project.reports[-5]
+                    msproject = session.query(Report).filter(Report.id==msprojectid).first()
+                    if msproject:
+                        msproject = msproject.body
+
+
+                    data = {'guntt':ganttdata, 'plan':project.reports[-3], 'resource':project.reports[-4], 
                             'profitAndLoss':project.reports[-6], 'msproject': project.reports[-5], 'json': jsondata }
                 except IndexError:
                     message = "We're busy planning your project. Please wait a bit or reload."

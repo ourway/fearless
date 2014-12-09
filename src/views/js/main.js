@@ -383,7 +383,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
                 {
                 $scope.$parent.userInfo.username = $scope.user.firstname;
                 localStorage.setItem('avatar', $scope.user.avatar);
-                localStorage.setItem('username', $scope.user.firstname);
+                document.cookie = 'username='+ $scope.user.firstname +'; path=/; max-age=86400;'
                 mail = {};
                 mail['message'] = 'Hello <b>'+ $scope.user.firstname +'</b>!<br/>'
                 mail['message']+= 'Your profile information updated successfully.<br/>';
@@ -403,8 +403,32 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
 
 
 
-fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $location){
+fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $timeout, $location){
+        $scope.report = {};
+        $scope.persian = false;
+        $scope.repotPlaceholder = 'Write your daily or hourly report here ...';
+        $scope.$watch($scope.persian, function(){
+            $('#report_textarea').focus();
+            console.log('ok');
+                
+                });
+        $scope.sendReport = function(){
+            req = $http.put('/api/report', $scope.report);
+            req.success(function(resp){
+                if (resp.message == 'OK'){
+                        $scope.report.body = null;
+                        $scope.report.messageCallBack = 'Thank you! Your report has been sent.'
+                        $timeout(function(){
+                                $scope.report = {};
+                                $('#report_textarea').focus();
 
+                            }, 3000)
+
+
+                    }
+                })
+       }
+        
 
         });
 

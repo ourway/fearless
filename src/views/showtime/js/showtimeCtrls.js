@@ -296,6 +296,7 @@ $scope.$watch(function(){return $location.$$path},
             reader = new FileReader();
             reader.onload = function(e) {
                 data = convertDataURL2binaryArray(reader.result);
+
                 //var img = new Image()
                 //var attach_thumb_canvas = document.createElement('canvas');
                 //attach_thumb_canvas.width = 48
@@ -305,10 +306,11 @@ $scope.$watch(function(){return $location.$$path},
                 //finalFile = attach_thumb_canvas.toDataURL('image/webp'); //Always convert to png
 
                 $http.put('/api/asset/save/showtimeAttachments?collection='+project.projectName+'_attachments&name='
-                        +name+'&attach_to='+$scope.asset.id, data, {transformRequest: []} ).success(function(){
+                        +name+'&attach_to='+$scope.asset.id, data, {transformRequest: []} ).success(function(resp){
                             
-
-
+                                $scope.asset.attachments.push(resp);
+                                console.log($scope.asset.attachments);
+    
                             });
 
                 

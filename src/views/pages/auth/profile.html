@@ -32,15 +32,28 @@
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Cell Number</label>
 					<div class="col-sm-6">
-						<input type="tel" class="form-control" ng-model="user.cell" />
+						<input type="tel" style="font-family:monospace" placeholder="Example: 0912-112-8899" class="form-control" ng-model="user.cell" />
 					</div>
 				</div>
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Address</label>
 					<div class="col-sm-6">
-						<input type="tel" class="form-control" ng-model="user.address" />
+						<input type="tel" class="form-control" placeholder="Example: P9-Gisha St,Tehran,Iran" ng-model="user.address" />
 					</div>
-				</div>
+                </div>
+                    <br/>
+                <div ng-if="$parent.userInfo.userid==1" style="border-top:1px solid #ccc;">
+                    <br/>
+				<div class="form-group" >
+					 <label for="inputPassword3" class="col-sm-4 control-label">Daily Rate</label>
+					<div class="col-sm-6">
+						<input style="font-family:monospace" type="number" class="form-control" placeholder="Example: 2,000,000&divide;192x8" ng-model="user.rate" />
+					</div>
+                </div>
+            </div>
+                    <br/>
+                    <br/>
+
 				<div class="form-group">
 					<div class="col-sm-offset-4 col-sm-10">
 						 <button type="submit" ng-click="updateUserInformation()" class="btn btn-primary">Update Information</button>

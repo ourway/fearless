@@ -15,13 +15,13 @@ Clean code is much better than Cleaner comments!
 #from gevent import monkey; monkey.patch_all()
 from falcon_patch import falcon
 import importlib
-from utils.helpers import commit, jsonify
+from utils.helpers import commit, jsonify, get_params
 import urlparse
 from urllib import unquote
 from string import ascii_uppercase
 import ujson as json
 from utils.assets import AssetSave, ListAssets, GetAsset, DeleteAsset
-from utils.reports import Mailer
+from utils.reports import Mailer, AddReport
 from gevent import wsgi
 from models import __all__ as av
 from models import *
@@ -39,7 +39,6 @@ from utils.project import GetProjectDetails, GetProjectLatestReport, \
         ListProjects, AddProject, AddTask, ListTasks, GetTask, UpdateTask, \
         DeleteTask
 
-from utils.helpers import get_params
 
 tables = [i for i in av if i[0] in ascii_uppercase]
 
@@ -204,6 +203,7 @@ app.add_route('/api/task/{taskId}', GetTask())
 app.add_route('/api/task/update/{taskId}', UpdateTask())
 app.add_route('/api/task/delete/{taskId}', DeleteTask())
 app.add_route('/api/sendmail', Mailer())
+app.add_route('/api/report', AddReport())
 
 
 if __name__ == '__main__':

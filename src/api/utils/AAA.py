@@ -375,7 +375,10 @@ def getUserInfoFromSession(req):
             if target:
                 return {'email':target.email, 'alias':target.alias, 'firstname':target.firstname,
                             'lastname':target.lastname, 'id':target.id, 'server':{'name':'Fearless API', 'ip':get_ip()}}
-
+            
+            else:
+                resp.append_header('set-cookie', 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
+                resp.append_header('set-cookie', 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
         return {'message':'ERROR'}
 
 

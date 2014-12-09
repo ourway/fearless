@@ -29,6 +29,13 @@ users_groups = Table('users_groups', Base.metadata,
                      Column('user_id', Integer, ForeignKey('user.id')),
                      Column('group_id', Integer, ForeignKey('group.id'))
                      )
+
+user_reports = Table('user_reports', Base.metadata,
+    Column('user_id', Integer, ForeignKey("user.id"),
+           primary_key=True),
+    Column('report_id', Integer, ForeignKey("report.id"),
+           primary_key=True)
+)
 class User(IDMixin, Base):
 
     '''Main users group
@@ -50,7 +57,8 @@ class User(IDMixin, Base):
     latest_session_id = Column(String(64))
     active = Column(Boolean, default=False)
     rate = Column(Float(precision=3), default=20000)
-    reports = relationship('Report', backref='user')
+    rep = relationship("Report", secondary=lambda: user_reports, backref='user')
+    reports = association_proxy('rep', 'id') # when we refer to reports, id will be returned.
     grps = relationship('Group', backref='users', secondary='users_groups')
     groups = association_proxy('grps', 'name')
 

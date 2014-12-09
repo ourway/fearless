@@ -120,6 +120,16 @@ border-top:1px solid #34AFD5;
 min-height:110px;
 }
 
+#report_textarea{
+width:500px;
+min-height:200px;
+}
+
+.farsi{
+text-align:right;
+direction:rtl;
+}
+
 
 
 

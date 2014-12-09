@@ -99,10 +99,11 @@ def init():
     for role in read_roles:
         users_group.rls.append(role)
 
-    profile_files_repository = session.query(Repository).filter(Repository.name == 'profiles').first()
-    if not profile_files_repository:
-        profile_files_repository = Repository(name='profiles', path= os.path.join(public_repository_path, 'profiles'))
-        session.add(profile_files_repository)
+    for repo in ['profiles', 'reports', 'assets', 'showtime']:
+        new_repository = session.query(Repository).filter(Repository.name == repo).first()
+        if not new_repository:
+            new_repository = Repository(name=repo, path= os.path.join(public_repository_path, repo))
+            session.add(new_repository)
 
     session.commit()
 

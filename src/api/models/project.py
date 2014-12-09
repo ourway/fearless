@@ -78,7 +78,7 @@ class Project(IDMixin, Base):
     tickets = association_proxy('tk', 'Ticket')
     #project_id = Column(Integer, ForeignKey('project.id'))
     rep = relationship("Report", secondary=lambda: project_reports, backref='project')
-    reports = association_proxy('rep', 'body') # when we refer to reports, id will be returned.
+    reports = association_proxy('rep', 'id') # when we refer to reports, id will be returned.
 
 
 

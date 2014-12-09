@@ -130,7 +130,7 @@ class AssetSave:
                 #newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
                 #asset.task_id = newAsset.task_id
             resp.body = {'message': 'Asset created|updated', 'key': asset.key,
-                             'url': asset.url}
+                         'url': asset.url, 'name':asset.name}
                 #resp.body = "I am working"
         else:  ## lets consume the stream!
             while True:
@@ -229,10 +229,8 @@ def getAssetInfo(key):
 
 
 class GetAsset:
-
     def on_post(self, req, resp, key):
         '''Serve asset based on a key (riak key for finding path'''
-
         name = req.get_param('name')
         if name == 'true':
             target = session.query(Asset).filter(Asset.name == key).first()
@@ -266,7 +264,6 @@ class DeleteAsset:
 
         
 class ListAssets:
-
     def on_get(self, req, resp):
         page = req.get_param('page') or 1
         userName = req.get_param('user') or '*'

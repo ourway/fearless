@@ -1,10 +1,46 @@
 <div class="container">
+    <br/>
+    <br/>
 	<div class="row clearfix">
-        <div class="col-md-8 column">
-            sdsdsd
+        <div class="col-md-2 column">
+            <p>
+            Write your reports here. Must be longer than 25 characters and less than 1000 ones.
+            </p>
+            <p class="alert">
+            <b>{{report.messageCallBack}}</b>
+            </p>
 		</div>
-        <div class="col-md-4 column">
-            portseeeeee
+        <div class="col-md-8 column">
+			<div class="btn-group">
+                <button id="taskAddButton"
+                    ng-click="repotPlaceholder='Write your daily or hourly report here ...';persian=false;"
+                    class="btn btn-default" type="button"><em class="glyphicon glyphicon-align-left"></em></button>
+                <button class="btn btn-default" 
+                    ng-click="repotPlaceholder='گزارش روزانه یا ساعتی خود را اینجا بنویسید ...';persian=true;"
+                    type="button"><em class=" glyphicon glyphicon-align-right"></em></button>
+            </div>
+            <br/>
+            <br/>
+				<div class="form-group">
+
+					<div class="col-sm-6" ng-disabled="report.messageCallBack">
+                        <textarea ng-class="{'farsi':persian}" id="report_textarea" type="text" class="form-control" placeholder="{{repotPlaceholder}}" ng-model="report.body"></textarea>
+                        <br/>
+                        <button ng-disabled="!report.body || report.body.length<25 || report.body.length>1000" type="submit" ng-click="sendReport()" class="btn btn-primary">Send My Report</button>
+					</div>
+				</div>
+
+		</div>
+        <div class="col-md-2 column">
+            <a href="#help/reports">Need help?</a>
 		</div>
 	</div>
 </div>
+
+<script>
+
+    $(document).ready(function(){
+        $('#report_textarea').focus();
+    });
+
+</script>
