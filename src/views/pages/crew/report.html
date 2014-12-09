@@ -12,10 +12,10 @@
 		</div>
         <div class="col-md-8 column">
 			<div class="btn-group">
-                <button id="taskAddButton"
+                <button
                     ng-click="repotPlaceholder='Write your daily or hourly report here ...';persian=false;"
-                    class="btn btn-default" type="button"><em class="glyphicon glyphicon-align-left"></em></button>
-                <button class="btn btn-default" 
+                    class="btn btn-default langChange" type="button"><em class="glyphicon glyphicon-align-left"></em></button>
+                <button class="btn btn-default langChange"
                     ng-click="repotPlaceholder='گزارش روزانه یا ساعتی خود را اینجا بنویسید ...';persian=true;"
                     type="button"><em class=" glyphicon glyphicon-align-right"></em></button>
             </div>
@@ -42,5 +42,10 @@
     $(document).ready(function(){
         $('#report_textarea').focus();
     });
+
+    $('.langChange').click(function(){
+    
+        $('#report_textarea').focus();
+    })
 
 </script>

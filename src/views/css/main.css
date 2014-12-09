@@ -8,6 +8,19 @@
   display: none !important;
 }
 
+
+@font-face { font-family: 'YEKAN_0'; src: local('b BYekan'),url('../fonts/YEKAN_0.TTF') format('truetype'); } 
+.right{ direction:rtl; font-family: 'Terafik'; }
+
+@font-face{font-family:"Terafik";
+    src:url('../fonts/terafik.eot');
+    src:url('../fonts/terafik.eot?#iefix') format('embedded-opentype'),
+        url('../fonts/terafik.svg#Terafik') format('svg'),
+        url('../fonts/terafik.woff') format('woff'),
+        url('../fonts/terafik.ttf') format('truetype')
+    }
+
+
 #profileImageDiv :hover {
     opacity: .75;
     cursor:pointer;
@@ -125,12 +138,12 @@ width:500px;
 min-height:200px;
 }
 
-.farsi{
-text-align:right;
-direction:rtl;
+.farsi {
+    direction:rtl;
+    text-align:right;
+    font-family:Terafik;
+    -webkit-font-smoothing: antialiased;
 }
-
-
 
 
 

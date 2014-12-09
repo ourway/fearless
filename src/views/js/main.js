@@ -407,11 +407,6 @@ fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $timeou
         $scope.report = {};
         $scope.persian = false;
         $scope.repotPlaceholder = 'Write your daily or hourly report here ...';
-        $scope.$watch($scope.persian, function(){
-            $('#report_textarea').focus();
-            console.log('ok');
-                
-                });
         $scope.sendReport = function(){
             req = $http.put('/api/report', $scope.report);
             req.success(function(resp){
