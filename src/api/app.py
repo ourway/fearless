@@ -33,7 +33,8 @@ from sqlalchemy import desc
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
     Verify, Reactivate, Reset, Logout, GetUserInfo, Authorize, \
-    getUserInfoFromSession, isAuthorizedTo, GetPermissions
+    getUserInfoFromSession, isAuthorizedTo, GetPermissions, ChangePasswordVerify, \
+    ChangePassword
 from utils.showtime import GetUserShows
 from utils.project import GetProjectDetails, GetProjectLatestReport, \
         ListProjects, AddProject, AddTask, ListTasks, GetTask, UpdateTask, \
@@ -188,6 +189,8 @@ app.add_route('/api/auth/reset', Reset())
 app.add_route('/api/auth/logout', Logout())
 app.add_route('/api/auth/getUserInfo', GetUserInfo())
 app.add_route('/api/auth/permissions/{userId}', GetPermissions())
+app.add_route('/api/auth/changepasswordverify', ChangePasswordVerify())
+app.add_route('/api/auth/changepassword', ChangePassword())
 app.add_route('/api/asset/save/{repo}', AssetSave())
 app.add_route('/api/asset', ListAssets())
 app.add_route('/api/asset/{key}', GetAsset())

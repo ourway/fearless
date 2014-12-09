@@ -84,8 +84,15 @@ var TITLE = 'TITLE';
 				templateUrl : 'pages/auth/reactivate.html',
 				controller  : 'mainController'
 			})		//$locationProvider.html5Mode(true);
+			.when('/auth/reset', {
+				templateUrl : 'pages/auth/reset.html',
+				controller  : 'mainController'
+			})		//$locationProvider.html5Mode(true);
+			.when('/auth/changepassword', {
+				templateUrl : 'pages/auth/changepassword.html',
+				controller  : 'mainController'
+			})		//$locationProvider.html5Mode(true);
             .when('/pms', {
-
                 templateUrl: 'pages/pms/index.html',
                 controller: 'projectCtrl'
             })
@@ -192,13 +199,14 @@ function updateImageSize(img, maxWidth, maxHeight){
                 return null;
                 $scope.AuthRespInfo = null;
 
-        prom = $http.post('/api/auth/login', $scope.loginInfo);
+        prom = $http.post('/api/auth/'+$scope.loginInfo.action, $scope.loginInfo);
         prom.success(function(resp){
                 $scope.login_wait = resp.wait;
                 $scope.AuthRespMessage = resp.message;
                 $scope.AuthRespInfo = resp.info;
                 if (resp.message == 'error') {
                     $scope.loginInfo.password = null;
+                    $scope.loginInfo.password2= null;
                     $scope.enable_signup = true;
                 }
                 setTimeout(function(){$scope.login_wait=null}, resp.wait);
@@ -231,6 +239,15 @@ function updateImageSize(img, maxWidth, maxHeight){
                             $location.path( '/' ) ;
                         }
                     }
+
+            if (resp.message=='password changed' || resp.message == 'reset key sent') //green light
+            {
+                    $location.path( 'auth/login' );
+            }
+            if (resp.message=='error in password change') //green light
+            {
+                    m = btoa('There is an error.  Please chack')
+            }
 
             if (resp.message=='warning' && resp.not_active)
             {

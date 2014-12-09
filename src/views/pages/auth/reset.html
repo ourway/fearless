@@ -1,0 +1,39 @@
+
+
+    <div class="container" >
+      <form class="form-signin" role="form" enctype="multipart/form-data">
+          <h3 class="form-signin-heading"><strong>RESET PASSWORD</strong></h3><small class="glyphicon glyphicon-cloud"></small> <small> Centeral Authentication System</small><hr/>
+
+  <div ng-show="AuthRespMessage" class="alert alert-dismissable"
+       ng-class="{'alert-warning':AuthRespMessage!='error', 'alert-danger':AuthRespMessage=='error'}">
+    <h5>
+        <strong>{{AuthRespMessage | uppercase}}!</strong>
+    </h5> <strong></strong> {{AuthRespInfo}}
+  </div>
+
+        <input type="email" class="form-control" placeholder="Email address" ng-model="loginInfo.email" required autofocus>
+        <br/>
+
+           <table class="table borderless ">
+              <tr>
+                  <td class="col-md-6">
+        <button type="signin" ng-disabled="login_wait" ng-click="loginInfo.action='reset';doLogin();"
+                class="btn btn-lg btn-success btn-block" >Send My Reset Confirm</button>
+                  </td>
+                  <td class="col-md-3">
+                      <span>Or maybe<br/>
+                      <a class="" href="#auth/login"><strong>login</strong></a><br/>
+                  </td>
+                </tr>
+
+
+          </table>
+
+
+
+
+      </form>
+
+    </div> <!-- /container -->
+
+

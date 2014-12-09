@@ -70,7 +70,9 @@ def Authenticate(req, resp, params):
     ip = req.env.get('HTTP_X_FORWARDED_FOR')
     free_services = ['/api/auth/signup', '/api/auth/login',
                      '/api/things', '/api/auth/activate', '/api/auth/reactivate',
-                     '/api/auth/reset', '/api/auth/logout', '/api/auth/getUserInfo']
+                     '/api/auth/reset', '/api/auth/logout', '/api/auth/getUserInfo',
+                     '/api/auth/changepasswordverify', '/api/auth/changepassword']
+
     sid = req.cookie('session-id')
     ''' Now we need to check if session is available and it's sha1 is in redis'''
     if req.path in free_services or (sid and r.get(hashlib.sha1(sid).hexdigest())):
@@ -298,7 +300,7 @@ class Reactivate:
         elif target and not target.active:
             host = req.protocol + '://' + req.headers.get('HOST')
             activation_link = host + '/api/auth/activate?token=' + target.token
-            send_envelope.delay(form.get('email'), 'Account ReActivation',
+            send_envelope.delay(form.get('email'), [], [], 'Account ReActivation',
                                 'Hi <strong>{u}</strong>! Please <a href="{l}">ReActivate</a> your account.'.format(u=target.firstname,
                                                                                                                     l=activation_link))
 
@@ -318,16 +320,56 @@ class Reactivate:
             resp.body = {'message': 'error', 'info': 'email not available'}
 
 
+class ChangePasswordVerify:
+
+    '''Account password token
+    '''
+
+    @falcon.after(commit)
+    def on_get(self, req, resp):
+        ip = req.env.get('HTTP_X_FORWARDED_FOR')
+        token = req.get_param('token')
+        target = session.query(User).filter(User.token == token).first()
+        if not target:
+            logger.warning(
+                '{ip}|Entered an expired reset key'.format(ip=ip))
+            m = encodestring('reset key is expired!')
+            resp.status = falcon.HTTP_303
+            resp.location = '/app/#auth/login?m=%s' % m
+        else:
+            new_token = str(uuid.uuid4())
+            target.active = True
+            target.token = new_token
+            logger.info('{ip}|Verified a reset key'.format(ip=ip))
+            resp.status = falcon.HTTP_302
+            m = encodestring('hey %s! You can reset your password here' % target.firstname)
+            resp.location = '/app/#auth/changepassword'
+
 class ChangePassword:
 
-    '''Account activation
+    '''Account pass change
     '''
 
     @falcon.after(commit)
     def on_post(self, req, resp):
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         form = json.loads(req.stream.read())
-        pass
+        email = form.get('email')
+        pass1 = form.get('password')
+        pass2 = form.get('password2')
+        target = session.query(User).filter(User.email == email).first()
+        if target and pass1 and pass2 and len(pass1)>5 and pass1==pass2:
+            target.password = pass1
+            resp.body = {'message':'password changed'}
+        else:
+            resp.body = {'message':'error in password change'}
+
+
+
+
+
+
+
 
 
 class Reset:
@@ -337,9 +379,30 @@ class Reset:
 
     @falcon.after(commit)
     def on_post(self, req, resp):
+        sid = req.cookie('session-id')
+        if sid and r.get('reactivation_%s' % sid):
+            resp.body = {'message': 'error', 'info': 'Please wait 5 seconds...',
+                         'not_active': False, 'wait': 5}
+            return
+
+        if not sid:
+            sid = getANewSessionId()
+            # this session is temprary
+            resp.set_header(
+                'set-cookie', 'session-id=%s; path=/; max-age=%s; HttpOnly' % (sid, 5))
+        r.incr('reactivation_' + sid, 1)
+        r.expire('reactivation_' + sid, 60)
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         form = json.loads(req.stream.read())
-        pass
+        target = session.query(User).filter(
+            User.email == form.get('email')).first()
+        if target:
+            host = req.protocol + '://' + req.headers.get('HOST')
+            reset_link = host + '/api/auth/changepasswordverify?token=' + target.token
+            send_envelope.delay(form.get('email'), [], [],  'Account Password Reset',
+                                'Hi <strong>{u}</strong>! <a href="{l}">reset</a> your account password.'.format(u=target.firstname,
+                                                                                                                    l=reset_link))
+            resp.body = {'message':'reset key sent'}
 
 
 class Logout:
