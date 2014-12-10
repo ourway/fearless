@@ -517,17 +517,10 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
 
 
         $scope.createNewProject = function(){
-           sd = $scope.newProjectStartDate;
-           ed = $scope.newProjectEndDate;
-           pn = $scope.newProjectName;
-           pl = $scope.newProjectLeader;
-           data = {start:sd, end:ed, name:pn, lead_id:pl}
-           $http.put('/api/db/project', data).success(function(resp){
+           $http.put('/api/project/add', $scope.newProject).success(function(resp){
+                   console.log(resp);
                    $scope.getProjData();
-                    $scope.newProjectStartDate = null;
-                    $scope.newProjectEndDate = null;
-                    $scope.newProjectName=null;
-                    $scope.newProjectLeader=null;
+                    $scope.newProject = {};
                    $('#projectAddModal').modal('hide');
                    
                    });
@@ -732,7 +725,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $scope.resetNewtask();
                $('#taskAddModal').modal('hide');
                 $scope.replan = true;
-                $scope.generateReport();
+                //$scope.generateReport();
                
                });
     }
@@ -827,7 +820,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.getTasksList();
             $scope.replan = true;
             $scope.getTasksList();
-            $scope.generateReport();
+            //$scope.generateReport();
             $scope.editTaskInfo = {};
             $('#taskDetailModal').modal('hide');
 

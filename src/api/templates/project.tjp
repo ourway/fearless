@@ -3,7 +3,6 @@ project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} -
     now  ${now.strftime('%Y-%m-%d')}
   currencyformat "(" ")" "," "." 0
    #timezone "Asia/Tehran" 
-    #dailyworkinghours 7.45
     workinghours mon 09:00 - 13:00, 14:00 - 18:00
     workinghours tue 09:00 - 13:00, 14:00 - 18:00
     workinghours wed 09:00 - 13:00, 14:00 - 18:00
@@ -80,7 +79,7 @@ balance resourceCost_${project.id} customerPayments_${project.id}
         % for resource in t.resources:
             % if not resource in rlist:
         resource _${resource.id} "${resource.firstname} ${resource.lastname}" {
-                efficiency ${resource.efficiency}
+                #efficiency ${resource.efficiency}
                 rate ${resource.rate}
                 chargeset _${resource.id}
                 <%
@@ -118,7 +117,7 @@ taskreport breakdown "csv_${project.id}"{
                 taskreport breakdown2 "guntt_${project.id}"{
                     formats html
                     loadunit longauto
-                    columns name, chart { scale day width 600 }, complete {title "Progress"}
+                    columns name, chart { scale day width 400 }, complete {title "Progress"}
                     sorttasks plan.start.up
                     taskroot fearless
                 }
@@ -138,7 +137,7 @@ textreport "resource_${project.id}" {
 
 resourcereport resourceGraph "" {
   scenarios plan
-  columns bsi, name, chart {scale day width 600}
+  columns bsi, name, effort, chart {scale day width 400}
   loadunit hours
   # We only like to show leaf tasks for leaf resources.
   hidetask ~(isleaf() & isleaf_())

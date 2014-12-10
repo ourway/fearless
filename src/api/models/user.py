@@ -49,7 +49,7 @@ class User(IDMixin, Base):
     lastname = Column(String(64), nullable=True)
     lastLogIn = Column(DateTime)
     age = Column(Integer)
-    efficiency = Column(Float(precision=3), default=0.75)
+    efficiency = Column(Float(precision=3), default=1.0)
     cell = Column(String(16))
     address = Column(String(512))
     daily_working_hours = Column(Integer, default=8)

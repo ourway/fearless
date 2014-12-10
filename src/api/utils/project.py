@@ -13,13 +13,15 @@ Clean code is much better than Cleaner comments!
 '''
 
 import ujson as json
-from models import Project, User, Report, Departement, Task, session
+from models import Project, User, Report, Departement, Task, session, Sequence, Repository
 from AAA import Authorize, getUserInfoFromSession
 import falcon
 from helpers import get_params
 from sqlalchemy import desc
-from utils.helpers import commit, jsonify, parse_tjcsv
+from helpers import commit, jsonify, parse_tjcsv
+from defaults import home
 import datetime
+import os
 from cStringIO import StringIO
 
 
@@ -46,13 +48,32 @@ class ListProjects:
 
 
 class AddProject:
-    'NOT WORKING YET'
+    @falcon.after(commit)
     def on_put(self, req, resp):
         user = getUserInfoFromSession(req)
         projectData = get_params(req.stream, flat=False)
-        if Project(start=projectData.get('start'),
-                   name = projectData.get('name'),
-                   end=projectData.get('end'), lead_id=projectData.get('lead_id')):
+        start, end, name, lead_id = None, None, None, None
+        if projectData.get('start'):
+            start = str(projectData.get('start'))
+        if projectData.get('end'):
+            end = str(projectData.get('end'))
+        if projectData.get('name'):
+            name = str(projectData.get('name'))
+        if projectData.get('lead_id'):
+            lead_id = int(projectData.get('lead_id'))
+
+        if start and end and name and lead_id: 
+            new = Project(start=start, name=name, end=end, lead_id=lead_id)
+            repoName = name
+            newRepoFolder = os.path.join(home, '.fearlessrepo', repoName)
+            if not os.path.isdir(newRepoFolder):
+                os.makedirs(newRepoFolder)
+            new_repository = session.query(Repository).filter(Repository.name == repoName).first()
+            if not new_repository:
+                new_repository = Repository(name=repoName, path= newRepoFolder)
+
+            new.repositories.append(new_repository)
+            session.add(new)
             resp.body = falcon.HTTP_202
             resp.body = {'message':'OK'}
 

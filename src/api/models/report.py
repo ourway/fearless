@@ -39,7 +39,7 @@ class Report(IDMixin, Base):
     @validates('data')
     def compress_body(self, key, data):
         self.uuid = getUUID()
-        c = bz2.compress(data.encode('utf-8'))
+        c = bz2.compress(data)
         #result = base64.encodestring(c)
         with open(os.path.join(db_files_path, self.uuid), 'wb') as f:
             f.write(c)
