@@ -343,7 +343,7 @@ class ChangePasswordVerify:
             logger.info('{ip}|Verified a reset key'.format(ip=ip))
             resp.status = falcon.HTTP_302
             m = encodestring('hey %s! You can reset your password here' % target.firstname)
-            resp.location = '/app/#auth/changepassword'
+            resp.location = '/app/#auth/changepassword/%s'%new_token
 
 class ChangePassword:
 
@@ -354,11 +354,13 @@ class ChangePassword:
     def on_post(self, req, resp):
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         form = json.loads(req.stream.read())
-        email = form.get('email')
+        token = req.get_param('token')
         pass1 = form.get('password')
         pass2 = form.get('password2')
-        target = session.query(User).filter(User.email == email).first()
+        target = session.query(User).filter(User.token == token).first()
         if target and pass1 and pass2 and len(pass1)>5 and pass1==pass2:
+            new_token = str(uuid.uuid4())
+            target.token = new_token
             target.password = pass1
             resp.body = {'message':'password changed'}
         else:
@@ -439,9 +441,6 @@ def getUserInfoFromSession(req):
                 return {'email':target.email, 'alias':target.alias, 'firstname':target.firstname,
                             'lastname':target.lastname, 'id':target.id, 'server':{'name':'Fearless API', 'ip':get_ip()}}
             
-            else:
-                resp.append_header('set-cookie', 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
-                resp.append_header('set-cookie', 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
         return {'message':'ERROR'}
 
 

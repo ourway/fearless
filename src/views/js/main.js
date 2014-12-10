@@ -88,7 +88,7 @@ var TITLE = 'TITLE';
 				templateUrl : 'pages/auth/reset.html',
 				controller  : 'mainController'
 			})		//$locationProvider.html5Mode(true);
-			.when('/auth/changepassword', {
+			.when('/auth/changepassword/:token', {
 				templateUrl : 'pages/auth/changepassword.html',
 				controller  : 'mainController'
 			})		//$locationProvider.html5Mode(true);
@@ -100,6 +100,11 @@ var TITLE = 'TITLE';
 
                 templateUrl: 'pages/pms/detail.html',
                 controller: 'projectDetailCtrl'
+            })
+            .when('/pms/:projId/:seqId', {
+
+                templateUrl: 'pages/pms/sequence.html',
+                controller: 'sequenceDetailCtrl'
             })
             .when('/profile', {
 
@@ -195,11 +200,13 @@ function updateImageSize(img, maxWidth, maxHeight){
 
     $scope.doLogin = function() {
         
-        if (validateEmail($scope.loginInfo.email) == false)
+        if (validateEmail($scope.loginInfo.email) == false && $scope.loginInfo.action != 'changepassword')
                 return null;
                 $scope.AuthRespInfo = null;
-
-        prom = $http.post('/api/auth/'+$scope.loginInfo.action, $scope.loginInfo);
+        url = '/api/auth/'+$scope.loginInfo.action;
+        if ($routeParams.token)
+            url = url + '?token=' + $routeParams.token
+        prom = $http.post(url, $scope.loginInfo);
         prom.success(function(resp){
                 $scope.login_wait = resp.wait;
                 $scope.AuthRespMessage = resp.message;
@@ -613,7 +620,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $scope.newtask.priority = 500;
                 $scope.newtask.effort = null;
             }
+            $scope.resetNewSequnences = function(){
+                $scope.newSequences = {};
+            }
             $scope.resetNewtask();
+            $scope.resetNewSequnences();
             $scope.getProjectDetails = function(){
             projectDetails = $http.get('/api/project/get/'+$scope.projId);
             projectDetails.success(function(resp){
@@ -694,6 +705,19 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $scope.tasks = resp;
             });
     }
+
+    $scope.createNewSeq = function(){
+        
+        $http.put('/api/sequence/add/'+$scope.projId, $scope.newSequences).success(function(resp)
+                {
+                    if (resp.message == 'OK'){
+                        $('#taskSeqModal').modal('hide');
+                        $scope.getProjectDetails();
+
+                    }
+                });
+    }
+
     $scope.createNewTask = function(){
        if ($scope.newtask.isMilestone)
        {
@@ -821,5 +845,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
 
     };
+
+        });
+
+
+
+fearlessApp.controller('sequenceDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
 
         });

@@ -146,6 +146,27 @@ font-size:14px;
     -webkit-font-smoothing: antialiased;
 }
 
+.projectSeqA {
+    background:#2aabd2;
+    color:#f2f2f2;
+    padding:1px;
+    margin:1px;
+    display:inline-block;
+    border:1px solid #eee;
+    border-radius:5px;
+    width:25px;
+    text-align:center;
+    text-shadow: 0 -1px 0 rgba(0,0,0,.2);
+}
+.projectSeqA:hover {
+    text-decoration: none;
+    color: white;
+    background: #c12e2a;
+    border: 1px solid #F7C2C2;
+    transform: scale(2,2);
+    box-shadow: 1px 1px 20px #FF3F3F;
+
+}
 
 
 

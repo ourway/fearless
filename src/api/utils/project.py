@@ -29,7 +29,8 @@ class GetProjectDetails:
         project = session.query(Project).filter(Project.id==id).first()
         if project:
             resp.body = {'name':project.name, 'tasks':dict.fromkeys(project.tasks, True),
-                     'id':project.id, 'leader':project.lead.fullname}
+                         'id':project.id, 'leader':project.lead.fullname, 
+                         'sequences':[{'number':i.number, 'name':i.name, 'code':i.code} for i in project.sequences]}
 
 
 class ListProjects:
@@ -107,32 +108,32 @@ class GetProjectLatestReport:
                     ganttdataid = project.reports[-2]
                     ganttdata = session.query(Report).filter(Report.id==ganttdataid).first()
                     if ganttdata:
-                        ganttdata = ganttdata.body
+                        ganttdata = str(ganttdata.body)
 
                     plandataid = project.reports[-3]
                     plandata = session.query(Report).filter(Report.id==plandataid).first()
                     if plandata:
-                        csvdata = plandata.body
+                        plandata = str(plandata.body)
 
 
                     resourcedataid = project.reports[-4]
                     resourcedata = session.query(Report).filter(Report.id==resourcedataid).first()
                     if resourcedata:
-                        resourcedata = resourcedata.body
+                        resourcedata = str(resourcedata.body)
 
                     profitandlossid = project.reports[-6]
                     profitandloss = session.query(Report).filter(Report.id==profitandlossid).first()
                     if profitandloss:
-                        profitandloss = profitandloss.body
+                        profitandloss = str(profitandloss.body)
 
                     msprojectid = project.reports[-5]
                     msproject = session.query(Report).filter(Report.id==msprojectid).first()
                     if msproject:
-                        msproject = msproject.body
+                        msproject = str(msproject.body)
 
 
-                    data = {'guntt':ganttdata, 'plan':project.reports[-3], 'resource':project.reports[-4], 
-                            'profitAndLoss':project.reports[-6], 'msproject': project.reports[-5], 'json': jsondata }
+                    data = {'guntt':ganttdata, 'plan':plandata, 'resource':resourcedata, 
+                            'profitAndLoss':profitandloss, 'msproject': msproject, 'json': jsondata }
                 except IndexError:
                     message = "We're busy planning your project. Please wait a bit or reload."
                     data = {'guntt':message, 'plan':message, 'resource':message, 

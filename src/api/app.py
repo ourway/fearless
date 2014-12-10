@@ -40,6 +40,9 @@ from utils.project import GetProjectDetails, GetProjectLatestReport, \
         ListProjects, AddProject, AddTask, ListTasks, GetTask, UpdateTask, \
         DeleteTask
 
+from utils.sequence import AddSequence
+
+
 
 tables = [i for i in av if i[0] in ascii_uppercase]
 
@@ -205,6 +208,7 @@ app.add_route('/api/task/list/{projId}', ListTasks())
 app.add_route('/api/task/{taskId}', GetTask())
 app.add_route('/api/task/update/{taskId}', UpdateTask())
 app.add_route('/api/task/delete/{taskId}', DeleteTask())
+app.add_route('/api/sequence/add/{projId}', AddSequence())
 app.add_route('/api/sendmail', Mailer())
 app.add_route('/api/report', AddReport())
 

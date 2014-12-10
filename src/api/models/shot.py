@@ -23,13 +23,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 
 
-shots_sequences = Table("shots_sequences", Base.metadata,
-                        Column('id', Integer, primary_key=True),
-                        Column(
-                            "shot_id", Integer, ForeignKey("shot.id"), primary_key=True),
-                        Column("sequence_id", Integer, ForeignKey(
-                            "sequence.id"), primary_key=True)
-                        )
+
 
 shot_scene = Table("shot_scene", Base.metadata,
                    Column('id', Integer, primary_key=True),

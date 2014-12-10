@@ -15,6 +15,9 @@ touch-reload=tasks.py
 touch-reload=utils/assets.py
 touch-reload=utils/AAA.py
 touch-reload=utils/reports.py
+touch-reload=utils/project.py
+touch-reload=utils/sequence.py
+touch-reload=utils/helpers.py
 
 
 

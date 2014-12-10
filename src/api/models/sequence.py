@@ -21,17 +21,24 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from mixin import IDMixin, Base
 
+shots_sequences = Table("shots_sequences", Base.metadata,
+                        Column('id', Integer, primary_key=True),
+                        Column(
+                            "shot_id", Integer, ForeignKey("shot.id"), primary_key=True),
+                        Column("sequence_id", Integer, ForeignKey(
+                            "sequence.id"), primary_key=True)
+                        )
 
 class Sequence(IDMixin, Base):
 
     number = Column(Integer, nullable=False)
     name = Column(String(64), nullable=False)  # sequence1
-    code = Column(String(64))  # SEQ1
+    code = Column(String(64), nullable=False)  # SEQ1
+    note = Column(String(512))  ## task note
     project_id = Column(Integer, ForeignKey("project.id"))
-    shots = relationship(
-        'Sequence', backref='sequences', secondary='shots_sequences')
-    """Sequence data
-    """
+    shots = relationship( 'Sequence', backref='sequences', 
+                secondary='shots_sequences')
+
 
     @validates('number')
     def _assign_name_code(self, key, data):
