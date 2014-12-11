@@ -101,7 +101,7 @@ var TITLE = 'TITLE';
                 templateUrl: 'pages/pms/detail.html',
                 controller: 'projectDetailCtrl'
             })
-            .when('/pms/:projId/:seqId', {
+            .when('/pms/:projId/seq/:seqId', {
 
                 templateUrl: 'pages/pms/sequence.html',
                 controller: 'sequenceDetailCtrl'
@@ -586,14 +586,14 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     value: 0,
                     color:"#419641",
                     highlight: "#58C758",
-                    label: "Complete"
+                    label: "Done"
 
                 },
                  {
                     value: 100,
                     color:"#ccc",
                     highlight: "#555",
-                    label: "Remaining"
+                    label: "Left"
                 },
 
             ]
@@ -605,6 +605,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.toTitleCase = toTitleCase;
             $rootScope.title = "Project " + $scope.projId + " - Fearless";
             $scope.timeConverter = timeConverter;
+            $scope.replan = true;
             $scope.newtask = {};
             $scope.resetNewtask = function(){
                 $scope.newtask = {};
@@ -654,8 +655,10 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 localStorage.setItem(getprefix + 'profitAndLoss', resp.profitAndLoss);
                 data = resp[mode];
                 $scope.printable = data;
+                //$scope.projectTjData = data;
                 $('#projectDetailDiv').html(data);
                 $('.tj_table_frame').fadeIn();
+                $scope.getProjectDetails();
                 $scope.generateProgressChart();
                 $scope.getTasksList();
                 })
@@ -664,10 +667,13 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             }
             else{
                 data = localStorage.getItem(getprefix + mode);
-                $scope.printable = data;
-                $('#projectDetailDiv').html(data);
-                $('.tj_table_frame').fadeIn();
-                $scope.generateProgressChart();
+                if (data != 'undefined')
+                {
+                    $scope.printable = data;
+                    $('#projectDetailDiv').html(data);
+                    $('.tj_table_frame').fadeIn();
+                    $scope.generateProgressChart();
+                }
                 $scope.getTasksList();
             }
             
@@ -725,6 +731,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $scope.resetNewtask();
                $('#taskAddModal').modal('hide');
                 $scope.replan = true;
+                $scope.getTasksList();
                 //$scope.generateReport();
                
                });

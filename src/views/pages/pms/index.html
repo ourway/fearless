@@ -41,6 +41,12 @@
                         <option ng-repeat="resource in resources" value="{{resource.id}}">{{resource.firstname}} {{resource.lastname}}</option>
                     </select>
                 </div>
+            </div>
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Description</label>
+					<div class="col-sm-6">
+                        <textarea placeholder="Write a brief description about project goal here ..." class="form-control" ng-model="newProject.description" ></textarea>
+					</div>
 				</div>
 
 			</form>

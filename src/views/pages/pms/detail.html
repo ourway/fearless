@@ -365,34 +365,77 @@ border-bottom: 1px solid #57BEDD;
 
 
 
-
-		<div class="col-md-12 column">
-			<div class="btn-group">
-                <button class="btn btn-default" type="button"><em class="glyphicon glyphicon-pencil"></em> Edit</button>
-                <button id="taskSeqButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add SEQUENCES</button>
-			</div>
-			</div>
-            <br/>
-            <br/>
-            <br/>
-
+    <div class="row clearfix" id="projectSummery">
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <h4 style="display:inline">PROJECT: {{project.name}} </h4>
+        <button class="btn btn-default btn-sm" type="button"><em class="glyphicon glyphicon-pencil"></em> Edit</button>
+		</div>
+	</div>
 
     <div class="row clearfix">
+        <div class="col-md-3 column" id="projectDescription">
+            <p>
+            <em>{{project.description || 'Project has no description'}}</em>
+            </p>
+		</div>
+		<div class="col-md-6 column">
+            <br/>
+            <table class="table table-bordered">
+            <tr class="active">
+                <td >Name</td>
+                <td >Progress</td>
+                <td >Start</td>
+                <td >End</td>
+                <td >Working days</td>
+                <td >Project Leader</td>
+            </tr>
+            <tr class="success">
+                <td class="active"><strong>{{project.name}}</strong></td>
+                <td ><strong>{{project.complete}}</strong>%</td>
+                <td >{{timeConverter(project.start)}}</td>
+                <td >{{timeConverter(project.end)}}</td>
+                <td >{{project.duration/24}}</td>
+                <td ><a href="#/user/{{project.leader.id}}">{{project.leader.fullname}}</a></td>
+            </tr>
+            </table>
+		</div>
+
+        <div class="col-md-3 column">
+             <div id="canvasDiv" >
+                <canvas style="padding:10px;" id="progressChart" width="96" height="96"></canvas>		
+            </div>
+		</div>
+    </div>
+    </div>
+
+    <hr/>
+
+    <div class="row clearfix" id="AssetsAndSequencesOfProject">
 
 
 
-                    <div class="col-md-9 column">
+        <div class="col-md-9 column">
+                        <h4>Project Assets</h4>
+                        <div id="CollectionsDiv" >
+                            <a class="projectCollectionsA" href="#pms/{{project.id}}/collection/{{collection.id}}" ng-repeat="collection in project.collections track by $index" 
+                                title="{{collection.name}}">{{collection.name}}</a>
+                        </div>
+                    <hr/>
+                        <h4 style="display:inline">Sequences</h4>
+                            <button id="taskSeqButton" class="btn btn-default btn-sm" type="button"><em class="glyphicon glyphicon-plus"></em> Add SEQUENCES</button>
                         <div id="SequencesDiv" >
-                            <a class="projectSeqA" href="#pms/{{project.id}}/{{seq.number}}" ng-repeat="seq in project.sequences track by $index" title="{{req.code}}">{{seq.number}}</a>
-
+                            <a class="projectSeqA" href="#pms/{{project.id}}/seq/{{seq.number}}" ng-repeat="seq in project.sequences track by $index" title="{{req.code}}">{{seq.number}}</a>
                         </div>
                     </div>
 
 
                 </div>
 
-    </div>
     <hr/>
+            <h3>Project Management</h3>
+    </div>
+            <div class="row clearfix" id="ManagementDivProject">
 		<div class="col-md-12 column">
 			<div class="btn-group">
                 <button id="taskAddButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
@@ -404,11 +447,10 @@ border-bottom: 1px solid #57BEDD;
                 <button class="btn btn-default" ng-click="replan=true;generateReport(mode)" type="button"><em class="glyphicon glyphicon-repeat"></em> </button>
 			</div>
 			</div>
-            <div class="row clearfix">
                 <div class="col-md-3 column">
                     <br/>
 
-                        <input type="text" class="form-control" placeholder="Filter Tasks" ng-model="filterTaskName" />
+                        <input ng-if="tasks" type="text" class="form-control" placeholder="Filter Tasks" ng-model="filterTaskName" />
                     <br/>
                     <div id="tasksDiv">
                         <ol class="">
@@ -425,16 +467,7 @@ border-bottom: 1px solid #57BEDD;
                     <div id="projectDetailContainer">
                         <div id="projectDetailDiv"></div>
                     </div>
-                </div>
-                    <div class="col-md-3 column">
-                        <div id="canvasDiv" >
-                            
-                            <canvas style="padding:10px;" id="progressChart" width="128" height="128"></canvas>		
-		
-                        </div>
-    </div>
-
-</div>
+            </div>
 
 
 <script>

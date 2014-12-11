@@ -56,6 +56,11 @@ class Repository(IDMixin, Base):
 
     @validates('collections')
     def check_collection_data(self, key, data):
+        if data.path:
+            collection_path = os.path.join(self.path, data.path)
+            if not os.path.isdir(collection_path):
+                os.makedirs(collection_path)
+
         collection = defaultdict(list)
         if data.schema:
             collection = json.loads(data.schema)

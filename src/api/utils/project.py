@@ -13,7 +13,8 @@ Clean code is much better than Cleaner comments!
 '''
 
 import ujson as json
-from models import Project, User, Report, Departement, Task, session, Sequence, Repository
+from models import Project, User, Report, Departement, Task, \
+    session, Sequence, Repository, Collection
 from AAA import Authorize, getUserInfoFromSession
 import falcon
 from helpers import get_params
@@ -29,10 +30,25 @@ class GetProjectDetails:
     #@Authorize('see_project')
     def on_get(self, req, resp, id):
         project = session.query(Project).filter(Project.id==id).first()
+        collections = list()
         if project:
-            resp.body = {'name':project.name, 'tasks':dict.fromkeys(project.tasks, True),
-                         'id':project.id, 'leader':project.lead.fullname, 
-                         'sequences':[{'number':i.number, 'name':i.name, 'code':i.code} for i in project.sequences]}
+            if project.repositories:
+                collections = project.repositories[0].collections
+            resp.body = {'name':project.name.title(), 'tasks':dict.fromkeys(project.tasks, True),
+                         'id':project.id, 'leader':{'fullname':project.lead.fullname, 'id':project.lead.id}, 
+                'sequences':[{'number':i.number, 'name':i.name, 'code':i.code} for i in project.sequences],
+                'description':project.description,
+                'start':project.start,
+                'end':project.end,
+                'effort_left':project.effort_left,
+                'effort_done':project.effort_done,
+                'duration':project.duration,
+                'effort':project.effort,
+                'complete':project.complete,
+                'tasks':[{'title':i.title, 'id':i.id} for i in project.tasks],
+                'collections':[{'name':i.name.title(), 'id':i.id, 'path':i.path, 
+                                'repository':i.repository.name.title(),
+                                'repository_path':i.repository.path} for i in collections]}
 
 
 class ListProjects:
@@ -59,11 +75,14 @@ class AddProject:
             end = str(projectData.get('end'))
         if projectData.get('name'):
             name = str(projectData.get('name'))
+        if projectData.get('description'):
+            description = str(projectData.get('description'))
+
         if projectData.get('lead_id'):
             lead_id = int(projectData.get('lead_id'))
 
         if start and end and name and lead_id: 
-            new = Project(start=start, name=name, end=end, lead_id=lead_id)
+            new = Project(start=start, name=name, end=end, lead_id=lead_id, description=description)
             repoName = name
             newRepoFolder = os.path.join(home, '.fearlessrepo', repoName)
             if not os.path.isdir(newRepoFolder):
@@ -71,6 +90,17 @@ class AddProject:
             new_repository = session.query(Repository).filter(Repository.name == repoName).first()
             if not new_repository:
                 new_repository = Repository(name=repoName, path= newRepoFolder)
+            
+            chars_section = Collection(name='chars', path='chars')
+            props_section = Collection(name='props', path='props')
+            sets_section = Collection(name='sets', path='sets')
+            sequences_section = Collection(name='sequences', path='sequences')
+
+            new_repository.collections.append(chars_section)
+            new_repository.collections.append(props_section)
+            new_repository.collections.append(sets_section)
+            new_repository.collections.append(sequences_section)
+
 
             new.repositories.append(new_repository)
             session.add(new)
@@ -84,6 +114,7 @@ class AddProject:
 
 class GetProjectLatestReport:
     #@Authorize('see_project')
+    @falcon.after(commit)
     def on_get(self, req, resp, id):
         project = session.query(Project).filter(Project.id==id).first()
         if project:
@@ -105,7 +136,7 @@ class GetProjectLatestReport:
                             target = session.query(Task).filter(Task.id==taskid).first()
                         elif typ == 'project':
                             projectid = int(d.get('projectid'))
-                            target = session.query(Project).filter(project.id==projectid).first()
+                            target = session.query(Project).filter(Project.id==projectid).first()
                         if target: ## donble check
                             start = d.get('start')
                             end = d.get('end')
@@ -114,8 +145,8 @@ class GetProjectLatestReport:
                             if complete:
                                 complete = complete[:-1]
                             effort = d.get('effort')
-                            effort_left = d.get('effort_left')
-                            effort_done = d.get('effort_done')
+                            effort_left = d.get('effort left')
+                            effort_done = d.get('effort done')
 
                             if typ == 'task':
                                 target.start = start
