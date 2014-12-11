@@ -381,13 +381,13 @@ border-bottom: 1px solid #57BEDD;
 		</div>
 		<div class="col-md-6 column">
             <br/>
-            <table class="table table-bordered">
+            <table class="table table-bordered table-responsive">
             <tr class="active">
                 <td >Name</td>
                 <td >Progress</td>
                 <td >Start</td>
                 <td >End</td>
-                <td >Working days</td>
+                <td >Effort Left</td>
                 <td >Project Leader</td>
             </tr>
             <tr class="success">
@@ -395,7 +395,7 @@ border-bottom: 1px solid #57BEDD;
                 <td ><strong>{{project.complete}}</strong>%</td>
                 <td >{{timeConverter(project.start)}}</td>
                 <td >{{timeConverter(project.end)}}</td>
-                <td >{{project.duration/24}}</td>
+                <td >{{project.effort_left}}</td>
                 <td ><a href="#/user/{{project.leader.id}}">{{project.leader.fullname}}</a></td>
             </tr>
             </table>
