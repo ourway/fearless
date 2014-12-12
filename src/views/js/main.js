@@ -42,7 +42,6 @@ function timeConverter(UNIX_timestamp, mode){
 var TITLE = 'TITLE';
     function TagToTip(a, b,c){
         task = c;
-        console.log(toTitleCase(task));
         target  = $("[data-task-title*='" + task + "']")
         if (target.length)
             target[0].click();
@@ -527,7 +526,7 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
         }
 
         $scope.getResources = function(){
-            $http.get('/api/db/user').success(function(resp){
+            $http.get('/api/users').success(function(resp){
                     $scope.resources = resp;
                     }).error(function(resp, status){
                         if (status == 401)
@@ -605,7 +604,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.toTitleCase = toTitleCase;
             $rootScope.title = "Project " + $scope.projId + " - Fearless";
             $scope.timeConverter = timeConverter;
-            $scope.replan = true;
+            //$scope.replan = true;
             $scope.newtask = {};
             $scope.resetNewtask = function(){
                 $scope.newtask = {};
@@ -624,14 +623,19 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             projectDetails.success(function(resp){
                 if (resp!='null')
                     {
-                        resp.tasks = Object.keys(resp.tasks)
+                        resp.tasks = Object.keys(resp.tasks);
+                        resp.start = timeConverter(resp.start);
+                        resp.end = timeConverter(resp.end);
+                        resp.updatedWatchers = [];
+                        resp.watchers.forEach(function(e){resp.updatedWatchers.push(e)});
                         $scope.project = resp;
                     }
                 else
                     $location.path('/pms')
                 })
-
-            getprefix = 'project_'+ $scope.projId+ '_' + timeConverter() + '_';
+            
+            _t = timeConverter(false, true).split('-').slice(0, 3).toString().split(' ').toString();
+            getprefix = 'project_'+ $scope.projId+ '_' + _t + '_';
             $scope.generateReport = function(mode){
             if (!mode)
                 {
@@ -695,10 +699,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         myWindow.print(); 
     }
     $scope.getResources = function(){
-            $http.get('/api/db/user').success(function(resp){
+            $http.get('/api/users').success(function(resp){
                     $scope.resources = resp;
                     });
         }
+    $scope.getResources();
     $scope.getTasksList = function(){
         $http.get('/api/task/list/'+$scope.projId).success(function(resp){
                 $scope.tasks = resp;
@@ -813,15 +818,25 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                             $scope.can_depend.splice(i, 1);
                     }
                 }
-                resp.resources.forEach(function(e){$scope.editTaskInfo.updatedResources.push(e.id)});
-                resp.depends.forEach(function(e){$scope.editTaskInfo.updatedDepends.push(e.id)});
-                resp.responsibles.forEach(function(e){$scope.editTaskInfo.updatedResponsibles.push(e.id)});
-                resp.watchers.forEach(function(e){$scope.editTaskInfo.updatedWatchers.push(e.id)});
-                resp.alternative_resources.forEach(function(e){$scope.editTaskInfo.updatedAlternativeResources.push(e.id)});
+
                 $('#taskDetailModal').modal('show');
 
                     });
             }
+
+    $scope.updateProject = function(){
+        $scope.projectUpdateInfo = {};
+        req = $http.post('/api/project/update/'+$scope.projId, $scope.project);
+        req.success(function(resp){
+                    if (resp.message == 'OK'){
+                        $scope.getProjectDetails();
+                        $('#projectEditModal').modal('hide');
+                        
+                    }
+                })
+
+        };
+        
     $scope.updateTask = function(taskId){
         $http.post('/api/task/update/'+taskId, $scope.editTaskInfo).success(function(resp){
             $scope.getTasksList();

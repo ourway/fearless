@@ -121,6 +121,83 @@ border-bottom: 1px solid #57BEDD;
 
 
 
+			<div class="modal fade" id="projectEditModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title" id="myModalLabel">
+								Create a new project
+							</h4>
+						</div>
+                        <div class="modal-body">
+
+			<form class="form-horizontal" role="form">
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Project Name</label>
+					<div class="col-sm-6">
+                        <input type="text" class="form-control" placeholder="New project name. Must be unique" ng-model="project.name" />
+					</div>
+				</div>
+				<div class="form-group" ng-init="newProject.start=timeConverter()">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Start Date</label>
+					<div class="col-sm-6">
+                        <input type="date" class="form-control" ng-model="project.start" required/>
+					</div>
+				</div>
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">End Date</label>
+					<div class="col-sm-6">
+						<input type="date" class="form-control" ng-model="project.end" required />
+					</div>
+				</div>
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Leader</label>
+					<div class="col-sm-6">
+                        <select class="form-control" ng-model="project.leader" placeholder="Who's running the project?" 
+                            ng-options="resource.fullname for resource in resources track by resource.id">
+                        </select>
+                </div>
+                </div>
+
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Watchers</label>
+					<div class="col-sm-6">
+                        <select class="form-control" ng-model="project.watchers" multiple 
+                            ng-options="resource.fullname for resource in resources track by resource.id">
+                        </select>
+                </div>
+
+            </div>
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Description</label>
+					<div class="col-sm-6">
+                        <textarea placeholder="Write a brief description about project goal here ..." class="form-control" ng-model="project.description" ></textarea>
+					</div>
+				</div>
+
+			</form>
+						</div>
+						<div class="modal-footer">
+                            <button type="button" ng-click="getProjectDetails()" class="btn btn-default" data-dismiss="modal">Close</button> 
+                            <button type="button" ng-show="project.name && project.start && project.end && project.leader.id" 
+                                ng-click="updateProject()" class="btn btn-primary">Update project information</button>
+						</div>
+					</div>
+					
+				</div>
+				
+			</div>
+
+
+
+
+
+
+
+
+
+
 
 			<div class="modal fade" id="taskSeqModal" role="dialog" ng-init="" aria-labelledby="AddNewSequences" aria-hidden="true">
 				<div class="modal-dialog">
@@ -133,7 +210,7 @@ border-bottom: 1px solid #57BEDD;
 						</div>
                         <div class="modal-body">
 
-			<form class="form-horizontal" ng-init="getResources()" role="form">
+			<form class="form-horizontal" role="form">
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Number of new sequences</label>
 					<div class="col-sm-6">
@@ -143,9 +220,9 @@ border-bottom: 1px solid #57BEDD;
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Sequence Lead</label>
 					<div class="col-sm-6">
-                    <select class="form-control" placeholder="Who's running these sequences?" ng-model="newSequences.lead">
-                        <option ng-repeat="resource in resources" value="{{resource.id}}">{{resource.firstname}} {{resource.lastname}}</option>
-                    </select>
+                        <select class="form-control" ng-model="newSequences.lead" 
+                            ng-options="resource.fullname for resource in resources track by resource.id">
+                        </select>
                      </div>
                  </div>
 
@@ -179,7 +256,7 @@ border-bottom: 1px solid #57BEDD;
 						</div>
                         <div class="modal-body">
 
-			<form class="form-horizontal" ng-init="getResources()" role="form">
+			<form class="form-horizontal" role="form">
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Task title</label>
 					<div class="col-sm-6">
@@ -214,9 +291,9 @@ border-bottom: 1px solid #57BEDD;
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Task Manager</label>
 					<div class="col-sm-6">
-                    <select class="form-control" placeholder="Who's running the task?" ng-model="newtask.manager">
-                        <option ng-repeat="resource in resources" value="{{resource.id}}">{{resource.firstname}} {{resource.lastname}}</option>
-                    </select>
+                        <select class="form-control" ng-model="newtask.manager" 
+                            ng-options="resource.fullname for resource in resources track by resource.id">
+                        </select>
                      </div>
                  </div>
 
@@ -225,9 +302,9 @@ border-bottom: 1px solid #57BEDD;
 				<div class="form-group" ng-show="!newtask.isMilestone">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Resources</label>
 					<div class="col-sm-6">
-                    <select class="form-control" placeholder="Who's running the task?" ng-model="newtask.resources" multiple>
-                        <option ng-repeat="resource in resources" value="{{resource.id}}">{{resource.firstname}} {{resource.lastname}}</option>
-                    </select>
+                        <select class="form-control" ng-model="newtask.resources" multiple 
+                            ng-options="resource.fullname for resource in resources track by resource.id">
+                        </select>
                      </div>
                 </div>
 
@@ -243,10 +320,10 @@ border-bottom: 1px solid #57BEDD;
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Depends On</label>
 					<div class="col-sm-6">
-                    <select class="form-control" ng-model="newtask.depends" multiple>
-                        <option value="0"></option>
-                        <option ng-repeat="task in tasks" value="{{task.id}}">{{task.title}}</option>
-                    </select>
+                        <select class="form-control" ng-model="newtask.depends" multiple 
+                            ng-options="task.title for task in tasks track by task.id">
+                            <option value="0"></option>
+                        </select>
                      </div>
                 </div>
 
@@ -291,7 +368,7 @@ border-bottom: 1px solid #57BEDD;
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Start</label>
 					<div class="col-sm-6">
-                        <input type="date" class="form-control" placeholder="Task start date" ng-model="editTaskInfo.start" />
+                        <input type="date" class="form-control" placeholder="Task start date" ng-model="editTaskInfo.start"/>
 					</div>
 				</div>
 				<div class="form-group" ng-show="editTaskInfo.effort==0">
@@ -317,19 +394,19 @@ border-bottom: 1px solid #57BEDD;
 				<div class="form-group" >
 					 <label for="inputPassword3" class="col-sm-4 control-label">Resources</label>
 					<div class="col-sm-6">
-                    <select class="form-control" placeholder="Who's running the task?" ng-model="editTaskInfo.updatedResources" multiple>
-                        <option ng-selected="isCurrenclyResource(resource.id)" ng-repeat="resource in resources" value="{{resource.id}}">{{resource.firstname}} {{resource.lastname}}</option>
-                    </select>
+                        <select class="form-control" ng-model="editTaskInfo.resources" multiple 
+                            ng-options="resource.fullname for resource in resources track by resource.id">
+                            <option value="0"></option>
+                        </select>
                      </div>
                 </div>
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Depends On</label>
 					<div class="col-sm-6">
-                    <select class="form-control" ng-model="editTaskInfo.updatedDepends" multiple>
-                        <option value="0"></option>
-
-                        <option ng-selected="isCurrenclyDependentOf(task.id)" ng-repeat="task in can_depend" value="{{task.id}}">{{task.title}}</option>
-                    </select>
+                        <select class="form-control" ng-model="editTaskInfo.depends" multiple 
+                            ng-options="task.title for task in can_depend track by task.id">
+                            <option value="0"></option>
+                        </select>
                      </div>
                 </div>
 
@@ -349,7 +426,7 @@ border-bottom: 1px solid #57BEDD;
 						<div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             <button type="button" ng-click="deleteTask(editTaskInfo.id)" class="btn btn-danger" >Delete Task</button>
-                            <button type="button" ng-show="editTaskInfo.updatedResources || editTaskInfo.effort==0"
+                            <button type="button" ng-show="editTaskInfo.resources || editTaskInfo.effort==0"
                                 ng-click="updateTask(editTaskInfo.id)" class="btn btn-primary">Update task</button>
 						</div>
 					</div>
@@ -369,7 +446,7 @@ border-bottom: 1px solid #57BEDD;
     <div class="row clearfix">
         <div class="col-md-12 column">
             <h4 style="display:inline">PROJECT: {{project.name}} </h4>
-        <button class="btn btn-default btn-sm" type="button"><em class="glyphicon glyphicon-pencil"></em> Edit</button>
+        <button id="editProjectButton" ng-click="updateProjectModalPrepare()" class="btn btn-default btn-sm" type="button"><em class="glyphicon glyphicon-pencil"></em> Edit</button>
 		</div>
 	</div>
 
@@ -381,6 +458,7 @@ border-bottom: 1px solid #57BEDD;
 		</div>
 		<div class="col-md-6 column">
             <br/>
+                        <h4>Project Details</h4>
             <table class="table table-bordered table-responsive">
             <tr class="active">
                 <td >Name</td>
@@ -393,12 +471,18 @@ border-bottom: 1px solid #57BEDD;
             <tr class="success">
                 <td class="active"><strong>{{project.name}}</strong></td>
                 <td ><strong>{{project.complete}}</strong>%</td>
-                <td >{{timeConverter(project.start)}}</td>
-                <td >{{timeConverter(project.end)}}</td>
+                <td >{{project.start}}</td>
+                <td >{{project.end}}</td>
                 <td >{{project.effort_left}}</td>
                 <td ><a href="#/user/{{project.leader.id}}">{{project.leader.fullname}}</a></td>
             </tr>
             </table>
+            This project is under supervision of 
+            <span ng-repeat="watcher in project.watchers track by $index">
+                <a href="#user/{{watcher.id}}">{{watcher.firstname}} {{watcher.lastname}}</a>
+                <em ng-show="$index+2 != project.watchers.length && $index+1 != project.watchers.length">,</em>
+                <em ng-show="$index+2 == project.watchers.length">and</em>
+            </span>
 		</div>
 
         <div class="col-md-3 column">
@@ -478,6 +562,9 @@ border-bottom: 1px solid #57BEDD;
         });
         $('#taskSeqButton').click(function(){
             $('#taskSeqModal').modal('show');
+        });
+        $('#editProjectButton').click(function(){
+            $('#projectEditModal').modal('show');
         });
 
 

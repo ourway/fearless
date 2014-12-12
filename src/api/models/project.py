@@ -33,6 +33,12 @@ project_users = Table('project_users', Base.metadata,
                       Column('user_id', Integer, ForeignKey('user.id'))
                       )
 
+project_watchers = Table('project_watchers', Base.metadata,
+                      Column('id', Integer, primary_key=True),
+                      Column('project_id', Integer, ForeignKey('project.id')),
+                      Column('user_id', Integer, ForeignKey('user.id'))
+                      )
+
 from db import session
 from mako.template import Template
 
@@ -67,6 +73,7 @@ class Project(IDMixin, Base):
         'Task', backref='project',
         cascade="all, delete-orphan")
     users = relationship('User', backref='projects', secondary='project_users')
+    watchers = relationship('User', backref='watches_projects', secondary='project_watchers')
     lead_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     working_days = Column(String(128), default='sat 09:00 - 18:00,')
     lead = relationship('User', backref='leads')
@@ -96,6 +103,7 @@ class Project(IDMixin, Base):
         if not self.end:
             # set a default end time for project! 3 months
             self.end = result + datetime.timedelta(days=31 * 3)
+
         return result
 
 

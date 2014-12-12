@@ -34,8 +34,10 @@ class GetProjectDetails:
         if project:
             if project.repositories:
                 collections = project.repositories[0].collections
-            resp.body = {'name':project.name.title(), 'tasks':dict.fromkeys(project.tasks, True),
-                         'id':project.id, 'leader':{'fullname':project.lead.fullname, 'id':project.lead.id}, 
+            data = {
+                'name':project.name.title(), 
+                'tasks':dict.fromkeys(project.tasks, True),
+                'id':project.id, 
                 'sequences':[{'number':i.number, 'name':i.name, 'code':i.code} for i in project.sequences],
                 'description':project.description,
                 'start':project.start,
@@ -45,10 +47,20 @@ class GetProjectDetails:
                 'duration':project.duration,
                 'effort':project.effort,
                 'complete':project.complete,
+                'watchers':[{'firstname':i.firstname, 'lastname':i.lastname, 'fullname':i.fullname, 'id':i.id} for i in project.watchers], 
                 'tasks':[{'title':i.title, 'id':i.id} for i in project.tasks],
                 'collections':[{'name':i.name.title(), 'id':i.id, 'path':i.path, 
                                 'repository':i.repository.name.title(),
                                 'repository_path':i.repository.path} for i in collections]}
+            if project.lead_id:
+                data['leader'] = {'fullname':project.lead.fullname, 'id':project.lead.id}
+            if project.director:
+                data['director'] = {'fullname':project.director.fullname, 'id':project.director.id}
+
+
+            resp.body = data
+
+
 
 
 class ListProjects:
@@ -77,7 +89,6 @@ class AddProject:
             name = str(projectData.get('name'))
         if projectData.get('description'):
             description = str(projectData.get('description'))
-
         if projectData.get('lead_id'):
             lead_id = int(projectData.get('lead_id'))
 
@@ -198,6 +209,30 @@ class GetProjectLatestReport:
                         'profitAndLoss':message, 'msproject':message, 'csv':message }
 
 
+class UpdateProject:
+    @falcon.after(commit)
+    def on_post(self, req, resp, projId):
+        user = getUserInfoFromSession(req)
+        data = get_params(req.stream, flat=False)
+        project = session.query(Project).filter(Project.id==int(projId)).first()
+        if project:
+            project.start = data.get('start')
+            project.end = data.get('end')
+            project.description= data.get('description')
+            project.lead_id = int(data.get('leader').get('id'))
+            project.watchers = []
+            if data.get('watchers'):
+                for eachWatcherId in data.get('watchers'):
+                    _id = int(eachWatcherId.get('id'))
+                    watcher = session.query(User).filter(User.id == _id).first()
+                    project.watchers.append(watcher)
+
+
+            resp.body = {'message':'OK'}
+        else:
+            resp.status = falcon.HTTP_404
+
+
 
 
 class AddTask:
@@ -223,9 +258,9 @@ class AddTask:
         if end:
             newTask.end = str(end)
 
-        if taskData.get('resources'): resources = map(int, taskData.get('resources'))
-        if taskData.get('depends'): depends = map(int, taskData.get('depends'))
-        if taskData.get('manager'): manager = int(taskData.get('manager'))
+        if taskData.get('resources'): resources = [int(i.get('id')) for i in taskData.get('resources')]
+        if taskData.get('depends'): depends = [int(i.get('id')) for i in taskData.get('depends')]
+        if taskData.get('manager'): manager = int(taskData.get('manager').get('id'))
         for i in resources:
             resource = session.query(User).filter(User.id==i).first()
             if resource: newTask.resources.append(resource)
@@ -274,9 +309,9 @@ class UpdateTask:
         resources, depends, responsibles, effort , alternative_resources = list(), list(), list(), 0, list()
         taskData = get_params(req.stream, flat=False)
         print taskData
-        if taskData.get('updatedResources'): resources = taskData.get('updatedResources')
+        if taskData.get('resources'): resources = [int(i.get('id')) for i in taskData.get('resources')]
         if taskData.get('updatedResponsibles'): responsibles = taskData.get('updatedResponsibles')
-        if taskData.get('updatedDepends'): depends = taskData.get('updatedDepends')
+        if taskData.get('depends'): depends = [int(i.get('id')) for i in taskData.get('depends')]
         if taskData.get('updatedAlternativeResources'): alternative_resources = taskData.get('updatedAlternativeResources')
         if taskData.get('updatedWatchers'): watchers = taskData.get('updatedWatchers')
 
@@ -300,14 +335,14 @@ class UpdateTask:
             if resources:
                 target.resources = []
             for i in resources:
-                resource = session.query(User).filter(User.id==int(i)).first()
+                resource = session.query(User).filter(User.id==i).first()
                 if not resource in target.project.users:
                     target.project.users.append(resource)
                 if resource: target.resources.append(resource)
             if depends:
                 target.depends = []
             for i in depends:
-                depend = session.query(Task).filter(Task.id==int(i)).first()
+                depend = session.query(Task).filter(Task.id==i).first()
                 if depend: target.depends.append(depend)
             
             resp.body = {'message':'Task Updated'}

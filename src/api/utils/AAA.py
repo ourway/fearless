@@ -475,6 +475,16 @@ def isAuthorizedTo(userId, actionName):
                 return True
 
 
+class Users:
+    def on_get(self, req, resp, **kw):
+
+        target = session.query(User).all()
+        data = [{'firstname':user.lastname, 'lastname':user.firstname, 
+                 'fullname':user.fullname, 'id':user.id} for user in target]
+        resp.body = data
+
+
+
 
 
 

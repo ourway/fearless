@@ -82,7 +82,7 @@ class Task(IDMixin, Base, BaseNestedSets):
     alternative_resources = relationship(
         'User', backref='alternative_for', secondary='task_alternative')
     watchers = relationship(
-        'User', backref='watches', secondary='task_watchers')
+        'User', backref='watches_tasks', secondary='task_watchers')
     responsibles = relationship(
         'User', backref='responsible_of', secondary='task_responsible')
     priority = Column(Integer, default=500)

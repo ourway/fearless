@@ -34,11 +34,11 @@ from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
     Verify, Reactivate, Reset, Logout, GetUserInfo, Authorize, \
     getUserInfoFromSession, isAuthorizedTo, GetPermissions, ChangePasswordVerify, \
-    ChangePassword
+    ChangePassword, Users
 from utils.showtime import GetUserShows
 from utils.project import GetProjectDetails, GetProjectLatestReport, \
         ListProjects, AddProject, AddTask, ListTasks, GetTask, UpdateTask, \
-        DeleteTask
+        DeleteTask, UpdateProject
 
 from utils.sequence import AddSequence
 
@@ -184,6 +184,7 @@ for table in tables:
 
 # things will handle all requests to the '/things' URL path
 app.add_route('/api/things', things)
+app.add_route('/api/users', Users())
 app.add_route('/api/auth/login', Login())
 app.add_route('/api/auth/signup', Signup())
 app.add_route('/api/auth/activate', Verify())
@@ -201,6 +202,7 @@ app.add_route('/api/asset/delete/{id}', DeleteAsset())
 app.add_route('/api/showtime/{userid}', GetUserShows())
 app.add_route('/api/project', ListProjects())
 app.add_route('/api/project/add', AddProject())
+app.add_route('/api/project/update/{projId}', UpdateProject())
 app.add_route('/api/project/get/{id}', GetProjectDetails())
 app.add_route('/api/project/report/{id}', GetProjectLatestReport())
 app.add_route('/api/task/add/{projId}', AddTask())

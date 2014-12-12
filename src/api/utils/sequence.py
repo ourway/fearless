@@ -25,7 +25,7 @@ class AddSequence:
         targetProject = session.query(Project).filter(Project.id==int(projId)).first()
         form = get_params(req.stream, flat=False)
         if targetProject and form.get('number') and form.get('lead'):
-            lead = session.query(User).filter(User.id == int(form.get('lead'))).first()
+            lead = session.query(User).filter(User.id == int(form.get('lead').get('id'))).first()
             lenOfSeqs = len(targetProject.sequences)
             if lead:
                 number = int(form.get('number'))
