@@ -67,10 +67,16 @@ class User(IDMixin, Base):
         if re.match(r'[^@]+@[^@]+\.[^@]+', data):
             if not self.alias:
                 self.alias = data.split('@')[0].replace('.', '_')
-
             self.groups.append(self.alias)
-
             return data
+
+    @validates('firstname')
+    def capitalize_firstname(self, key, data):
+        return data.title()
+
+    @validates('lastname')
+    def capitalize_firstname(self, key, data):
+        return data.title()
 
     @validates('id')
     def authorize_first_user(self, key, data):

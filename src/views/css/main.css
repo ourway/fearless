@@ -227,7 +227,11 @@ table {
     font-size: 300%;
 }
 #projectDetailContainer{
-    padding-top:5em;
+    padding-top:1em;
+}
+#calendar{
+box-shadow: inset 0px 0px 9px #B5B5B5;
+padding: 7px;
 }
 
 

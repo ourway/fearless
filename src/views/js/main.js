@@ -644,6 +644,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 else
                     mode = 'guntt';
                 }
+            if (mode=='cal')
+                return null;
             $scope.mode=mode;
             $('.tj_table_frame').fadeOut(2000);
             data = localStorage.getItem(getprefix +  mode);
@@ -707,6 +709,19 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
     $scope.getTasksList = function(){
         $http.get('/api/task/list/'+$scope.projId).success(function(resp){
                 $scope.tasks = resp;
+                $scope.calTasks = [];
+                for (x in $scope.tasks){
+                        ev = $scope.tasks[x];
+                        n = {
+                                'id':ev.id,
+                                'title':ev.title, 
+                                'start':timeConverter(ev.start, true), 
+                                'end':timeConverter(ev.end, true),
+
+                            };
+                        $scope.calTasks.push(n);
+                    }
+                $scope.prepareCal();
             });
     }
 
@@ -792,6 +807,45 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
 
         }
+        $scope.showCal = function(){
+            $scope.mode = 'cal';
+            $('.tj_table_frame').fadeOut(1000);
+            data = '<div id="calendar" style="display:none"></div>';
+            $('#projectDetailDiv').html(data);
+            $('#calendar').fadeIn(1000);
+        }
+        $scope.prepareCal = function(){
+            $('#calendar').fullCalendar('destroy');
+            $('#calendar').fullCalendar({
+                    weekends: true, // will hide Saturdays and Sundays,
+                    dow : [0,1,2,3,6],
+                    timezone:'Asia/Tehran',
+                    hiddenDays: [5], // hide Tuesdays and Thursdays
+                    firstDay:6,
+                    businessHours:{
+                        start: '9:00', // a start time (10am in this example)
+                        end: '18:00', // an end time (6pm in this example)
+                        dow: [ 1, 2, 3, 4 ]
+                    },
+
+                    eventClick: function(calEvent, jsEvent, view) {
+                            //alert('Event: ' + calEvent.title);
+                            $scope.taskDetail(calEvent.id);
+                            
+
+        },
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+			editable: true,
+			//eventLimit: true, // allow "more" link when too many events
+			events: $scope.calTasks,
+                // put your options and callbacks here
+            })
+
+        }
 
         $scope.taskDetail = function(taskId) {
             //console.log(taskId);
@@ -868,3 +922,15 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 fearlessApp.controller('sequenceDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
 
         });
+
+//////////////////////////////////////////////////////
+
+$(document).ready(function(){
+    $('input').on('input', function() {
+        alert('Text1 changed!');
+    });
+});
+
+
+/////////////////////////////////////////////////
+

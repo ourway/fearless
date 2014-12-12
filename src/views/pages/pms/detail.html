@@ -165,6 +165,7 @@ border-bottom: 1px solid #57BEDD;
 					<div class="col-sm-6">
                         <select class="form-control" ng-model="project.watchers" multiple 
                             ng-options="resource.fullname for resource in resources track by resource.id">
+                            <option value="0"></option>
                         </select>
                 </div>
 
@@ -476,13 +477,15 @@ border-bottom: 1px solid #57BEDD;
                 <td >{{project.effort_left}}</td>
                 <td ><a href="#/user/{{project.leader.id}}">{{project.leader.fullname}}</a></td>
             </tr>
-            </table>
+        </table>
+            <div ng-if="project.watchers">
             This project is under supervision of 
             <span ng-repeat="watcher in project.watchers track by $index">
                 <a href="#user/{{watcher.id}}">{{watcher.firstname}} {{watcher.lastname}}</a>
                 <em ng-show="$index+2 != project.watchers.length && $index+1 != project.watchers.length">,</em>
                 <em ng-show="$index+2 == project.watchers.length">and</em>
             </span>
+            </div>
 		</div>
 
         <div class="col-md-3 column">
@@ -523,12 +526,18 @@ border-bottom: 1px solid #57BEDD;
 		<div class="col-md-12 column">
 			<div class="btn-group">
                 <button id="taskAddButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
-                <button class="btn btn-default" ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" ng-class="{'active':mode=='plan'}" ng-click="generateReport('plan')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</button>
-                <button class="btn btn-default" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" ng-click="generateReport('guntt')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Gantt</button>
-                <button class="btn btn-default" ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}" ng-click="generateReport('resource')" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
-                <button class="btn btn-default" ng-class="{'active':mode=='profitAndLoss', 'btn-success':mode=='profitAndLoss'}" ng-click="generateReport('profitAndLoss')" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
+                <button class="btn btn-default" ng-class="{'active':mode=='cal', 'btn-success':mode=='cal'}" 
+                        ng-class="{'active':mode=='cal'}" ng-click="showCal();prepareCal();" type="button"><em class="glyphicon glyphicon-eye-open"></em> Calendar</button>
+                <button class="btn btn-default" ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
+                        ng-class="{'active':mode=='plan'}" ng-click="generateReport('plan')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</button>
+                    <button class="btn btn-default" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" 
+                        ng-click="generateReport('guntt')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Gantt</button>
+                    <button class="btn btn-default" ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}"
+                        ng-click="generateReport('resource')" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
+                    <button class="btn btn-default" ng-class="{'active':mode=='profitAndLoss', 'btn-success':mode=='profitAndLoss'}" 
+                        ng-click="generateReport('profitAndLoss')" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
                 <button class="btn btn-default" ng-click="print()" type="button"><em class="glyphicon glyphicon-print"></em> </button>
-                <button class="btn btn-default" ng-click="replan=true;generateReport(mode)" type="button"><em class="glyphicon glyphicon-repeat"></em> </button>
+                <button ng-show="mode!='cal'" class="btn btn-default" ng-click="replan=true;generateReport(mode)" type="button"><em class="glyphicon glyphicon-repeat"></em> </button>
 			</div>
 			</div>
                 <div class="col-md-3 column">
@@ -547,11 +556,24 @@ border-bottom: 1px solid #57BEDD;
 
                     </div>
 				</div>
-				<div class="col-md-6 column">
+				<div class="col-md-9 column">
                     <div id="projectDetailContainer">
                         <div id="projectDetailDiv"></div>
                     </div>
             </div>
+            </div>
+
+            <div class="row clearfix">
+				<div class="col-md-3 column">
+                </div>
+				<div class="col-md-6 column">
+                </div>
+                <div class="col-md-3 column">
+                </div>
+            </div>
+
+
+</div>
 
 
 <script>
