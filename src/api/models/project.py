@@ -177,7 +177,7 @@ class Project(IDMixin, Base):
 
         tj3 = sh.Command('/usr/local/bin/tj3')
         try:
-            tj = tj3(plan_path, o='/tmp', c=8)
+            tj = tj3(plan_path, '--silent', '--no-color', o='/tmp')
         except Exception,e:
             #print type(repr(e))
             for i in xrange(3):

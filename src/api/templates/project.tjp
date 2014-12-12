@@ -1,5 +1,5 @@
 project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} - ${project.end.strftime('%Y-%m-%d')} {
-    timingresolution 5min
+    timingresolution 60min
     now  ${now.strftime('%Y-%m-%d')}
   currencyformat "(" ")" "," "." 0
    #timezone "Asia/Tehran" 

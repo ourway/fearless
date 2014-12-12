@@ -15,7 +15,8 @@ Clean code is much better than Cleaner comments!
 import re
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
-from . import session, Group
+from . import Group
+from db import Session
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
@@ -62,6 +63,13 @@ class User(IDMixin, Base):
     grps = relationship('Group', backref='users', secondary='users_groups')
     groups = association_proxy('grps', 'name')
 
+
+#    def __init__(self, **kwargs):
+#        print kwargs
+#        super(User, self).__init__(**kwargs)
+#        print self
+
+
     @validates('email')
     def _validate_email(self, key, data):
         if re.match(r'[^@]+@[^@]+\.[^@]+', data):
@@ -90,10 +98,19 @@ class User(IDMixin, Base):
     #groups = Set("Group")
 
 
-def logUserCreation(mapper, connection, target):
+def AfterUserCreationFuncs(mapper, connection, target):
+    '''Some operations after getting ID'''
     logger.info('New user added|{t.id}|{t.email}'.format(t=target))
-    #new_group = Group(name=target.login)
-    #target.group= new_group
-    # session.add(new_group)
+    session=Session()  ## old session is closed...
+    user = session.query(User).filter(User.id==target.id).first()
+    if target.id == 1: ## first user is admin!
+        adminGroup = session.query(Group).filter(Group.name=='admin').first()
+        user.grps.append(adminGroup)
+    else:
+        usersGroup = session.query(Group).filter(Group.name=='users').first()
+        if not usersGroup in user.grps:
+            user.grps.append(usersGroup)
+    session.commit()
 
-event.listen(User, 'after_insert', logUserCreation)
+
+event.listen(User, 'after_insert', AfterUserCreationFuncs)

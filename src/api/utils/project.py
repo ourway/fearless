@@ -217,6 +217,7 @@ class UpdateProject:
         project = session.query(Project).filter(Project.id==int(projId)).first()
         if project:
             project.start = data.get('start')
+            project.name = data.get('name')
             project.end = data.get('end')
             project.description= data.get('description')
             project.lead_id = int(data.get('leader').get('id'))
@@ -246,7 +247,6 @@ class AddTask:
         start = taskData.get('start')
         end = taskData.get('end')
         priority = taskData.get('priority')
-        #print responsible_id
         project = session.query(Project).filter(Project.id==int(projId)).first()
         if not start:
            start = project.start
@@ -313,7 +313,6 @@ class UpdateTask:
         user = getUserInfoFromSession(req)
         resources, depends, responsibles, effort , alternative_resources = list(), list(), list(), 0, list()
         taskData = get_params(req.stream, flat=False)
-        print taskData
         if taskData.get('resources'): resources = [int(i.get('id')) for i in taskData.get('resources')]
         if taskData.get('updatedResponsibles'): responsibles = taskData.get('updatedResponsibles')
         if taskData.get('depends'): depends = [int(i.get('id')) for i in taskData.get('depends')]

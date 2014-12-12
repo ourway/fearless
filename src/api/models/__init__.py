@@ -70,7 +70,7 @@ def init():
     departements = ['animation', 'rigging', 'character', 'storyboard', 'voice', 'sound', 'texture', 'layout', 'editorial', 'technical',
                     'story', 'rendering', 'compositing', 'lighting', 'dynamics', 'stereoscopic', 'staff', 'management', 'directing', 'art']
 
-    for gr in ['managers', 'users', 'clients', 'guests'] + departements :
+    for gr in ['managers', 'users', 'clients', 'guests', 'admin'] + departements :
         if not gr in [i.name for i in groups]:
             new = Group(gr, role=gr[:-1], typ='general')
             if gr in departements:
@@ -78,6 +78,7 @@ def init():
             session.add(new)
 
     manager_group = session.query(Group).filter(Group.name=='managers').first()
+    admin_group = session.query(Group).filter(Group.name=='admin').first()
     user_group = session.query(Group).filter(Group.name=='users').first()
 
     role_actions = ['create', 'see', 'delete', 'edit']
@@ -93,6 +94,7 @@ def init():
                 if area in role_areas_users:
                     user_group.rls.append(new)
                 manager_group.rls.append(new)
+                admin_group.rls.append(new)
 
     read_roles = session.query(Role).filter(Role.name.like('see%')).all()
     users_group = session.query(Group).filter(Group.name=='users').first()

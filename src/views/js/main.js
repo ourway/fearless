@@ -207,6 +207,9 @@ function updateImageSize(img, maxWidth, maxHeight){
             url = url + '?token=' + $routeParams.token
         prom = $http.post(url, $scope.loginInfo);
         prom.success(function(resp){
+
+
+
                 $scope.login_wait = resp.wait;
                 $scope.AuthRespMessage = resp.message;
                 $scope.AuthRespInfo = resp.info;
@@ -220,6 +223,8 @@ function updateImageSize(img, maxWidth, maxHeight){
 
                if (resp.message=='success') //green light
                     {
+                        
+                    console.log(resp);
 
                         if (resp.avatar != 'null')
                             localStorage.setItem('avatar', resp.avatar);
@@ -281,6 +286,21 @@ function updateImageSize(img, maxWidth, maxHeight){
         c = {};
         document.cookie.split('; ').forEach(function(e){key = e.split('=')[0];value=e.split('=')[1];c[key]=value});
         var userid = c.userid;
+        var groups = c.groups.split(',');
+        $scope.isManager = false;
+        $scope.isAdmin = false;
+        $scope.isClient = false;
+        $scope.userGroups = [];
+        for (group in groups){
+            _g = groups[group];
+            if (_g == 'admin')
+                $scope.isAdmin = true;
+            else if (_g == 'managers')
+                $scope.isManager = true;
+            else if (_g == 'clients')
+                $scope.isClient = true;
+            $scope.userGroups.push(_g);
+        }
         var username = c.username;
        if (userid && username)
             {
@@ -646,6 +666,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 }
             if (mode=='cal')
                 return null;
+
+            //$('#calendar').fullCalendar('destroy');
             $scope.mode=mode;
             $('.tj_table_frame').fadeOut(2000);
             data = localStorage.getItem(getprefix +  mode);
@@ -721,7 +743,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                             };
                         $scope.calTasks.push(n);
                     }
-                $scope.prepareCal();
+                //if ($scope.mode == 'cal')
+                //    $scope.prepareCal();
             });
     }
 

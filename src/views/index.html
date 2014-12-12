@@ -42,7 +42,7 @@
           <a class="navbar-brand" ng-click="page='home'" href="#"><span>{{appName}}&trade;</span></a>
           <ul class="nav navbar-nav">
             <li ng-class="{active:page=='pms'}"><a ng-click="page='pms'" href="#pms">Projects</a></li>
-            <li ng-class="{active:page=='cr'}"  ><a ng-click="page='cr'" href="#cr">Reports</a></li>
+            <li ng-if="isAdmin || isClient || isManager"  ng-class="{active:page=='cr'}"  ><a ng-click="page='cr'" href="#cr">Reports</a></li>
             <li ng-class="{active:page=='ams'}"   ><a ng-click="page='ams'" href="#ams">Assets</a></li>
             <li ng-class="{active:page=='showtime'}"   ><a ng-click="page='showtime'" href="/app/showtime/">ShowTime&reg;</a></li>
             <li class="dropdown">
@@ -66,7 +66,7 @@
               </ul>
               </li>
 
-            <li class="dropdown">
+              <li class="dropdown" ng-if="isAdmin || isClient || isManager" >
               <a href="" class="dropdown-toggle" data-toggle="dropdown">Clients<span class="caret"></span></a>
               <ul class="dropdown-menu" role="menu">
                 <li class="dropdown-header">Monitoring</li>

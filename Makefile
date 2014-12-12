@@ -67,6 +67,9 @@ prepare:
 	@yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u55-linux-x64.rpm -y
 	@ln -s -f '/usr/java/default/bin/java' /usr/bin/java
 	@yum install https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.4.noarch.rpm -y
+	@gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
+	@curl -sSL https://get.rvm.io | bash -s stable --ruby
+	@gem install taskjuggler
 	@service riak start
 	@service elasticsearch start
 	@service supervisord start

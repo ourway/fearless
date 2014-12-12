@@ -85,7 +85,7 @@ background-color: #FFEDA5;
 }
 
 .pmsmaindiv{
-    font-family:Terafik;
+    font-size:11px;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -117,7 +117,7 @@ border-bottom: 1px solid #57BEDD;
 
 <div class="container pmsmaindiv" ng-init="getProjectDetails()">
     <br/>
-	<div class="row clearfix">
+	<div class="row clearfix" ng-cloak>
 
 
 
@@ -127,7 +127,7 @@ border-bottom: 1px solid #57BEDD;
 						<div class="modal-header">
 							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
 							<h4 class="modal-title" id="myModalLabel">
-								Create a new project
+                                Edit project: {{project.name}}
 							</h4>
 						</div>
                         <div class="modal-body">
@@ -188,7 +188,7 @@ border-bottom: 1px solid #57BEDD;
 					
 				</div>
 				
-			</div>
+	</div>
 
 
 
@@ -527,13 +527,13 @@ border-bottom: 1px solid #57BEDD;
 			<div class="btn-group">
                 <button id="taskAddButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
                 <button class="btn btn-default" ng-class="{'active':mode=='cal', 'btn-success':mode=='cal'}" 
-                        ng-class="{'active':mode=='cal'}" ng-click="showCal();prepareCal();" type="button"><em class="glyphicon glyphicon-eye-open"></em> Calendar</button>
+                        ng-class="{'active':mode=='cal'}" ng-click="showCal();prepareCal();" type="button"><em class="glyphicon glyphicon-calendar"></em> Calendar</button>
                 <button class="btn btn-default" ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
                         ng-class="{'active':mode=='plan'}" ng-click="generateReport('plan')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</button>
                     <button class="btn btn-default" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" 
-                        ng-click="generateReport('guntt')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Gantt</button>
+                        ng-click="generateReport('guntt')" type="button"><em class="glyphicon glyphicon-tasks"></em> Gantt</button>
                     <button class="btn btn-default" ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}"
-                        ng-click="generateReport('resource')" type="button"><em class="glyphicon glyphicon-align-right"></em> Resources</button>
+                        ng-click="generateReport('resource')" type="button"><em class="glyphicon glyphicon-list-alt"></em> Resources</button>
                     <button class="btn btn-default" ng-class="{'active':mode=='profitAndLoss', 'btn-success':mode=='profitAndLoss'}" 
                         ng-click="generateReport('profitAndLoss')" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
                 <button class="btn btn-default" ng-click="print()" type="button"><em class="glyphicon glyphicon-print"></em> </button>
@@ -547,7 +547,7 @@ border-bottom: 1px solid #57BEDD;
                     <br/>
                     <div id="tasksDiv">
                         <ol class="">
-                            <li ng-click="taskDetail(task.id)" title="{{task}}" class="taskA" 
+                            <li ng-click="taskDetail(task.id)" title="{{task.name}}" class="taskA" 
                             ng-repeat="task in tasks | orderBy:'start' | filter:filterTaskName ">
                             
                             <a class="btn-sm" style="color: #13560C;" data-task-title="{{toTitleCase(task.title)}}" 

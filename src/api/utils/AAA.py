@@ -167,7 +167,11 @@ class Login:
                 target.lastLogIn = now()
                 rem_time = 3600 * 24
                 # this session is not yet saved
+
+                
+                groups = ','.join([i.name for i in target.grps])
                 resp.append_header('set-cookie', 'userid=%s; path=/; max-age=%s' % (str(target.id), rem_time) )
+                resp.append_header('set-cookie', 'groups=%s; path=/; max-age=%s' % (str(groups), rem_time) )
                 resp.append_header('set-cookie', 'username=%s; path=/; max-age=%s' % (str(target.firstname or target.alias), rem_time) )
                 resp.append_header(
                     'set-cookie', 'session-id=%s; path=/; max-age=%s; HttpOnly' % (sid, rem_time))
@@ -178,9 +182,13 @@ class Login:
 
                 logger.info(
                     '{ip}|"{u}" loggin in from web"'.format(u=target.email, ip=ip))
-                resp.body = {'message': 'success',
-                                        'firstname': target.firstname,
-                             'id': target.id, 'avatar':target.avatar}
+                resp.body = {
+                            'message': 'success',
+                            'firstname': target.firstname,
+                            'id': target.id,
+                            'avatar':target.avatar,
+                            'groups':[i.name for i in target.grps]
+                            }
             else:
 
                 logger.warning('{ip}|{u} tried to login from web without activation"'.format(
@@ -214,14 +222,13 @@ class Signup:
         olduser = session.query(User).filter(
             User.email == email).first()
         if not olduser:
-            userGroup = session.query(Group).filter(Group.name=='users').first()
             newuser = User(email=email,
                            password=form.get('password'),
                            firstname=form.get('firstname'),
                            lastname=form.get('lastname'),
                            token=str(uuid.uuid4()))
 
-            newuser.grps.append(userGroup)  ## default users group 
+
             session.add(newuser)
 
             activation_link = host + \
