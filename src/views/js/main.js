@@ -380,7 +380,6 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
         
         userInfoReq = $http.get('/api/db/user/'+userId);
         userInfoReq.success(function(resp, b, c, d){
-            resp = resp[0]
             delete resp.password;
             delete resp.created_on;
             delete resp.modified_on;
