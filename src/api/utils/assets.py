@@ -352,10 +352,20 @@ class CollectionInfo:
             data['description'] = target.description
             data['repository'] = {'name':target.repository.name, 'id':target.repository.id}
             data['project'] = {'name':target.repository.project.name, 'id':target.repository.project.id}
-            if target.parent:
-                data['parent'] = {'name':target.parent.name, 'id':target.parent.id, 'path':target.parent.path}
+            _t = target.parent
+            d = data
+            while True:
+                if _t:
+                    d['parent'] = {'name':_t.name, 'id':_t.id, 'path':_t.path}
+                    d = d['parent']
+                    _t = _t.parent
+                else:
+                    break
+
             if target.children:
-                data['children'] = [{'name':i.name, 'id':i.id, 'path':i.path} for i in target.children]
+                data['children'] = [{'name':i.name, 'id':i.id, 'path':i.path,
+                                     'children':[{'name':c1.name, 'id':c1.id, 'path':c1.path, } for c1 in i.children]
+                                     } for i in target.children]
             resp.body = data
 
 class AddCollection:

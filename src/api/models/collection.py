@@ -64,9 +64,7 @@ class Collection(IDMixin, Base):
         parent = session.query(Collection).filter_by(id=data).first()
         if parent and parent.path not in self.path:
             newpath = os.path.join(parent.path, self.path)
-            print self.path, parent.path
             self.path = newpath
-            print self.path
         return data
 
     @validates('repository_id')
