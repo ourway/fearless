@@ -39,6 +39,8 @@ class Collection(IDMixin, Base):
     schema = deferred(Column(Text))  # load on access
     name = Column(String(128))
     description = Column(String(512))
+    container = Column(Boolean(), default=True)  ## can contain assets
+    holdAssets = Column(Boolean(), default=True)  ## can contain assets
     version = Column(Integer, default=1)  ## asset versioning
     template = Column(String(64))
     owner_id = Column(Integer, ForeignKey('user.id'))
@@ -104,7 +106,8 @@ def BeforeUserCreationFuncs(mapper, connection, target):
 def AfterUserCreationFuncs(mapper, connection, target):
     '''Some operations after getting ID'''
     session = Session()
-    repository = session.query(Repository).filter(Repository.id == target.repository_id).first()
+    repository = session.query(Repository).filter_by(id=target.repository_id).first()
+    Target = session.query(Collection).filter_by(id=target.id).first()
     if target.path:
         collection_path = os.path.join(repository.path, target.path)
         if not os.path.isdir(collection_path):
@@ -129,6 +132,9 @@ def AfterUserCreationFuncs(mapper, connection, target):
         # print collection.get('folders')
         if collection.get('folders'):
             generated = {}
+            Target.container = False
+            Target.holdAssets = False
+
             for folder in collection.get('folders'):
                 newFolder = os.path.join(
                     repository.path, target.path or repository.path, folder)
@@ -139,20 +145,28 @@ def AfterUserCreationFuncs(mapper, connection, target):
                         pass
                 newCollectionName = os.path.basename(folder).title()
                 for part in folder.split('/'):
+                    container = False
+                    holdAssets = False
+                    index = folder.split('/').index(part)
+                    if index == len(folder.split('/')) - 1:
+                        container = True
+                        holdAssets = True
+
                     part = part.strip()
                     tn = folder.split('/').index(part)
-                    tc = '@'.join(folder.split('/')[:tn+1])
-                    partPath = os.path.join(repository.path, target.path,  tc.replace('@', '/'))
+                    tc = '@@'.join(folder.split('/')[:tn+1])
+                    partPath = os.path.join(repository.path, target.path,  tc.replace('@@', '/'))
 
                     if not generated.get(tc):
-                        newCollection = Collection(name=newCollectionName, path=part, repository_id=repository.id)
+                        newCollection = Collection(name=newCollectionName, path=part, 
+                                            repository_id=repository.id, 
+                                            container=container, holdAssets=holdAssets)
                         if tn:
-                            tcm = '_'.join(folder.split('/')[:tn])
+                            tcm = '@@'.join(folder.split('/')[:tn])
                             newCollection.parent = generated.get(tcm)
                         else:
                             newCollection.parent_id = target.id
                         generated[tc] = newCollection
-                        print part
                         if 'seq_' in part.lower():
                             part = 'sequence'
                         tdest = os.path.join(partPath, 'thumb.png')

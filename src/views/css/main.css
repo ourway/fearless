@@ -234,6 +234,19 @@ box-shadow: inset 0px 0px 9px #B5B5B5;
 padding: 7px;
 }
 
+.asm_col_thumb_img{
+border:1px solid #fff;
+opacity:0.9;
+}
+
+.asm_col_thumb_img:hover {
+border: 1px dotted #333;
+opacity: 1;
+transform: scale(1.05,1.05);
+box-shadow: 1px 1px 97px #D8D8D8;
+}
+
+
 
 
 

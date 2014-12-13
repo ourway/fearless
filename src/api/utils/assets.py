@@ -348,6 +348,8 @@ class CollectionInfo:
             data = dict()
             data['name'] = target.name
             data['id'] = target.id
+            data['container'] = target.container
+            data['holdAssets'] = target.holdAssets
             data['path'] = target.path
             data['description'] = target.description
             data['repository'] = {'name':target.repository.name, 'id':target.repository.id}
@@ -375,6 +377,7 @@ class AddCollection:
         name = data.get('name')
         repository_id = data.get('repository_id')
         parent_id = data.get('parent_id')
+
         template = data.get('template').lower()
         if name and repository_id:
             newC = Collection(name=name, path=name, repository_id=repository_id)

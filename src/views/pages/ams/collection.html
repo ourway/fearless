@@ -74,12 +74,15 @@
 			</ul>
         </div>
 
-			<div class="btn-group">
-                <button id="collectionAddButton" class="btn btn-success btn-sm" type="button"><em class="glyphicon glyphicon-plus"></em></button>
+			<div class="btn-group" ng-show="collection.container">
+                <button id="collectionAddButton" class="btn btn-success btn-sm" type="button">
+                    <em class="glyphicon glyphicon-plus"></em>
+                    <em class="glyphicon glyphicon-folder-open"></em>
+
+                </button>
 			</div>
 
-
-        <h2>{{collection.name}}</h2>
+        <h3>{{collection.name | uppercase}}</h3>
     </div>
 
 
@@ -90,12 +93,11 @@
                 <!----------------------------------------------------------------------------!>
 				<div class="col-md-2" ng-repeat="subcol in collection.children track by $index">
 					<div class="thumbnail">
-                        <img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" />
+                        <a href="#ams/c/{{subcol.id}}" title="{{subcol.description}}"
+                        ><img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
 						<div class="caption">
-							<h4>{{subcol.name}}</h4>
-							<p>{{subcol.description}}</p>
+                            <h5><a href="#ams/c/{{subcol.id}}" style="color:#333;font-family: monospace">{{subcol.name}}</a></h5>
 							<p>
-                            <a class="btn" href="#ams/c/{{subcol.id}}">Details</a>
 							</p>
 						</div>
 					</div>
