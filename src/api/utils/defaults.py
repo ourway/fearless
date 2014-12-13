@@ -3,7 +3,7 @@ import os
 import user
 home = user.home
 fearless_folder = os.path.abspath(os.path.dirname(__file__))
-public_repository_path = os.path.join(home, '.fearlessrepo', 'public')
+public_repository_path = os.path.join(home, '.fearlessrepo')
 
 
 
