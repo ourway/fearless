@@ -51,7 +51,7 @@ class GetProjectDetails:
                 'tasks':[{'title':i.title, 'id':i.id} for i in project.tasks],
                 'collections':[{'name':i.name.title(), 'id':i.id, 'path':i.path, 
                                 'repository':i.repository.name.title(),
-                                'repository_path':i.repository.path} for i in collections]}
+                                'repository_path':i.repository.path} for i in collections if not i.parent]}
             if project.lead_id:
                 data['leader'] = {'fullname':project.lead.fullname, 'id':project.lead.id}
             if project.director:
@@ -80,7 +80,7 @@ class AddProject:
     def on_put(self, req, resp):
         user = getUserInfoFromSession(req)
         projectData = get_params(req.stream, flat=False)
-        start, end, name, lead_id = None, None, None, None
+        start, end, name, lead_id, description = None, None, None, None, None
         if projectData.get('start'):
             start = str(projectData.get('start'))
         if projectData.get('end'):
@@ -93,7 +93,9 @@ class AddProject:
             lead_id = int(projectData.get('lead_id'))
 
         if start and end and name and lead_id: 
-            new = Project(start=start, name=name, end=end, lead_id=lead_id, description=description)
+            new = Project(start=start, name=name, end=end, lead_id=lead_id)
+            if description:
+                new.description = description
             repoName = name
             newRepoFolder = os.path.join(home, '.fearlessrepo', repoName)
             if not os.path.isdir(newRepoFolder):
@@ -102,10 +104,10 @@ class AddProject:
             if not new_repository:
                 new_repository = Repository(name=repoName, path= newRepoFolder)
             
-            chars_section = Collection(name='chars', path='chars')
-            props_section = Collection(name='props', path='props')
-            sets_section = Collection(name='sets', path='sets')
-            sequences_section = Collection(name='sequences', path='sequences')
+            chars_section = Collection(name='Characters', path='chars')
+            props_section = Collection(name='Props', path='props')
+            sets_section = Collection(name='Sets', path='sets')
+            sequences_section = Collection(name='Sequences', path='sequences')
 
             new_repository.collections.append(chars_section)
             new_repository.collections.append(props_section)

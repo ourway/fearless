@@ -20,7 +20,7 @@ import urlparse
 from urllib import unquote
 from string import ascii_uppercase
 import ujson as json
-from utils.assets import AssetSave, ListAssets, GetAsset, DeleteAsset
+from utils.assets import AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection
 from utils.reports import Mailer, AddReport
 from gevent import wsgi
 from models import __all__ as av
@@ -78,7 +78,7 @@ class DB:
             query = 'session.query({t}).filter({t}.{key}=="{id}")'.format(
                 t=table, id=id, key=key)
 
-            data = eval(query).all()
+            data = eval(query).first()
         else:
             if not show:
                 query = 'session.query({t}).order_by(desc({t}.modified_on))'.format(t=table)
@@ -95,7 +95,10 @@ class DB:
         field = req.get_param('field')
         if field:
             try:
-                data = [eval('i.%s'%field) for i in data]
+                if len(args) != 5:
+                    data = [eval('i.%s'%field) for i in data]
+                elif len(args) == 5:
+                    data = eval('data.%s'%field)
             except AttributeError, e:
                 print e
                 raise falcon.HTTPBadRequest('Bad Request', 'The requested field is not available for database')
@@ -205,6 +208,8 @@ app.add_route('/api/project/add', AddProject())
 app.add_route('/api/project/update/{projId}', UpdateProject())
 app.add_route('/api/project/get/{id}', GetProjectDetails())
 app.add_route('/api/project/report/{id}', GetProjectLatestReport())
+app.add_route('/api/collection/{collectionId}', CollectionInfo())
+app.add_route('/api/collection/add', AddCollection())
 app.add_route('/api/task/add/{projId}', AddTask())
 app.add_route('/api/task/list/{projId}', ListTasks())
 app.add_route('/api/task/{taskId}', GetTask())

@@ -24,7 +24,6 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from mixin import IDMixin, Base
 from collections import defaultdict
-from mako.template import Template
 import ujson as json  # for collection data validation and parsing
 
 
@@ -43,6 +42,8 @@ class Repository(IDMixin, Base):
     collections = relationship('Collection', backref='repository')
     project_id = Column(Integer, ForeignKey("project.id"))
     project = relationship('Project', backref='repositories')
+    owner_id = Column(Integer, ForeignKey('user.id'))
+    owner = relationship("User", backref="ownes_repositories")
 
     @validates('path')
     def create_folders(self, key, path):
@@ -54,63 +55,3 @@ class Repository(IDMixin, Base):
         #GIT(readme).add('repo *%s* created successfully' % self.name)
         return path
 
-    @validates('collections')
-    def check_collection_data(self, key, data):
-        if data.path:
-            collection_path = os.path.join(self.path, data.path)
-            if not os.path.isdir(collection_path):
-                os.makedirs(collection_path)
-
-        collection = defaultdict(list)
-        if data.schema:
-            collection = json.loads(data.schema)
-        elif data.template:
-            templateFile = os.path.join(
-                os.path.dirname(__file__), '../templates/collection_templates.json')
-            collection = json.loads(
-                open(templateFile).read()).get(data.template)
-        if collection:
-            # print collection.get('folders')
-            for folder in collection.get('folders'):
-                newFolder = os.path.join(
-                    self.path, data.path or self.path, data.name, folder)
-                if not os.path.isdir(newFolder):
-                    try:
-                        os.makedirs(newFolder)
-                    except OSError:
-                        pass
-            for each in collection.get('files'):
-                newFile = os.path.join(
-                    self.path, data.path or self.path, data.name, each)
-                if not os.path.isfile(newFile):
-                    with open(newFile, 'w') as f:
-                        tempname = collection.get('files').get(each)
-                        templateFile = os.path.join(
-                            os.path.dirname(__file__), '../templates/%s' % tempname)
-                        if os.path.isfile(templateFile):
-                            template = Template(filename=templateFile)
-                            f.write(template.render(reponame=self.name, project=self.project.name,
-                                                    id=data.id, collection=data.name))
-                        pass
-            message = 'Added: files to collection:*%s* of repo:*%s*' % (
-                data.name, self.name)
-
-            for each in collection.get('ignore'):
-                with open(os.path.join(self.path, data.path or self.path, data.name,
-                                       '.gitignore'), 'a+') as gitignore:
-                    gitignore.writelines(each + '\n')
-
-            collection_git = GIT(
-                '.', wt=os.path.join(self.path, data.path or self.path, data.name))
-            collection_git.add(message)
-            #collection_git.tag('start')
-
-            '''Add these collection folders to main repo gitignore.'''
-            with open(os.path.join(self.path, '.gitignore'), 'a+') as repoignore:
-                if data.path:
-                    repoignore.write('%s/%s/\n' % (data.path, data.name))
-                else:
-                    repoignore.write(data.name + '/')
-            #repo_git = GIT('.', wt=os.path.join(self.path))
-
-        return data

@@ -1,0 +1,119 @@
+
+
+			<div class="modal fade" id="collectionAddModal" role="dialog" ng-init="" aria-labelledby="AddNewSequences" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title" id="myModalLabel">
+                                Add a new item to {{collection.name}}
+							</h4>
+						</div>
+                        <div class="modal-body">
+
+			<form class="form-horizontal" role="form">
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">New Item Name</label>
+					<div class="col-sm-6">
+                        <input type="text" class="form-control" placeholder="Enter number of new sequences" ng-model="newSubCollection.name" />
+					</div>
+				</div>
+			</form>
+						</div>
+						<div class="modal-footer">
+                            <button type="button" class="btn btn-default" ng-click="newSubCollection={}" data-dismiss="modal">Close</button>
+                            <button type="button" ng-disabled="!newSubCollection.name"
+                                ng-click="createNewSubCollection()" class="btn btn-success">Add item to {{collection.name}}</button>
+						</div>
+					</div>
+
+				</div>
+
+			</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="container collectionDiv" ng-init="getCollectionDetails()">
+    <br/>
+    <div class="row clearfix" ng-cloak>
+		<div class="col-md-12 column">
+			<ul class="breadcrumb">
+				<li>
+					<a href="#/pms">Projects</a> <span class="divider"></span>
+				</li>
+				<li>
+                <a href="#/pms/{{collection.project.id}}">{{collection.project.name}}</a> <span class="divider">/</span>
+                </li>
+
+                <li ng-if="collection.parent">
+                <a href="#/ams/c/{{collection.parent.id}}">{{collection.parent.name}}</a> <span class="divider"></span>
+				</li>
+				<li class="active">
+				    {{collection.name}}
+				</li>
+			</ul>
+        </div>
+
+			<div class="btn-group">
+                <button id="collectionAddButton" class="btn btn-success btn-sm" type="button"><em class="glyphicon glyphicon-plus"></em></button>
+			</div>
+
+
+        <h2>{{collection.name}}</h2>
+    </div>
+
+
+	<div class="row clearfix">
+		<div class="col-md-12 column">
+			<div class="row">
+                <!----------------------------------------------------------------------------!>
+                <!----------------------------------------------------------------------------!>
+				<div class="col-md-4" ng-repeat="subcol in collection.children track by $index">
+					<div class="thumbnail">
+                        <img alt="300x200" ng-src="/static/{{collection.project.name}}/{{subcol.path}}/thumb.png" />
+						<div class="caption">
+							<h3>{{subcol.name}}</h3>
+							<p>{{subcol.description}}</p>
+							<p>
+                            <a class="btn" href="#ams/c/{{subcol.id}}">Details</a>
+							</p>
+						</div>
+					</div>
+                </div>
+                <!----------------------------------------------------------------------------!>
+                <!----------------------------------------------------------------------------!>
+                <!----------------------------------------------------------------------------!>
+
+
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+</div>
+
+
+
+<script>
+    $(document).ready(function(){
+        $('#collectionAddButton').click(function(){
+            $('#collectionAddModal').modal('show');
+        });
+
+    });
+</script>

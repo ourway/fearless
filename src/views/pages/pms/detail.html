@@ -85,7 +85,6 @@ background-color: #FFEDA5;
 }
 
 .pmsmaindiv{
-    font-size:11px;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -117,6 +116,16 @@ border-bottom: 1px solid #57BEDD;
 
 <div class="container pmsmaindiv" ng-init="getProjectDetails()">
     <br/>
+	<div class="row clearfix" ng-cloak>
+			<ul class="breadcrumb">
+				<li>
+					<a href="#/pms">Projects</a> <span class="divider"></span>
+				</li>
+				<li class="active">
+				    {{project.name}}
+				</li>
+			</ul>
+    </div>
 	<div class="row clearfix" ng-cloak>
 
 
@@ -444,12 +453,7 @@ border-bottom: 1px solid #57BEDD;
 
 
     <div class="row clearfix" id="projectSummery">
-    <div class="row clearfix">
-        <div class="col-md-12 column">
-            <h4 style="display:inline">PROJECT: {{project.name}} </h4>
         <button id="editProjectButton" ng-click="updateProjectModalPrepare()" class="btn btn-default btn-sm" type="button"><em class="glyphicon glyphicon-pencil"></em> Edit</button>
-		</div>
-	</div>
 
     <div class="row clearfix">
         <div class="col-md-3 column" id="projectDescription">
@@ -505,7 +509,7 @@ border-bottom: 1px solid #57BEDD;
         <div class="col-md-9 column">
                         <h4>Project Assets</h4>
                         <div id="CollectionsDiv" >
-                            <a class="projectCollectionsA" href="#pms/{{project.id}}/collection/{{collection.id}}" ng-repeat="collection in project.collections track by $index" 
+                            <a class="projectCollectionsA" href="#/ams/c/{{collection.id}}" ng-repeat="collection in project.collections track by $index" 
                                 title="{{collection.name}}">{{collection.name}}</a>
                         </div>
                     <hr/>
@@ -578,7 +582,6 @@ border-bottom: 1px solid #57BEDD;
 
 <script>
     $(document).ready(function(){
-
         $('#taskAddButton').click(function(){
             $('#taskAddModal').modal('show');
         });
@@ -588,13 +591,7 @@ border-bottom: 1px solid #57BEDD;
         $('#editProjectButton').click(function(){
             $('#projectEditModal').modal('show');
         });
-
-
-
-
     });
-
-
 </script>
 
 

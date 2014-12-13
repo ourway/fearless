@@ -19,7 +19,7 @@ from cStringIO import StringIO
 import falcon
 from urllib import unquote
 import os
-from helpers import commit
+from helpers import commit, get_params
 from sys import stderr
 from os import path
 from tasks import add_asset
@@ -339,3 +339,47 @@ class ListAssets:
                     assetExtractedData[key] = keydata[0]
             results.append(assetExtractedData)
         resp.body = results
+
+
+class CollectionInfo:
+    def on_get(self, req, resp, collectionId):
+        target = session.query(Collection).filter(Collection.id==int(collectionId)).first()
+        if target:
+            data = dict()
+            data['name'] = target.name
+            data['id'] = target.id
+            data['path'] = target.path
+            data['description'] = target.description
+            data['repository'] = {'name':target.repository.name, 'id':target.repository.id}
+            data['project'] = {'name':target.repository.project.name, 'id':target.repository.project.id}
+            if target.parent:
+                data['parent'] = {'name':target.parent.name, 'id':target.parent.id, 'path':target.parent.path}
+            if target.children:
+                data['children'] = [{'name':i.name, 'id':i.id, 'path':i.path} for i in target.children]
+            resp.body = data
+
+class AddCollection:
+    @falcon.after(commit)
+    def on_put(self, req, resp):
+        data = get_params(req.stream, flat=False)
+        name = data.get('name')
+        repository_id = data.get('repository_id')
+        parent_id = data.get('parent_id')
+        template = data.get('template')
+        if name and repository_id:
+            newC = Collection(name=name, path=name, repository_id=repository_id)
+            if parent_id:
+                newC.parent_id = parent_id
+            if template:
+                newC.template = template
+
+            if not os.path.isdir(newC.url):
+                session.add(newC)
+                resp.body = {'message':'OK', 'info':'Collection created'}
+            else:
+                resp.body = {'message':'ERROR', 'info':'Collection is available on server'}
+        
+        
+
+
+        

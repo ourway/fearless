@@ -125,6 +125,10 @@ var TITLE = 'TITLE';
                 templateUrl: 'pages/auth/access.html',
                 controller: 'userAccessCtrl'
             })
+             .when('/ams/c/:collectionId', {
+                templateUrl: 'pages/ams/collection.html',
+                controller: 'collectionCtrl'
+            })
 
 	
     })
@@ -946,6 +950,39 @@ fearlessApp.controller('sequenceDetailCtrl', function($scope, $rootScope, $route
 
         });
 
+
+fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
+        $scope.collection = {};
+        $scope.newSubCollection = {};
+        ci = $routeParams.collectionId;
+
+        $scope.getCollectionDetails = function(){
+            req = $http.get('/api/collection/'+ci);
+            req.success(function(resp){
+                    $scope.collection = resp;
+                })
+        }
+
+        $scope.createNewSubCollection = function(){
+            $scope.newSubCollection.parent_id = $scope.collection.id;
+            $scope.newSubCollection.repository_id = $scope.collection.repository.id;
+            $scope.newSubCollection.template = $scope.collection.path;
+            req = $http.put('/api/collection/add', $scope.newSubCollection);
+            req.success(function(resp){
+                if (resp.message == 'OK'){
+                    $('#collectionAddModal').modal('hide');
+                    $scope.getCollectionDetails();
+                }
+                else{
+                    alert(resp.info);
+                }
+                
+                })
+        }
+
+
+
+        });
 //////////////////////////////////////////////////////
 
 $(document).ready(function(){
