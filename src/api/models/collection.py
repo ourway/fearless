@@ -62,9 +62,11 @@ class Collection(IDMixin, Base):
     @validates('parent_id')
     def update_path(self, key, data):
         parent = session.query(Collection).filter_by(id=data).first()
-        if parent:
+        if parent and parent.path not in self.path:
             newpath = os.path.join(parent.path, self.path)
+            print self.path, parent.path
             self.path = newpath
+            print self.path
         return data
 
     @validates('repository_id')
@@ -76,7 +78,7 @@ class Collection(IDMixin, Base):
 
     @validates('path')
     def check_path(self, key, data):
-        self.name = os.path.basename(data)
+        self.name = os.path.basename(data).title()
         if self.repository_id:
             repository = session.query(Repository).filter(Repository.id == self.repository_id).first()
             self.url = os.path.join(repository.path, data)
@@ -84,10 +86,11 @@ class Collection(IDMixin, Base):
 
     @hybrid_property
     def archive(self):
-        collection_path = os.path.join(
-            self.repository.path, self.path or '')
-        git = GIT('.', wt=collection_path)
-        return git.archive()
+        pass
+        #collection_path = os.path.join(
+        #    self.repository.path, self.path or '')
+        #git = GIT('.', wt=collection_path)
+        #return git.archive()
 
 
 
@@ -134,26 +137,26 @@ def AfterUserCreationFuncs(mapper, connection, target):
                         os.makedirs(newFolder)
                     except OSError:
                         pass
-                newCollectionName = os.path.basename(folder)
-                r = None
+                newCollectionName = os.path.basename(folder).title()
                 for part in folder.split('/'):
                     tn = folder.split('/').index(part)
                     tc = '_'.join(folder.split('/')[:tn+1])
-                    print 'tc:', tc
+                    partPath = os.path.join(repository.path, target.path,  tc.replace('_', '/'))
+
                     if not generated.get(tc):
                         newCollection = Collection(name=newCollectionName, path=part, repository_id=repository.id)
-                    else:
-                        newCollection = generated.get(tc)
-                    if r:
-                        tcm = '_'.join(folder.split('/')[:tn])
-                        print 'tcm:', tcm
-                        newCollection.parent = generated.get(tcm)
-                    else:
-                        newCollection.parent_id = target.id
+                        if tn:
+                            tcm = '_'.join(folder.split('/')[:tn])
+                            newCollection.parent = generated.get(tcm)
+                        else:
+                            newCollection.parent_id = target.id
+                        generated[tc] = newCollection
+                        tdest = os.path.join(partPath, 'thumb.png')
+                        tsrc = os.path.join(os.path.dirname(__file__), '../templates/%s.png' % part.lower())
+                        if os.path.isfile(tsrc):
+                            shutil.copyfile(tsrc, tdest)
+                        session.add(newCollection)
 
-                    r = newCollection
-                    generated[tc] = newCollection
-                    session.add(newCollection)
 
 
         if collection.get('copy'):
@@ -162,46 +165,47 @@ def AfterUserCreationFuncs(mapper, connection, target):
                             os.path.dirname(__file__), '../templates/%s' % collection.get('copy')[c])
                 dest = os.path.join(
                     repository.path, target.path or repository.path, c)
-                if os.path.isfile(src):
 
+
+                if os.path.isfile(src):
                     shutil.copyfile(src, dest)
 
 
-        if collection.get('files'):
-            for each in collection.get('files'):
-                newFile = os.path.join(
-                    repository.path, target.path or repository.path, each)
-                if not os.path.isfile(newFile):
-                    with open(newFile, 'w') as f:
-                        tempname = collection.get('files').get(each)
-                        templateFile = os.path.join(
-                            os.path.dirname(__file__), '../templates/%s' % tempname)
-                        if os.path.isfile(templateFile):
-                            template = Template(filename=templateFile)
-                            f.write(template.render(reponame=repository.name, project=repository.project.name,
-                                                    id=target.id, collection=target.name))
+#        if collection.get('files'):
+#            for each in collection.get('files'):
+#                newFile = os.path.join(
+#                    repository.path, target.path or repository.path, each)
+#                if not os.path.isfile(newFile):
+#                    with open(newFile, 'w') as f:
+#                        tempname = collection.get('files').get(each)
+#                        templateFile = os.path.join(
+#                            os.path.dirname(__file__), '../templates/%s' % tempname)
+#                        if os.path.isfile(templateFile):
+#                            template = Template(filename=templateFile)
+#                            f.write(template.render(reponame=repository.name, project=repository.project.name,
+#                                                    id=target.id, collection=target.name.decode('utf-8')))
 
     
-        message = 'Added: files to collection:*%s* of repo:*%s*' % (
-            target.name, repository.name)
-
-        if collection.get('ignore'):
-            for each in collection.get('ignore'):
-                with open(os.path.join(repository.path, target.path or repository.path ,
-                                       '.gitignore'), 'a+') as gitignore:
-                    gitignore.writelines(each + '\n')
-
-        collection_git = GIT(
-            '.', wt=os.path.join(repository.path, target.path or repository.path))
-        collection_git.add(message)
-        #collection_git.tag('start')
-
-        '''Add these collection folders to main repo gitignore.'''
-        with open(os.path.join(repository.path, '.gitignore'), 'a+') as repoignore:
-            if target.path:
-                repoignore.write('%s/\n' % (target.path))
-            else:
-                repoignore.write('/')
+#        message = 'Added: files to collection:*%s* of repo:*%s*' % (
+#            target.name, repository.name)
+#
+#        if collection.get('ignore'):
+#            for each in collection.get('ignore'):
+#                with open(os.path.join(repository.path, target.path or repository.path ,
+#                                       '.gitignore'), 'a+') as gitignore:
+#                    gitignore.writelines(each + '\n')
+#
+#        collection_git = GIT(
+#            '.', wt=os.path.join(repository.path, target.path or repository.path))
+#        collection_git.add(message)
+#        #collection_git.tag('start')
+#
+#        '''Add these collection folders to main repo gitignore.'''
+#        with open(os.path.join(repository.path, '.gitignore'), 'a+') as repoignore:
+#            if target.path:
+#                repoignore.write('%s/\n' % (target.path))
+#            else:
+#                repoignore.write('/')
         #repo_git = GIT('.', wt=os.path.join(self.path))
 
     session.commit()

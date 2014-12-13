@@ -88,6 +88,9 @@
             "art/modelsheet": [""],
             "art/design": [""],
         },
+        "copy": {
+            "thumb.png": "props_thumb.png"
+        },
         "files": {
             "README.txt": "readme.txt",
             "Characters.txt": "characters_guideline.txt"
@@ -124,6 +127,9 @@
             "art/colorkey": [""],
             "art/modelsheet": [""],
             "art/design": [""],
+        },
+        "copy": {
+            "thumb.png": "sets_thumb.png"
         },
         "files": {
             "README.txt": "readme.txt",

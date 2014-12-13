@@ -15,7 +15,7 @@
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">New Item Name</label>
 					<div class="col-sm-6">
-                        <input type="text" class="form-control" placeholder="Enter number of new sequences" ng-model="newSubCollection.name" />
+                        <input type="text" class="form-control" placeholder="Enter item name here ..." ng-model="newSubCollection.name" />
 					</div>
 				</div>
 			</form>
@@ -80,11 +80,11 @@
 			<div class="row">
                 <!----------------------------------------------------------------------------!>
                 <!----------------------------------------------------------------------------!>
-				<div class="col-md-4" ng-repeat="subcol in collection.children track by $index">
+				<div class="col-md-2" ng-repeat="subcol in collection.children track by $index">
 					<div class="thumbnail">
-                        <img alt="300x200" ng-src="/static/{{collection.project.name}}/{{subcol.path}}/thumb.png" />
+                        <img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.project.name}}/{{subcol.path}}/thumb.png" />
 						<div class="caption">
-							<h3>{{subcol.name}}</h3>
+							<h4>{{subcol.name}}</h4>
 							<p>{{subcol.description}}</p>
 							<p>
                             <a class="btn" href="#ams/c/{{subcol.id}}">Details</a>

@@ -84,9 +84,9 @@ class Asset(IDMixin, Base):
 
     @validates('version')
     def commit(self, key, data):
-        wt = os.path.join(self.collection.repository.path, self.collection.path)
-        git = GIT(self.full_path, wt=wt)
-        git.add(self.name, version=data)
+        #wt = os.path.join(self.collection.repository.path, self.collection.path)
+        #git = GIT(self.full_path, wt=wt)
+        #git.add(self.name, version=data)
         return data
 
     @hybrid_property
