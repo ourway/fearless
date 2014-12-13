@@ -51,6 +51,8 @@ class Collection(IDMixin, Base):
         Integer, ForeignKey('repository.id'), nullable=False)
     assets = relationship('Asset', backref='collection')
 
+
+
     @validates('schema')
     def load_json(self, key, schema):
         try:
@@ -107,7 +109,7 @@ def AfterUserCreationFuncs(mapper, connection, target):
         collection_path = os.path.join(repository.path, target.path)
         if not os.path.isdir(collection_path):
             os.makedirs(collection_path)
-        thmb =  os.path.join( os.path.dirname(__file__), '../templates/asset_thumb.png')
+        thmb =  os.path.join( os.path.dirname(__file__), '../templates/icons/asset_thumb.png')
         dest = os.path.join(collection_path, 'thumb.png')
         if not os.path.isfile(dest):
             shutil.copyfile(thmb, dest)
@@ -137,9 +139,10 @@ def AfterUserCreationFuncs(mapper, connection, target):
                         pass
                 newCollectionName = os.path.basename(folder).title()
                 for part in folder.split('/'):
+                    part = part.strip()
                     tn = folder.split('/').index(part)
-                    tc = '_'.join(folder.split('/')[:tn+1])
-                    partPath = os.path.join(repository.path, target.path,  tc.replace('_', '/'))
+                    tc = '@'.join(folder.split('/')[:tn+1])
+                    partPath = os.path.join(repository.path, target.path,  tc.replace('@', '/'))
 
                     if not generated.get(tc):
                         newCollection = Collection(name=newCollectionName, path=part, repository_id=repository.id)
@@ -149,8 +152,11 @@ def AfterUserCreationFuncs(mapper, connection, target):
                         else:
                             newCollection.parent_id = target.id
                         generated[tc] = newCollection
+                        print part
+                        if 'seq_' in part.lower():
+                            part = 'sequence'
                         tdest = os.path.join(partPath, 'thumb.png')
-                        tsrc = os.path.join(os.path.dirname(__file__), '../templates/%s.png' % part.lower())
+                        tsrc = os.path.join(os.path.dirname(__file__), '../templates/icons/%s.png' % part.lower())
                         if os.path.isfile(tsrc):
                             shutil.copyfile(tsrc, tdest)
                         session.add(newCollection)

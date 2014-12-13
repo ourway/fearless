@@ -375,7 +375,7 @@ class AddCollection:
         name = data.get('name')
         repository_id = data.get('repository_id')
         parent_id = data.get('parent_id')
-        template = data.get('template')
+        template = data.get('template').lower()
         if name and repository_id:
             newC = Collection(name=name, path=name, repository_id=repository_id)
             if parent_id:

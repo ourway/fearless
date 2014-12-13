@@ -25,7 +25,7 @@ from mixin import IDMixin, Base
 
 
 
-shot_scene = Table("shot_scene", Base.metadata,
+shots_scenes = Table("shots_scenes", Base.metadata,
                    Column('id', Integer, primary_key=True),
                    Column(
                        "shot_id", Integer, ForeignKey("shot.id"), primary_key=True),
@@ -46,6 +46,9 @@ class Shot(IDMixin, Base):
     code = Column(String(64), nullable=False)  # SHOO1
     timerate = Column(Integer, default=1)
     project_id = Column(Integer, ForeignKey("project.id"))
+    collection_id = Column(Integer, ForeignKey("collection.id"))
+    collection = relationship("Collection", backref='shots')
+    scenes = relationship("Scene", backref='shots', secondary="shots_scenes")
 
     @validates('number')
     def _assign_name_code(self, key, data):

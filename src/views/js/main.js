@@ -563,6 +563,7 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
 
 
 fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
+        $scope.$parent.page = 'auth';
         $scope.getUsers = function(){
             $http.get('/api/db/user').success(function(resp){
                     $scope.users = resp;
@@ -592,6 +593,7 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
         })
 
 fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
+        $scope.$parent.page = 'pms';
             progressChartOptions = {
                 segmentShowStroke : false,
                 segmentStrokeColor : "#ccc",
@@ -669,8 +671,14 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 }
             if (mode=='cal')
                 return null;
+            else
+            {
+                data = 'No data available yet!'
+                if (!$scope.tasks)
+                    data = ''
+                $('#projectDetailDiv').html(data);
 
-            //$('#calendar').fullCalendar('destroy');
+            }
             $scope.mode=mode;
             $('.tj_table_frame').fadeOut(2000);
             data = localStorage.getItem(getprefix +  mode);
@@ -951,6 +959,7 @@ fearlessApp.controller('sequenceDetailCtrl', function($scope, $rootScope, $route
 
 
 fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
+        $scope.$parent.page = 'ams';
         $scope.collection = {};
         $scope.newSubCollection = {};
         ci = $routeParams.collectionId;
@@ -965,7 +974,8 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         $scope.createNewSubCollection = function(){
             $scope.newSubCollection.parent_id = $scope.collection.id;
             $scope.newSubCollection.repository_id = $scope.collection.repository.id;
-            $scope.newSubCollection.template = $scope.collection.path;
+            tarray = $scope.collection.path.split('/');
+            $scope.newSubCollection.template = tarray[tarray.length-1];
             req = $http.put('/api/collection/add', $scope.newSubCollection);
             req.success(function(resp){
                 if (resp.message == 'OK'){

@@ -36,7 +36,9 @@ class Sequence(IDMixin, Base):
     code = Column(String(64), nullable=False)  # SEQ1
     note = Column(String(512))  ## task note
     project_id = Column(Integer, ForeignKey("project.id"))
-    shots = relationship( 'Sequence', backref='sequences', 
+    collection_id = Column(Integer, ForeignKey("collection.id"))
+    collection = relationship("Collection", backref='sequence')
+    shots = relationship( 'Shot', backref='sequences', 
                 secondary='shots_sequences')
 
 

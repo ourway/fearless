@@ -20,7 +20,8 @@
         "folders": {
             "scripts": ["nk"],
             "images": ["exr", "png", "tga", "jpg", "tiff"],
-            "output": ["exr", "png"]
+            "output": ["exr", "png"],
+            "data": [""],
         },
         "files": {
             "README.txt": "readme.txt",
@@ -46,9 +47,9 @@
             "textures/8k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
             "renderman/data": [""],
             "renderman/rib": ["rib"],
-            "slim/palettes ": ["palette"],
-            "slim/sessions ": [""],
-            "slim/shaders ": ["sl", "slo"],
+            "slim/palettes": ["palette"],
+            "slim/sessions": [""],
+            "slim/shaders": ["sl", "slo"],
             "art/concept": [""],
             "art/colorkey": [""],
             "art/modelsheet": [""],
@@ -59,7 +60,34 @@
             "Characters.txt": "characters_guideline.txt"
         },
         "copy": {
-            "thumb.png": "chars_thumb.png"
+            "thumb.png": "icons/chars.png"
+        },
+        "ignore": []
+    },
+    "seq_chars": {
+        "folders": {
+            "maya/scenes/model": ["ma", "mb"],
+            "maya/scenes/rig": ["ma", "mb"],
+            "maya/scenes/dynamics": ["ma", "mb"],
+            "maya/scenes/shader": ["ma", "mb"],
+            "maya/scenes/light": ["ma", "mb"],
+            "textures/128": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/256": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/512": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/1k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/2k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/4k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/8k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "slim/palettes": ["palette"],
+            "slim/sessions": [""],
+            "slim/shaders": ["sl", "slo"],
+        },
+        "files": {
+            "README.txt": "readme.txt",
+            "Characters.txt": "characters_guideline.txt"
+        },
+        "copy": {
+            "thumb.png": "icons/chars.png"
         },
         "ignore": []
     },
@@ -80,16 +108,43 @@
             "textures/8k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
             "renderman/data": [""],
             "renderman/rib": ["rib"],
-            "slim/palettes ": ["palette"],
-            "slim/sessions ": [""],
-            "slim/shaders ": ["sl", "slo"],
+            "slim/palettes": ["palette"],
+            "slim/sessions": [""],
+            "slim/shaders": ["sl", "slo"],
             "art/concept": [""],
             "art/colorkey": [""],
             "art/modelsheet": [""],
             "art/design": [""],
         },
         "copy": {
-            "thumb.png": "props_thumb.png"
+            "thumb.png": "icons/props.png"
+        },
+        "files": {
+            "README.txt": "readme.txt",
+            "Characters.txt": "characters_guideline.txt"
+        },
+        "ignore": []
+    },
+    "seq_props": {
+        "folders": {
+            "maya/scenes/model": ["ma", "mb"],
+            "maya/scenes/rig": ["ma", "mb"],
+            "maya/scenes/dynamics": ["ma", "mb"],
+            "maya/scenes/shader": ["ma", "mb"],
+            "maya/scenes/light": ["ma", "mb"],
+            "textures/128": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/256": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/512": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/1k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/2k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/4k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/8k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "slim/palettes": ["palette"],
+            "slim/sessions": [""],
+            "slim/shaders": ["sl", "slo"],
+        },
+        "copy": {
+            "thumb.png": "icons/props.png"
         },
         "files": {
             "README.txt": "readme.txt",
@@ -115,9 +170,9 @@
             "textures/8k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
             "renderman/data": [""],
             "renderman/rib": ["rib"],
-            "slim/palettes ": ["palette"],
-            "slim/sessions ": [""],
-            "slim/shaders ": ["sl", "slo"],
+            "slim/palettes": ["palette"],
+            "slim/sessions": [""],
+            "slim/shaders": ["sl", "slo"],
             "vfx/houdini": ["hip", "hipc"],
             "vfx/houdini/geo": ["obj"],
             "vfx/houdini/cache": ["bgeo.gz"],
@@ -129,7 +184,7 @@
             "art/design": [""],
         },
         "copy": {
-            "thumb.png": "sets_thumb.png"
+            "thumb.png": "icons/sets.png"
         },
         "files": {
             "README.txt": "readme.txt",
@@ -137,7 +192,86 @@
         },
         "ignore": []
     },
+    "seq_sets": {
+        "folders": {
+            "maya/scenes/model": ["ma", "mb"],
+            "maya/scenes/rig": ["ma", "mb"],
+            "maya/scenes/dynamics": ["ma", "mb"],
+            "maya/scenes/shader": ["ma", "mb"],
+            "maya/scenes/light": ["ma", "mb"],
+            "textures/128": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/256": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/512": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/1k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/2k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/4k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/8k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "slim/palettes": ["palette"],
+            "slim/sessions": [""],
+            "slim/shaders": ["sl", "slo"],
+            "vfx/houdini": ["hip", "hipc"],
+            "vfx/houdini/geo": ["obj"],
+            "vfx/houdini/cache": ["bgeo.gz"],
+            "vfx/realflow": [""],
+            "vfx/nayad": [""],
+        },
+        "copy": {
+            "thumb.png": "icons/sets.png"
+        },
+        "files": {
+            "README.txt": "readme.txt",
+            "Characters.txt": "characters_guideline.txt"
+        },
+        "ignore": []
+    },
+    "sequences": {
+        "folders": {
 
-
+            "art/storyboard": [""],
+            "art/storyreel": [""],
+            "seq_chars": [""],
+            "seq_props": [""],
+            "seq_sets": [""],
+            "shots": [""],
+        },
+        "copy": {
+            "thumb.png": "icons/sequences.png"
+        },
+        "files": {
+            "README.txt": "readme.txt",
+            "sequence.txt": "sequences_guideline.txt"
+        },
+        "ignore": []
+    },
+    "shots": {
+        "folders": {
+            "maya/scenes/layout": ["ma", "mb"],
+            "maya/scenes/animate": ["ma", "mb"],
+            "maya/scenes/dynamics": ["ma", "mb"],
+            "maya/scenes/render": ["ma", "mb"],
+            "maya/scenes/light": ["ma", "mb"],
+            "maya/data": ["ma", "mb"],
+            "maya/cache": ["ma", "mb"],
+            "maya/sound": ["ma", "mb"],
+            "maya/images": ["ma", "mb"],
+            "maya/movies": ["ma", "mb"],
+            "maya/renderData": ["ma", "mb"],
+            "renderman": [""],
+            "slim": [""],
+            "vfx": [""],
+            "nuke/images": [""],
+            "nuke/data": [""],
+            "nuke/script": [""],
+            "nuke/output": [""],
+        },
+        "copy": {
+            "thumb.png": "icons/sequences.png"
+        },
+        "files": {
+            "README.txt": "readme.txt",
+            "sequence.txt": "sequences_guideline.txt"
+        },
+        "ignore": []
+    }
 }
 
