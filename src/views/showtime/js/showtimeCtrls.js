@@ -136,9 +136,6 @@ $scope.$watch(function(){return $location.$$path},
                             window.location = '/app/#/auth/login/' + btoa('showtime');
                             })
                     req.success(function(assetInfo){
-                            console.log(assetInfo);
-
-
                         if (assetInfo.url) {
                             JSZipUtils.getBinaryContent(assetInfo.url + '?rn=' + makeid(), function (err, data) {
                                 if (err) {

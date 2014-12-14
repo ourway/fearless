@@ -19,6 +19,7 @@ from cStringIO import StringIO
 import falcon
 from urllib import unquote
 import os
+import cgi
 from helpers import commit, get_params
 from sys import stderr
 from os import path
@@ -51,7 +52,6 @@ class AssetSave:
         '''Get data based on a file object or b64 data, save and commit it'''
         userInfo = getUserInfoFromSession(req)
         uploader = userInfo.get('alias')
-
         targetRepo = session.query(Repository).filter(
             Repository.name == repo).first()
 
@@ -70,37 +70,51 @@ class AssetSave:
             else:
                 targetRepo = pr
 
-        _collection = req.get_param('collection')
-
-        if not _collection:
-            _collection = 'danger'
-        collection = session.query(Collection).filter(Collection.repository==targetRepo)\
-                        .filter(Collection.path==_collection).first()
+        _cid = req.get_param('collection_id')
+        if _cid:
+            collection = session.query(Collection).filter_by(repository=targetRepo)\
+                            .filter_by(id=_cid).first()
+        _cname = req.get_param('collection')
+        if _cname:
+            collection = session.query(Collection).filter_by(repository=targetRepo)\
+                            .filter_by(name=_cname).first()
         if not collection:
-            collection = Collection(path=_collection, repository=targetRepo)
+            collection = Collection(path='danger', repository=targetRepo)
             session.add(collection)
 
 
         
         body = req.stream
+
         b64 = req.get_param('b64')
+        mt = req.get_param('multipart')
+        mtname = None
+        if mt:
+            fs = cgi.FieldStorage(fp=req.stream, environ=req.env)
+            body = fs['file'].file
+            mtname = fs['file'].filename
+
+
         thumbnail = req.get_param('thmb')
         attach_to = req.get_param('attach_to')
         if targetRepo and body:
-            name = req.get_param('name') or 'undefined.%s.raw' % _generate_id()
+            if not mtname:
+                name = req.get_param('name') or 'undefined.%s.raw' % _generate_id()
+            else:
+                name = mtname
             assetExt = name.split('.')[-1]
             content_type = contenttype(name)
-            assetPath = content_type.split(';')[0].replace('x-', '') or ''
+            assetPath = name
             tempraryStoragePath = path.join(targetRepo.path, collection.path,
-                                            assetPath, name)
+                                            name)
 
             name, bodyMd5 = safeCopyAndMd5(body, tempraryStoragePath, b64=b64)
             asset = session.query(Asset).filter(
-                Asset.repository == targetRepo).filter(Asset.collection == collection)\
-                        .filter(Asset.key==bodyMd5).first()
+                Asset.repository == targetRepo).filter_by(collection=collection)\
+                        .filter_by(key=bodyMd5).first()
             if not asset:
                 asset = Asset(key=bodyMd5, repository=targetRepo,
-                              collection=collection, name=name,
+                              collection=collection, name=name[-16:],
                               path=assetPath, ext=assetExt, owner=targetUser)
                 session.add(asset)
             else:
@@ -345,8 +359,11 @@ class CollectionInfo:
     def on_get(self, req, resp, collectionId):
         target = session.query(Collection).filter(Collection.id==int(collectionId)).first()
         if target:
+            assets = session.query(Asset).filter_by(collection=target).all()
             data = dict()
             data['name'] = target.name
+            data['assets'] = [{'id':i.id, 'name':i.name, 'url':i.url, 
+                               'description':i.description, 'content_type':i.content_type.split('/')[0]} for i in assets]
             data['id'] = target.id
             data['container'] = target.container
             data['holdAssets'] = target.holdAssets
@@ -363,7 +380,6 @@ class CollectionInfo:
                     _t = _t.parent
                 else:
                     break
-
             if target.children:
                 data['children'] = [{'name':i.name, 'id':i.id, 'path':i.path,
                                      'children':[{'name':c1.name, 'id':c1.id, 'path':c1.path, } for c1 in i.children]

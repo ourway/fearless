@@ -79,7 +79,7 @@ class Asset(IDMixin, Base):
     def check_file(self, key, collection_id):
         if not os.path.isfile(self.full_path):
             raise ValueError(
-                'Asset %s:* %s * is not available on Storage!' % (self.key, self.full_path))
+                'Asset %s: *%s* is not available on Storage!' % (self.key, self.full_path))
         return collection_id
 
     @validates('version')
@@ -97,11 +97,11 @@ class Asset(IDMixin, Base):
             ext = '.' + self.ext
         result = os.path.join(self.collection.repository.path,
                             self.collection.path,
-                            self.path or '', self.name)
+                            self.path)
 
         return result
 
     @property
     def url(self):
         return os.path.join(os.path.basename(self.collection.repository.path),
-                            self.collection.path, self.path or '', self.name)
+                            self.collection.path, self.path)

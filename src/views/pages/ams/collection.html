@@ -74,7 +74,9 @@
 			</ul>
         </div>
 
+            
 			<div class="btn-group" ng-show="collection.container">
+
                 <button id="collectionAddButton" class="btn btn-success btn-sm" type="button">
                     <em class="glyphicon glyphicon-plus"></em>
                     <em class="glyphicon glyphicon-folder-open"></em>
@@ -87,16 +89,16 @@
 
 
 	<div class="row clearfix">
-		<div class="col-md-12 column">
+        <div ng-class="{'column':true, 'col-md-7':collection.holdAssets, 'col-md-12':!collection.holdAssets}">
 			<div class="row">
                 <!----------------------------------------------------------------------------!>
                 <!----------------------------------------------------------------------------!>
-				<div class="col-md-2" ng-repeat="subcol in collection.children track by $index">
+                <div ng-class="{'col-md-3':collection.holdAssets, 'col-md-2':!collection.holdAssets}" ng-repeat="subcol in collection.children track by $index">
 					<div class="thumbnail">
                         <a href="#ams/c/{{subcol.id}}" title="{{subcol.description}}"
                         ><img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
 						<div class="caption">
-                            <h5><a href="#ams/c/{{subcol.id}}" style="color:#333;font-family: monospace">{{subcol.name}}</a></h5>
+                            <h5><a href="#ams/c/{{subcol.id}}" style="color:#333">{{subcol.name}}</a></h5>
 							<p>
 							</p>
 						</div>
@@ -105,10 +107,34 @@
                 <!----------------------------------------------------------------------------!>
                 <!----------------------------------------------------------------------------!>
                 <!----------------------------------------------------------------------------!>
-
-
+			</div>
+            <hr/>
+			<div class="row" id="ams_assets">
+                <div class="col-md-3" ng-repeat="asset in collection.assets track by $index">
+					<div class="thumbnail">
+                        <a href="/static/{{asset.url}}" title="{{asset.description}}"
+                            ><img 
+                            ng-if="asset.content_type=='image'"
+                            class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{asset.url}}" /></a>
+						<div class="caption">
+                            <a ng-if="asset.content_type!='image'" href="/static/{{asset.url}}"><button><em class="glyphicon glyphicon-download-alt"></em></button></a>
+                           
+                            <h5><a href="#ams/a/{{asset.id}}" style="color:#333">{{asset.name}}</a></h5>
+							<p>
+							</p>
+						</div>
+                </div>                
+            </div>
+                
+                
 			</div>
 		</div>
+
+        <div class="col-md-5 column" ng-show="collection.holdAssets">
+            <form id="my-awesome-dropzone" action="/target" class="dropzone">
+            
+            </form>
+        </div>
 	</div>
 
 
@@ -124,6 +150,8 @@
         $('#collectionAddButton').click(function(){
             $('#collectionAddModal').modal('show');
         });
+
+
 
     });
 </script>

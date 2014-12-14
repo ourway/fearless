@@ -20,6 +20,16 @@ function pad(num, size) {
     return s;
 }
 
+var convertDataURL2binaryArray = function(dataURL){
+
+    var blobBin = atob(dataURL.split(',')[1]);
+    var array = [];
+    for(var i = 0; i < blobBin.length; i++) {
+        array.push(blobBin.charCodeAt(i));
+    }
+    return new Uint8Array(array)
+}
+
 
 function timeConverter(UNIX_timestamp, mode){
     if (UNIX_timestamp)
@@ -959,6 +969,10 @@ fearlessApp.controller('sequenceDetailCtrl', function($scope, $rootScope, $route
 
 
 fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
+
+
+
+
         $scope.$parent.page = 'ams';
         $scope.collection = {};
         $scope.newSubCollection = {};
@@ -968,6 +982,21 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             req = $http.get('/api/collection/'+ci);
             req.success(function(resp){
                     $scope.collection = resp;
+                    $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+"&multipart=true";
+                    new Dropzone("#my-awesome-dropzone", { 
+                        init: function() {
+                            this.on("addedfile", function(file) {
+                                console.log("Added file."); 
+                                });
+                        },
+                        url: $scope.attachurl,
+                        //autoProcessQueue: false,
+                        method:'PUT',
+                        parallelUploads: 1,
+                        maxFileSize: 500,
+                        maxThumbnailFilesize: 100,
+                        uploadMultiple:false,
+                    });
                 })
         }
 
@@ -988,6 +1017,10 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                 
                 })
         }
+
+
+
+
 
 
 

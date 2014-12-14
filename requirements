@@ -30,3 +30,4 @@ passlib
 pillow
 qrcode
 mako
+python-multipart

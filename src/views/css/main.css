@@ -240,10 +240,14 @@ opacity:0.9;
 }
 
 .asm_col_thumb_img:hover {
-border: 1px dotted #333;
 opacity: 1;
-transform: scale(1.05,1.05);
-box-shadow: 1px 1px 97px #D8D8D8;
+transform: scale(1.1,1.1);
+}
+
+#ams_assets{
+background:#F1FFE0;
+padding:10px;
+border-radius:5px;
 }
 
 

@@ -900,7 +900,7 @@ function showtime() {
                 frame = hCanvas.toDataURL('image/webp');
                 if (frame == lastframe)
                 {
-                    sourceVid.currentTime = sourceVid.currentTime + 1/60;
+                    sourceVid.currentTime = sourceVid.currentTime + 1/50;
                     return null;
                 }
 
@@ -930,7 +930,7 @@ function showtime() {
                 count +=1;
                 if (!sourceVid.ended)
                     {
-                    sourceVid.currentTime = sourceVid.currentTime + 1/60;
+                    sourceVid.currentTime = sourceVid.currentTime + 1/50;
                     }
             return frame;
             };
