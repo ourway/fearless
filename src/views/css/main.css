@@ -236,18 +236,30 @@ padding: 7px;
 
 .asm_col_thumb_img{
 border:1px solid #fff;
-opacity:0.9;
+opacity:0.75;
 }
 
 .asm_col_thumb_img:hover {
 opacity: 1;
-transform: scale(1.1,1.1);
+transform: scale(1.025,1.025);
 }
 
 #ams_assets{
-background:#F1FFE0;
+background:#F7F7F7;
 padding:10px;
 border-radius:5px;
+border: 2px solid #ccc;
+box-shadow: inset 0px 0px 35px #9B9B9B;
+}
+.asm_thumb{
+box-shadow: 1px 1px 4px rgba(0,0,0,0.16);
+height:200px;
+
+
+}
+.asm_thumb:hover {
+transform: scale(1.1,1.1);
+transform: rotate(30);
 }
 
 

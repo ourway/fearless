@@ -114,7 +114,7 @@ class AssetSave:
                         .filter_by(key=bodyMd5).first()
             if not asset:
                 asset = Asset(key=bodyMd5, repository=targetRepo,
-                              collection=collection, name=name[-16:],
+                              collection=collection, name=name[-20:].replace('_', ' '), fullname=name,
                               path=assetPath, ext=assetExt, owner=targetUser)
                 session.add(asset)
             else:
@@ -123,7 +123,9 @@ class AssetSave:
             # Asset descriptions
             if req.get_param('description'):
                 asset.description = req.get_param('description')
-
+            
+            asset.name = name[-20:].replace('_', ' ')
+            asset.fullname = name
 
             asset.key = bodyMd5
             if targetUser:
@@ -144,7 +146,8 @@ class AssetSave:
                 #newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
                 #asset.task_id = newAsset.task_id
             resp.body = {'message': 'Asset created|updated', 'key': asset.key,
-                         'url': asset.url, 'name':asset.name}
+                         'url': asset.url, 'fullname':asset.fullname,
+                         'name':asset.name, 'content_type':asset.content_type.split('/')[0]}
                 #resp.body = "I am working"
         else:  ## lets consume the stream!
             while True:
@@ -362,7 +365,7 @@ class CollectionInfo:
             assets = session.query(Asset).filter_by(collection=target).all()
             data = dict()
             data['name'] = target.name
-            data['assets'] = [{'id':i.id, 'name':i.name, 'url':i.url, 
+            data['assets'] = [{'id':i.id, 'name':i.name, 'url':i.url, 'fullname':i.fullname, 
                                'description':i.description, 'content_type':i.content_type.split('/')[0]} for i in assets]
             data['id'] = target.id
             data['container'] = target.container

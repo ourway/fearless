@@ -45,7 +45,8 @@ class Asset(IDMixin, Base):
     '''
     id = Column( Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     key = Column(String(32), nullable=False)
-    name = Column(String(128))
+    name = Column(String(64))
+    fullname = Column(String(256))
     description = Column(String(512))
     thumbnail = Column(Text())
     ext = Column(String(32))

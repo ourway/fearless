@@ -94,7 +94,7 @@
                 <!----------------------------------------------------------------------------!>
                 <!----------------------------------------------------------------------------!>
                 <div ng-class="{'col-md-3':collection.holdAssets, 'col-md-2':!collection.holdAssets}" ng-repeat="subcol in collection.children track by $index">
-					<div class="thumbnail">
+					<div class="thumbnail asm_thumb">
                         <a href="#ams/c/{{subcol.id}}" title="{{subcol.description}}"
                         ><img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
 						<div class="caption">
@@ -109,9 +109,10 @@
                 <!----------------------------------------------------------------------------!>
 			</div>
             <hr/>
+            <h3>Assets <small>({{collection.assets.length}})</small></h3>
 			<div class="row" id="ams_assets">
                 <div class="col-md-3" ng-repeat="asset in collection.assets track by $index">
-					<div class="thumbnail">
+					<div class="thumbnail asm_thumb">
                         <a href="/static/{{asset.url}}" title="{{asset.description}}"
                             ><img 
                             ng-if="asset.content_type=='image'"
@@ -119,7 +120,7 @@
 						<div class="caption">
                             <a ng-if="asset.content_type!='image'" href="/static/{{asset.url}}"><button><em class="glyphicon glyphicon-download-alt"></em></button></a>
                            
-                            <h5><a href="#ams/a/{{asset.id}}" style="color:#333">{{asset.name}}</a></h5>
+                            <h5><a title="{{asset.fullname}}" href="#ams/a/{{asset.id}}" style="color:#333">{{asset.name}}</a></h5>
 							<p>
 							</p>
 						</div>
@@ -130,7 +131,7 @@
 			</div>
 		</div>
 
-        <div class="col-md-5 column" ng-show="collection.holdAssets">
+        <div class="col-md-5 column" style="padding: 19px;" ng-show="collection.holdAssets">
             <form id="my-awesome-dropzone" action="/target" class="dropzone">
             
             </form>

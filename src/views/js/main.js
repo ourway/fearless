@@ -496,7 +496,7 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
         enablePinning: true,
         columnDefs: [
                     { field: "name", displayName : 'Project', width: 200,
-                    cellTemplate: '<div>  <a class="btn" href="#pms/{{row.entity.id}}"><span class="glyphicon glyphicon-folder-close"></span> {{row.entity.name}}</a></div>'
+cellTemplate: '<div>  <a style="position:absolute;margin:5px" href="#pms/{{row.entity.id}}"><span class="glyphicon glyphicon-folder-close"></span> {{row.entity.name}}</a></div>'
                     },
                     { field: "calculate_number_of_tasks", displayName : 'Tasks', enableFiltering: true, enableSorting:true, width:70,
                     
@@ -968,7 +968,7 @@ fearlessApp.controller('sequenceDetailCtrl', function($scope, $rootScope, $route
         });
 
 
-fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
+fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
 
 
 
@@ -983,10 +983,21 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             req.success(function(resp){
                     $scope.collection = resp;
                     $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+"&multipart=true";
-                    new Dropzone("#my-awesome-dropzone", { 
+                    if ($scope.dropzone)
+                        $scope.dropzone.destroy();
+                    $scope.dropzone = new Dropzone("#my-awesome-dropzone", { 
                         init: function() {
                             this.on("addedfile", function(file) {
                                 console.log("Added file."); 
+                                });
+                            this.on("complete", function(file) {
+                                $timeout(function(){
+                                    $scope.dropzone.removeFile(file);
+                                    }, 2000);
+                                });
+                            this.on("success", function(file, resp) {
+                                $scope.collection.assets.push(resp);
+                                $scope.$apply();
                                 });
                         },
                         url: $scope.attachurl,
