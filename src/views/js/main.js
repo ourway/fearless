@@ -993,6 +993,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                             this.on("complete", function(file) {
                                 $timeout(function(){
                                     $scope.dropzone.removeFile(file);
+                                    $scope.getCollectionDetails();
                                     }, 2000);
                                 });
                             this.on("success", function(file, resp) {
