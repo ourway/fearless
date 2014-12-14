@@ -976,6 +976,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
         $scope.$parent.page = 'ams';
         $scope.collection = {};
+        $scope.collection.assets = [];
         $scope.newSubCollection = {};
         ci = $routeParams.collectionId;
         Dropzone.autoDiscover = false;
