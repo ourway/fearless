@@ -5,7 +5,7 @@ module=app
 callable=app
 master=True
 vacuum=True
-enable-threads=False
+enable-threads=True
 offload-threads = 2
 gevent-monkey-patch = true
 

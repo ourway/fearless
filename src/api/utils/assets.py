@@ -33,6 +33,7 @@ from base64 import encode, decode, decodestring
 from models import Asset, Repository, Collection, es, session, User
 from AAA import getUserInfoFromSession
 from defaults import public_repository_path
+
 def _generate_id():
     return os.urandom(2).encode('hex') + hex(int(time.time() * 10))[5:]
 
@@ -102,6 +103,8 @@ class AssetSave:
                 name = req.get_param('name') or 'undefined.%s.raw' % _generate_id()
             else:
                 name = mtname
+
+            name = name.decode('utf-8')
             assetExt = name.split('.')[-1]
             content_type = contenttype(name)
             assetPath = name
@@ -147,7 +150,8 @@ class AssetSave:
                 #asset.task_id = newAsset.task_id
             resp.body = {'message': 'Asset created|updated', 'key': asset.key,
                          'url': asset.url, 'fullname':asset.fullname,
-                         'name':asset.name, 'content_type':asset.content_type.split('/')[0]}
+                         'name':asset.name, 'content_type':asset.content_type.split('/')[0],
+                         'datetime':time.time()}
                 #resp.body = "I am working"
         else:  ## lets consume the stream!
             while True:
@@ -170,7 +174,7 @@ def safeCopyAndMd5(fileobj, destinationPath, b64=False):
         ext = 'raw'
     checkPath(destDir)
     if path.isfile(destinationPath):
-        basename = 'C.' + basename
+        basename = _generate_id() + '_' + basename
         destinationPath = os.path.join(destDir, basename)
         #os.remove(destinationPath)
     f = open(destinationPath, 'wb')
@@ -190,6 +194,12 @@ def safeCopyAndMd5(fileobj, destinationPath, b64=False):
 
     f.close()
     dataMd5 = md5.hexdigest()
+    ## check if there is an asset with same key
+    availableAsset = session.query(Asset).filter_by(key=dataMd5).first()
+    if availableAsset:
+        os.remove(destinationPath) ## we dont need it anymore
+        os.symlink(availableAsset.full_path, destinationPath)
+        #print 'Symblink: %s generated' % destinationPath
 
     return (basename, dataMd5)
 
@@ -365,15 +375,16 @@ class CollectionInfo:
             assets = session.query(Asset).filter_by(collection=target).all()
             data = dict()
             data['name'] = target.name
-            data['assets'] = [{'id':i.id, 'name':i.name, 'url':i.url, 'fullname':i.fullname, 
-                               'description':i.description, 'content_type':i.content_type.split('/')[0]} for i in assets]
+            data['assets'] = [{'id':i.id, 'name':'-'.join(i.name.split('.')[:-1]).replace('_', '-'), 'url':i.url, 'fullname':i.fullname, 
+                               'description':i.description, 'content_type':i.content_type, 'datetime':i.modified_on} for i in assets]
             data['id'] = target.id
             data['container'] = target.container
             data['holdAssets'] = target.holdAssets
             data['path'] = target.path
             data['description'] = target.description
             data['repository'] = {'name':target.repository.name, 'id':target.repository.id}
-            data['project'] = {'name':target.repository.project.name, 'id':target.repository.project.id}
+            if target.repository and target.repository.project:
+                data['project'] = {'name':target.repository.project.name, 'id':target.repository.project.id}
             _t = target.parent
             d = data
             while True:

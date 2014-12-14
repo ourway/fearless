@@ -300,7 +300,8 @@ function updateImageSize(img, maxWidth, maxHeight){
         c = {};
         document.cookie.split('; ').forEach(function(e){key = e.split('=')[0];value=e.split('=')[1];c[key]=value});
         var userid = c.userid;
-        var groups = c.groups.split(',');
+        if (c.groups)
+            var groups = c.groups.split(',');
         $scope.isManager = false;
         $scope.isAdmin = false;
         $scope.isClient = false;
@@ -977,41 +978,52 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         $scope.collection = {};
         $scope.newSubCollection = {};
         ci = $routeParams.collectionId;
+        Dropzone.autoDiscover = false;
+        $scope.dropzone = new Dropzone("#my-awesome-dropzone", {
+            init: function() {
+                this.on("addedfile", function(file) {
+                    //console.log("Added file."); 
+                    });
+                this.on("complete", function(file) {
+                    $timeout(function(){
+                        $scope.dropzone.removeFile(file);
+
+                        }, 1000);
+                    });
+                this.on("success", function(file, resp) {
+                    $scope.collection.assets.push(resp);
+                    $scope.$apply();
+                    });
+                this.on("queuecomplete", function(file, resp) {
+                        console.log('all complete')
+                        $scope.getCollectionDetails();
+                        $scope.$apply();
+                    });
+                this.on("thumbnail", function(file, dataUrl) {
+                        //$scope.dropzone.options.url = 'ok';
+                        //$scope.$apply();
+
+                    });
+            },
+            url: 'NULL',
+            //autoDiscover: false,
+            //autoProcessQueue: false,
+            method:'PUT',
+            parallelUploads: 4,
+            maxFilesize: 8000,
+            maxThumbnailFilesize: 10,
+            uploadMultiple:false,
+        });
 
         $scope.getCollectionDetails = function(){
             req = $http.get('/api/collection/'+ci);
             req.success(function(resp){
                     $scope.collection = resp;
                     $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+"&multipart=true";
-                    if ($scope.dropzone)
-                        $scope.dropzone.destroy();
-                    $scope.dropzone = new Dropzone("#my-awesome-dropzone", { 
-                        init: function() {
-                            this.on("addedfile", function(file) {
-                                console.log("Added file."); 
-                                });
-                            this.on("complete", function(file) {
-                                $timeout(function(){
-                                    $scope.dropzone.removeFile(file);
-                                    $scope.getCollectionDetails();
-                                    }, 2000);
-                                });
-                            this.on("success", function(file, resp) {
-                                $scope.collection.assets.push(resp);
-                                $scope.$apply();
-                                });
-                        },
-                        url: $scope.attachurl,
-                        //autoProcessQueue: false,
-                        method:'PUT',
-                        parallelUploads: 1,
-                        maxFileSize: 500,
-                        maxThumbnailFilesize: 100,
-                        uploadMultiple:false,
-                    });
+                    $scope.dropzone.options.url = $scope.attachurl;
+
                 })
         }
-
         $scope.createNewSubCollection = function(){
             $scope.newSubCollection.parent_id = $scope.collection.id;
             $scope.newSubCollection.repository_id = $scope.collection.repository.id;
