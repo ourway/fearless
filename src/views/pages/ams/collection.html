@@ -125,14 +125,13 @@
                         <a href="/static/{{asset.url}}" title="{{asset.description}}"
                             ><img class="asm_col_thumb_img thumbnail"  ng-src="/static/{{asset.url}}" /></a>
                             </div>
-                        <div ng-init="activateVideo(asset.id)"
-                            ng-if="isVideo(asset)" >
-                        <A href="/static/{{asset.url}}"><video 
+                        <div ng-init="activateVideo(asset.id)" ng-if="isVideo(asset)">
+                        <video 
                              id="video_{{asset.id}}" class="video-js vjs-default-skin" controls preload="none" width="235"
                               data-setup="{}">
-                              <source ng-src="{{'/static/'+asset.url}}" type='{{asset.content_type}}' /></video></a>
-                            </div>
-						</div>
+                              <source ng-src="{{'/static/'+asset.url}}" type='{{asset.content_type}}' /></video>
+                        </div>
+					</div>
 
 
 
