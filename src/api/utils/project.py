@@ -280,6 +280,7 @@ class AddTask:
         #depend = session.query(Task).filter(Task.id==depends).first()
         #newTask.depends.append(depend)
         session.add(newTask)
+        resp.body = {'message':'OK'}
 
 
 class ListTasks:

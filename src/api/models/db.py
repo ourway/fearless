@@ -19,7 +19,8 @@ except OSError:
     pass
 
 msqldbname = 'fearless1'
-msql = 'mysql+mysqldb://root:rrferl@localhost/%s?charset=utf8&use_unicode=0' % msqldbname
+#msql = 'mysql+mysqldb://root:rrferl@localhost/%s?charset=utf8&use_unicode=1' % msqldbname
+msql = 'mysql+mysqldb://root:rrferl@localhost/%s' % msqldbname
 
 sqlite = 'sqlite:///%s' % db_path
 postgres = 'postgresql+psycopg2://user:password@/dbname'
@@ -28,7 +29,7 @@ DB = msql
 
 
 
-engine = create_engine(DB, echo=False, encoding='utf-8')
+engine = create_engine(DB, echo=False, convert_unicode=True)
 #engine.raw_connection().connection.text_factory = str
 Session = mptt_sessionmaker(sessionmaker(bind=engine))
 session = Session()

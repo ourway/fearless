@@ -178,8 +178,14 @@ class Task(IDMixin, Base, BaseNestedSets):
             return data
         else:
             return now()
+    
+    @validates('computed_start')
+    def _update_computed_start(self, key, data):
+        return convert_to_datetime(data)
 
-
+    @validates('computed_end')
+    def _update_computed_end(self, key, data):
+        return convert_to_datetime(data)
 
     @validates('effort')
     def _update_end(self, key, data):

@@ -637,6 +637,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             var progressPyChart = new Chart(ctx).Pie(progressData, progressChartOptions);
 
             $scope.projId = $routeParams.projId;
+            $scope.$watch($scope.projId, function(){
+                    $scope.getProjectDetails();
+                    })
             $scope.toTitleCase = toTitleCase;
             $rootScope.title = "Project " + $scope.projId + " - Fearless";
             $scope.timeConverter = timeConverter;
@@ -987,12 +990,34 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
         }
 
+        $scope.isImage = function(asset){
+            ct = asset.content_type;
+            ctM = ct.split('/')[0];
+            ctT = ct.split('/')[1];
+            if (ctM=='image'){
+                if (['png', 'jpeg', 'gif', 'webp', 'svg'].indexOf(ctT)>=0)
+                    return true;
+            }
+        }
+        $scope.isVideo = function(asset){
+            ct = asset.content_type;
+            ctM = ct.split('/')[0];
+            ctT = ct.split('/')[1];
+            if (ctM=='video'){
+                if (['mp4', 'ogg', 'mpeg', 'webm'].indexOf(ctT)>=0)
+                    return true;
+            }
+        }
+
 
         $scope.$parent.page = 'ams';
         $scope.collection = {};
         $scope.collection.assets = [];
         $scope.newSubCollection = {};
         ci = $routeParams.collectionId;
+        $scope.$watch(ci, function(){
+                $scope.getCollectionDetails();
+                })
         Dropzone.autoDiscover = false;
         $scope.dropzone = new Dropzone("#my-awesome-dropzone", {
             init: function() {

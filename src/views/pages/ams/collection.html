@@ -45,7 +45,7 @@
 
 
 
-<div class="container collectionDiv" ng-init="getCollectionDetails()">
+<div class="container collectionDiv">
     <br/>
     <div class="row clearfix" ng-cloak>
 		<div class="col-md-12 column">
@@ -102,6 +102,7 @@
             
             </form>
         </div>
+		</div>
 
 	<div class="row clearfix">
         <div ng-class="col-md-12">
@@ -120,14 +121,14 @@
                 <div class="col-sm-6 col-md-3" ng-repeat="asset in collection.assets | orderBy:'content_type'| orderBy:'datetime':reverse | filter:collection.CollectionAssetFilter track by $index">
 					<div class="thumbnail asm_thumb">
                         <div class="col-md-12 ">
-                            <div ng-if="asset.content_type.split('/')[0]=='image'"> 
+                            <div ng-if="isImage(asset)"> 
                         <a href="/static/{{asset.url}}" title="{{asset.description}}"
                             ><img class="asm_col_thumb_img thumbnail"  ng-src="/static/{{asset.url}}" /></a>
                             </div>
                         <div ng-init="activateVideo(asset.id)"
-                            ng-if="asset.content_type.split('/')[0]=='video'" >
+                            ng-if="isVideo(asset)" >
                         <A href="/static/{{asset.url}}"><video 
-                             id="video_{{asset.id}}" class="video-js vjs-default-skin" controls preload="none" width="235"
+                             id="video_{{asset.id}}" class="video-js vjs-default-skin" controls preload="metadata" width="235"
                               data-setup="{}">
                               <source ng-src="{{'/static/'+asset.url}}" type='{{asset.content_type}}' /></video></a>
                             </div>
@@ -137,9 +138,9 @@
 
                         <div class="caption" >
 
-                            <label ng-if="asset.content_type.split('/')[0]!='image'"  style="color:grey">{{asset.content_type.split('/')[1] | uppercase}}</label>
+                            <label ng-if="!isImage(asset)"  style="color:grey">{{asset.content_type.split('/')[1] | uppercase}}</label>
                     <br/>
-                    <A   ng-if="asset.content_type.split('/')[0]!='image' ||  asset.content_type.split('/')[0]!='video'"  href="/static/{{asset.url}}"><button id="collectionAddButton" class="btn btn-default btn-sm" type="button">
+                    <A   ng-if="!isImage(asset) ||  !isVideo(asset)"  href="/static/{{asset.url}}"><button id="collectionAddButton" class="btn btn-default btn-sm" type="button">
                         <em class="glyphicon glyphicon-download"></em>
                     </button></a>
                     <a title="{{asset.fullname}}" href="#ams/a/{{asset.id}}" style="color:#333"><small>{{asset.name}}</small></a> 
