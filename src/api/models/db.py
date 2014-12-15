@@ -20,7 +20,9 @@ except OSError:
 
 msqldbname = 'fearless1'
 msql = 'mysql+mysqldb://root:rrferl@localhost/%s?charset=utf8&use_unicode=0' % msqldbname
+
 sqlite = 'sqlite:///%s' % db_path
+postgres = 'postgresql+psycopg2://user:password@/dbname'
 
 DB = msql
 

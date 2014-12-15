@@ -6,8 +6,8 @@ callable=app
 master=True
 vacuum=True
 enable-threads=True
-offload-threads = 2
-gevent-monkey-patch = true
+#offload-threads = 2
+gevent-monkey-patch=True
 
 touch-reload=app.py
 touch-reload=model.py
@@ -20,18 +20,16 @@ touch-reload=utils/sequence.py
 touch-reload=utils/helpers.py
 
 
-
-
 harakiri=180
-cpu-affinity=1
-workers=8
+#cpu-affinity=2
+procceses=8
 #threads=20
-disable-logging=False
+disable-logging=True
 listen=128
-optimize=1
+optimize=2
 cache2=True,name=ctc_internal_cache,items=2000
-thunder-lock=False
-max-requests=256
+thunder-lock=True
+max-requests=1024
 #limit-as=256
 reload-mercy=8
 chmod-socket    = 666
@@ -40,4 +38,4 @@ chmod-socket    = 666
 socket={dir}/etc/fearless_api.socket
 #http=127.0.0.1:5002
 buffer-size=32768
-stats=/tmp/statsockt
+#stats=/tmp/statsockt

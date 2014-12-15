@@ -14,6 +14,10 @@ server {
         alias {dir}/src/views;    # your cache path
         gzip_vary on;
         gzip_http_version 1.1;
+        gzip_comp_level 4;
+        gzip_types text/plain video/mp4 video/webm image/png image/jpeg video/ogg image/gif text/css application/x-javascript;
+        expires 1h;
+        gzip             on;
         #expires max;
         add_header Cache-Control public;
         #error_page 404 /404;
@@ -24,7 +28,10 @@ server {
         alias {HOME}/.fearlessrepo;    # your cache path
         gzip_vary on;
         gzip_http_version 1.1;
+        gzip_comp_level 4;
+        gzip_types text/plain video/mp4 video/webm image/png image/jpeg video/ogg image/gif text/css application/x-javascript;
         expires 1h;
+        gzip             on;
         add_header Cache-Control public;
         #error_page 404 /404;
         #error_page 403 /403;
