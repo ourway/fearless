@@ -12,6 +12,7 @@ falcon
 riak
 pyinotify
 jsonschema
+MySQL-Python
 psycopg2
 lxml
 ipython

@@ -18,7 +18,15 @@ try:
 except OSError:
     pass
 
-engine = create_engine('sqlite:///%s' % db_path, echo=False, encoding='utf-8', poolclass=SingletonThreadPool)
+msqldbname = 'fearless1'
+msql = 'mysql+mysqldb://root:rrferl@localhost/%s?charset=utf8&use_unicode=0' % msqldbname
+sqlite = 'sqlite:///%s' % db_path
+
+DB = msql
+
+
+
+engine = create_engine(DB, echo=False, encoding='utf-8')
 #engine.raw_connection().connection.text_factory = str
 Session = mptt_sessionmaker(sessionmaker(bind=engine))
 session = Session()
