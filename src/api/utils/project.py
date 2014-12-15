@@ -160,11 +160,16 @@ class GetProjectLatestReport:
                             effort = d.get('effort')
                             effort_left = d.get('effort left')
                             effort_done = d.get('effort done')
+                            gauge = d.get('gauge')
 
                             if typ == 'task':
                                 target.start = start
+                                target.computed_start = start
+                                target.computed_end = end
                                 target.end = end
                             target.complete = complete
+                            target.computed_complete = complete
+                            target.gauge = gauge
                             target.effort = effort
                             target.effort_left = effort_left
                             target.effort_done = effort_done

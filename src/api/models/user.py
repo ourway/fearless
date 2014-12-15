@@ -15,7 +15,7 @@ Clean code is much better than Cleaner comments!
 import re
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
-from . import Group
+from . import Group, now
 from db import Session
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
@@ -48,6 +48,8 @@ class User(IDMixin, Base):
     firstname = Column(String(64), nullable=True)
     alias = Column(String(64), nullable=True)
     lastname = Column(String(64), nullable=True)
+    hasFrequentPayment = Column(Boolean(), default=True)
+    payment_type = Column(String(64), nullable=True, default='monthly') ## , manually. ..
     lastLogIn = Column(DateTime)
     age = Column(Integer)
     efficiency = Column(Float(precision=3), default=1.0)
@@ -59,16 +61,13 @@ class User(IDMixin, Base):
     active = Column(Boolean, default=False)
     rate = Column(Float(precision=3), default=20000)
     rep = relationship("Report", secondary=lambda: user_reports, backref='user')
+    agreement_id = Column(Integer, ForeignKey('document.id'))
+    agreement = relationship("Document", backref='related_to')
+    aggregated_start = Column(DateTime, nullable=False, default=now)
+    aggregated_end = Column(DateTime, nullable=False, default=now)
     reports = association_proxy('rep', 'id') # when we refer to reports, id will be returned.
     grps = relationship('Group', backref='users', secondary='users_groups')
     groups = association_proxy('grps', 'name')
-
-
-#    def __init__(self, **kwargs):
-#        print kwargs
-#        super(User, self).__init__(**kwargs)
-#        print self
-
 
     @validates('email')
     def _validate_email(self, key, data):
@@ -93,10 +92,19 @@ class User(IDMixin, Base):
     @hybrid_property
     def fullname(self):
         return (self.firstname or '<>') + " " + (self.lastname or '<>')
+
+    @hybrid_property
+    def finished_tasks(self):
+        'Not Implemented'
+        pass
+
+    @hybrid_property
+    def open_tasks(self):
+        'Not Implemented'
+        pass
     # group =
     #reports = Set("Report")
     #groups = Set("Group")
-
 
 def AfterUserCreationFuncs(mapper, connection, target):
     '''Some operations after getting ID'''

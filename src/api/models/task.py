@@ -68,13 +68,19 @@ class Task(IDMixin, Base, BaseNestedSets):
     project_id = Column(Integer, ForeignKey("project.id"), nullable=False)
     title = Column(String(64), nullable=False)
     note = Column(String(256))  ## task note
+    gauge = Column(String(64))  ## task note
     start = Column(DateTime, nullable=False, default=now)
+    computed_start = Column(DateTime)
+    computed_end = Column(DateTime)
     end = Column(DateTime, nullable=False)
     duration = Column(Float(precision=3), default=0)
     effort = Column(Float(precision=3), nullable=False, default=0)
     effort_left = Column(Float(precision=3), default=0)
     effort_done = Column(Float(precision=3), default=0)
     length = Column(Float(precision=3), default=0)
+    criticalness = Column(Float(precision=3), default=0)
+    onstart_charge = Column(Float(precision=3), default=0)
+    onend_charge = Column(Float(precision=3), default=0)
     milestone = Column(Boolean, default=False) # is task a milestone?
     parent_id = Column(Integer, ForeignKey("task.id"))
 
@@ -87,6 +93,7 @@ class Task(IDMixin, Base, BaseNestedSets):
         'User', backref='responsible_of', secondary='task_responsible')
     priority = Column(Integer, default=500)
     complete = Column(Integer, default=0)
+    computed_complete = Column(Integer, default=0)
     version = relationship('Version', backref='task')
     #task = relationship('Task', backref='parent')
     ######### GOLDEN SOLUSION : Nested tree  for task to task relations ######

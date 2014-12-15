@@ -23,7 +23,7 @@ usage:
 __all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
            'Repository', 'Project', 'now', 'Ticket', 'session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
-           'Page', 'Collection', 'r', 'es', 'Departement']
+           'Document', 'Account', 'Collection', 'r', 'es', 'Departement']
 
 import os
 
@@ -43,6 +43,8 @@ from db import session, engine, Base
 
 
 from models.group import Group
+from models.document import Document
+from models.account import Account
 from models.user import User
 from models.report import Report
 from models.role import Role
@@ -56,7 +58,6 @@ from models.sequence import Sequence
 from models.scene import Scene
 from models.tag import Tag
 from models.version import Version
-from models.page import Page
 from models.asset import Asset
 from models.collection import Collection
 from models.departement import Departement
@@ -83,7 +84,7 @@ def init():
 
     role_actions = ['create', 'see', 'delete', 'edit']
     role_areas_managers = ['project', 'collection', 'repository', 'database']
-    role_areas_users = ['tag', 'asset', 'ticket', 'shot', 'sequence', 'report', 'scene', 'page', 'task', 'user']
+    role_areas_users = ['tag', 'asset', 'ticket', 'shot', 'sequence', 'report', 'scene', 'document', 'task', 'user']
     roles = session.query(Role).all()
     for act in role_actions:
         for area in role_areas_managers + role_areas_users:

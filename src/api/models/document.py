@@ -22,9 +22,8 @@ from sqlalchemy.orm import validates, deferred
 from mixin import IDMixin, Base
 
 
-class Page(IDMixin, Base):
-
-    """Implements o simple page structure for wikis
+class Document(IDMixin, Base):
+    """Implements o simple Document structure for wikis and structures
     """
     title = Column(String(256), unique=True)
     content = Column(Text)
