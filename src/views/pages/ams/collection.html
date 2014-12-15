@@ -128,7 +128,7 @@
                         <div ng-init="activateVideo(asset.id)"
                             ng-if="isVideo(asset)" >
                         <A href="/static/{{asset.url}}"><video 
-                             id="video_{{asset.id}}" class="video-js vjs-default-skin" controls preload="metadata" width="235"
+                             id="video_{{asset.id}}" class="video-js vjs-default-skin" controls preload="none" width="235"
                               data-setup="{}">
                               <source ng-src="{{'/static/'+asset.url}}" type='{{asset.content_type}}' /></video></a>
                             </div>
