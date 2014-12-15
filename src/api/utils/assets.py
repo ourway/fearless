@@ -91,7 +91,13 @@ class AssetSave:
         mt = req.get_param('multipart')
         mtname = None
         if mt:
-            fs = cgi.FieldStorage(fp=req.stream, environ=req.env)
+            try:
+                fs = cgi.FieldStorage(fp=req.stream, environ=req.env)
+            except ValueError:
+                resp.status = falson.HTTP_400
+                resp.body={'message':'error'}
+                return
+
             body = fs['file'].file
             mtname = fs['file'].filename
 

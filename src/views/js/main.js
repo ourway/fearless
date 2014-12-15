@@ -972,6 +972,20 @@ fearlessApp.controller('sequenceDetailCtrl', function($scope, $rootScope, $route
 fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
 
 
+        $scope.activateVideo = function(vid){
+        var _v = "video_"+vid.toString();
+        $timeout(function(){
+        try {
+            videojs(_v, {}, function(){
+          // Player (this) is initialized and ready.
+            })}
+
+        catch(e){
+            console.log(e)
+            }
+        }, 100);
+
+        }
 
 
         $scope.$parent.page = 'ams';
@@ -988,12 +1002,12 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                 this.on("complete", function(file) {
                     $timeout(function(){
                         $scope.dropzone.removeFile(file);
-
                         }, 1000);
                     });
                 this.on("success", function(file, resp) {
                     $scope.collection.assets.push(resp);
                     $scope.$apply();
+
                     });
                 this.on("queuecomplete", function(file, resp) {
                         console.log('all complete')
@@ -1010,7 +1024,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             //autoDiscover: false,
             //autoProcessQueue: false,
             method:'PUT',
-            parallelUploads: 4,
+            parallelUploads: 1,
             maxFilesize: 8000,
             maxThumbnailFilesize: 10,
             uploadMultiple:false,
@@ -1056,6 +1070,10 @@ $(document).ready(function(){
     $('input').on('input', function() {
         alert('Text1 changed!');
     });
+
+
+
+
 });
 
 

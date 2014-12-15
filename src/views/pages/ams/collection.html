@@ -74,6 +74,7 @@
 			</ul>
         </div>
 
+        <div class="col-md-6 column">
             
 			<div class="btn-group" ng-show="collection.container">
 
@@ -82,17 +83,8 @@
                     <em class="glyphicon glyphicon-folder-open"></em>
                 </button>
 			</div>
-
-        <h3>{{collection.name | uppercase}}</h3>
-    </div>
-
-
-	<div class="row clearfix">
-        <div ng-class="{'column':true, 'col-md-7':collection.holdAssets, 'col-md-12':!collection.holdAssets}">
-			<div class="row">
-                <!----------------------------------------------------------------------------!>
-                <!----------------------------------------------------------------------------!>
-                <div ng-class="{'col-md-3':collection.holdAssets, 'col-md-2':!collection.holdAssets}" ng-repeat="subcol in collection.children track by $index">
+            <h3>{{collection.name | uppercase}}</h3>
+                <div class="col-md-4" ng-repeat="subcol in collection.children track by $index">
 					<div class="thumbnail asm_thumb">
                         <a href="#ams/c/{{subcol.id}}" title="{{subcol.description}}"
                         ><img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
@@ -103,13 +95,19 @@
 						</div>
 					</div>
                 </div>
-                <!----------------------------------------------------------------------------!>
-                <!----------------------------------------------------------------------------!>
-                <!----------------------------------------------------------------------------!>
-            </div>
+		</div>
+
+        <div class="col-md-6 column" ng-show="collection.holdAssets">
+            <form id="my-awesome-dropzone" style="min-height: 130px;" class="dropzone">
+            
+            </form>
+        </div>
+
+	<div class="row clearfix">
+        <div ng-class="col-md-12">
             <div ng-if="collection.holdAssets">
             <hr/>
-            <h3>Assets <small>({{collection.assets.length}})</small></h3>
+            <h3 ng-show="collection.assets.length>0">Assets <small>({{collection.assets.length}})</small></h3>
             <div class="row" id="ams_assets" ng-show="collection.assets.length>0">
 			<form class="form-horizontal" role="form">
 				<div class="form-group">
@@ -118,27 +116,35 @@
 					</div>
 				</div>
 			</form>
-            <hr/>
-                <div class="col-md-3" ng-repeat="asset in collection.assets | orderBy:asset.datetime| filter:collection.CollectionAssetFilter">
+            <br/>
+                <div class="col-sm-6 col-md-3" ng-repeat="asset in collection.assets | orderBy:'content_type'| orderBy:'datetime':reverse | filter:collection.CollectionAssetFilter track by $index">
 					<div class="thumbnail asm_thumb">
-                        <div class="col-md-12" style="height:140px">
-                        <a ng-if="asset.content_type.split('/')[0]=='image'" href="/static/{{asset.url}}" title="{{asset.description}}"
-                            ><img class="asm_col_thumb_img"  style="max-height: 115px;" alt="150x100" ng-src="/static/{{asset.url}}" /></a>
-
-                        <A href="/static/{{asset.url}}"><video ng-if="asset.content_type.split('/')[0]=='video' && (asset.content_type.split('/')[1]=='mp4')"
-                        id="video_{{asset.id}}" class="video-js vjs-default-skin" preload="auto" width="100"
+                        <div class="col-md-12 ">
+                            <div ng-if="asset.content_type.split('/')[0]=='image'"> 
+                        <a href="/static/{{asset.url}}" title="{{asset.description}}"
+                            ><img class="asm_col_thumb_img thumbnail"  ng-src="/static/{{asset.url}}" /></a>
+                            </div>
+                        <div ng-init="activateVideo(asset.id)"
+                            ng-if="asset.content_type.split('/')[0]=='video'" >
+                        <A href="/static/{{asset.url}}"><video 
+                             id="video_{{asset.id}}" class="video-js vjs-default-skin" controls preload="auto" width="235"
                               data-setup="{}">
                               <source ng-src="{{'/static/'+asset.url}}" type='{{asset.content_type}}' /></video></a>
+                            </div>
 						</div>
 
-						<div class="caption">
-                           
-                    <A style="float: left; margin-right:5px;" href="/static/{{asset.url}}"><button id="collectionAddButton" class="btn btn-default btn-sm" type="button">
+
+
+                        <div class="caption" >
+
+                            <label ng-if="asset.content_type.split('/')[0]!='image'"  style="color:grey">{{asset.content_type.split('/')[1] | uppercase}}</label>
+                    <br/>
+                    <A   ng-if="asset.content_type.split('/')[0]!='image' ||  asset.content_type.split('/')[0]!='video'"  href="/static/{{asset.url}}"><button id="collectionAddButton" class="btn btn-default btn-sm" type="button">
                         <em class="glyphicon glyphicon-download"></em>
                     </button></a>
-                    <a title="{{asset.fullname}}" href="#ams/a/{{asset.id}}" style="color:#333"><small>{{asset.name}}</small></a>
-
+                    <a title="{{asset.fullname}}" href="#ams/a/{{asset.id}}" style="color:#333"><small>{{asset.name}}</small></a> 
                     </div>
+
                 </div>                
             </div>
                 
@@ -147,17 +153,8 @@
 		</div>
     </div>
 
-        <div class="col-md-5 column" style="padding: 19px;" ng-show="collection.holdAssets">
-            <form id="my-awesome-dropzone" class="dropzone">
-            
-            </form>
-        </div>
+
 	</div>
-
-
-
-
-
 </div>
 
 
@@ -167,8 +164,5 @@
         $('#collectionAddButton').click(function(){
             $('#collectionAddModal').modal('show');
         });
-
-
-
     });
 </script>
