@@ -71,7 +71,7 @@ def init():
     departements = ['animation', 'rigging', 'character', 'storyboard', 'voice', 'sound', 'texture', 'layout', 'editorial', 'technical',
                     'story', 'rendering', 'compositing', 'lighting', 'dynamics', 'stereoscopic', 'staff', 'management', 'directing', 'art']
 
-    for gr in ['managers', 'users', 'clients', 'guests', 'admin'] + departements :
+    for gr in ['managers', 'users', 'clients', 'guests', 'admin']:
         if not gr in [i.name for i in groups]:
             new = Group(gr, role=gr[:-1], typ='general')
             if gr in departements:

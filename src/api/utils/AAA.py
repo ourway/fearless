@@ -17,7 +17,7 @@ Clean code is much better than Cleaner comments!
 
 
 from models import User, Group, Role, session, r, now  # r is redis
-from helpers import commit, get_ip
+from helpers import commit, get_ip, get_params
 import ujson as json
 import hmac
 import uuid
@@ -489,6 +489,31 @@ class Users:
         data = [{'firstname':user.lastname, 'lastname':user.firstname, 
                  'fullname':user.fullname, 'id':user.id} for user in target]
         resp.body = data
+
+class UpdateGroups:
+    def on_get(self, req, resp, userId, **kw):
+        pass
+
+    @falcon.after(commit)
+    def on_post(self, req, resp, userId):
+        target = session.query(User).filter_by(id=int(userId)).first()
+        data = get_params(req.stream, False)
+        added = []
+        if data.get('groups'):
+            target.grps = []
+            for grpinfo in data.get('groups'):
+                group = session.query(Group).filter_by(id=grpinfo.get('id')).first()
+                if group:
+                    target.grps.append(group)
+                    added.append(group.name)
+
+            resp.status = falcon.HTTP_202
+            resp.body = {'message':'OK', 'info':added}
+
+
+
+
+
 
 
 

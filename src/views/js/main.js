@@ -188,6 +188,12 @@ function updateImageSize(img, maxWidth, maxHeight){
         $scope.login_init = function() {
             //
         }
+        $scope.getGroups = function(){
+            req = $http.get('/api/db/group').success(function(resp){
+                    $scope.groups = resp;
+                });
+         
+        }
         $scope.persianDate = function(d){
         // d is like 2015-1-1
         if (d)
@@ -398,7 +404,8 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
         userId = $routeParams.userId;
         if (!userId)
             userId = $scope.$parent.userInfo.userid;
-       
+    
+    $scope.$parent.getGroups();
     $scope.print = function(){
         $scope.printable = $('#invoice_print_area').html();
         styles = '<html><head><title>Fearless Monthly Invoice</title><link rel="stylesheet" href="css/bootstrap.min.css"> <link rel="stylesheet" href="css/main.css"> </head><body>';
@@ -423,18 +430,15 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
         }
         userInfoReq = $http.get('/api/db/user/'+userId);
         userInfoReq.success(function(resp){
-            delete resp.password;
-            delete resp.created_on;
-            delete resp.modified_on;
-            delete resp.lastLogIn;
-            delete resp.token;
             delete resp.uuid;
-            delete resp.latest_session_id;
-            delete resp.token;
             resp.agreement_start = timeConverter(resp.agreement_start);
             resp.agreement_end = timeConverter(resp.agreement_end);
+
+            $scope.user = resp; 
+            $http.get('/api/db/user/'+userId+'?field=grps').success(function(grps){
+                $scope.user.grps = grps; 
+                })
             //console.log(resp);
-           $scope.user = resp; 
             });
         userInfoReq.error(function(a, b, c, d){
                 console.log(a, b, c, d);
@@ -462,9 +466,6 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
                     _pic = updateImageSize(this, 300, 300);
                     $scope.user.avatar=_pic;
                     $scope.$apply();
-                            
-
-
                     //$('#ProfilePicImg')[0].src = profilePic;
                 }
                 img.src = picDataURL;
@@ -491,6 +492,8 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
                 m = $http.post('/api/sendmail', mail);
                 }
             });
+        // lets update groups or other list type data:
+         y = $http.post('/api/user/'+userId+'/groups', {'groups':$scope.user.grps});
     }
 
 });

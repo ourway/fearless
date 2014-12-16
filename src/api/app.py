@@ -34,7 +34,7 @@ from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
     Verify, Reactivate, Reset, Logout, GetUserInfo, Authorize, \
     getUserInfoFromSession, isAuthorizedTo, GetPermissions, ChangePasswordVerify, \
-    ChangePassword, Users
+    ChangePassword, Users, UpdateGroups
 from utils.showtime import GetUserShows
 from utils.project import GetProjectDetails, GetProjectLatestReport, \
         ListProjects, AddProject, AddTask, ListTasks, GetTask, UpdateTask, \
@@ -64,7 +64,8 @@ class DB:
 
     #@Authorize('see_db')
     def on_get(self, req, resp, **kw):
-
+        banned = ['password', 'token', 'created_on', 'modified_on', 
+                  'session_id', 'latest_session_id', 'lastLogIn', 'password2']
         args = req.path.split('/')
         table = args[3]
         u = getUserInfoFromSession(req)
@@ -90,10 +91,12 @@ class DB:
             except (AttributeError):
                 data = None
 
-
-
         field = req.get_param('field')
         if field:
+            if field in banned:
+                resp.status = falcon.HTTP_403
+                resp.body = {'message':'Not Authorized'}
+                return
             try:
                 if len(args) != 5:
                     data = [eval('i.%s'%field) for i in data]
@@ -102,12 +105,28 @@ class DB:
             except AttributeError, e:
                 print e
                 raise falcon.HTTPBadRequest('Bad Request', 'The requested field is not available for database')
+
+
             resp.body = data
             return
 
+
         try:
             data = repr(data)
-            resp.body = json.loads(data)
+            d = json.loads(data)
+            if d and isinstance(d, dict):
+                for i in banned:
+                    if d.get(i):
+                        del(d[i])
+
+            if d and isinstance(d, list):
+                for each in d:
+                    if isinstance(each, dict):
+                        for i in banned:
+                            if each.get(i):
+                                del(each[i])
+
+            resp.body = d
         except (TypeError, ValueError):
             resp.body = data
         # Ok, We have an id
@@ -143,12 +162,20 @@ class DB:
         # lets get the table data
         query = 'session.query({t}).filter({t}.id=={id})'.format(
             t=table, id=int(id))
-        result = eval(query)
+        result = eval(query).first()
         ##
         query_params = get_params(req.stream, flat=False)
-        if result.update(query_params):
-            resp.status = falcon.HTTP_202
-            resp.body = {'message':'updated'}
+        updated_values = [];
+        for key in query_params:
+            key = str(key)
+            value = query_params[key]
+            if isinstance(value, (int, str, unicode, float)) and hasattr(result, key):
+                setattr(result, key, value)
+                updated_values.append(key)
+
+        #if result.update(query_params):
+        resp.status = falcon.HTTP_202
+        resp.body = {'message':'updated', 'info':updated_values}
         #query = 'result({q})'.format(q=query_params)
         # print eval(query)
 
@@ -218,6 +245,7 @@ app.add_route('/api/task/delete/{taskId}', DeleteTask())
 app.add_route('/api/sequence/add/{projId}', AddSequence())
 app.add_route('/api/sendmail', Mailer())
 app.add_route('/api/report', AddReport())
+app.add_route('/api/user/{userId}/groups', UpdateGroups())
 
 
 if __name__ == '__main__':
