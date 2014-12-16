@@ -57,19 +57,36 @@
 
 
 
-                <div ng-if="$parent.userInfo.userid==1" style="border-top:1px solid #ccc;">
+                <div ng-if="$parent.isAdmin" style="border-top:1px solid #ccc;">
                     <br/>
 
 				<div class="form-group" >
 					 <label for="inputPassword3" class="col-sm-4 control-label">Agreement Start</label>
 					<div class="col-sm-6">
-						<input style="font-family:monospace" type="date" class="form-control" ng-model="user.agreement_start" />
+						<input type="date" class="form-control" ng-model="user.agreement_start" />
 					</div>
                 </div>
 				<div class="form-group" >
 					 <label for="inputPassword3" class="col-sm-4 control-label">Agreement End</label>
 					<div class="col-sm-6">
-						<input style="font-family:monospace" type="date" class="form-control" ng-model="user.agreement_end" />
+						<input type="date" class="form-control" ng-model="user.agreement_end" />
+					</div>
+                </div>
+				<div class="form-group" >
+					 <label for="inputPassword3" class="col-sm-4 control-label">Job</label>
+					<div class="col-sm-6">
+                        <select class="form-control" ng-model="user.job">
+                            <option value="supervisor">Supervisor</option>
+                            <option value="director">Director</option>
+                            <option value="manager">Manager</option>
+                            <option value="artist">Artist</option>
+                            <option value="staff">Staff</option>
+                            <option value="chairman">Chairman</option>
+                            <option value="CEO">Chief Executive Officer</option>
+                            <option value="CFO">Chief Financial Officer</option>
+                            <option value="CTO">Chief Technology Officer</option>
+                            <option value="Officer">Officer</option>
+                        </select>
 					</div>
                 </div>
 				<div class="form-group" >
@@ -100,7 +117,7 @@
 				<div class="form-group" >
 					 <label for="inputPassword3" class="col-sm-4 control-label">Bank</label>
 					<div class="col-sm-6">
-						<input style="font-family:monospace" type="text" class="form-control" placeholder="Example: Pasargaad" ng-model="user.bank" />
+						<input  type="text" class="form-control" placeholder="Example: Pasargaad" ng-model="user.bank" />
 					</div>
                 </div>
 				<div class="form-group" >
@@ -150,18 +167,23 @@
     <hr/>
         <div class="col-sm-1 column">
         </div>
-        <div id="invoice" class="col-sm-9 column farsi">
-            <h5>فیش حقوق آذرماه <b>{{user.persian_firstname}} {{user.persian_lastname}}</b> از دپارتمان IT با سمت مسئول اجرایی</h5>
+        <div id="invoice_print_area" ng-if="$parent.isAdmin">
+        <div id="invoice" class="col-md-8 column farsi" style="direction:rtl;text-align:right">
+            <h5>فیش حقوق آذرماه <b>{{user.persian_firstname}} {{user.persian_lastname}}</b> 
+                <span ng-if="user.departements">از دپارتمان IT</span> <span ng-if="user.job">با سمت {{user.job}}</span></h5>
             <h6>با سلام خدمت مدیریت مالی و تولید، گزارش کارکرد {{user.persian_firstname}} {{user.persian_lastname}} به شرح زیر میباشد:</h6>
-            <table class="table">
-                <tr class="success"><td>نام کار</td><td>شروع</td> <td>پایان</td> </tr>
+            <table class="table table-responsive table-bordered">
+                <tr class="success"><td>نام کار</td></tr>
+                <tr ng-repeat="task in userTasks track by $index">
+                    <td>{{task}}</td>
+                </tr>
             </table>
             
             <h4>پرداخت</h4>
-            <table class="table">
-                <tr class="success"><td>پایه حقوق</td><td>ساعات حضور</td> <td>کسورات</td><td>مبلغ قابل پرداخت</td></tr>
+            <table class="table table-bordered table-responsive">
+                <tr class="info"><td>پایه حقوق</td><td>ساعات حضور</td> <td>کسورات</td><td>مبلغ قابل پرداخت</td></tr>
                 <tr class="active"><td>{{user.monthly_salary}}</td><td>{{user.monthly_present_hours}} <small>(از {{user.monthly_working_hours}} ساعت)</small></td> <td>
-                        <table class="table">
+                        <table class="table table-bordered table-responsive">
                             <tr>
                                 <td>عنوان</td><td>واحد</td><td>میزان</td><td>مجموع</td>
                             </tr>
@@ -180,8 +202,8 @@
                             </tr>
                             <tr>
                                 <td></td><td></td><td></td><td>
-                                    <b>
-{{user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + (round((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours))))}}</b>
+                                    <code>
+{{user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + (round((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours))))}}</code>
                                 </td>
                             </tr>
                         </table>
@@ -189,31 +211,42 @@
 
                 
                 
-                </td><td><h4><b>{{user.monthly_salary - (user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + (round((user.monthly_salary/user.monthly_working_hours)*(user.monthly_working_hours-user.monthly_present_hours))))}}</b> <small>تومان</small></h4> </td></tr>
+                </td><td><h4><code style="color:darkgreen">{{user.monthly_salary - (user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + (round((user.monthly_salary/user.monthly_working_hours)*(user.monthly_working_hours-user.monthly_present_hours))))}}</code> <small>تومان</small></h4> </td></tr>
             </table>
         
         <h4>تائیدات</h4>
-                        <table class="table">
+                        <table class="table table-bordered">
                             <tr class="warning">
                                 <td>سرپرست</td><td>کارگردان</td><td>مدیرتولید</td><td><b>تایید نهایی مدیر پروژه</b></td>
                             </tr>
                             <tr class="active">
-                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td>توضیحات</td><td></td></tr> </table> </td>
-                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td>توضیحات</td><td></td></tr> </table> </td>
-                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td>توضیحات</td><td></td></tr> </table> </td>
-                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td>توضیحات</td><td></td></tr> </table> </td>
+                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td> </td><td></td></tr> </table> </td>
+                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td> </td><td></td></tr> </table> </td>
+                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td> </td><td></td></tr> </table> </td>
+                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td> </td><td></td></tr> </table> </td>
 
                             </tr>
                         </table>
 
 
-        <h6>لطفا در صورت تائید نهایی توسط مدیر پروژه مبلغ  را به شماره کارت <code>{{user.debit_card_number}}</code> به نام {{user.persian_firstname}} {{user.persian_lastname}} واریز نمایید.</h6>
-            
+        <h6>لطفا در صورت تائید نهایی توسط مدیر پروژه مبلغ  را به شماره کارت <code style="color:black">{{user.debit_card_number}}</code> به نام {{user.persian_firstname}} {{user.persian_lastname}} واریز نمایید.</h6>
+
+        <small>این پرونده در تاریخ {{$parent.persianDate()}} توسط سامانه مدیریت پروژه پویامهر تولید گردید.</small>
+        <small></small>
 
 
         </div>
+        </div>
 
         <div class="col-sm-2 column">
+
+			<div class="btn-group" >
+                <button id="collectionAddButton" ng-click="print()" class="btn btn-primary btn-sm" type="button">
+                    <em class="glyphicon glyphicon-print"></em>
+                </button>
+			</div>
+
+
         </div>
 </div>
 

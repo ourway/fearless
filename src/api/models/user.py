@@ -45,6 +45,14 @@ user_documents = Table('user_documents', Base.metadata,
            primary_key=True)
 )
 
+
+user_departement = Table('user_departement', Base.metadata,
+    Column('user_id', Integer, ForeignKey("user.id"),
+           primary_key=True),
+    Column('departement_id', Integer, ForeignKey("departement.id"),
+           primary_key=True)
+)
+
 class User(IDMixin, Base):
 
     '''Main users group
@@ -54,6 +62,7 @@ class User(IDMixin, Base):
     avatar = Column(Text())
     token = Column(String(64), default=getUUID, unique=True)
     firstname = Column(String(64), nullable=True)
+    job = Column(String(64))
     persian_firstname = Column(String(64))
     alias = Column(String(64), nullable=True)
     lastname = Column(String(64), nullable=True)
