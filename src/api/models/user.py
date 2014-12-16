@@ -37,6 +37,14 @@ user_reports = Table('user_reports', Base.metadata,
     Column('report_id', Integer, ForeignKey("report.id"),
            primary_key=True)
 )
+
+user_documents = Table('user_documents', Base.metadata,
+    Column('user_id', Integer, ForeignKey("user.id"),
+           primary_key=True),
+    Column('document_id', Integer, ForeignKey("document.id"),
+           primary_key=True)
+)
+
 class User(IDMixin, Base):
 
     '''Main users group
@@ -46,8 +54,10 @@ class User(IDMixin, Base):
     avatar = Column(Text())
     token = Column(String(64), default=getUUID, unique=True)
     firstname = Column(String(64), nullable=True)
+    persian_firstname = Column(String(64))
     alias = Column(String(64), nullable=True)
     lastname = Column(String(64), nullable=True)
+    persian_lastname = Column(String(64))
     hasFrequentPayment = Column(Boolean(), default=True)
     payment_type = Column(String(64), nullable=True, default='monthly') ## , manually. ..
     lastLogIn = Column(DateTime)
@@ -55,16 +65,25 @@ class User(IDMixin, Base):
     efficiency = Column(Float(precision=3), default=1.0)
     cell = Column(String(16))
     address = Column(String(512))
+    bank = Column(String(64), default='Paarsian')
+    bank_account_number = Column(String(64))
+    debit_card_number = Column(String(64))
     daily_working_hours = Column(Integer, default=8)
+    monthly_working_hours = Column(Integer, default=192)
+    monthly_present_hours = Column(Integer, default=0)
     off_days = Column(String(32), default='fri')
     latest_session_id = Column(String(64))
     active = Column(Boolean, default=False)
-    rate = Column(Float(precision=3), default=20000)
+    rate = Column(Float(precision=3), default=80000)
+    monthly_salary = Column(Float(precision=3), default=1000000)
+    retention = Column(Float(precision=3), default=10)
+    payroll_tax = Column(Float(precision=3), default=3)
+    insurance_deductions = Column(Float(precision=3), default=7.8)
     rep = relationship("Report", secondary=lambda: user_reports, backref='user')
-    agreement_id = Column(Integer, ForeignKey('document.id'))
-    agreement = relationship("Document", backref='related_to')
-    aggregated_start = Column(DateTime, nullable=False, default=now)
-    aggregated_end = Column(DateTime, nullable=False, default=now)
+    agreements = relationship("Document", backref='agreement_of', secondary="user_documents")
+    payment_invoices = relationship("Document", backref='invoice_of', secondary="user_documents")
+    agreement_start = Column(DateTime, nullable=False, default=now)
+    agreement_end = Column(DateTime, nullable=False, default=now)
     reports = association_proxy('rep', 'id') # when we refer to reports, id will be returned.
     grps = relationship('Group', backref='users', secondary='users_groups')
     groups = association_proxy('grps', 'name')

@@ -20,6 +20,7 @@
         url('../fonts/terafik.ttf') format('truetype')
     }
 
+@font-face { font-family: 'YEKAN_0'; src: local('b BYekan'),url('../fonts/YEKAN_0.TTF') format('truetype'); } 
 
 #profileImageDiv :hover {
     opacity: .75;
@@ -257,6 +258,13 @@ box-shadow: 1px 1px 4px rgba(0,0,0,0.16);
 .asm_thumb:hover {
 transform: scale(1.1,1.1);
 transform: rotate(30);
+}
+
+#invoice{
+padding:10px;
+border:1px solid #ccc;
+border-radius:5px;
+font-size: 11px;
 }
 
 

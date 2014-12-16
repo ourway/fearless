@@ -42,13 +42,14 @@ user26 = User(email='amirhoseinkasraee@yahoo.com', password='123456', active=Tru
 user27 = User(email='nsns_1300@yahoo.com', password='123456', active=True, firstname='Nasim', lastname='Sadegi')
 user28 = User(email='zahra.mansouriyeh@gmail.com', password='123456', active=True, firstname='Zahra', lastname='Mansooriye')
 user29 = User(email='alenhue@gmail.com', password='123456', active=True, firstname='Arash', lastname='Mogaddam')
+user30 = User(email='sara_kayvan@hotmail.com', password='123456', active=True, firstname='Sara', lastname='Keyvan')
 
 
 
 session.add_all([ user1, user2, user3, user4, user5, user6, user7, user8, user9,
                  user10, user11, user12, user13, user14, user15, user16, user17,
                  user18, user19, user20, user21, user22, user23, user24, user25,
-                    user26, user27, user28, user29])
+                    user26, user27, user28, user29, user30])
 session.commit()
     #import shutil
 #print animate.get_tree(session, json=True)

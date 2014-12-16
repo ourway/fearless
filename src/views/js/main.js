@@ -388,15 +388,29 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
         userId = $routeParams.userId;
         if (!userId)
             userId = $scope.$parent.userInfo.userid;
-        
+       
+        $scope.roundG = function(num){
+            return Math.round(num);
+        }
+        $scope.ceilG = function(a){
+            if (a > 0)
+                return a;
+            else
+                return 0;
+        }
+
         userInfoReq = $http.get('/api/db/user/'+userId);
         userInfoReq.success(function(resp, b, c, d){
             delete resp.password;
             delete resp.created_on;
             delete resp.modified_on;
             delete resp.lastLogIn;
+            delete resp.token;
+            delete resp.uuid;
             delete resp.latest_session_id;
             delete resp.token;
+            resp.agreement_start = timeConverter(resp.agreement_start);
+            resp.agreement_end = timeConverter(resp.agreement_end);
             //console.log(resp);
            $scope.user = resp; 
 

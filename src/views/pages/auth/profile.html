@@ -30,6 +30,18 @@
 					</div>
 				</div>
 				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Persian First Name</label>
+					<div class="col-sm-6">
+                        <input type="text" class="form-control farsi" ng-model="user.persian_firstname" />
+					</div>
+				</div>
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Persian Last Name</label>
+					<div class="col-sm-6">
+                        <input type="text" class="form-control farsi" ng-model="user.persian_lastname" />
+					</div>
+				</div>
+				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Cell Number</label>
 					<div class="col-sm-6">
 						<input type="tel" style="font-family:monospace" placeholder="Example: 0912-112-8899" class="form-control" ng-model="user.cell" />
@@ -42,14 +54,68 @@
 					</div>
                 </div>
                     <br/>
+
+
+
                 <div ng-if="$parent.userInfo.userid==1" style="border-top:1px solid #ccc;">
                     <br/>
+
 				<div class="form-group" >
-					 <label for="inputPassword3" class="col-sm-4 control-label">Daily Rate</label>
+					 <label for="inputPassword3" class="col-sm-4 control-label">Agreement Start</label>
 					<div class="col-sm-6">
-						<input style="font-family:monospace" type="number" class="form-control" placeholder="Example: 2,000,000&divide;192x8" ng-model="user.rate" />
+						<input style="font-family:monospace" type="date" class="form-control" ng-model="user.agreement_start" />
 					</div>
                 </div>
+				<div class="form-group" >
+					 <label for="inputPassword3" class="col-sm-4 control-label">Agreement End</label>
+					<div class="col-sm-6">
+						<input style="font-family:monospace" type="date" class="form-control" ng-model="user.agreement_end" />
+					</div>
+                </div>
+				<div class="form-group" >
+					 <label for="inputPassword3" class="col-sm-4 control-label">Monthly Working Hours</label>
+					<div class="col-sm-6">
+						<input style="font-family:monospace" type="number" class="form-control" placeholder="Example: 192" ng-model="user.monthly_working_hours" />
+					</div>
+                </div>
+				<div class="form-group" >
+					 <label for="inputPassword3" class="col-sm-4 control-label">Salery</label>
+					<div class="col-sm-6">
+						<input style="font-family:monospace" type="number" class="form-control" placeholder="Example: 1,000,000" ng-model="user.monthly_salary" />
+					</div>
+                </div>
+				<div class="form-group" >
+					 <label for="inputPassword3" class="col-sm-4 control-label">Present Hours</label>
+					<div class="col-sm-6">
+						<input style="font-family:monospace" type="number" class="form-control" placeholder="Example: 149" ng-model="user.monthly_present_hours" />
+					</div>
+                </div>
+
+				<div class="form-group" >
+					 <label for="inputPassword3" class="col-sm-4 control-label">Retention Rate</label>
+					<div class="col-sm-6">
+						<input style="font-family:monospace" type="number" step="any" class="form-control" placeholder="Example: 20.8" ng-model="user.retention" />
+					</div>
+                </div>
+				<div class="form-group" >
+					 <label for="inputPassword3" class="col-sm-4 control-label">Bank</label>
+					<div class="col-sm-6">
+						<input style="font-family:monospace" type="text" class="form-control" placeholder="Example: Pasargaad" ng-model="user.bank" />
+					</div>
+                </div>
+				<div class="form-group" >
+					 <label for="inputPassword3" class="col-sm-4 control-label">Bank Account Number</label>
+					<div class="col-sm-6">
+						<input style="font-family:monospace" type="text" class="form-control" placeholder="Example: 1-800-123456" ng-model="user.bank_account_number" />
+					</div>
+                </div>
+				<div class="form-group" >
+					 <label for="inputPassword3" class="col-sm-4 control-label">Debit Card Number</label>
+					<div class="col-sm-6">
+						<input style="font-family:monospace" type="text" class="form-control" placeholder="Example: 5022-2910-1840-7500" ng-model="user.debit_card_number" />
+					</div>
+                </div>
+
             </div>
                     <br/>
                     <br/>
@@ -80,6 +146,75 @@
             
             </div>
 	</div>
+    <br/>
+    <hr/>
+        <div class="col-sm-1 column">
+        </div>
+        <div id="invoice" class="col-sm-9 column farsi">
+            <h5>فیش حقوق آذرماه <b>{{user.persian_firstname}} {{user.persian_lastname}}</b> از دپارتمان IT با سمت مسئول اجرایی</h5>
+            <h6>با سلام خدمت مدیریت مالی و تولید، گزارش کارکرد {{user.persian_firstname}} {{user.persian_lastname}} به شرح زیر میباشد:</h6>
+            <table class="table">
+                <tr class="success"><td>نام کار</td><td>شروع</td> <td>پایان</td> </tr>
+            </table>
+            
+            <h4>پرداخت</h4>
+            <table class="table">
+                <tr class="success"><td>پایه حقوق</td><td>ساعات حضور</td> <td>کسورات</td><td>مبلغ قابل پرداخت</td></tr>
+                <tr class="active"><td>{{user.monthly_salary}}</td><td>{{user.monthly_present_hours}} <small>(از {{user.monthly_working_hours}} ساعت)</small></td> <td>
+                        <table class="table">
+                            <tr>
+                                <td>عنوان</td><td>واحد</td><td>میزان</td><td>مجموع</td>
+                            </tr>
+                            <tr>
+                                <td>مالیات</td><td>{{user.payroll_tax}}</td><td>{{user.monthly_salary*user.payroll_tax/100}}</td><td></td>
+                            </tr>
+                            <tr>
+                                <td>بیمه</td><td>{{user.insurance_deductions}}</td><td>{{user.monthly_salary*user.insurance_deductions/100}}</td><td></td>
+                            </tr>
+                            <tr>
+                                <td>حسن انجام کار</td><td>{{user.retention}}</td><td>{{user.monthly_salary*user.retention/100}}</td><td></td>
+                            </tr>
+                            <tr>
+                                <td>کسر کار</td><td>{{ceilG(user.monthly_working_hours-user.monthly_present_hours)}}</td>
+                                <td>{{round((user.monthly_salary/user.monthly_working_hours)*(user.monthly_working_hours-user.monthly_present_hours))}}</td><td></td>
+                            </tr>
+                            <tr>
+                                <td></td><td></td><td></td><td>
+                                    <b>
+{{user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + (round((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours))))}}</b>
+                                </td>
+                            </tr>
+                        </table>
+
+
+                
+                
+                </td><td><h4><b>{{user.monthly_salary - (user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + (round((user.monthly_salary/user.monthly_working_hours)*(user.monthly_working_hours-user.monthly_present_hours))))}}</b> <small>تومان</small></h4> </td></tr>
+            </table>
+        
+        <h4>تائیدات</h4>
+                        <table class="table">
+                            <tr class="warning">
+                                <td>سرپرست</td><td>کارگردان</td><td>مدیرتولید</td><td><b>تایید نهایی مدیر پروژه</b></td>
+                            </tr>
+                            <tr class="active">
+                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td>توضیحات</td><td></td></tr> </table> </td>
+                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td>توضیحات</td><td></td></tr> </table> </td>
+                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td>توضیحات</td><td></td></tr> </table> </td>
+                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td>توضیحات</td><td></td></tr> </table> </td>
+
+                            </tr>
+                        </table>
+
+
+        <h6>لطفا در صورت تائید نهایی توسط مدیر پروژه مبلغ  را به شماره کارت <code>{{user.debit_card_number}}</code> به نام {{user.persian_firstname}} {{user.persian_lastname}} واریز نمایید.</h6>
+            
+
+
+        </div>
+
+        <div class="col-sm-2 column">
+        </div>
 </div>
 
 
