@@ -499,13 +499,22 @@ class UpdateGroups:
         target = session.query(User).filter_by(id=int(userId)).first()
         data = get_params(req.stream, False)
         added = []
+        user_group = session.query(Group).filter_by(name='users').first()
+        admin_group = session.query(Group).filter_by(name='admin').first()
         if data.get('groups'):
             target.grps = []
+
             for grpinfo in data.get('groups'):
+                if grpinfo.get('name') != 'guests' and user_group and not user_group in target.grps:
+                    target.grps.append(user_group)
                 group = session.query(Group).filter_by(id=grpinfo.get('id')).first()
                 if group:
                     target.grps.append(group)
                     added.append(group.name)
+
+            if target.id == 1 and not admin_group in target.grps:
+                    target.grps.append(admin_group)
+
 
             resp.status = falcon.HTTP_202
             resp.body = {'message':'OK', 'info':added}
