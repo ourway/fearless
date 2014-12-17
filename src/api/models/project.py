@@ -71,7 +71,7 @@ class Project(IDMixin, Base):
     client = relationship('Client', backref='projects')
     tasks = relationship(
         'Task', backref='project',
-        cascade="all, delete-orphan")
+        cascade="all, delete, delete-orphan")
     users = relationship('User', backref='projects', secondary='project_users')
     watchers = relationship('User', backref='watches_projects', secondary='project_watchers')
     lead_id = Column(Integer, ForeignKey("user.id"), nullable=False)
@@ -80,11 +80,11 @@ class Project(IDMixin, Base):
     director = relationship('User', backref='directs')
     is_stereoscopic = Column(Boolean, default=False)
     fps = Column(Float(precision=3), default=24.000)
-    tk = relationship('Ticket', backref='project')
-    sequences = relationship('Sequence', backref='project')
+    tk = relationship('Ticket', backref='project', cascade="all, delete, delete-orphan")
+    sequences = relationship('Sequence', backref='project', cascade="all, delete, delete-orphan")
     tickets = association_proxy('tk', 'Ticket')
     #project_id = Column(Integer, ForeignKey('project.id'))
-    rep = relationship("Report", secondary=lambda: project_reports, backref='project')
+    rep = relationship("Report",backref='project', cascade="all, delete, delete-orphan")
     reports = association_proxy('rep', 'id') # when we refer to reports, id will be returned.
 
 

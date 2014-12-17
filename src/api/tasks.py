@@ -149,11 +149,13 @@ def send_envelope(to, cc, bcc, subject, message, attach=None):
         subject=subject,
         html_body=M
     )
+    #envelope.add_attachment('/home/farsheed/Desktop/guntt.html', mimetype="text/html")
 
     if attach and os.path.isfile(attach):
         envelope.add_attachment(attach)
 
     pwd = '\n==gchZmcoVWbwADMxM2Q'[::-1]
+
     gmail = GMailSMTP('farsheed.ashouri@gmail.com',
                       base64.decodestring(pwd))
     gmail.send(envelope)

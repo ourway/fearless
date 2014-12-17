@@ -194,6 +194,10 @@ function updateImageSize(img, maxWidth, maxHeight){
                 });
          
         }
+        $scope.sendmail = function(mail){
+            m = $http.post('/api/sendmail', mail);
+        }
+
         $scope.persianDate = function(d){
         // d is like 2015-1-1
         if (d)
@@ -474,6 +478,19 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
             reader.readAsDataURL(picFile);
         }
 
+    $scope.mailInvoice = function(){
+                mail = {};
+                invoice = '<div style="margin:5px;font-size:10px;border:1px solid #333;padding:5px;background:#f8f8f8">' + $('#invoice_print_area').html() + '</div>';
+                mail['message'] = 'Hello <b>'+ $scope.user.firstname +'</b>!<br/>'
+                mail['message']+= 'Here is your monthly salary document.<br/>';
+                mail['message']+= invoice;
+                mail['to'] = $scope.user.email;
+                mail['cc'] = ['rodmena@me.com', 'sara_kayvan@hotmail.com', 'hamid2117@gmail.com'];
+                mail['subject'] = 'Pooyamehr Financial Departement - Salary Document';
+                if (confirm('Are you sure you want to send invoice to ' + $scope.user.email + ' ?'))
+                    $scope.$parent.sendmail(mail);
+    }
+
     $scope.updateUserInformation = function(){
         x = $http.post('/api/db/user/'+ userId, $scope.user); //send it
         x.success(function(resp){
@@ -489,7 +506,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
                 mail['to'] = $scope.user.email;
                 mail['subject'] = 'Fearless profile';
                 //console.log(mail)
-                m = $http.post('/api/sendmail', mail);
+                $scope.$parent.sendmail(mail);
                 }
             });
         // lets update groups or other list type data:
@@ -1020,7 +1037,9 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
 
         $scope.activateVideo = function(vid){
-        var _v = "video_"+vid.toString();
+        if (vid)
+        {
+            var _v = "video_"+vid.toString();
         $timeout(function(){
         try {
             videojs(_v, {}, function(){
@@ -1031,6 +1050,8 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             console.log(e)
             }
         }, 100);
+
+        }
 
         }
 
@@ -1105,6 +1126,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     $scope.collection = resp;
                     $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+"&multipart=true";
                     $scope.dropzone.options.url = $scope.attachurl;
+                    $scope.activateVideo();
 
                 })
         }

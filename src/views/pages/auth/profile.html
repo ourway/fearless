@@ -113,10 +113,18 @@
 						<input style="font-family:monospace" type="number" class="form-control" placeholder="Example: 1,000,000" ng-model="user.monthly_salary" />
 					</div>
                 </div>
+
+				<div class="form-group" >
+					 <label for="inputPassword3" class="col-sm-4 control-label">Budget Account Code</label>
+					<div class="col-sm-6">
+						<input style="font-family:monospace" type="number" class="form-control" placeholder="Example: 408" ng-model="user.budget_account" />
+					</div>
+                </div>
+
 				<div class="form-group" >
 					 <label for="inputPassword3" class="col-sm-4 control-label">Present Hours</label>
 					<div class="col-sm-6">
-						<input style="font-family:monospace" type="number" class="form-control" placeholder="Example: 149" ng-model="user.monthly_present_hours" />
+						<input style="font-family:monospace" type="number" step="any" class="form-control" placeholder="Example: 149" ng-model="user.monthly_present_hours" />
 					</div>
                 </div>
 
@@ -179,7 +187,7 @@
     <hr/>
         <div class="col-sm-1 column">
         </div>
-        <div id="invoice_print_area" ng-if="$parent.isAdmin">
+        <div id="invoice_print_area" ng-if="$parent.isAdmin && user.monthly_present_hours">
         <div id="invoice" class="col-md-8 column farsi" style="direction:rtl;text-align:right">
             <h5>فیش حقوق آذرماه <b>{{user.persian_firstname}} {{user.persian_lastname}}</b> 
                 <span ng-if="user.departements">از دپارتمان IT</span> <span ng-if="user.job">با سمت {{user.job}}</span></h5>
@@ -210,12 +218,12 @@
                             </tr>
                             <tr>
                                 <td>کسر کار</td><td>{{ceilG(user.monthly_working_hours-user.monthly_present_hours)}}</td>
-                                <td>{{round((user.monthly_salary/user.monthly_working_hours)*(user.monthly_working_hours-user.monthly_present_hours))}}</td><td></td>
+                                <td>{{roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours)))}}</td><td></td>
                             </tr>
                             <tr>
                                 <td></td><td></td><td></td><td>
                                     <code>
-{{user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + (round((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours))))}}</code>
+{{user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + (roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours))))}}</code>
                                 </td>
                             </tr>
                         </table>
@@ -223,7 +231,7 @@
 
                 
                 
-                </td><td><h4><code style="color:darkgreen">{{user.monthly_salary - (user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + (round((user.monthly_salary/user.monthly_working_hours)*(user.monthly_working_hours-user.monthly_present_hours))))}}</code> <small>تومان</small></h4> </td></tr>
+                </td><td><h4><code style="color:darkgreen">{{user.monthly_salary - (user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + (roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours)))))}}</code> <small>تومان</small></h4> </td></tr>
             </table>
         
         <h4>تائیدات</h4>
@@ -241,7 +249,7 @@
                         </table>
 
 
-        <h6>لطفا در صورت تائید نهایی توسط مدیر پروژه مبلغ  را به شماره کارت <code style="color:black">{{user.debit_card_number}}</code> به نام {{user.persian_firstname}} {{user.persian_lastname}} واریز نمایید.</h6>
+                        <h6>لطفا در صورت تائید نهایی توسط مدیر پروژه مبلغ فوق از کد هزینه <code>{{user.budget_account}}</code> را به شماره کارت <code style="color:black">{{user.debit_card_number}}</code> به نام {{user.persian_firstname}} {{user.persian_lastname}} واریز نمایید.</h6>
 
         <small>این پرونده در تاریخ {{$parent.persianDate()}} توسط سامانه مدیریت پروژه پویامهر تولید گردید.</small>
         <small></small>
@@ -255,6 +263,9 @@
 			<div class="btn-group" >
                 <button id="collectionAddButton" ng-click="print()" class="btn btn-primary btn-sm" type="button">
                     <em class="glyphicon glyphicon-print"></em>
+                </button>
+                <button id="collectionAddButton" ng-click="mailInvoice()" class="btn btn-primary btn-sm" type="button">
+                    <em class="glyphicon glyphicon-send"></em>
                 </button>
 			</div>
 
