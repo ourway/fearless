@@ -15,7 +15,7 @@ Clean code is much better than Cleaner comments!
 import os
 import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
-    Float, Boolean, event
+    Float, Boolean, event, Unicode
 
 import ujson as json
 from db import session
@@ -66,7 +66,7 @@ class Task(IDMixin, Base, BaseNestedSets):
     id = Column(
         Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     project_id = Column(Integer, ForeignKey("project.id"), nullable=False)
-    title = Column(String(64), nullable=False)
+    title = Column(Unicode(64), nullable=False)
     note = Column(String(256))  ## task note
     gauge = Column(String(64))  ## task note
     start = Column(DateTime, nullable=False, default=now)
