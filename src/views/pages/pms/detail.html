@@ -477,8 +477,8 @@ border-bottom: 1px solid #57BEDD;
             <tr class="success">
                 <td class="active"><strong>{{project.name}}</strong></td>
                 <td ><strong>{{project.complete}}</strong>%</td>
-                <td >{{project.start}}</td>
-                <td >{{project.end}}</td>
+                <td class="farsi" >{{$parent.persianDate(project.start)}}</td>
+                <td class="farsi" >{{$parent.persianDate(project.end)}}</td>
                 <td >{{project.effort_left}}</td>
                 <td ><a href="#/user/{{project.leader.id}}">{{project.leader.fullname}}</a></td>
             </tr>
@@ -556,7 +556,7 @@ border-bottom: 1px solid #57BEDD;
                             ng-repeat="task in tasks | orderBy:'start' | filter:filterTaskName ">
                             
                             <a class="btn-sm" style="color: #13560C;" data-task-title="{{toTitleCase(task.title)}}" 
-                                ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" id="task_{{task.id}}" >{{toTitleCase(task.title)}}</a></li>
+                                ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" id="task_{{task.id}}" >{{toTitleCase(task.title).slice(0,30)}}</a></li>
                         </ol>
 
                     </div>

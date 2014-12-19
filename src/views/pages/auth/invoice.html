@@ -1,0 +1,89 @@
+        <div id="invoice_print_area" ng-if="$parent.isAdmin && user.monthly_present_hours">
+        <div id="invoice" class="col-md-8 column farsi" style="direction:rtl;text-align:right">
+            <h5>فیش حقوق {{$parent.persianDate(null, 1)}} ماه سال {{$parent.persianDate(null, 2)}} <b>{{user.persian_firstname}} {{user.persian_lastname}}</b> 
+                <span ng-if="user.departements">از دپارتمان IT</span> <span ng-if="user.job">با سمت {{user.job}}</span></h5>
+            <h6>با سلام خدمت مدیریت مالی و تولید، گزارش کارکرد {{user.persian_firstname}} {{user.persian_lastname}} در ماه  {{$parent.persianDate(null, 1)}} به شرح زیر میباشد:</h6>
+            <table class="table table-responsive table-bordered" ng-if="userTasks">
+                <tr class="success"><td class="col-sm-1">ردیف</td><td>نام فعالیت</td><td>پروژه</td></tr>
+                <tr ng-repeat="task in userTasks track by $index">
+                    <td>{{$index+1}}</td>
+                    <td><a href="#pms/task/{{task.id}}">{{task.title}}</a></td>
+                    <td><a href="#pms/{{task.project_id}}">{{task.project_id}}</a></td>
+                </tr>
+            </table>
+
+            <span ng-if="userTasks.length==0" style="color:darkred">هیچ فعالیتی در برنامه ماهانه ایشان وجود ندارد</span>
+            
+            <h4>پرداخت</h4>
+            <table class="table table-bordered table-responsive">
+                <tr class="info"><td>پایه حقوق</td><td>ساعات حضور</td> <td>کسورات</td><td>مبلغ قابل پرداخت</td></tr>
+                <tr class="active"><td>{{user.monthly_salary}}</td><td>{{user.monthly_present_hours}} <small>(از {{user.monthly_working_hours}} ساعت)</small></td> <td>
+                        <table class="table table-bordered table-responsive">
+                            <tr>
+                                <td>عنوان</td><td>واحد</td><td>میزان</td><td>مجموع</td>
+                            </tr>
+                            <tr>
+                                <td>مالیات</td><td>{{user.payroll_tax}}</td><td>{{user.monthly_salary*user.payroll_tax/100}}</td><td></td>
+                            </tr>
+                            <tr>
+                                <td>بیمه</td><td>{{user.insurance_deductions}}</td><td>{{user.monthly_salary*user.insurance_deductions/100}}</td><td></td>
+                            </tr>
+                            <tr>
+                                <td>حسن انجام کار</td><td>{{user.retention}}</td><td>{{user.monthly_salary*user.retention/100}}</td><td></td>
+                            </tr>
+                            <tr>
+                                <td>کسر کار</td><td>{{ceilG(user.monthly_working_hours-user.monthly_present_hours)}}</td>
+                                <td>{{roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours)))}}</td><td></td>
+                            </tr>
+                            <tr>
+                                <td></td><td></td><td></td><td>
+                                    <code class="farsi">
+                                        {{ceilG(user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 +
+                                        (roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours)))))}}</code>
+                                </td>
+                            </tr>
+                        </table>
+
+
+                
+                
+                </td><td><h4><code class="farsi" style="color:darkgreen">{{ceilG(user.monthly_salary - 
+                (user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + 
+                (roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours))))))}}</code> <small>تومان</small></h4> </td></tr>
+            </table>
+        
+        <h4>تائیدات</h4>
+                        <table class="table table-bordered">
+                            <tr class="warning">
+                                <td>سرپرست</td><td>کارگردان</td><td>مدیرتولید</td><td><b>تایید نهایی مدیر پروژه</b></td>
+                            </tr>
+                            <tr class="active">
+                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td> </td><td></td></tr> </table> </td>
+                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td> </td><td></td></tr> </table> </td>
+                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td> </td><td></td></tr> </table> </td>
+                                <td> <table class="table"> <tr><td>آری</td><td>خیر</td></tr> <tr><td> </td><td></td></tr> </table> </td>
+
+                            </tr>
+                        </table>
+
+
+                        <h6>لطفا در صورت تائید نهایی توسط مدیر پروژه مبلغ فوق از کد هزینه <code class="farsi">{{user.budget_account}}</code> را به شماره کارت <code class="farsi" style="color:black">{{user.debit_card_number}}</code> به نام {{user.persian_firstname}} {{user.persian_lastname}} واریز نمایید.</h6>
+
+        <small>این پرونده در تاریخ {{$parent.persianDate()}} توسط سامانه مدیریت پروژه پویامهر تولید گردید.</small>
+        <small></small>
+
+
+        </div>
+        </div>
+        <div class="col-sm-2 column" ng-if="$parent.isAdmin && user.monthly_present_hours">
+
+			<div class="btn-group" >
+                <button id="collectionAddButton" ng-click="print()" class="btn btn-primary btn-sm" type="button">
+                    <em class="glyphicon glyphicon-print"></em>
+                </button>
+                <button id="collectionAddButton" ng-click="mailInvoice()" class="btn btn-primary btn-sm" type="button">
+                    <em class="glyphicon glyphicon-send"></em>
+                </button>
+			</div>
+    </div>
+

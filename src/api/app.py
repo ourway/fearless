@@ -27,6 +27,7 @@ from models import __all__ as av
 from models import *
 import uwsgi
 from sqlalchemy import desc
+from datetime import datetime
 
 
 
@@ -100,8 +101,23 @@ class DB:
             try:
                 if len(args) != 5:
                     data = [eval('i.%s'%field) for i in data]
+
+
                 elif len(args) == 5:
+                    '''/api/db/user/1?field=tasks'''
                     data = eval('data.%s'%field)
+                    finalResult = []
+                    for i in data:
+                        newDataDict = dict()
+                        for key in i.__dict__.keys():
+                            value = getattr(i, key)
+                            if isinstance(value, (str, type(None), unicode, int, float, long, datetime)):
+                                newDataDict[key] = value
+                        finalResult.append(newDataDict)
+                    if finalResult:
+                        data = finalResult
+                            
+
             except AttributeError, e:
                 print e
                 raise falcon.HTTPBadRequest('Bad Request', 'The requested field is not available for database')

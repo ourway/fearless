@@ -198,15 +198,21 @@ function updateImageSize(img, maxWidth, maxHeight){
             m = $http.post('/api/sendmail', mail);
         }
 
-        $scope.persianDate = function(d){
+        $scope.persianDate = function(d, mode){
         // d is like 2015-1-1
+        list = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 
+                'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
         if (d)
-            a = new Date(a);
+            a = new Date(d)  // 1000 is for unix time date;
         else
             a = new Date();
 
         j = new JDate(a);
-        return j.jdate[2] + '/' + j.jdate[1] + '/' + j.jdate[0]
+        result = [j.jdate[2], list[j.jdate[1]-1], j.jdate[0]]
+        if (mode!=null)
+            return result[mode];
+        else
+            return result[0] + ' ' + result[1] + ' ' + result[2];
         }
         $scope.check_auth_area = function() {
             if ($location.$$path.split('/')[1] == 'auth')
@@ -434,7 +440,6 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
         }
         userInfoReq = $http.get('/api/db/user/'+userId);
         userInfoReq.success(function(resp){
-            delete resp.uuid;
             resp.agreement_start = timeConverter(resp.agreement_start);
             resp.agreement_end = timeConverter(resp.agreement_end);
 
@@ -450,8 +455,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
 
         userTasksReq = $http.get('/api/db/user/'+userId+'?field=tasks');
             userTasksReq.success(function(tasks){
-           $scope.userTasks = tasks; 
-           console.log(tasks);
+                $scope.userTasks = tasks; 
             });
 
         $scope.fileNameChanged = function(e){
@@ -485,13 +489,14 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
                 mail['message']+= 'Here is your monthly salary document.<br/>';
                 mail['message']+= invoice;
                 mail['to'] = $scope.user.email;
-                mail['cc'] = ['rodmena@me.com', 'sara_kayvan@hotmail.com', 'hamid2117@gmail.com'];
+                //mail['cc'] = ['rodmena@me.com', 'sara_kayvan@hotmail.com', 'hamid2117@gmail.com'];
                 mail['subject'] = 'Pooyamehr Financial Departement - Salary Document';
                 if (confirm('Are you sure you want to send invoice to ' + $scope.user.email + ' ?'))
                     $scope.$parent.sendmail(mail);
     }
 
     $scope.updateUserInformation = function(){
+        $scope.user.rate = ($scope.user.monthly_salary / $scope.user.monthly_working_hours) * 8;
         x = $http.post('/api/db/user/'+ userId, $scope.user); //send it
         x.success(function(resp){
                 if (!$routeParams.userId)

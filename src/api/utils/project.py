@@ -141,6 +141,7 @@ class GetProjectLatestReport:
                         csvdata = csvdata.body
                     csvfile.write(csvdata)
                     jsondata = parse_tjcsv(csvfile)
+                    print jsondata
                     for each in jsondata:
                         d =  jsondata[each]
                         typ = d.get('type')
@@ -154,6 +155,7 @@ class GetProjectLatestReport:
                             start = d.get('start')
                             end = d.get('end')
                             duration = d.get('duration')
+                            criticalness = d.get('criticalness')
                             complete = d.get('completion')
                             if complete:
                                 complete = complete[:-1]
@@ -168,6 +170,7 @@ class GetProjectLatestReport:
                                 target.computed_end = end
                                 target.end = end
                             target.complete = complete
+                            target.criticalness = criticalness
                             target.computed_complete = complete
                             target.gauge = gauge
                             target.effort = effort

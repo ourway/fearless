@@ -141,9 +141,9 @@ table {
 }
 
 .farsi {
-    direction:rtl;
-    text-align:right;
-    font-family:Terafik;
+    direction:rtl !important;
+    text-align:right !important;
+    font-family:YEKAN_0 !important;
     -webkit-font-smoothing: antialiased;
 }
 
