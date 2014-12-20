@@ -78,7 +78,7 @@ class DB:
         show = req.get_param('show')
         if len(args) == 5:
             id = args[4]
-            query = 'session.query({t}).filter({t}.{key}=="{id}")'.format(
+            query = 'session.query({t}).filter({t}.{key}=="{id}").order_by(desc({t}.modified_on))'.format(
                 t=table, id=id, key=key)
 
             data = eval(query).all()
