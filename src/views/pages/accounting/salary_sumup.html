@@ -1,0 +1,45 @@
+    	<div class="row clearfix">
+            <div class="col-md-11" id="salary_sumup">
+                <table class="table table-responsive table-bordered farsi" style="direction:rtl;text-align:right">
+
+                    <tr class="info">
+                        <td>ردیف</td>
+                        <td>نام</td>
+                        <td>پایه حقوق</td>
+                        <td>بیمه</td>
+                        <td>مالیات</td>
+                        <td>حسن انجام</td>
+                        <td>کسر کار</td>
+                        <td>کد هزینه</td>
+                        <td>مبلغ قابل پرداخت (تومان)</td>
+                    </tr>
+                    <tr class="active" ng-repeat="user in users | orderBy:user.firstname | filter:filterUA track by $index" >
+                        <td>{{$index+1}}</td>
+                        <td><a href="#user/{{user.id}}">{{user.persian_firstname || user.firstname}} {{user.persian_lastname || user.lastname}}</a></td>
+                        <td ng-if="user.monthly_salary">{{user.monthly_salary}}</td>
+                        <td ng-if="user.monthly_salary">{{user.monthly_salary*user.insurance_deductions/100}}</td>
+                        <td ng-if="user.monthly_salary">{{user.monthly_salary*user.payroll_tax/100}}</td>
+                        <td ng-if="user.monthly_salary">{{user.monthly_salary*user.retention/100}}</td>
+                        <td ng-if="user.monthly_salary">{{roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours)))}}</td>
+                        <td ng-if="user.monthly_salary">{{user.budget_account}}</td>
+                        <td ng-if="user.monthly_salary" class="success"><strong>{{ceilG(user.monthly_salary - 
+                (user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + 
+                (roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours))))))}}</strong></td>
+                        
+                    </tr>
+
+                </table>
+    
+
+            </div>
+        <div class="col-sm-1 column">
+			<div class="btn-group" >
+                <button id="collectionaddbutton" ng-click="print()" class="btn btn-primary btn-sm" type="button">
+                    <em class="glyphicon glyphicon-print"></em>
+                </button>
+                <button id="collectionaddbutton" ng-click="mailSumpup()" class="btn btn-primary btn-sm" type="button">
+                    <em class="glyphicon glyphicon-send"></em>
+                </button>
+            </div>
+        </div>
+        </div>

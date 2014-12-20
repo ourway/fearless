@@ -1,3 +1,16 @@
+   upstream api {
+        server unix://{dir}/etc/fearless_api_1.socket;
+        server unix://{dir}/etc/fearless_api_2.socket;
+        server unix://{dir}/etc/fearless_api_3.socket;
+        server unix://{dir}/etc/fearless_api_4.socket;
+        server unix://{dir}/etc/fearless_api_5.socket;
+        server unix://{dir}/etc/fearless_api_6.socket;
+        server unix://{dir}/etc/fearless_api_7.socket;
+        server unix://{dir}/etc/fearless_api_8.socket;
+    }
+
+
+
 server {
     listen 5003;
     server_name _;
@@ -38,11 +51,12 @@ server {
     }
 
      location /api {
-        uwsgi_pass unix://{dir}/etc/fearless_api.socket;
+        uwsgi_pass api;
         include uwsgi_params; 
+        #proxy_pass http://localhost:5002;
         client_max_body_size 8000M;
-        include /etc/nginx/uwsgi_params;
-        #uwsgi_ignore_client_abort on;
+        #include /etc/nginx/uwsgi_params;
+        uwsgi_ignore_client_abort on;
         uwsgi_read_timeout 300;
         }
 

@@ -8,6 +8,8 @@ vacuum=True
 enable-threads=True
 #offload-threads = 2
 gevent-monkey-patch=True
+enable-threads=True
+gevent=100
 
 touch-reload=app.py
 touch-reload=model.py
@@ -28,14 +30,14 @@ disable-logging=True
 listen=128
 optimize=2
 cache2=True,name=ctc_internal_cache,items=2000
-thunder-lock=True
+thunder-lock=False
 max-requests=1024
 #limit-as=256
 reload-mercy=8
 chmod-socket    = 666
 chmod-socket    = 666
 #daemonize=/home/project/log
-socket={dir}/etc/fearless_api.socket
+socket={dir}/etc/fearless_api_1.socket
 #http=127.0.0.1:5002
 buffer-size=32768
 #stats=/tmp/statsockt

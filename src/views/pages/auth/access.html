@@ -3,7 +3,7 @@
     <div class="container">
     	<div class="row clearfix">
             <br/>
-                <div class="col-md-8 column usersUA">
+                <div class="col-md-12 usersUA">
             <input placeholder="Filter users. Example: type yahoo for filtering users with yahoo! email" class="form-control" type="text" ng-model="filterUA" />
             <div ng-repeat="user in users | orderBy:'firstname'| filter:filterUA" class="useracessDiv" >
                 <img ng-show="user.avatar" ng-src="{{user.avatar}}" width="100" class="pull-left img-responsive img-rounded center-block img-thumbnail"/>
@@ -17,6 +17,8 @@
 
 
         </div>
+        <hr/>
+        <div ng-include="'pages/accounting/salary_sumup.html'"></div>
 
     </div> <!-- /container -->
 

@@ -141,7 +141,6 @@ class GetProjectLatestReport:
                         csvdata = csvdata.body
                     csvfile.write(csvdata)
                     jsondata = parse_tjcsv(csvfile)
-                    print jsondata
                     for each in jsondata:
                         d =  jsondata[each]
                         typ = d.get('type')

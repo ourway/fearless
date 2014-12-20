@@ -94,7 +94,7 @@ class AssetSave:
             try:
                 fs = cgi.FieldStorage(fp=req.stream, environ=req.env)
             except (ValueError, IOError):
-                resp.status = falson.HTTP_400
+                resp.status = falcon.HTTP_400
                 resp.body={'message':'error'}
                 return
 

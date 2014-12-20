@@ -30,6 +30,11 @@ DB = msql
 
 
 engine = create_engine(DB, echo=False, convert_unicode=True)
+
+
+
+
+#engine = create_engine("postgresql+psycopg2://farsheed:rrferl@localhost:5432/fearless2")
 #engine.raw_connection().connection.text_factory = str
 Session = mptt_sessionmaker(sessionmaker(bind=engine))
 session = Session()

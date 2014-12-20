@@ -14,6 +14,8 @@ Clean code is much better than Cleaner comments!
 
 #from gevent import monkey; monkey.patch_all()
 from falcon_patch import falcon
+import cgi
+#cgi.maxlen = 10 * 1024 * 1024 # 8Gb
 import importlib
 from utils.helpers import commit, jsonify, get_params
 import urlparse
@@ -25,7 +27,6 @@ from utils.reports import Mailer, AddReport
 from gevent import wsgi
 from models import __all__ as av
 from models import *
-import uwsgi
 from sqlalchemy import desc
 from datetime import datetime
 
@@ -284,6 +285,6 @@ if __name__ == '__main__':
     import sys
     import os
     sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
-    from werkzeug import run_simple
-    run_simple('0.0.0.0', 5004, app, use_debugger=True, use_reloader=True)
-    #wsgi.WSGIServer(('127.0.0.1', 5004), app).serve_forever()
+    #from werkzeug import run_simple
+    #run_simple('0.0.0.0', 5002, app, use_debugger=True, use_reloader=True)
+    wsgi.WSGIServer(('127.0.0.1', 5002), app).serve_forever()

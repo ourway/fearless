@@ -78,13 +78,21 @@ class IDMixin(object):
 
     @property
     def columns(self):
-        return [c.name for c in self.__table__.columns]
+        data =  [c.name for c in self.__table__.columns]
+        return data
+            
 
     @property
     def columnitems(self):
         try:
-            return dict([(c, getattr(self, c)) for c in self.columns])
-        except AttributeError:
+            data =  dict([(c, getattr(self, c)) for c in self.columns])
+            for i in data:
+                ## convert datetime to unix time
+                if isinstance(data[i], datetime.datetime):
+                    data[i] = data[i].strftime('%s')
+            return data
+        except AttributeError, e:
+            print e
             return self.title
 
     def __repr__(self):
