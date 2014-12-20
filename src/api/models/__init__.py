@@ -23,7 +23,7 @@ usage:
 __all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
            'Repository', 'Project', 'now', 'Ticket', 'session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
-           'Document', 'Account', 'Collection', 'r', 'es', 'Departement']
+           'Document', 'Account', 'Collection', 'r', 'es', 'Departement', 'Comment']
 
 import os
 
@@ -61,6 +61,8 @@ from models.version import Version
 from models.asset import Asset
 from models.collection import Collection
 from models.departement import Departement
+from models.document import Document
+from models.comment import Comment
 from utils.defaults import public_repository_path
 Base.metadata.create_all(engine)
 

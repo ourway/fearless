@@ -145,7 +145,8 @@ border-bottom: 1px solid #57BEDD;
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Project Name</label>
 					<div class="col-sm-6">
-                        <input type="text" class="form-control" placeholder="New project name. Must be unique" ng-model="project.name" />
+                        <input type="text" class="form-control" ng-class="{'farsi':!$parent.isASCII(project.name)}"  placeholder="New project name. Must be unique" 
+                        ng-model="project.name" />
 					</div>
 				</div>
 				<div class="form-group" ng-init="newProject.start=timeConverter()">
@@ -271,7 +272,7 @@ border-bottom: 1px solid #57BEDD;
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Task title</label>
 					<div class="col-sm-6">
-                        <input type="text" class="form-control" placeholder="New task name" ng-model="newtask.title" />
+                        <input type="text" class="form-control" ng-class="{'farsi':!$parent.isASCII(newtask.title)}"  placeholder="New task name" ng-model="newtask.title" />
 					</div>
 				</div>
 				<div class="form-group">
@@ -373,7 +374,8 @@ border-bottom: 1px solid #57BEDD;
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Task title</label>
 					<div class="col-sm-6">
-                        <input type="text" class="form-control" placeholder="Task name" ng-model="editTaskInfo.title" />
+                        <input type="text" class="form-control" ng-class="{'farsi':!$parent.isASCII(editTaskInfo.title)}"  placeholder="Task name" 
+                        ng-model="editTaskInfo.title" />
 					</div>
 				</div>
 				<div class="form-group">
@@ -555,7 +557,7 @@ border-bottom: 1px solid #57BEDD;
                             <li ng-click="taskDetail(task.id)" title="{{task.name}}" class="taskA" 
                             ng-repeat="task in tasks | orderBy:'start' | filter:filterTaskName ">
                             
-                            <a class="btn-sm" style="color: #13560C;" data-task-title="{{toTitleCase(task.title)}}" 
+                            <a class="btn-sm" ng-class="{'farsi':!$parent.isASCII(task.title)}" style="color: #13560C;" data-task-title="{{toTitleCase(task.title)}}" 
                                 ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" id="task_{{task.id}}" >{{toTitleCase(task.title).slice(0,30)}}</a></li>
                         </ol>
 
@@ -592,6 +594,10 @@ border-bottom: 1px solid #57BEDD;
         $('#editProjectButton').click(function(){
             $('#projectEditModal').modal('show');
         });
+
+
+
+
     });
 </script>
 

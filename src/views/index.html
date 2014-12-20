@@ -19,6 +19,7 @@
         <link rel="stylesheet" href="css/auth.css">
         <link rel="stylesheet" href="css/dropzone.css">
         <link rel="stylesheet" href="css/video-js.min.css">
+        <link rel="stylesheet" href="css/blueimp-gallery.min.css">
         <link rel="apple-touch-icon" href="images/logo_small.png" sizes="152x152">
         <link rel="shortcut icon" href="images/logo.ico">
         <style>
@@ -34,6 +35,19 @@
         <script src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
     </head>
     <body ng-cloak ng-controller="mainController">
+
+<div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-start-slideshow="true">
+    <div class="slides"></div>
+    <h3 class="title"></h3>
+    <a class="prev">‹</a>
+    <a class="next">›</a>
+    <a class="close">×</a>
+    <a class="play-pause"></a>
+    <ol class="indicator"></ol>
+</div>
+
+
+
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
@@ -152,6 +166,9 @@
         <script src="js/vendor/resumable.js"></script>
 	    <script src='js/vendor/FileSaver.js'></script>
         <script src="js/vendor/moment.min.js"></script>
+        <script src="js/vendor/moment-twitter.js"></script>
+        <script src="js/vendor/moment-jalaali.js"></script>
+        <script src="js/vendor/moment-timezone-with-data.min.js"></script>
         <script src="js/vendor/angular-moment.min.js"></script>
         <script src="js/vendor/fullcalendar.min.js"></script>
         <script src='js/vendor/Chart.min.js'></script>
@@ -162,6 +179,9 @@
         <script src="js/vendor/video.js"></script>
         <script src="js/vendor/persian.min.js"></script>
         <script src="js/vendor/jdate.js"></script>
+        <script src="js/vendor/impress.js"></script>
+        <script src="js/vendor/d3.v3.min.js"></script>
+        <script src="js/vendor/jquery.blueimp-gallery.min.js"></script>
         <script src="js/main.js"></script>
 
 

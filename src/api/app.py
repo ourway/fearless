@@ -26,7 +26,7 @@ from gevent import wsgi
 from models import __all__ as av
 from models import *
 import uwsgi
-from sqlalchemy import desc
+from sqlalchemy import desc, asc
 from datetime import datetime
 
 
@@ -65,8 +65,7 @@ class DB:
 
     #@Authorize('see_db')
     def on_get(self, req, resp, **kw):
-        banned = ['password', 'token', 'created_on', 'modified_on', 
-                  'session_id', 'latest_session_id', 'lastLogIn', 'password2']
+        banned = ['password', 'token', 'session_id', 'latest_session_id', 'lastLogIn', 'password2']
         args = req.path.split('/')
         table = args[3]
         u = getUserInfoFromSession(req)
@@ -77,10 +76,10 @@ class DB:
         show = req.get_param('show')
         if len(args) == 5:
             id = args[4]
-            query = 'session.query({t}).filter({t}.{key}=="{id}")'.format(
+            query = 'session.query({t}).filter({t}.{key}=="{id}").order_by(desc({t}.modified_on))'.format(
                 t=table, id=id, key=key)
+            data = eval(query).all()
 
-            data = eval(query).first()
         else:
             if not show:
                 query = 'session.query({t}).order_by(desc({t}.modified_on))'.format(t=table)
@@ -105,17 +104,19 @@ class DB:
 
                 elif len(args) == 5:
                     '''/api/db/user/1?field=tasks'''
-                    data = eval('data.%s'%field)
                     finalResult = []
-                    for i in data:
-                        newDataDict = dict()
-                        for key in i.__dict__.keys():
-                            value = getattr(i, key)
-                            if isinstance(value, (str, type(None), unicode, int, float, long, datetime)):
-                                newDataDict[key] = value
-                        finalResult.append(newDataDict)
+                    for each in data:
+                        _d = getattr(each, field)
+                        for i in _d:
+                            newDataDict = dict()
+                            for key in i.__dict__.keys():
+                                value = getattr(i, key)
+                                if isinstance(value, (str, type(None), unicode, int, float, long, datetime)) and key not in banned:
+                                    newDataDict[key] = value
+                            finalResult.append(newDataDict)
                     if finalResult:
                         data = finalResult
+
                             
 
             except AttributeError, e:
@@ -123,9 +124,8 @@ class DB:
                 raise falcon.HTTPBadRequest('Bad Request', 'The requested field is not available for database')
 
 
-            resp.body = data
-            return
-
+            #resp.body = data
+            #return
 
         try:
             data = repr(data)
@@ -142,9 +142,14 @@ class DB:
                             if each.get(i):
                                 del(each[i])
 
-            resp.body = d
+            data = d
         except (TypeError, ValueError):
-            resp.body = data
+            print 'here'
+
+
+        resp.body = data
+        if len(args) == 5 and len(data)==1:
+            resp.body = data[0]
         # Ok, We have an id
 
     @falcon.after(commit)
@@ -154,9 +159,11 @@ class DB:
         u = getUserInfoFromSession(req)
         #if not isAuthorizedTo(u.get('id'), 'create_%s'%table):
         #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
-        query_params = get_params(req.stream)
-        insert_cmd = '{t}({q})'.format(t=table, q=query_params)
+        query_params = get_params(req.stream, flat=False)
+        insert_cmd = '{t}()'.format(t=table)
         new = eval(insert_cmd)
+        for i in query_params:
+            setattr(new, i, query_params.get(i))
         resp.status = falcon.HTTP_201
         session.add(new)
         data = repr(new)

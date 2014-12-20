@@ -122,20 +122,20 @@
 					<div class="thumbnail asm_thumb">
                         <div class="col-md-12 ">
                             <div ng-if="isImage(asset)"> 
-                        <a href="/static/{{asset.url}}" title="{{asset.description}}"
-                            ><img class="asm_col_thumb_img thumbnail"  ng-src="/static/{{asset.url}}" /></a>
+                                <a title="{{asset.name}} {{asset.description}}" href="/static/{{asset.url}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}" data-gallery="collectionLinks">
+                                <img class="asm_col_thumb_img thumbnail"  ng-src="/static/{{asset.url}}" /></a>
                             </div>
-                        <div ng-init="activateVideo(asset.id)" ng-if="isVideo(asset)" >
-                        <video id="video_{{asset.id}}" class="video-js vjs-default-skin" controls preload="none" width="235"
-                              data-setup="{}">
-                              <source ng-src="{{'/static/'+asset.url}}" type='{{asset.content_type}}' /></video>
-                        </div>
+                            <div ng-if="isVideo(asset)" >
+                                <a  title="{{asset.name}} {{asset.description}}"  sources="{{['/static/'+asset.url]}}" type="{{asset.content_type}}" href="/static/{{asset.url}}" data-gallery="collectionLinks">
+                            <video id="video_{{asset.id}}" class="video-js vjs-default-skin" preload="metadata" width="235"
+                                  data-setup="{}">
+                                  <source ng-src="{{'/static/'+asset.url}}" type='{{asset.content_type}}' /></video></a>
+                            </div>
 						</div>
 
 
 
                         <div class="caption" >
-
                             <label ng-if="!isImage(asset)"  style="color:grey">{{asset.content_type.split('/')[1] | uppercase}}</label>
                     <br/>
                     <A   ng-if="!isImage(asset) ||  !isVideo(asset)"  href="/static/{{asset.url}}"><button id="collectionAddButton" class="btn btn-default btn-sm" type="button">
@@ -152,8 +152,11 @@
 		</div>
     </div>
 
-
 	</div>
+    <hr/>
+    <div ng-include="'pages/comment/index.html'"></div>
+
+
 </div>
 
 

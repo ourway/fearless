@@ -266,6 +266,17 @@ border:1px solid #ccc;
 border-radius:5px;
 font-size: 13px;
 }
+li.ui-state-default{
+    background:#fff0;
+    border:none;
+    border-bottom:1px solid #ddd;
+    text-align: left;
+    padding-bottom: 10px;
+}
+
+li.ui-state-default:last-child {
+    border-bottom:none;
+}
 
 
 

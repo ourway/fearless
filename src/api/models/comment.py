@@ -22,8 +22,11 @@ from sqlalchemy.orm import validates, deferred
 from mixin import IDMixin, Base
 
 
-class Document(IDMixin, Base):
+class Comment(IDMixin, Base):
     """Implements o simple Document structure for wikis and structures
     """
-    title = Column(String(256), unique=True)
+    item = Column(String(256), nullable=False)
     content = Column(Text, nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    user = relationship("User", backref='comments')
+

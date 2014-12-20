@@ -1,0 +1,39 @@
+
+<div class="container">
+    <div class="col-lg-4 col-sm-6 text-center">
+    <div class="well">
+        <h4>What is on your mind?<br/><small>Write only about this page</small></h4>
+    <div class="input-group">
+        <input type="text" id="userComment" class="form-control input-sm chat-input" ng-model="$parent.newComment.content" placeholder="Write your message here..." />
+	    <span class="input-group-btn" ng-click="$parent.addComment()">     
+            <button class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-comment"></span> Add Comment</button>
+        </span>
+    </div>
+    <hr data-brackets-id="">
+    <ul data-brackets-id="" id="sortable" class="list-unstyled ui-sortable">
+        <div ng-repeat="comment in $parent.comments[$parent.comment_id] track by $index">
+            <a href="#user/{{comment.user_id}}" class="pull-left primary-font">{{$parent.members[comment.user_id].firstname}} {{$parent.members[comment.user_id].lastname}}</a>
+        <small class="pull-right text-muted">
+            <span class="glyphicon glyphicon-time"></span> {{$parent.prettyDate(comment.modified_on)}} ago</small>
+        </br>
+        <li class="ui-state-default" ng-class="{'farsi':!$parent.isASCII(comment.content)}">{{comment.content}}</li>
+        </br>
+        <div>
+    </ul>
+    </div>
+</div>
+
+<script>
+
+function isASCII(str, extended) {
+    return (extended ? /^[\x00-\xFF]*$/ : /^[\x00-\x7F]*$/).test(str);
+}
+
+    $('input').keyup(function(){
+        if (!isASCII(this.value))
+            $(this).addClass('farsi');
+        else
+            $(this).removeClass('farsi');
+    })
+
+</script>

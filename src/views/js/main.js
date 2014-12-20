@@ -185,8 +185,53 @@ function updateImageSize(img, maxWidth, maxHeight){
                                                       $timeout, authFactory, $location, $routeParams) {
 		// create a message to display in our view
         $rootScope.title = "Centeral Auth - Fearless";
+        $scope.comments = {};
+        $scope.newComment = {};
         $scope.login_init = function() {
             //
+        }
+        $scope.prettyDate = function(time){
+            var _d = moment.unix(time); 
+            return moment.duration(_d-moment()).humanize();
+
+        }
+        $scope.isASCII = function(str, extended) {
+            data = (extended ? /^[\x00-\xFF]*$/ : /^[\x00-\x7F]*$/).test(str);
+            return data;
+        }
+
+
+        userInfoReq = $http.get('/api/db/user/');
+        userInfoReq.success(function(resp){
+                _members = {};
+                for (i in resp){
+                    _members[resp[i].id] = resp[i];
+                }
+                $scope.members = _members;
+            });
+
+        $scope.getComments = function(){
+            console.log($scope.comment_id);
+            req = $http.get('/api/db/comment/'+$scope.comment_id+'?key=item');
+            req.success(function(resp){
+                    $scope.comments[$scope.comment_id] = resp;
+                })
+        }
+        $scope.addComment = function(){
+            $scope.newComment.user_id = $scope.userInfo.userid;
+            $scope.newComment.item = $scope.comment_id;
+            if ($scope.userInfo.userid && $scope.newComment.content){
+                req = $http.put('/api/db/comment', $scope.newComment);
+                req.success(function(resp){
+                            $scope.newComment.modified_on = moment().unix();
+                            if (!$scope.comments[$scope.comment_id])
+                                $scope.comments[$scope.comment_id] = [];
+                            $scope.comments[$scope.comment_id].splice(0, 0, $scope.newComment);
+                            $scope.newComment = {};
+                        })
+
+            }
+
         }
         $scope.getGroups = function(){
             req = $http.get('/api/db/group').success(function(resp){
@@ -1069,6 +1114,18 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     return true;
             }
         }
+
+        $scope.makeGallery = function(asset){
+            blueimp.Gallery([
+                {
+                    title: asset.name,
+                    href: '/static/' + asset.url,
+                    type: asset.content_type,
+                }
+            ]);
+
+        }
+
         $scope.isVideo = function(asset){
             ct = asset.content_type;
             ctM = ct.split('/')[0];
@@ -1129,9 +1186,11 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             req = $http.get('/api/collection/'+ci);
             req.success(function(resp){
                     $scope.collection = resp;
+                    $scope.$parent.comment_id = resp.uuid;
+                    $scope.$parent.getComments();
                     $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+"&multipart=true";
                     $scope.dropzone.options.url = $scope.attachurl;
-                    $scope.activateVideo();
+                    //$scope.activateVideo();
 
                 })
         }
@@ -1161,16 +1220,6 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
         });
 //////////////////////////////////////////////////////
-
-$(document).ready(function(){
-    $('input').on('input', function() {
-        alert('Text1 changed!');
-    });
-
-
-
-
-});
 
 
 /////////////////////////////////////////////////

@@ -386,6 +386,7 @@ class CollectionInfo:
             data['id'] = target.id
             data['container'] = target.container
             data['holdAssets'] = target.holdAssets
+            data['uuid'] = target.uuid
             data['path'] = target.path
             data['description'] = target.description
             data['repository'] = {'name':target.repository.name, 'id':target.repository.id}
