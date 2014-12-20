@@ -26,7 +26,7 @@ from gevent import wsgi
 from models import __all__ as av
 from models import *
 import uwsgi
-from sqlalchemy import desc, asc
+from sqlalchemy import desc
 from datetime import datetime
 
 
@@ -65,21 +65,23 @@ class DB:
 
     #@Authorize('see_db')
     def on_get(self, req, resp, **kw):
-        banned = ['password', 'token', 'session_id', 'latest_session_id', 'lastLogIn', 'password2']
+        banned = ['password', 'token', 'created_on', 'modified_on', 
+                  'session_id', 'latest_session_id', 'lastLogIn', 'password2']
         args = req.path.split('/')
         table = args[3]
         u = getUserInfoFromSession(req)
         #if not isAuthorizedTo(u.get('id'), 'see_%s'%table):
         #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         key = req.get_param('key') or 'id'
+        listMe = req.get_param('list')
         table = table.title()
         show = req.get_param('show')
         if len(args) == 5:
             id = args[4]
-            query = 'session.query({t}).filter({t}.{key}=="{id}").order_by(desc({t}.modified_on))'.format(
+            query = 'session.query({t}).filter({t}.{key}=="{id}")'.format(
                 t=table, id=id, key=key)
-            data = eval(query).all()
 
+            data = eval(query).all()
         else:
             if not show:
                 query = 'session.query({t}).order_by(desc({t}.modified_on))'.format(t=table)
@@ -105,17 +107,25 @@ class DB:
                 elif len(args) == 5:
                     '''/api/db/user/1?field=tasks'''
                     finalResult = []
-                    for each in data:
-                        _d = getattr(each, field)
-                        for i in _d:
+                    for i in data:
+                        #_d = eval('i.%s'%field)
+                        _d = getattr(i, field)
+                        if isinstance(_d, list):
+                            for item in _d:
+                                newDataDict = dict()
+                                for key in item.__dict__.keys():
+                                    value = getattr(item, key)
+                                    if isinstance(value, (str, type(None), unicode, int, float, long, datetime)):
+                                        newDataDict[key] = value
+                                finalResult.append(newDataDict)
+                        else:
                             newDataDict = dict()
-                            for key in i.__dict__.keys():
-                                value = getattr(i, key)
-                                if isinstance(value, (str, type(None), unicode, int, float, long, datetime)) and key not in banned:
+                            for key in _d.__dict__.keys():
+                                value = getattr(_d, key)
+                                if isinstance(value, (str, type(None), unicode, int, float, long, datetime)):
                                     newDataDict[key] = value
-                            finalResult.append(newDataDict)
-                    if finalResult:
-                        data = finalResult
+
+                    data = finalResult
 
                             
 
@@ -124,11 +134,12 @@ class DB:
                 raise falcon.HTTPBadRequest('Bad Request', 'The requested field is not available for database')
 
 
-            #resp.body = data
-            #return
+            resp.body = data
+            return
+
 
         try:
-            data = repr(data)
+            #data = repr(data)
             d = json.loads(data)
             if d and isinstance(d, dict):
                 for i in banned:
@@ -142,13 +153,11 @@ class DB:
                             if each.get(i):
                                 del(each[i])
 
-            data = d
+            resp.body = d
         except (TypeError, ValueError):
-            print 'here'
+            resp.body = data
 
-
-        resp.body = data
-        if len(args) == 5 and len(data)==1:
+        if len(args)==5 and len(data)==1 and not listMe:
             resp.body = data[0]
         # Ok, We have an id
 

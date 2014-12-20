@@ -1,4 +1,4 @@
-        <div id="invoice_print_area" ng-if="$parent.isAdmin && user.monthly_present_hours">
+        <div id="invoice_print_area" ng-if="($parent.isAdmin || $parent.userInfo.userid == user.id) && user.monthly_present_hours">
         <div id="invoice" class="col-md-8 column farsi" style="direction:rtl;text-align:right">
             <h5>فیش حقوق {{$parent.persianDate(null, 1)}} ماه سال {{$parent.persianDate(null, 2)}} <b>{{user.persian_firstname}} {{user.persian_lastname}}</b> 
                 <span ng-if="user.departements">از دپارتمان IT</span> <span ng-if="user.job">با سمت {{user.job}}</span></h5>

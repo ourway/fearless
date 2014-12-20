@@ -83,17 +83,11 @@ def get_params(stream, flat=True):
     data = stream.read()
     if not data:
         return {}
-    try:
-        stream = json.loads(data)
-        if not flat:
-            return stream
-
-
-        l = ','.join(['%s="%s"' % (i, stream[i]) for i in stream])
-        return l
-    except ValueError, e:
-        print e
-        return {}
+    stream = json.loads(data)
+    if not flat:
+        return stream
+    l = ','.join(['%s="%s"' % (i, stream[i]) for i in stream])
+    return l
 
 
 def parse_tjcsv(csvfile):

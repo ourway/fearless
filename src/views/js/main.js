@@ -212,7 +212,7 @@ function updateImageSize(img, maxWidth, maxHeight){
 
         $scope.getComments = function(){
             console.log($scope.comment_id);
-            req = $http.get('/api/db/comment/'+$scope.comment_id+'?key=item');
+            req = $http.get('/api/db/comment/'+$scope.comment_id+'?key=item&list=true');
             req.success(function(resp){
                     $scope.comments[$scope.comment_id] = resp;
                 })
@@ -489,7 +489,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
             resp.agreement_end = timeConverter(resp.agreement_end);
 
             $scope.user = resp; 
-            $http.get('/api/db/user/'+userId+'?field=grps').success(function(grps){
+            $http.get('/api/db/user/'+userId+'?field=grps&list=true').success(function(grps){
                 $scope.user.grps = grps; 
                 })
             //console.log(resp);
@@ -498,7 +498,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
                 console.log(a, b, c, d);
             });
 
-        userTasksReq = $http.get('/api/db/user/'+userId+'?field=tasks');
+        userTasksReq = $http.get('/api/db/user/'+userId+'?field=tasks&list=true');
             userTasksReq.success(function(tasks){
                 $scope.userTasks = tasks; 
             });
@@ -542,6 +542,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
 
     $scope.updateUserInformation = function(){
         $scope.user.rate = ($scope.user.monthly_salary / $scope.user.monthly_working_hours) * 8;
+        $scope.$parent.members[$scope.user.id] = $scope.user;
         x = $http.post('/api/db/user/'+ userId, $scope.user); //send it
         x.success(function(resp){
                 if (!$routeParams.userId)
