@@ -24,8 +24,8 @@
         <link rel="shortcut icon" href="images/logo.ico">
         <style>
             body {
-                padding-top: 50px;
-                padding-bottom: 20px;
+                padding-top: 10px;
+                padding-bottom: 10px;
             }
                 [ng\:cloak], [ng-cloak], .ng-cloak { display: none; }
         </style>
@@ -51,82 +51,51 @@
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
-          <div class="">
 
-          <a class="navbar-brand" ng-click="page='home'" href="#"><span>{{appName}}&trade;</span></a>
-          <ul class="nav navbar-nav">
-            <li ng-class="{active:page=='pms'}"><a ng-click="page='pms'" href="#pms">Projects</a></li>
-            <li ng-if="isAdmin || isClient || isManager"  ng-class="{active:page=='cr'}"  ><a ng-click="page='cr'" href="#cr">Reports</a></li>
-            <li ng-class="{active:page=='ams'}"   ><a ng-click="page='ams'" href="#ams">Assets</a></li>
-            <li ng-class="{active:page=='showtime'}"   ><a ng-click="page='showtime'" href="/app/showtime/">ShowTime&reg;</a></li>
-            <li class="dropdown">
-              <a href="" class="dropdown-toggle" data-toggle="dropdown">Crew<span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu">
-                <li class="dropdown-header">Logging and reports</li>
-                <li><a href="#report">Report</a></li>
-                <li><a href="/app/idea">Ideas</a></li>
-                <li><a href="#rnd">RnD</a></li>
-                <li><a target="_new" href="http://192.168.20.162:5000">Development Area</a></li>
-                <li><a href="#stay_in_touch">Stay in touch with managers</a></li>
-                <li class="divider"></li>
-                <li class="dropdown-header">Utilities</li>
-                <li><a href="#download_for_me">Download requests</a></li>
-                <li class="divider"></li>
-                <li class="dropdown-header">Documents</li>
-                <li><a href="#asset_docs">Asset management protocols</a></li>
-                <li><a href="#human_docs">Interaction protocols</a></li>
-                <li><a href="#timing_docs">Time management protocols</a></li>
-                <li><a href="#"></a></li>
-              </ul>
+      <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#"><code>Fear:Less</code></a>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li ><a href="#">Home</a></li>
+              <li><a href="#pms">Projects</a></li>
+              <li><a href="#pms/tasks">Tasks</a></li>
+              <li class="dropdown">
+                <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tools <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#report">Reports</a></li>
+                  <li><a href="#">GitLab</a></li>
+                  <li><a href="#">Chat Corner</a></li>
+                  <li class="divider"></li>
+                  <li class="dropdown-header">Fear:Less CARE</li>
+                  <li><a href="">Contact Managers</a></li>
+                  <li><a href="#">Requests</a></li>
+                </ul>
               </li>
-
-              <li class="dropdown" ng-if="isAdmin || isClient || isManager" >
-              <a href="" class="dropdown-toggle" data-toggle="dropdown">Clients<span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu">
-                <li class="dropdown-header">Monitoring</li>
-                <li><a href="#monitoring">Monitoring</a></li>
-                <li><a href="#health">System health check</a></li>
-                <li><a href="#status">Project Status</a></li>
-                <li class="divider"></li>
-                <li class="dropdown-header">Authorization</li>
-                <li><a href="#ua">User Access</a></li>
-                <li class="divider"></li>
-                <li class="dropdown-header">Reports</li>
-                <li><a href="#client_reports">Crew reports</a></li>
-                <li><a href="#asset_reports">Asset reports</a></li>
-                <li><a href="#"></a></li>
-              </ul>
-            </li>
-
-
-
-          </ul>
-
-
-
-        </div>
-
-
-        <div ng-if="!check_auth_area()" class="navbar-collapse collapse" ng-init="is_logged_in()">
-
-
-        <form ng-if="userInfo.logged_in" class="navbar-form navbar-right" role="form" name="profile_form">
-            <button class="btn btn-info" ng-click=";go('profile/')">{{userInfo.username}}</button>
-            <button class="btn btn-danger" ng-click="loginInfo.action='signout';doLogout();go('auth/login/'+$location.$$path)">Sign Out</button>
+            </ul>
+            <ul class="nav navbar-nav navbar-right" ng-if="!check_auth_area()" ng-init="is_logged_in()">
+        <form ng-if="userInfo.logged_in" class="navbar-form" name="profile_form">
+        <button class="btn btn-info" ng-click=";go('profile/')">{{userInfo.username}}</button>
+        <button class="btn btn-danger" ng-click="loginInfo.action='signout';doLogout();go('auth/login/'+$location.$$path)">Sign Out</button>
         </form>
 
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </nav>
 
 
 
 
-      </div><!--/.navbar-collapse -->
-
-
-
-
-      </div>
     </div>
 	<div id="container" style="min-height:500px">
 <div class="row clearfix">
@@ -139,7 +108,8 @@
  !-->
 
 		<div ng-view></div>
-	    </div>
+    </div>
+
     <hr>
     <div class="container">
       <footer>
@@ -149,8 +119,6 @@
 		</div>
 	</div>
       </footer>
-  </div> <!-- /container -->        
-  </div> <!-- /container -->        
 
         <script src="js/vendor/jquery-2.1.1.min.js"></script>
         <script src="js/vendor/jquery.appear.js"></script>
