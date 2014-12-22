@@ -1216,8 +1216,12 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             },
             accept: function(file, done){
                     // this will be called before thumbnails
-                    file.generateThumbnailFinished = done;
-                    },
+                    _t = file.type.split('/')[0];
+                    if (_t=='image')
+                        file.generateThumbnailFinished = done;
+                    else
+                        done();
+                },
 
             url: 'NULL',
             //autoDiscover: false,
