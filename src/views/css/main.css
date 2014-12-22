@@ -238,7 +238,7 @@ padding: 7px;
 .asm_col_thumb_img{
 border:1px solid #fff;
 opacity:0.9;
-min-height:140px !important;
+height:100px !important;
 }
 
 .asm_col_thumb_img:hover {

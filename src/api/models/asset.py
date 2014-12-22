@@ -98,11 +98,11 @@ class Asset(IDMixin, Base):
             ext = '.' + self.ext
         result = os.path.join(self.collection.repository.path,
                             self.collection.path,
-                            self.path)
+                            self.fullname)
 
         return result
 
     @property
     def url(self):
         return os.path.join(os.path.basename(self.collection.repository.path),
-                            self.collection.path, self.path)
+                            self.collection.path, self.fullname)

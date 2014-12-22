@@ -601,7 +601,7 @@ function showtime() {
                             {
                                 this.imgsAdata[f] = "data:" + 'image/webp' + ";base64," + btoa(tempA.asBinary());
                                 $("#sequenceImage").prop("src", this.imgsAdata[f]);
-                                //postProcess(_data, f);
+                                //postProcess(_data, f)file
                                 if (!this.thumbstate[f])
                                     this.addThumb(this.imgsAdata[f]);
                             }

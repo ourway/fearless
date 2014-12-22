@@ -1185,7 +1185,9 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         $scope.dropzone = new Dropzone("#my-awesome-dropzone", {
             init: function() {
                 this.on("addedfile", function(file) {
-                    //console.log("Added file."); 
+                    _t = file.type.split('/')[0];
+                    if (_t=='image' || _t=='video'){
+                        }
                     });
                 this.on("complete", function(file) {
                     $timeout(function(){
@@ -1198,19 +1200,28 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
                     });
                 this.on("queuecomplete", function(file, resp) {
-                        console.log('all complete')
                         $scope.getCollectionDetails();
                         $scope.$apply();
                     });
                 this.on("thumbnail", function(file, dataUrl) {
-                        //$scope.dropzone.options.url = 'ok';
-                        //$scope.$apply();
+                        file.thumbnail = dataUrl;
+                        file.generateThumbnailFinished();
+
+                    });
+                this.on("sending", function(file, b, c) {
+                        if (file.thumbnail)
+                            c.append('thumbnail', file.thumbnail);
 
                     });
             },
+            accept: function(file, done){
+                    // this will be called before thumbnails
+                    file.generateThumbnailFinished = done;
+                    },
+
             url: 'NULL',
             //autoDiscover: false,
-            //autoProcessQueue: false,
+            autoProcessQueue: true,
             method:'PUT',
             parallelUploads: 4,
             maxFilesize: 8000,

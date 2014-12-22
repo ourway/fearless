@@ -123,7 +123,12 @@
                         <div class="col-md-12 ">
                             <div ng-if="isImage(asset)"> 
                                 <a title="{{asset.name}} {{asset.description}}" href="/static/{{asset.url}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}" data-gallery="collectionLinks">
-                                <img class="asm_col_thumb_img thumbnail"  ng-src="/static/{{asset.url}}" /></a>
+                                <img ng-if="!asset.thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="/static/{{asset.url}}" />
+                                <img ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{asset.thumbnail}}" /></a>
+                            </div>
+                            <div ng-if="!isImage(asset) && !isVideo(asset)"> 
+                                <a title="{{asset.name}} {{asset.description}}" href="/static/{{asset.url}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}" data-gallery="collectionLinks">
+                                <img class="asm_col_thumb_img thumbnail" ng-src="/app/images/icons/P_Movie.svg.png" /></a>
                             </div>
                             <div ng-if="isVideo(asset)" >
                                 <a  title="{{asset.name}} {{asset.description}}"  sources="{{['/static/'+asset.url]}}" type="{{asset.content_type}}" href="/static/{{asset.url}}" data-gallery="collectionLinks">

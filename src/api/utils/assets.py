@@ -88,6 +88,7 @@ class AssetSave:
         body = req.stream
 
         b64 = req.get_param('b64')
+        thumbnail = req.get_param('thmb')
         mt = req.get_param('multipart')
         mtname = None
         if mt:
@@ -99,10 +100,12 @@ class AssetSave:
                 return
 
             body = fs['file'].file
+            if fs.has_key('thumbnail'): ## thumbnails are dataURLs
+                thumbnail = fs['thumbnail'].file.read()  ## thumbs are mostly small
+
             mtname = fs['file'].filename
 
 
-        thumbnail = req.get_param('thmb')
         attach_to = req.get_param('attach_to')
         if targetRepo and body:
             if not mtname:
@@ -133,7 +136,7 @@ class AssetSave:
             if req.get_param('description'):
                 asset.description = req.get_param('description')
             
-            asset.name = name[-20:].replace('_', ' ')
+            asset.name = name[-20:].replace('_', ' ').replace('@@', '_')
             asset.fullname = name
 
             asset.key = bodyMd5
@@ -141,6 +144,7 @@ class AssetSave:
                 asset.modifiers.append(targetUser)
                 asset.users.append(targetUser)
             if thumbnail:
+                #print 'i am a thumbnail'
                 thumbnail = unquote(thumbnail)
                 asset.thumbnail = thumbnail 
 
@@ -180,7 +184,7 @@ def safeCopyAndMd5(fileobj, destinationPath, b64=False):
         ext = 'raw'
     checkPath(destDir)
     if path.isfile(destinationPath):
-        basename = _generate_id() + '_' + basename
+        basename = _generate_id() + '@@' + basename
         destinationPath = os.path.join(destDir, basename)
         #os.remove(destinationPath)
     f = open(destinationPath, 'wb')
@@ -202,10 +206,12 @@ def safeCopyAndMd5(fileobj, destinationPath, b64=False):
     dataMd5 = md5.hexdigest()
     ## check if there is an asset with same key
     availableAsset = session.query(Asset).filter_by(key=dataMd5).first()
-    if availableAsset:
-        os.remove(destinationPath) ## we dont need it anymore
-        os.symlink(availableAsset.full_path, destinationPath)
-        #print 'Symblink: %s generated' % destinationPath
+    if availableAsset and not os.path.isfile(availableAsset.full_path):
+        session.delete(availableAsset)
+    elif availableAsset:
+            os.remove(destinationPath) ## we dont need it anymore
+            os.symlink(availableAsset.full_path, destinationPath)
+            #print 'Symblink: %s generated' % destinationPath
 
     return (basename, dataMd5)
 
@@ -381,7 +387,8 @@ class CollectionInfo:
             assets = session.query(Asset).filter_by(collection=target).all()
             data = dict()
             data['name'] = target.name
-            data['assets'] = [{'id':i.id, 'name':'-'.join(i.name.split('.')[:-1]).replace('_', '-'), 'url':i.url, 'fullname':i.fullname, 
+            data['assets'] = [{'id':i.id, 'name':'-'.join(i.name.split('.')[:-1]).replace('_', '-'),
+                               'url':i.url, 'fullname':i.fullname, 'thumbnail':i.thumbnail,
                                'description':i.description, 'content_type':i.content_type, 'datetime':i.modified_on} for i in assets]
             data['id'] = target.id
             data['container'] = target.container
