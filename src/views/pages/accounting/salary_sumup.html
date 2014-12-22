@@ -13,7 +13,7 @@
                         <td>کد هزینه</td>
                         <td>مبلغ قابل پرداخت (تومان)</td>
                     </tr>
-                    <tr class="active" ng-repeat="user in users | orderBy:user.firstname | filter:filterUA track by $index" >
+                    <tr ng-if="user.monthly_salary || showAll" class="active" ng-repeat="user in users | orderBy:user.firstname | filter:filterUA track by $index" >
                         <td>{{$index+1}}</td>
                         <td><a href="#user/{{user.id}}">{{user.persian_firstname || user.firstname}} {{user.persian_lastname || user.lastname}}</a></td>
                         <td ng-if="user.monthly_salary">{{user.monthly_salary}}</td>
@@ -22,10 +22,20 @@
                         <td ng-if="user.monthly_salary">{{user.monthly_salary*user.retention/100}}</td>
                         <td ng-if="user.monthly_salary">{{roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours)))}}</td>
                         <td ng-if="user.monthly_salary">{{user.budget_account}}</td>
-                        <td ng-if="user.monthly_salary" class="success"><strong>{{ceilG(user.monthly_salary - 
-                (user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + 
-                (roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours))))))}}</strong></td>
+                        <td ng-if="user.monthly_salary" class="success"><strong>{{calculate_salery(user)}}</strong></td>
                         
+                    </tr>
+                    <tr class="warning">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td><h4><code>{{final_payment()}}</code></h4></td>
+                    
                     </tr>
 
                 </table>
@@ -40,6 +50,10 @@
                 <button id="collectionaddbutton" ng-click="mailSumpup()" class="btn btn-primary btn-sm" type="button">
                     <em class="glyphicon glyphicon-send"></em>
                 </button>
+				<div class="form-group" >
+				    <label class="col-sm-12 control-label">Show All</label>
+                <input type="checkbox" class="form-control" ng-model="showAll" />
+                </div>
             </div>
         </div>
         </div>

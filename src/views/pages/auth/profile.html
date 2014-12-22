@@ -40,7 +40,14 @@
 					<div class="col-sm-6">
                         <input type="text" class="form-control farsi" ng-model="user.persian_lastname" />
 					</div>
+                </div>
+				<div class="form-group" ng-if="$parent.isAdmin">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Email</label>
+					<div class="col-sm-6">
+						<input type="email" style="font-family:monospace" placeholder="Example: ceo@apple.com" class="form-control" ng-model="user.email" />
+					</div>
 				</div>
+
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Cell Number</label>
 					<div class="col-sm-6">

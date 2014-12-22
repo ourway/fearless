@@ -706,6 +706,28 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
                 return 0;
         }
 
+        $scope.calculate_salery = function(user, rawMode){
+                result = $scope.ceilG(user.monthly_salary - 
+                (user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + 
+                ($scope.roundG((user.monthly_salary/user.monthly_working_hours)*($scope.ceilG(user.monthly_working_hours-user.monthly_present_hours))))));
+                //$scope.final_payment+=result;
+                if (rawMode)
+                    return result;
+                else
+                    return accounting.formatNumber(result);
+
+        }
+
+        $scope.final_payment = function(){
+            result = 0;
+            for (i in $scope.users){
+                result += $scope.calculate_salery($scope.users[i], true);
+            }
+            return accounting.formatNumber(result);
+        
+        };
+
+
         $scope.print = function(){
             $scope.printable = $('#salary_sumup').html();
             styles = '<html><head><title>Fearless Salary Brief</title><link rel="stylesheet" href="css/bootstrap.min.css"> <link rel="stylesheet" href="css/main.css"> </head><body>';
@@ -725,8 +747,8 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
                 mail['message']+= 'Here is a sum up of crew salaries, Please review:<br/>';
                 mail['message']+= invoice;
                 //mail['to'] = 'farsheed.ashouri@gmail.com';
-                mail['to'] = ['sara_kayvan@hotmail.com', 'hamid2117@gmail.com'];
-                mail['subject'] = 'Pooyamehr Financial Departement - Salaries brief';
+                mail['to'] = ['hamid2177@gmail.com'];
+                mail['subject'] = 'گزارش کارکرد ماه ' + $scope.$parent.persianDate(null, 1) + ' پروژه پادشاه آب';
                 if (confirm('Are you sure you want to send sumpup?'))
                     $scope.$parent.sendmail(mail);
     }

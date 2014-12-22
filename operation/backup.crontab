@@ -1,0 +1,2 @@
+## midnight database backup
+0 0 * * * /home/farsheed/Documents/dev/fa-team/operation/backup_db.py
