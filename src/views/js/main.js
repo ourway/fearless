@@ -7,6 +7,16 @@ fearlessApp.factory('authFactory', function($resource) {
   );
 });
 
+fearlessApp.filter('range', function() {
+  return function(input, total) {
+    total = parseInt(total);
+    for (var i=0; i<total; i++)
+      input.push(i);
+    return input;
+  };
+});
+
+
 function toTitleCase(str)
 {
     return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
@@ -137,7 +147,8 @@ var TITLE = 'TITLE';
             })
              .when('/ams/c/:collectionId', {
                 templateUrl: 'pages/ams/collection.html',
-                controller: 'collectionCtrl'
+                controller: 'collectionCtrl',
+                 reloadOnSearch: false
             })
 
 	
@@ -211,7 +222,6 @@ function updateImageSize(img, maxWidth, maxHeight){
             });
 
         $scope.getComments = function(){
-            console.log($scope.comment_id);
             req = $http.get('/api/db/comment/'+$scope.comment_id+'?key=item&list=true');
             req.success(function(resp){
                     $scope.comments[$scope.comment_id] = resp;
@@ -1255,10 +1265,26 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             uploadMultiple:false,
         });
 
-        $scope.getCollectionDetails = function(){
-            req = $http.get('/api/collection/'+ci);
+        $scope.getCollectionDetails = function(page){
+            if (page==undefined)
+            {
+                if ($routeParams.page>0)
+                    page = $routeParams.page-1;
+                else
+                    page = 0;
+            }
+            start = 0;
+            end = 10;
+            if (page){
+                c = 10;
+                start = c*page;
+                end = start + c;
+            }
+            req = $http.get('/api/collection/'+ci+'?s='+start+'&e='+end);
             req.success(function(resp){
                     $scope.collection = resp;
+                    $scope.collection.page = (page||0)+1;
+                    $location.search('page', (page||0)+1);
                     $scope.$parent.comment_id = resp.uuid;
                     $scope.$parent.getComments();
                     $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+"&multipart=true";

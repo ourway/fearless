@@ -35,6 +35,9 @@ def commit(req, resp):
     try:
         session.commit()
     except Exception, e:
+        print '*'*80
+        print e
+        print '*'*80
         session.rollback()
         resp.status = falcon.HTTP_400
         resp.body = e

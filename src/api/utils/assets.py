@@ -28,6 +28,7 @@ from tasks import STORAGE
 from opensource.contenttype import contenttype
 from utils.validators import checkPath
 from base64 import encode, decode, decodestring
+from sqlalchemy import desc
 
 # from celery.result import AsyncResult
 from models import Asset, Repository, Collection, es, session, User
@@ -383,10 +384,22 @@ class ListAssets:
 class CollectionInfo:
     def on_get(self, req, resp, collectionId):
         target = session.query(Collection).filter(Collection.id==int(collectionId)).first()
+        start = req.get_param('s')
+        end = req.get_param('e')
+        if start: start = int(start)
+        else: start = 0
+        if end: end = int(end)
+        if start!=None and not end:
+            end = start+10
+
+        end = max(start, end)
+
         if target:
-            assets = session.query(Asset).filter_by(collection=target).all()
+            assets = session.query(Asset).filter_by(collection=target).order_by(desc(Asset.modified_on)).slice(start, end)
+            assets_count = session.query(Asset).filter_by(collection=target).count()
             data = dict()
             data['name'] = target.name
+            data['assets_count'] = assets_count
             if assets:
                 data['assets'] = [{'id':i.id, 'name':'-'.join(i.name.split('.')[:-1]).replace('_', '-'),
                                    'url':i.url, 'fullname':i.fullname, 'thumbnail':i.thumbnail,

@@ -108,17 +108,30 @@
         <div ng-class="col-md-12">
             <div ng-if="collection.holdAssets">
             <hr/>
-            <h3 ng-show="collection.assets.length>0">Assets <small>({{collection.assets.length}})</small></h3>
+            <h3 ng-show="collection.assets.length>0">Assets <small>({{(collection.page-1)*10+1}}-{{ (collection.page-1)*10+collection.assets.length}} of {{collection.assets_count}})</small></h3>
             <div class="row" id="ams_assets" ng-show="collection.assets.length>0">
 			<form class="form-horizontal" role="form" style="background:#ddd">
 				<div class="form-group">
-					<div class="col-sm-6">
+					<div class="col-sm-4">
                         <input type="text" class="form-control" placeholder="Search for {{collection.name}} Assets here" ng-model="collection.CollectionAssetFilter" />
-					</div>
-				</div>
-			</form>
+                    </div>
+
+                    <ul ng-if="collection.assets_count>10" class="pagination" style="display:inline">
+                        <li ng-class="{'active':collection.page==$index+1}" ng-repeat="i in [] | range:(collection.assets_count/10)+1" ><a style="cursor:pointer"
+                            ng-click="getCollectionDetails($index)">{{$index+1}}</a></li>
+
+</ul>
+
+
+
+                </div>
+
+
+
+            </form>
+
             <br/>
-                <div class="col-sm-3" ng-repeat="asset in collection.assets | orderBy:'content_type'| orderBy:'datetime':reverse | filter:collection.CollectionAssetFilter track by $index">
+                <div class="col-sm-3" ng-repeat="asset in collection.assets | filter:collection.CollectionAssetFilter track by $index">
 					<div class="thumbnail asm_thumb">
                         <div class="col-md-12 asm_upper">
                             <div ng-if="isImage(asset)"> 
@@ -135,7 +148,7 @@
                             </div>
                             <div ng-if="isVideo(asset)" >
                                 <a  title="{{asset.name}} {{asset.description}}"  sources="{{['/static/'+asset.url]}}" type="{{asset.content_type}}" href="/static/{{asset.url}}" data-gallery="collectionLinks">
-                                    <video id="video_{{asset.id}}" class="video-js vjs-default-skin asm_col_thumb_img thumbnail" preload="metadata" width="100" poster="{{asset.thumbnail || '/app/images/icons/video.png'}}"
+                                    <video id="video_{{asset.id}}" class="video-js vjs-default-skin asm_col_thumb_img thumbnail" preload="none" width="100" poster="{{asset.thumbnail || '/app/images/icons/video.png'}}"
                                   data-setup="{}">
                                   <source ng-src="{{'/static/'+asset.url}}" type='{{asset.content_type}}' /></video></a>
                             </div>
@@ -150,14 +163,17 @@
                     </a>
                     <em >{{asset.content_type.split('/')[1].split(';')[0] | uppercase}}</em>
                     <ul>
-                        <li style="list-style:none;"><a title="{{asset.fullname}}" href="#ams/a/{{asset.id}}"><strong>{{asset.name}}</strong></a>
+                        <li style="list-style:none;"><a title="{{asset.fullname}}" href="#ams/a/{{asset.id}}"><strong>{{asset.name || asset.fullname}}</strong></a>
                         
                         
                         </li>
                         <li style="list-style:none;"><Small><b>{{$parent.prettyDate(asset.datetime)}}</b> ago</small></li>
-                        <li style="list-style:none;"> <a href="#/user/{{asset.owner.id}}" style="font-size:9pt;color:grey">{{asset.owner.name}}</a></li> 
+                        <li ng-if="asset.owner" style="list-style:none;"> <a href="#/user/{{asset.owner.id}}" style="font-size:9pt;color:grey">{{asset.owner.name}}</a></li> 
+                        <li ng-if="!asset.owner" style="list-style:none;"> <a style="font-size:9pt;color:grey">Anonymous</a></li> 
                     </ul>
                     </div>
+
+
 
                 </div>                
             </div>
@@ -166,6 +182,9 @@
 			</div>
 		</div>
     </div>
+
+
+
 
 	</div>
     <hr/>

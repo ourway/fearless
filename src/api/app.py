@@ -77,20 +77,32 @@ class DB:
         listMe = req.get_param('list')
         table = table.title()
         show = req.get_param('show')
+        start = req.get_param('s')
+        end = req.get_param('e')
+        order_by = req.get_param('order_by')
+        if not order_by:
+            order_by = 'modified_on'
+
+        if start: start = int(start)
+        if end: end = int(end)
+        if start and not end:
+            end = start+10
         if len(args) == 5:
             id = args[4]
-            query = 'session.query({t}).filter({t}.{key}=="{id}").order_by(desc({t}.modified_on))'.format(
-                t=table, id=id, key=key)
-
+            query = 'session.query({t}).filter({t}.{key}=="{id}").order_by(desc({t}.{order}))'.format(
+                t=table, id=id, key=key, order=order_by)
             data = eval(query).all()
         else:
             if not show:
-                query = 'session.query({t}).order_by(desc({t}.modified_on))'.format(t=table)
+                query = 'session.query({t}).order_by(desc({t}.{order}))'.format(t=table, order=order_by)
             else:
-                query = 'session.query({t}.{f}).order_by(desc({t}.modified_on))'.format(t=table, f=show)
+                query = 'session.query({t}.{f}).order_by(desc({t}.{order}))'.format(t=table, f=show, order=order_by)
             
             try:
-                data = eval(query).all()
+                if start and end:
+                    data = eval(query).slice(start, end)
+                else:
+                    data = eval(query).all()
             except (AttributeError):
                 data = None
 
