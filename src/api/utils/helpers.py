@@ -13,7 +13,7 @@ Clean code is much better than Cleaner comments!
 '''
 
 import falcon
-from models import session
+
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 import ujson as json
 import commands
@@ -31,10 +31,14 @@ def get_ip():
 
 
 def commit(req, resp):
+    from models import session
+    from models.db import Session
     try:
         session.commit()
+        session=Session()
     except IntegrityError, e:
         session.rollback()
+        session=Session()
         resp.status = falcon.HTTP_400
         resp.body = e
 

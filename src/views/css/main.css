@@ -238,7 +238,6 @@ padding: 7px;
 .asm_col_thumb_img{
 border:1px solid #fff;
 opacity:0.9;
-height:100px !important;
 }
 
 .asm_col_thumb_img:hover {
@@ -246,7 +245,7 @@ opacity: 1;
 }
 
 #ams_assets{
-background:#F7F7F7;
+background:#ccc;
 padding:10px;
 border-radius:5px;
 border: 2px solid #ccc;
@@ -278,6 +277,22 @@ li.ui-state-default:last-child {
     border-bottom:none;
 }
 
+.video-js {
+background-color: #000;
+position: relative;
+padding: 0;
+font-size: 10px;
+vertical-align: middle;
+margin-left: auto;
+margin-right: auto;
+font-weight: 400;
+font-style: normal;
+font-family: Arial,sans-serif;
+-webkit-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+}
 
 
 

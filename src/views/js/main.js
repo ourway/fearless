@@ -1189,7 +1189,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             ctM = ct.split('/')[0];
             ctT = ct.split('/')[1];
             if (ctM=='video'){
-                if (['mp4', 'ogg', 'mpeg', 'webm', 'x-flv'].indexOf(ctT)>=0)
+                if (['mp4', 'ogg', 'webm', 'x-flv'].indexOf(ctT)>=0)
                     return true;
             }
         }

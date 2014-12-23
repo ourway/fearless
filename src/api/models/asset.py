@@ -22,6 +22,8 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from mixin import IDMixin, Base
 from utils.fagit import GIT
+from db import session, Session
+from utils.videoTools import generateThumbnail
 from opensource.contenttype import contenttype
 
 users_assets = Table('users_assets', Base.metadata,
@@ -80,7 +82,8 @@ class Asset(IDMixin, Base):
     def check_file(self, key, collection_id):
         if not os.path.isfile(self.full_path):
             raise ValueError(
-                'Asset %s: *%s* is not available on Storage!' % (self.key, self.full_path))
+                'Asset %s: *%s* is not available on Storage!' % (self.key, self.full_path)) 
+
         return collection_id
 
     @validates('version')
@@ -106,3 +109,23 @@ class Asset(IDMixin, Base):
     def url(self):
         return os.path.join(os.path.basename(self.collection.repository.path),
                             self.collection.path, self.fullname)
+
+
+def AfterAssetCreationFuncs(mapper, connection, target):
+    '''Some operations after getting ID'''
+    session = Session()
+    Target = session.query(Asset).filter_by(id=target.id).first()
+
+    ## videos using ffmpeg
+    if Target.content_type.split('/')[0] == 'video':
+        newThumb = generateThumbnail(Target.full_path)
+        if newThumb:
+            Target.thumbnail = newThumb
+            session.add(Target)
+    
+    
+    session.commit()
+
+    
+
+event.listen(Asset, 'after_insert', AfterAssetCreationFuncs)
