@@ -29,7 +29,7 @@ DB = msql
 
 
 
-engine = create_engine(DB, echo=False, convert_unicode=True)
+engine = create_engine(DB, echo=False, convert_unicode=True, pool_recycle=3600)
 
 
 
