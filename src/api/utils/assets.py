@@ -127,7 +127,7 @@ class AssetSave:
             if not asset:
                 asset = Asset(key=bodyMd5, repository=targetRepo,
                               collection=collection, name=name[-20:].replace('_', ' '), fullname=name,
-                              path=assetPath, ext=assetExt, owner=targetUser)
+                              path=assetPath, ext=assetExt, owner_id=targetUser.id)
                 session.add(asset)
             else:
                 asset.version += 1
@@ -387,9 +387,11 @@ class CollectionInfo:
             assets = session.query(Asset).filter_by(collection=target).all()
             data = dict()
             data['name'] = target.name
-            data['assets'] = [{'id':i.id, 'name':'-'.join(i.name.split('.')[:-1]).replace('_', '-'),
-                               'url':i.url, 'fullname':i.fullname, 'thumbnail':i.thumbnail,
-                               'description':i.description, 'content_type':i.content_type, 'datetime':i.modified_on} for i in assets]
+            if assets:
+                data['assets'] = [{'id':i.id, 'name':'-'.join(i.name.split('.')[:-1]).replace('_', '-'),
+                                   'url':i.url, 'fullname':i.fullname, 'thumbnail':i.thumbnail,
+                                   'owner':{'id':i.owner.id if i.owner else 0, 'name':i.owner.fullname if i.owner else None},
+                                   'description':i.description, 'content_type':i.content_type, 'datetime':i.modified_on} for i in assets]
             data['id'] = target.id
             data['container'] = target.container
             data['holdAssets'] = target.holdAssets

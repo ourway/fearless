@@ -253,7 +253,20 @@ box-shadow: inset 0px 0px 35px #9B9B9B;
 }
 .asm_thumb{
 box-shadow: 1px 1px 4px rgba(0,0,0,0.16);
+background: #E0E0E0;
 }
+.asm_upper{
+height: 130px;
+border:1px solid #ccc;
+margin-bottom: 10px;
+background:#fff;
+}
+
+.asm_upper video{
+    margin-top:10px !important;
+
+}
+
 .asm_thumb:hover {
 transform: scale(1.1,1.1);
 transform: rotate(30);
@@ -293,6 +306,7 @@ font-family: Arial,sans-serif;
 -ms-user-select: none;
 user-select: none;
 }
+
 
 
 

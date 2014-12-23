@@ -32,13 +32,10 @@ def get_ip():
 
 def commit(req, resp):
     from models import session
-    from models.db import Session
     try:
         session.commit()
-        session=Session()
-    except IntegrityError, e:
+    except Exception, e:
         session.rollback()
-        session=Session()
         resp.status = falcon.HTTP_400
         resp.body = e
 

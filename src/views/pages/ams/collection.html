@@ -104,7 +104,7 @@
         </div>
 		</div>
 
-	<div class="row clearfix">
+	<div class="row clearfix" bg-cloak>
         <div ng-class="col-md-12">
             <div ng-if="collection.holdAssets">
             <hr/>
@@ -118,9 +118,9 @@
 				</div>
 			</form>
             <br/>
-                <div class="col-sm-2" ng-repeat="asset in collection.assets | orderBy:'content_type'| orderBy:'datetime':reverse | filter:collection.CollectionAssetFilter track by $index">
+                <div class="col-sm-3" ng-repeat="asset in collection.assets | orderBy:'content_type'| orderBy:'datetime':reverse | filter:collection.CollectionAssetFilter track by $index">
 					<div class="thumbnail asm_thumb">
-                        <div class="col-md-12" style="height:130px;">
+                        <div class="col-md-12 asm_upper">
                             <div ng-if="isImage(asset)"> 
                                 <a title="{{asset.name}} {{asset.description}}" href="/static/{{asset.url}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}" data-gallery="collectionLinks">
                                 <img class="thumbnail" ng-if="!asset.thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="/static/{{asset.url}}" />
@@ -135,13 +135,12 @@
                             </div>
                             <div ng-if="isVideo(asset)" >
                                 <a  title="{{asset.name}} {{asset.description}}"  sources="{{['/static/'+asset.url]}}" type="{{asset.content_type}}" href="/static/{{asset.url}}" data-gallery="collectionLinks">
-                                    <video id="video_{{asset.id}}" class="video-js vjs-default-skin asm_col_thumb_img thumbnail" preload="none" width="100" poster="{{asset.thumbnail}}"
+                                    <video id="video_{{asset.id}}" class="video-js vjs-default-skin asm_col_thumb_img thumbnail" preload="metadata" width="100" poster="{{asset.thumbnail || '/app/images/icons/video.png'}}"
                                   data-setup="{}">
                                   <source ng-src="{{'/static/'+asset.url}}" type='{{asset.content_type}}' /></video></a>
                             </div>
 						</div>
-
-
+                        <hr/>
 
                         <div class="caption" >
                     <A href="/static/{{asset.url}}">
@@ -149,8 +148,15 @@
                             <em class="glyphicon glyphicon-download"></em>
                         </button>
                     </a>
-                    <label style="color:grey">{{asset.content_type.split('/')[1].split(';')[0] | uppercase}}</label><br/>
-                    <a title="{{asset.fullname}}" href="#ams/a/{{asset.id}}" style="color:#333"><small>{{asset.name}}</small></a> 
+                    <em >{{asset.content_type.split('/')[1].split(';')[0] | uppercase}}</em>
+                    <ul>
+                        <li style="list-style:none;"><a title="{{asset.fullname}}" href="#ams/a/{{asset.id}}"><strong>{{asset.name}}</strong></a>
+                        
+                        
+                        </li>
+                        <li style="list-style:none;"><Small><b>{{$parent.prettyDate(asset.datetime)}}</b> ago</small></li>
+                        <li style="list-style:none;"> <a href="#/user/{{asset.owner.id}}" style="font-size:9pt;color:grey">{{asset.owner.name}}</a></li> 
+                    </ul>
                     </div>
 
                 </div>                
