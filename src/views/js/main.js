@@ -72,13 +72,11 @@ var TITLE = 'TITLE';
 
 	fearlessApp.config(function($routeProvider, $locationProvider) {
 		$routeProvider
-
 			// route for the home page
 			.when('/', {
 				templateUrl : 'pages/home.html',
 				controller  : 'mainController'
 			})
-
 			// route for the about page
 			.when('/about/', {
 				templateUrl : 'pages/about.html',
@@ -148,10 +146,8 @@ var TITLE = 'TITLE';
              .when('/ams/c/:collectionId', {
                 templateUrl: 'pages/ams/collection.html',
                 controller: 'collectionCtrl',
-                 reloadOnSearch: false
+                 reloadOnSearch: false // dont reload the page on $location.search
             })
-
-	
     })
 
 
@@ -469,7 +465,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
         userId = $routeParams.userId;
         if (!userId)
             userId = $scope.$parent.userInfo.userid;
-    
+    $scope.accounting = accounting; 
     $scope.$parent.getGroups();
     $scope.print = function(){
         $scope.printable = $('#invoice_print_area').html();
@@ -496,9 +492,11 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
 
         userInfoReq = $http.get('/api/db/user/'+userId);
         userInfoReq.success(function(resp){
+            resp = resp[0];
             resp.agreement_start = timeConverter(resp.agreement_start);
             resp.agreement_end = timeConverter(resp.agreement_end);
-
+            delete resp.created_on;
+            delete resp.modified_on;
             $scope.user = resp; 
             $http.get('/api/db/user/'+userId+'?field=grps&list=true').success(function(grps){
                 $scope.user.grps = grps; 
@@ -715,6 +713,7 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
             else
                 return 0;
         }
+        $scope.accounting = accounting;
 
         $scope.calculate_salery = function(user, rawMode){
                 result = $scope.ceilG(user.monthly_salary - 
@@ -875,6 +874,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $('.tj_table_frame').fadeOut(2000);
             data = localStorage.getItem(getprefix +  mode);
             if ($scope.replan || !data){
+
+                localStorage.clear();
             //if (1){
             //console.log('getting')
             projectReport = $http.get('/api/project/report/'+$scope.projId);

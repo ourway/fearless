@@ -152,7 +152,7 @@ class DB:
 
 
         try:
-            #data = repr(data)
+            data = repr(data)
             d = json.loads(data)
             if d and isinstance(d, dict):
                 for i in banned:
