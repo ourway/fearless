@@ -31,7 +31,7 @@ from base64 import encode, decode, decodestring
 from sqlalchemy import desc
 
 # from celery.result import AsyncResult
-from models import Asset, Repository, Collection, es, session, User
+from models import Asset, Repository, Collection, es, session, User, fdb
 from AAA import getUserInfoFromSession
 from defaults import public_repository_path
 
@@ -135,6 +135,8 @@ class AssetSave:
                               collection=collection, name=name, fullname=fullname,
                               path=assetPath, ext=assetExt, owner_id=targetUser.id)
                 session.add(asset)
+                if not Commit():
+                    return ## commit as soon as posiible
             else:
                 if not bodyMd5 == asset.key:
                     asset.version += 1
@@ -166,11 +168,10 @@ class AssetSave:
                 
                 #newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
                 #asset.task_id = newAsset.task_id
-            if Commit(): ## cause we need data
-                resp.body = {'message': 'Asset created|updated', 'key': asset.key,
-                             'url': asset.url, 'fullname':asset.fullname, 'id':asset.id,
-                             'name':asset.name, 'content_type':asset.content_type.split('/')[0],
-                             'datetime':time.time(), 'thumbnail':asset.thumbnail}
+            resp.body = {'message': 'Asset created|updated', 'key': asset.key,
+                         'url': asset.url, 'fullname':asset.fullname, 'id':asset.id,
+                         'name':asset.name, 'content_type':asset.content_type.split('/')[0],
+                         'datetime':time.time(), 'thumbnail':asset.thumbnail}
                 #resp.body = "I am working"
         else:  ## lets consume the stream!
             while True:
@@ -479,6 +480,21 @@ class AddCollection:
                 resp.body = {'message':'OK', 'info':'Collection created'}
             else:
                 resp.body = {'message':'ERROR', 'info':'Collection is available on server'}
+
+
+class GetAssetThumbnails:
+    def on_get(self, req, resp, assetId):
+        '''Get asset thumbnails from riak'''
+        target = session.query(Asset).filter_by(id=int(assetId)).first()
+        versions = xrange(target.version)
+        result = {}
+        for i in versions:
+            thmbKey = '%s_thmb_v%s'%(target.uuid, i+1)
+            thmb = fdb.get(thmbKey).data
+            if thmb:
+                result[i+1] = thmb
+        resp.body = result
+ 
         
         
 

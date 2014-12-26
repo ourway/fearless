@@ -40,7 +40,7 @@ from mako.template import Template
 from utils.fagit import GIT
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from mako.template import Template
-from utils.defaults import public_upload_folder, public_repository_path
+from utils.defaults import public_upload_folder, public_repository_path, GIT_folder, ASSETS
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 ffmpeg = os.path.join(current_dir, '../../bin/ffmpeg/ffmpeg')
@@ -218,13 +218,9 @@ def duration(path):
 
 @Capp.task
 def addFileToGit(path, assetUuid, version):
-    from models import Asset
-    asset = session.query(Asset).filter_by(uuid=assetUuid).first()
-    if not asset:
-        return
     path = path.encode("utf-8")
     directory = os.path.dirname(path)
-    git_dir = os.path.join('/home/farsheed/Desktop', asset.uuid)
+    git_dir = os.path.join(GIT_folder, assetUuid)
     filename = os.path.basename(path)
     ## initilize
     command = 'init'
@@ -242,18 +238,25 @@ def addFileToGit(path, assetUuid, version):
     command = 'tag v_%s' % version
     arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
     process(arg)
-
+    ## now lets clone it to assets folder
+    asset_folder = os.path.join(ASSETS, assetUuid)
+    if not os.path.isdir(asset_folder):  ## not cloned
+        command = 'git clone "%s" "%s"' % (git_dir, asset_folder)
+        process(command)
+    else:
+        command = 'pull'
+        arg = 'git --work-tree="{d}" --git-dir="{d}/.git" {c}'.format(d=asset_folder, c=command)
+        process(arg)
+ 
 
 def getTags(path, assetUuid):
     path = path.encode("utf-8")
     directory = os.path.dirname(path)
-    git_dir = os.path.join('/home/farsheed/Desktop', assetUuid)
+    git_dir = os.path.join(GIT_folder, assetUuid)
     command = 'tag -l'
     arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
     result, error = process(arg)
     return ','.join(result.strip().split('\n'))
-
-
 
 
 @Capp.task
@@ -291,8 +294,6 @@ def generateVideoThumbnail(path, w=146, h=110, text=None):
         with open(thpath, 'rb') as newThumb:
             webmode = 'data:image/%s;base64,' % fmt
             result =  webmode + base64.encodestring(newThumb.read())
-
-
         return result
 
 

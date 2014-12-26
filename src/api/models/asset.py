@@ -79,7 +79,7 @@ class Asset(IDMixin, Base):
 
     @validates('thmb')
     def save_thumbnail_to_riak(self, key, data):
-        thmbKey = str(uuid.uuid4())
+        thmbKey = '%s_thmb_v%s'%(self.uuid, self.version)
         newThmb = fdb.new(thmbKey, data)
         newThmb.store()
         return thmbKey
@@ -87,13 +87,13 @@ class Asset(IDMixin, Base):
 
     @validates('pst')
     def save_poster_to_riak(self, key, data):
-        pstKey = str(uuid.uuid4())
+        pstKey = '%s_poster_v%s'%(self.uuid, self.version)
         newPoster = fdb.new(pstKey, data)
         newPoster.store()
         return pstKey
 
     @validates('name')
-    def find_type(self, key, name):
+    def check_name(self, key, name):
         return name
 
 
@@ -156,7 +156,6 @@ class Asset(IDMixin, Base):
         from tasks import getTags
         if self.uuid and self.full_path:
             result = getTags(self.full_path, self.uuid)
-            print result
         return result
 
     @property
@@ -187,8 +186,10 @@ class Asset(IDMixin, Base):
 def AfterAssetCreationFuncs(mapper, connection, target):
     '''Some operations after getting ID'''
     from tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
+    from tasks import addFileToGit
     session = Session()
     Target = session.query(Asset).filter_by(id=target.id).first()
+    addFileToGit.delay(Target.full_path, Target.uuid, Target.version)
     identify.delay(Target.full_path, Target.id)
 
     ## videos using ffmpeg

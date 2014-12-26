@@ -31,11 +31,11 @@
 					<div class="thumbnail asm_thumb_solo">
                         <div class="col-md-12 asm_upper">
                             <div ng-if="asset.thumbnail"> 
-                                <a title="{{asset.name}} {{asset.description}}"class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
+                                <a title="{{asset.fullname}} {{asset.description}}" class="collectionImages" title="{{asset.description}}">
                                 <img class="thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{asset.thumbnail}}" /></a>
                             </div>
                             <div ng-if="!asset.thumbnail"> 
-                                <a title="{{asset.name}} {{asset.description}}"class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
+                                <a title="{{asset.fullname}} {{asset.description}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
                                 <img class="thumbnail" class="asm_col_thumb_img thumbnail" ng-src="/app/images/icons/P_Movie.svg.png" />
                                 
                                 </a>
@@ -62,10 +62,16 @@
                     </ul>
                 </div>
             </div>
+                <div class="col-md-12" ng-if="asset">
+                    <h4>Asset Versions</h4>
+                    <button class="btn btn-sm btn-default" ng-repeat="version in assetVersions">{{version.split('v_')[1]}}</button>
+                </div>
             </div>
+
+
             <div class="col-sm-9" ng-if="asset">
-            <label>{{asset.fullname}}</label>
-            <small>{{asset.fileinfo}}</small>
+            <h5>{{asset.fullname}}</h5>
+            <small style="color:grey">{{asset.fileinfo}}</small>
                 <div ng-if="asset.preview && asset.content_type.split('/')[0]=='video'">
                     <video id="video_{{asset.id}}" class="video-js vjs-default-skin thumbnail" controls 
                     preload="metadata" ng-attr-poster="{{asset.poster}}" width="720" height="480" >
@@ -78,8 +84,6 @@
                 <div ng-if="asset.content_type.split('/')[0]=='image'">
                     <img ng-src="{{asset.poster}}" width="720" class="thumbnail"/>
                 </div>
-
-
 
             </div>
 

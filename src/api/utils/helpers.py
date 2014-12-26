@@ -35,6 +35,7 @@ def Commit():
     from models import session
     try:
         session.commit()
+
         return True
     except Exception, e:
         print '*'*80
@@ -55,12 +56,17 @@ def commit(req, resp):
 
 def jsonify(self, resp):
     '''Everything is json here'''
+    from models.db import session, Session
     if isinstance(resp.body, associationproxy._AssociationList):
         #resp.body = str(resp.body)
         resp.body = repr(resp.body)
     elif isinstance(resp.stream, (file, cStringIO.OutputType)):
+        session.close()
+        session = Session()
         return
     elif isinstance(resp.body, (file, cStringIO.OutputType)):
+        session.close()
+        session = Session()
         return
     else:
         try:
@@ -72,8 +78,10 @@ def jsonify(self, resp):
             except:
                 data = resp.body
         finally:
-
             resp.body = str(data)
+            session.close()
+            session = Session()
+
 
 
 def punish(self, req, resp):

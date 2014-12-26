@@ -22,7 +22,7 @@ import urlparse
 from urllib import unquote
 from string import ascii_uppercase
 import ujson as json
-from utils.assets import AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection
+from utils.assets import GetAssetThumbnails, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection
 from utils.reports import Mailer, AddReport
 from gevent import wsgi
 from models import __all__ as av
@@ -229,11 +229,16 @@ class DB:
         query_params = get_params(req.stream, flat=False)
         updated_values = [];
         for key in query_params:
+            if key in ['created_on', 'modified_on', 'id']:
+                continue
             key = str(key)
             value = query_params[key]
             if isinstance(value, (int, str, unicode, float)) and hasattr(result, key):
-                setattr(result, key, value)
-                updated_values.append(key)
+                try:
+                    setattr(result, key, value)
+                    updated_values.append(key)
+                except AttributeError:
+                    continue
 
         #if result.update(query_params):
         resp.status = falcon.HTTP_202
@@ -291,6 +296,7 @@ app.add_route('/api/asset/save/{repo}', AssetSave())
 app.add_route('/api/asset', ListAssets())
 app.add_route('/api/asset/{key}', GetAsset())
 app.add_route('/api/asset/delete/{id}', DeleteAsset())
+app.add_route('/api/asset/thmbs/{assetId}', GetAssetThumbnails())
 app.add_route('/api/showtime/{userid}', GetUserShows())
 app.add_route('/api/project', ListProjects())
 app.add_route('/api/project/add', AddProject())

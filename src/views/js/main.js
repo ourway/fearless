@@ -1224,6 +1224,8 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                     $scope.$parent.comment_id = Resp.uuid;
                     //$location.search('version', Resp.version)
                     $scope.asset = Resp;
+                    $scope.assetVersions = Resp.git_tags.split(',');
+                    console.log($scope.assetVersions)
                     $rootScope.title = 'Asset: ' + Resp.name + ' - ' + 'Fearless'
                     if (Resp.owner_id){
 
@@ -1278,6 +1280,8 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         }
 
         $scope.isImage = function(asset){
+            if (!asset)
+                return null;
             ct = asset.content_type;
             ctM = ct.split('/')[0];
             ctT = ct.split('/')[1];
@@ -1299,6 +1303,8 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         }
 
         $scope.isVideo = function(asset){
+            if (!asset)
+                return null;
             ct = asset.content_type;
             ctM = ct.split('/')[0];
             ctT = ct.split('/')[1];
