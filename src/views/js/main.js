@@ -1161,9 +1161,71 @@ fearlessApp.controller('sequenceDetailCtrl', function($scope, $rootScope, $route
 fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
         assetId = $routeParams.assetId;
 
+
+
+        $scope.activateVideo = function(vid){
+        if (vid)
+        {
+            var _v = "video_"+vid.toString();
+        $timeout(function(){
+        try {
+            videojs(_v, {}, function(){
+          // Player (this) is initialized and ready.
+            })}
+
+        catch(e){
+            console.log(e)
+            }
+        }, 100);
+
+        }
+
+        }
+
+        $scope.isImage = function(asset){
+            ct = asset.content_type;
+            ctM = ct.split('/')[0];
+            ctT = ct.split('/')[1];
+            if (ctM=='image'){
+                if (['png', 'jpeg', 'gif', 'webp', 'svg'].indexOf(ctT)>=0)
+                    return true;
+            }
+        }
+
+        $scope.isVideo = function(asset){
+            ct = asset.content_type;
+            ctM = ct.split('/')[0];
+            ctT = ct.split('/')[1];
+            if (ctM=='video'){
+                if (['mp4', 'ogg', 'webm', 'x-flv'].indexOf(ctT)>=0)
+                    return true;
+            }
+        }
+
+
+
+
+
         $scope.getAssetInfo = function(){
-            req = $http.get('/api/db/asset/'+assetId).success(function(resp){
-                    $scope.$parent.comment_id = resp.uuid;
+            req = $http.get('/api/db/asset/'+assetId).success(function(Resp){
+                    $scope.$parent.comment_id = Resp.uuid;
+                    $scope.asset = Resp;
+                    if (Resp.owner_id){
+
+                        ureq = $http.get('/api/db/user/'+Resp.owner_id).success(function(resp){
+                                $scope.asset.owner = resp;
+                                videojs('video_'+$scope.asset.id);
+                            })
+
+                        creq = $http.get('/api/db/collection/'+Resp.collection_id).success(function(resp){
+                            $scope.asset.collection = resp;
+                            });
+                        rreq = $http.get('/api/db/repository/'+Resp.repository_id).success(function(resp){
+                            $scope.asset.repository = resp;
+                            });
+
+
+                    }
                 })
 
 
@@ -1225,7 +1287,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             ctM = ct.split('/')[0];
             ctT = ct.split('/')[1];
             if (ctM=='video'){
-                if (['mp4', 'ogg', 'webm', 'x-flv'].indexOf(ctT)>=0)
+                //if (['mp4', 'ogg', 'webm', 'x-flv'].indexOf(ctT)>=0)
                     return true;
             }
         }

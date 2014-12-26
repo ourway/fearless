@@ -19,6 +19,8 @@ import sys
 import base64
 import uuid
 from opensource.contenttype import contenttype
+from tasks import app
+from defaults import public_upload_folder, public_repository_path
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 ffmpeg = os.path.join(current_dir, '../../../bin/ffmpeg/ffmpeg')
@@ -49,10 +51,10 @@ def generateVideoThumbnail(path, w=146, h=110, text=None):
     '''generate a thumbnail from a video file and return a vfile db'''
     upf = '/tmp'
     #upf = '/home/farsheed/Desktop'
-    fid = uuid.uuid4()
+    fid = str(uuid.uuid4())
     fmt = 'png'
     thpath = '%s/%s.%s' % (upf, fid, fmt)
-    arg = '''"%s" -threads 4 -i "%s" -an -r 1 -vf "select=gte(n\,100)" -vframes 1 -s %sx%s -y "%s"''' \
+    arg = '''"%s" -i "%s" -an -r 1 -vf "select=gte(n\,100)" -vframes 1 -s %sx%s -y "%s"''' \
         % (ffmpeg, path, w, h, thpath)
     
     pr = process(arg)
@@ -60,6 +62,31 @@ def generateVideoThumbnail(path, w=146, h=110, text=None):
         with open(thpath, 'rb') as newThumb:
             webmode = 'data:image/%s;base64,' % fmt
             return webmode + base64.encodestring(newThumb.read())
+
+
+@app.task
+def generateVideoPreview(path, asset=None):
+    '''generate a thumbnail from a video file and return a vfile db'''
+    from models import Asset, session
+    if asset:
+        target = session.query(Asset).filter_by(id=asset).first()
+    fid = str(uuid.uuid4())
+    fmt = 'm4v'
+    previewPath = os.path.join(public_upload_folder, fid+'.'+fmt)
+    arg = '''"%s" -i "%s" -preset ultrafast -s hd480 "%s"''' \
+        % (ffmpeg, path, previewPath)
+    
+    pr = process(arg)
+    if os.path.isfile(previewPath):
+        result =  os.path.join('uploads', fid+'.'+fmt)
+        if asset and target:
+            target.preview = result
+            session.commit()
+            return result
+
+
+
+        #return os.path.realpath(public_repository_path, previewPath)
 
         
 

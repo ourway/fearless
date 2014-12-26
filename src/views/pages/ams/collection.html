@@ -143,22 +143,21 @@
                                 <img class="thumbnail" ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{asset.thumbnail}}" /></a>
                             </div>
                             <div ng-if="!isImage(asset) && !isVideo(asset)"> 
-                                <a title="{{asset.name}} {{asset.description}}" href="/static/{{asset.url}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
+                                <a title="{{asset.name}} {{asset.description}}" href="#/ams/a/{{asset.id}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
                                 <img class="thumbnail" ng-if="!asset.thumbnail" class="asm_col_thumb_img thumbnail" ng-src="/app/images/icons/P_Movie.svg.png" />
                                 <img class="thumbnail" ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail" ng-src="{{asset.thumbnail}}" />
                                 
                                 </a>
                             </div>
-                            <div ng-if="isVideo(asset)" >
-                                <a  title="{{asset.name}} {{asset.description}}"  sources="{{['/static/'+asset.url]}}" type="{{asset.content_type}}" href="/static/{{asset.url}}" data-gallery="collectionLinks">
-                                    <video id="video_{{asset.id}}" class="video-js vjs-default-skin asm_col_thumb_img thumbnail" preload="none" width="100" poster="{{asset.thumbnail || '/app/images/icons/video.png'}}"
-                                  data-setup="{}">
-                                  <source ng-src="{{'/static/'+asset.url}}" type='{{asset.content_type}}' /></video></a>
+                            <div ng-if="asset.content_type.split('/')[0]=='video'" >
+                                <a title="{{asset.name}} {{asset.description}}" href="#/ams/a/{{asset.id}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
+                                <img class="thumbnail" ng-if="!asset.thumbnail" class="asm_col_thumb_img thumbnail" ng-src="/app/images/icons/video.png"/>
+                                <img class="thumbnail" ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{asset.thumbnail}}" /></a>
                             </div>
 						</div>
                         <hr/>
 
-                        <div class="caption" >
+                <div class="caption" >
                     <A href="/static/{{asset.url}}">
                         <button id="collectionAddButton" class="btn btn-default btn-sm" type="button">
                             <em class="glyphicon glyphicon-download"></em>
@@ -174,11 +173,9 @@
                         <li ng-if="asset.owner" style="list-style:none;"> <a href="#/user/{{asset.owner.id}}" style="font-size:9pt;color:grey">{{asset.owner.name}}</a></li> 
                         <li ng-if="!asset.owner" style="list-style:none;"> <a style="font-size:9pt;color:grey">Anonymous</a></li> 
                     </ul>
-                    </div>
+                </div>
+            </div>
 
-
-
-                </div>                
             </div>
                 
                 

@@ -401,12 +401,26 @@ class CollectionInfo:
             assets_count = session.query(Asset).filter_by(collection=target).count()
             data = dict()
             data['name'] = target.name
+            data['name'] = target.name
             data['assets_count'] = assets_count
             if assets:
-                data['assets'] = [{'id':i.id, 'name':'-'.join(i.name.split('.')[:-1]).replace('_', '-'),
-                                   'url':i.url, 'fullname':i.fullname, 'thumbnail':i.thumbnail,
-                                   'owner':{'id':i.owner.id if i.owner else 0, 'name':i.owner.fullname if i.owner else None},
-                                   'description':i.description, 'content_type':i.content_type, 'datetime':i.modified_on} for i in assets]
+                data['assets'] = [
+                                    {'id':i.id, 
+                                   'name':'-'.join(i.name.split('.')[:-1]).replace('_', '-'),
+                                   'url':i.url,
+                                   'fullname':i.fullname,
+                                   'thumbnail':i.thumbnail,
+                                   'preview':i.preview,
+                                   #'poster':i.poster,
+                                   'owner':{
+                                            'id':i.owner.id if i.owner else 0,
+                                            'name':i.owner.fullname if i.owner else None
+                                            },
+                                   'description':i.description,
+                                   'content_type':i.content_type,
+                                   'datetime':i.modified_on}
+                                for i in assets]
+
             data['id'] = target.id
             data['container'] = target.container
             data['holdAssets'] = target.holdAssets

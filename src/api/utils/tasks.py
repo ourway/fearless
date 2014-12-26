@@ -19,7 +19,6 @@ Clean code is much better than Cleaner comments!
 @version: 0.1.8
 '''
 
-from gevent import monkey; monkey.patch_all()
 import ujson
 import hashlib
 import base64
@@ -30,12 +29,11 @@ import elasticsearch
 import requests
 import os
 from envelopes import Envelope, GMailSMTP
-from utils.validators import email_validator
+from validators import email_validator
 from opensource.contenttype import contenttype
 # riak bucket for our files
 from mako.template import Template
-from models import session, es, Asset, Repository
-from utils.fagit import GIT
+from fagit import GIT
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from mako.template import Template
 templates_folder = os.path.join(os.path.dirname(__file__), 'templates')
@@ -46,6 +44,7 @@ templates_folder = os.path.join(os.path.dirname(__file__), 'templates')
 __all__ = ['app', 'download', 'add_asset', 'send_envelope']
 
 BROKER_URL = 'redis://localhost:6379/0'
+CELERYD_POOL = 'gevent'
 BACKEND_URL = 'redis://localhost:6379/1'
 from celery import Celery
 

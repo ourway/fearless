@@ -4,9 +4,80 @@
 <div class="container assetDiv">
     <br/>
     <div class="row clearfix" ng-cloak>
+
+
+		<div class="col-md-12 column">
+			<ul class="breadcrumb">
+				<li>
+					<a href="#/pms">Projects</a> <span class="divider"></span>
+				</li>
+				<li>
+                <a href="#/pms/{{asset.repository.project_id}}">{{asset.repository.name}}</a> <span class="divider"></span>
+                </li>
+                <li >
+                <a href="#/ams/c/{{asset.collection.id}}">{{asset.collection.name}}</a> <span class="divider"></span>
+				</li>
+				<li class="active">
+				    {{asset.name}}
+				</li>
+			</ul>
+        </div>
+
+
 		<div class="col-md-12 column">
 
-	</div>
+                <div class="col-sm-3" ng-if="asset">
+					<div class="thumbnail asm_thumb_solo">
+                        <div class="col-md-12 asm_upper">
+                            <div ng-if="asset.thumbnail"> 
+                                <a title="{{asset.name}} {{asset.description}}"class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
+                                <img class="thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{asset.thumbnail}}" /></a>
+                            </div>
+                            <div ng-if="!asset.thumbnail"> 
+                                <a title="{{asset.name}} {{asset.description}}"class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
+                                <img class="thumbnail" class="asm_col_thumb_img thumbnail" ng-src="/app/images/icons/P_Movie.svg.png" />
+                                
+                                </a>
+                            </div>
+						</div>
+                        <hr/>
+
+                <div class="caption" >
+                    <A href="/static/{{asset.url}}">
+                        <button id="collectionAddButton" class="btn btn-default btn-sm" type="button">
+                            <em class="glyphicon glyphicon-download"></em>
+                        </button>
+                    </a>
+                    <em >{{asset.content_type.split('/')[1].split(';')[0] | uppercase}}</em>
+                    <ul>
+                        <li style="list-style:none;"><strong>{{asset.name || asset.fullname}}</strong>
+                        
+                        
+                        </li>
+                        <li style="list-style:none;"><Small><b>{{$parent.prettyDate(asset.modified_on)}}</b> ago</small></li>
+                        <li ng-if="asset.owner" style="list-style:none;"> <a href="#/user/{{asset.owner.id}}" 
+                            style="font-size:9pt;color:grey">{{asset.owner.firstname}} {{asset.owner.lastname}}</a></li> 
+                        <li ng-if="!asset.owner" style="list-style:none;"> <a style="font-size:9pt;color:grey">Anonymous</a></li> 
+                    </ul>
+                </div>
+            </div>
+            </div>
+            <div class="col-sm-9" ng-if="asset">
+                <div ng-if="asset.preview && asset.content_type.split('/')[0]=='video'">
+                    <video id="video_{{asset.id}}" class="video-js vjs-default-skin thumbnail" controls 
+                    preload="metadata" ng-attr-poster="{{asset.poster}}" width="720" height="480" >
+                    <source 
+                   data-setup='{"techOrder": ["flash", "html5", "links"]}'
+                    ng-src="{{'/static/'+asset.preview}}" type="video/mp4" /></video>
+                </div>
+            </div>
+
+
+
+
+
+	    </div>
+	    </div>
     <hr/>
     <div ng-include="'pages/comment/index.html'"></div>
 
@@ -16,9 +87,4 @@
 
 
 <script>
-    $(document).ready(function(){
-        $('#collectionAddButton').click(function(){
-            $('#collectionAddModal').modal('show');
-        });
-    });
 </script>

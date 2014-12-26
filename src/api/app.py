@@ -66,8 +66,8 @@ class DB:
 
     #@Authorize('see_db')
     def on_get(self, req, resp, **kw):
-        banned = ['password', 'token', 'created_on', 'modified_on', 
-                  'session_id', 'latest_session_id', 'lastLogIn', 'password2']
+        banned = ['password', 'token',  'session_id', 
+                  'latest_session_id', 'lastLogIn', 'password2']
         args = req.path.split('/')
         table = args[3]
         u = getUserInfoFromSession(req)
@@ -180,10 +180,13 @@ class DB:
             data = data[0]
             _d = {}
             for i in dir(data):
-                if not '_' in i:
+                if not i.startswith('_') and i not in banned:
                     value=getattr(data, i)
-                    if isinstance(value, (str, unicode, int, float, bool)):
+                    if isinstance(value, (str, unicode, long, int, float, bool, datetime)):
                         _d[i] = value
+                    #if isinstance(value, long) and i.endswith('_id'):
+                    #    table = i.split('_')[0]
+
 
             resp.body = _d
         # Ok, We have an id

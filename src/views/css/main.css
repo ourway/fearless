@@ -256,6 +256,13 @@ text-shadow: 0px 1px 1px #FFF;
 box-shadow: 1px 1px 4px rgba(0,0,0,0.16);
 background: #E0E0E0;
 }
+
+.asm_thumb_solo{
+box-shadow: 1px 1px 10px #333;
+background: #f2f2f2;
+border:5px solid #ccc;
+}
+
 .asm_upper{
 height: 130px;
 border:1px solid #AEAEAE;
@@ -312,6 +319,8 @@ font-family: Arial,sans-serif;
 -ms-user-select: none;
 user-select: none;
 }
+.vjs-default-skin .vjs-play-progress { background: #999; }
+
 
 
 

@@ -158,7 +158,7 @@ def generateImageThumbnail(path, w=146, h=110, text=None):
         extra = '-flatten'
     if content_type == 'application/pdf':
         page = '[0]'
-    newthmbPath = os.path.join('/home/farsheed/Desktop', str(uuid.uuid4())+'.png')
+    newthmbPath = os.path.join('/tmp', str(uuid.uuid4())+'.png')
     cmd = 'convert "%s%s" -resize %sx%s %s "%s"' % (path,page, w, h, extra, newthmbPath)
     pr = process(cmd)
     if os.path.isfile(newthmbPath):

@@ -25,7 +25,7 @@ from utils.fagit import GIT
 from db import session, Session
 from . import fdb
 import uuid
-from utils.videoTools import generateVideoThumbnail
+from utils.videoTools import generateVideoThumbnail, generateVideoPreview
 from utils.helpers import generateImageThumbnail
 from opensource.contenttype import contenttype
 
@@ -55,6 +55,7 @@ class Asset(IDMixin, Base):
     description = Column(String(512))
     thmb = Column(String(64))  ##thmbnail image id in riak
     pst = Column(String(64)) #poster image id in riak
+    preview = Column(String(256)) #preview video url
     ext = Column(String(32))
     content_type = Column(String(64))
     version = Column(Integer, default=1)  ## asset versioning
@@ -154,13 +155,15 @@ def AfterAssetCreationFuncs(mapper, connection, target):
 
     ## videos using ffmpeg
     if Target.content_type.split('/')[0] == 'video':
+        generateVideoPreview.delay(Target.full_path, Target.id)
         newThumb = generateVideoThumbnail(Target.full_path)
         if newThumb:
             Target.thmb = newThumb
-        newPoster = generateVideoThumbnail(Target.full_path, 720, 480)
+        newPoster = generateVideoThumbnail(Target.full_path, 720, 480)  ## hd480 
         if newPoster:
             Target.pst = newPoster
             session.add(Target)
+
 
     if Target.content_type.split('/')[0] == 'image' or Target.content_type.split('/')[1] in ['pdf']:
         newThumb = generateImageThumbnail(Target.full_path)
