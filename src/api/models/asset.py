@@ -51,6 +51,7 @@ class Asset(IDMixin, Base):
     name = Column(String(64))
     fullname = Column(String(256))
     description = Column(String(512))
+    fileinfo = Column(String(512))  ## information about this file. usually using identify command
     thmb = Column(String(64))  ##thmbnail image id in riak
     pst = Column(String(64)) #poster image id in riak
     preview = Column(String(256)) #preview video url
@@ -93,8 +94,14 @@ class Asset(IDMixin, Base):
 
     @validates('name')
     def find_type(self, key, name):
-        self.content_type = contenttype(name)
         return name
+
+
+    @validates('fullname')
+    def find_type(self, key, fullname):
+        self.content_type = contenttype(fullname)
+        return fullname
+
 
     @validates('collection_id')
     def check_file(self, key, collection_id):
@@ -106,10 +113,13 @@ class Asset(IDMixin, Base):
 
     @validates('version')
     def commit(self, key, data):
+        from tasks import addFileToGit
+        if self.uuid:
+            version = addFileToGit(self.full_path, self.uuid, data)
+            return data
         #wt = os.path.join(self.collection.repository.path, self.collection.path)
         #git = GIT(self.full_path, wt=wt)
         #git.add(self.name, version=data)
-        return data
 
     @hybrid_property
     def full_path(self):
@@ -148,9 +158,10 @@ class Asset(IDMixin, Base):
 
 def AfterAssetCreationFuncs(mapper, connection, target):
     '''Some operations after getting ID'''
-    from tasks import generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
+    from tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
     session = Session()
     Target = session.query(Asset).filter_by(id=target.id).first()
+    identify.delay(Target.full_path, Target.id)
 
     ## videos using ffmpeg
     if Target.content_type.split('/')[0] == 'video':

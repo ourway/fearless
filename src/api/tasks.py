@@ -35,6 +35,7 @@ from utils.validators import email_validator
 from models import session
 from opensource.contenttype import contenttype
 # riak bucket for our files
+import sh
 from mako.template import Template
 from utils.fagit import GIT
 from sqlalchemy.exc import IntegrityError  # for exception handeling
@@ -204,6 +205,7 @@ def show_secrets(stream):
 ###########################################################################
 def duration(path):
     '''Find video duration'''
+    path = path.encode("utf-8")
     arg = '''nice "%s" -show_format "%s" 2>&1''' % (ffprobe, path)
     pr = process(arg)
     dupart = pr[0].split('duration=')  # text processing output of a file
@@ -214,9 +216,56 @@ def duration(path):
         except ValueError:
             return
 
+def addFileToGit(path, assetUuid, version):
+    from models import Asset
+    asset = session.query(Asset).filter_by(uuid=assetUuid).first()
+    if not asset:
+        return
+    path = path.encode("utf-8")
+    directory = os.path.dirname(path)
+    git_dir = os.path.join('/home/farsheed/Desktop', asset.uuid)
+    filename = os.path.basename(path)
+    ## initilize
+    command = 'init'
+    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
+    process(arg)
+    ## add file
+    command = 'add "%s"' % filename
+    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
+    process(arg)
+    ## add tag based on new version and uuid
+    ## commit
+    command = 'commit -m "file: %s added."' % filename
+    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
+    commit, error = process(arg)
+    command = 'tag v_%s' % version
+    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
+    print process(arg)
+
+
+
+@Capp.task
+def identify(path, assetId):
+    '''Find video duration'''
+    path = path.encode('utf-8')
+    content_type = contenttype(path)
+    if content_type.split('/')[0]=='image':
+        arg = '''nice identify "%s" 2>&1''' % (path)
+    else:
+        arg = '''nice file "%s" 2>&1''' % (path)
+    result, error = process(arg)
+    if assetId:
+        from models import Asset
+        target = session.query(Asset).filter_by(id=assetId).first()
+        if target and result:
+            target.fileinfo = result.replace(path, '').strip()
+            session.commit()
+
+
 @Capp.task
 def generateVideoThumbnail(path, w=146, h=110, text=None):
     '''generate a thumbnail from a video file and return a vfile db'''
+    path = path.encode('utf-8')
     upf = '/tmp'
     #upf = '/home/farsheed/Desktop'
     fid = str(uuid.uuid4())
@@ -237,6 +286,7 @@ def generateVideoThumbnail(path, w=146, h=110, text=None):
 
 @Capp.task
 def generateVideoPreview(path, asset=None):
+    path = path.encode('utf-8')
     '''generate a thumbnail from a video file and return a vfile db'''
     if asset:
         from models import Asset
@@ -258,6 +308,7 @@ def generateVideoPreview(path, asset=None):
 @Capp.task
 def generateImageThumbnail(path, w=146, h=110, asset=None, text=None):
     '''generate thumbnails using convert command'''
+    path = path.encode('utf-8')
     content_type = contenttype(path)
     fmt = 'png'
     extra = ''
@@ -267,7 +318,7 @@ def generateImageThumbnail(path, w=146, h=110, asset=None, text=None):
     if content_type == 'application/pdf':
         page = '[0]'
     newthmbPath = os.path.join('/tmp', str(uuid.uuid4())+'.png')
-    cmd = 'convert "%s%s" -resize %sx%s %s "%s"' % (path,page, w, h, extra, newthmbPath)
+    cmd = 'convert "%s%s" %s -resize %sx%s "%s"' % (path, page, extra, w, h, newthmbPath)
     pr = process(cmd)
     if os.path.isfile(newthmbPath):
         with open(newthmbPath, 'rb') as newThumb:

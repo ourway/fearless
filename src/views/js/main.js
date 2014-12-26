@@ -329,7 +329,7 @@ function updateImageSize(img, maxWidth, maxHeight){
                if (resp.message=='success') //green light
                     {
                         
-                    console.log(resp);
+                    //console.log(resp);
 
                         if (resp.avatar != 'null')
                             localStorage.setItem('avatar', resp.avatar);
@@ -341,7 +341,7 @@ function updateImageSize(img, maxWidth, maxHeight){
                         $scope.userInfo.logged_in = true;
                         try {
                             next_page = atob($routeParams.next);
-                            console.log(next_page)
+                            //console.log(next_page)
                             if (next_page.split('/')[1] === 'api' || next_page === 'showtime' )
                             {
                                 window.location = next_page;
@@ -595,6 +595,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
 
 
 fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $timeout, $location){
+        $rootScope.title = "User Reports - Fearless";
         $scope.report = {};
         $scope.persian = false;
         $scope.repotPlaceholder = 'Write your daily or hourly report here ...';
@@ -708,6 +709,7 @@ cellTemplate: '<div>  <a style="position:absolute;margin:5px" href="#pms/{{row.e
 
 
 fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
+        $rootScope.title = "Members - Fearless";
         $scope.$parent.page = 'auth';
         $scope.getUsers = function(){
             $http.get('/api/db/user').success(function(resp){
@@ -857,6 +859,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         resp.tasks = Object.keys(resp.tasks);
                         resp.start = timeConverter(resp.start);
                         resp.end = timeConverter(resp.end);
+                        $rootScope.title = resp.name + ' - ' + 'Fearless'
                         resp.updatedWatchers = [];
                         resp.watchers.forEach(function(e){resp.updatedWatchers.push(e)});
                         $scope.project = resp;
@@ -1219,7 +1222,9 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
         $scope.getAssetInfo = function(){
             req = $http.get('/api/db/asset/'+assetId).success(function(Resp){
                     $scope.$parent.comment_id = Resp.uuid;
+                    //$location.search('version', Resp.version)
                     $scope.asset = Resp;
+                    $rootScope.title = 'Asset: ' + Resp.name + ' - ' + 'Fearless'
                     if (Resp.owner_id){
 
                         ureq = $http.get('/api/db/user/'+Resp.owner_id).success(function(resp){
@@ -1383,6 +1388,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             req = $http.get('/api/collection/'+ci+'?s='+start+'&e='+end);
             req.success(function(resp){
                     $scope.collection = resp;
+                    $rootScope.title = 'Collection: ' + resp.name + ' - ' + 'Fearless'
                     $scope.collection.page = (page||0)+1;
                     $location.search('page', (page||0)+1);
                     $scope.$parent.comment_id = resp.uuid;

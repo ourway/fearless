@@ -20,10 +20,10 @@ import falcon
 from urllib import unquote
 import os
 import cgi
+import uuid
 from helpers import commit, Commit, get_params
 from sys import stderr
 from os import path
-from tasks import add_asset
 from tasks import STORAGE
 from opensource.contenttype import contenttype
 from utils.validators import checkPath
@@ -122,27 +122,32 @@ class AssetSave:
             tempraryStoragePath = path.join(targetRepo.path, collection.path,
                                             name)
 
-            name, bodyMd5 = safeCopyAndMd5(body, tempraryStoragePath, b64=b64)
+            name, bodyMd5 = safeCopyAndMd5(body, tempraryStoragePath, targetRepo.id, b64=b64)
+            fullname = name
+            name = (name[:10] + '..') if len(name) > 10 else name
             asset = session.query(Asset).filter(
                 Asset.repository == targetRepo).filter_by(collection=collection)\
-                        .filter_by(key=bodyMd5).first()
-            print targetUser
+                        .filter_by(fullname=fullname).first()
+
             if not asset:
-                asset = Asset(key=bodyMd5, repository=targetRepo,
-                              collection=collection, name=name[-20:].replace('_', ' '), fullname=name,
+                _uuid = str(uuid.uuid4())
+                asset = Asset(key=bodyMd5, version=1, repository=targetRepo, uuid=_uuid,
+                              collection=collection, name=name, fullname=fullname,
                               path=assetPath, ext=assetExt, owner_id=targetUser.id)
                 session.add(asset)
             else:
-                asset.version += 1
+                if not bodyMd5 == asset.key:
+                    asset.version += 1
+                asset.name = name
+                asset.fullname = fullname
+                asset.key = bodyMd5
 
             # Asset descriptions
             if req.get_param('description'):
                 asset.description = req.get_param('description')
             
-            asset.name = name[-20:].replace('_', ' ').replace('@@', '_')
-            asset.fullname = name
 
-            asset.key = bodyMd5
+
             if targetUser:
                 asset.modifiers.append(targetUser)
                 asset.users.append(targetUser)
@@ -176,7 +181,7 @@ class AssetSave:
             resp.body = {'message': 'Repo is not available'}
 
 
-def safeCopyAndMd5(fileobj, destinationPath, b64=False):
+def safeCopyAndMd5(fileobj, destinationPath, repoId, b64=False):
     '''copy a file in chunked mode safely'''
 
     destDir = path.dirname(destinationPath)
@@ -187,9 +192,9 @@ def safeCopyAndMd5(fileobj, destinationPath, b64=False):
     else:
         ext = 'raw'
     checkPath(destDir)
-    if path.isfile(destinationPath):
-        basename = _generate_id() + '@@' + basename
-        destinationPath = os.path.join(destDir, basename)
+    #if path.isfile(destinationPath):
+    #    basename = _generate_id() + '@@' + basename
+    #    destinationPath = os.path.join(destDir, basename)
         #os.remove(destinationPath)
     f = open(destinationPath, 'wb')
     md5 = hashlib.md5()
@@ -209,14 +214,20 @@ def safeCopyAndMd5(fileobj, destinationPath, b64=False):
     f.close()
     dataMd5 = md5.hexdigest()
     ## check if there is an asset with same key
-    availableAsset = session.query(Asset).filter_by(key=dataMd5).first()
+    if not repoId:
+        availableAsset = session.query(Asset).filter_by(key=dataMd5).first()
+    else:
+        availableAsset = session.query(Asset).filter_by(key=dataMd5).join(Collection).filter_by(repository_id=repoId).first()
     if availableAsset and not os.path.isfile(availableAsset.full_path):
         session.delete(availableAsset)
     elif availableAsset:
+        if os.path.isfile(availableAsset.full_path) and availableAsset.full_path!=destinationPath:
             os.remove(destinationPath) ## we dont need it anymore
             os.symlink(availableAsset.full_path, destinationPath)
             #print 'Symblink: %s generated' % destinationPath
 
+
+    
     return (basename, dataMd5)
 
 
@@ -407,9 +418,10 @@ class CollectionInfo:
             if assets:
                 data['assets'] = [
                                     {'id':i.id, 
-                                   'name':'-'.join(i.name.split('.')[:-1]).replace('_', '-'),
+                                   'name':i.name,
                                    'url':i.url,
                                    'fullname':i.fullname,
+                                   'version':i.version,
                                    'thumbnail':i.thumbnail,
                                    'preview':i.preview,
                                    #'poster':i.poster,

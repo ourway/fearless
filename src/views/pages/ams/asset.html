@@ -18,14 +18,15 @@
                 <a href="#/ams/c/{{asset.collection.id}}">{{asset.collection.name}}</a> <span class="divider"></span>
 				</li>
 				<li class="active">
-				    {{asset.name}}
+				    {{asset.fullname}}
 				</li>
 			</ul>
         </div>
 
 
 		<div class="col-md-12 column">
-
+        </div>
+		<div class="col-md-12 column">
                 <div class="col-sm-3" ng-if="asset">
 					<div class="thumbnail asm_thumb_solo">
                         <div class="col-md-12 asm_upper">
@@ -63,6 +64,8 @@
             </div>
             </div>
             <div class="col-sm-9" ng-if="asset">
+            <label>{{asset.fullname}}</label>
+            <small>{{asset.fileinfo}}</small>
                 <div ng-if="asset.preview && asset.content_type.split('/')[0]=='video'">
                     <video id="video_{{asset.id}}" class="video-js vjs-default-skin thumbnail" controls 
                     preload="metadata" ng-attr-poster="{{asset.poster}}" width="720" height="480" >

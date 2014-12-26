@@ -143,14 +143,14 @@
                                 <img class="thumbnail" ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{asset.thumbnail}}" /></a>
                             </div>
                             <div ng-if="!isImage(asset) && !isVideo(asset)"> 
-                                <a title="{{asset.name}} {{asset.description}}" href="#/ams/a/{{asset.id}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
+                                <a title="{{asset.name}} {{asset.description}}" href="#/ams/a/{{asset.id}}?version={{asset.version}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
                                 <img class="thumbnail" ng-if="!asset.thumbnail" class="asm_col_thumb_img thumbnail" ng-src="/app/images/icons/P_Movie.svg.png" />
                                 <img class="thumbnail" ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail" ng-src="{{asset.thumbnail}}" />
                                 
                                 </a>
                             </div>
                             <div ng-if="asset.content_type.split('/')[0]=='video'" >
-                                <a title="{{asset.name}} {{asset.description}}" href="#/ams/a/{{asset.id}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
+                                <a title="{{asset.name}} {{asset.description}}" href="#/ams/a/{{asset.id}}?version={{asset.version}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
                                 <img class="thumbnail" ng-if="!asset.thumbnail" class="asm_col_thumb_img thumbnail" ng-src="/app/images/icons/video.png"/>
                                 <img class="thumbnail" ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{asset.thumbnail}}" /></a>
                             </div>
@@ -165,7 +165,7 @@
                     </a>
                     <em >{{asset.content_type.split('/')[1].split(';')[0] | uppercase}}</em>
                     <ul>
-                        <li style="list-style:none;"><a title="{{asset.fullname}}" href="#ams/a/{{asset.id}}"><strong>{{asset.name || asset.fullname}}</strong></a>
+                        <li style="list-style:none;"><a title="{{asset.fullname}}" href="#ams/a/{{asset.id}}?version={{asset.version}}"><strong>{{asset.name || asset.fullname}}</strong></a>
                         
                         
                         </li>
