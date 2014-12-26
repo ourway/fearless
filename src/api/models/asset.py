@@ -23,7 +23,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from mixin import IDMixin, Base
 from utils.fagit import GIT
 from db import session, Session
-from utils.videoTools import generateThumbnail
+from . import fdb
+import uuid
+from utils.videoTools import generateVideoThumbnail
+from utils.helpers import generateImageThumbnail
 from opensource.contenttype import contenttype
 
 users_assets = Table('users_assets', Base.metadata,
@@ -50,7 +53,8 @@ class Asset(IDMixin, Base):
     name = Column(String(64))
     fullname = Column(String(256))
     description = Column(String(512))
-    thumbnail = Column(Text())
+    thmb = Column(String(64))  ##thmbnail image id in riak
+    pst = Column(String(64)) #poster image id in riak
     ext = Column(String(32))
     content_type = Column(String(64))
     version = Column(Integer, default=1)  ## asset versioning
@@ -72,6 +76,21 @@ class Asset(IDMixin, Base):
 
     collection_id = Column( Integer, ForeignKey('collection.id'), nullable=False)
 
+
+    @validates('thmb')
+    def save_thumbnail_to_riak(self, key, data):
+        thmbKey = str(uuid.uuid4())
+        newThmb = fdb.new(thmbKey, data)
+        newThmb.store()
+        return thmbKey
+
+
+    @validates('pst')
+    def save_poster_to_riak(self, key, data):
+        pstKey = str(uuid.uuid4())
+        newPoster = fdb.new(pstKey, data)
+        newPoster.store()
+        return pstKey
 
     @validates('name')
     def find_type(self, key, name):
@@ -106,6 +125,23 @@ class Asset(IDMixin, Base):
         return result
 
     @property
+    def thumbnail(self):
+        if not self.thmb:
+            return
+        obj = fdb.get(self.thmb)
+        if obj:
+            return obj.data
+
+    @property
+    def poster(self):
+        if not self.pst:
+            return
+        obj = fdb.get(self.pst)
+        if obj:
+            return obj.data
+
+
+    @property
     def url(self):
         return os.path.join(os.path.basename(self.collection.repository.path),
                             self.collection.path, self.fullname)
@@ -118,10 +154,22 @@ def AfterAssetCreationFuncs(mapper, connection, target):
 
     ## videos using ffmpeg
     if Target.content_type.split('/')[0] == 'video':
-        newThumb = generateThumbnail(Target.full_path)
+        newThumb = generateVideoThumbnail(Target.full_path)
         if newThumb:
-            Target.thumbnail = newThumb
+            Target.thmb = newThumb
+        newPoster = generateVideoThumbnail(Target.full_path, 720, 480)
+        if newPoster:
+            Target.pst = newPoster
             session.add(Target)
+
+    if Target.content_type.split('/')[0] == 'image' or Target.content_type.split('/')[1] in ['pdf']:
+        newThumb = generateImageThumbnail(Target.full_path)
+        if newThumb:
+            Target.thmb = newThumb
+
+
+
+
     
     
     session.commit()

@@ -36,5 +36,6 @@ engine = create_engine(DB, echo=False, convert_unicode=True, pool_recycle=3600)
 
 #engine = create_engine("postgresql+psycopg2://farsheed:rrferl@localhost:5432/fearless2")
 #engine.raw_connection().connection.text_factory = str
+#Session = mptt_sessionmaker(sessionmaker(bind=engine, expire_on_commit=False))
 Session = mptt_sessionmaker(sessionmaker(bind=engine))
 session = Session()

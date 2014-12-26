@@ -18,6 +18,7 @@ import os
 import sys
 import base64
 import uuid
+from opensource.contenttype import contenttype
 
 current_dir = os.path.abspath(os.path.dirname(__file__))
 ffmpeg = os.path.join(current_dir, '../../../bin/ffmpeg/ffmpeg')
@@ -44,14 +45,14 @@ def duration(path):
         except ValueError:
             return
 
-def generateThumbnail(path, w=146, h=110, text=None):
+def generateVideoThumbnail(path, w=146, h=110, text=None):
     '''generate a thumbnail from a video file and return a vfile db'''
     upf = '/tmp'
     #upf = '/home/farsheed/Desktop'
     fid = uuid.uuid4()
     fmt = 'png'
     thpath = '%s/%s.%s' % (upf, fid, fmt)
-    arg = '''nice "%s" -threads 4 -i "%s" -an -r 1 -vf "select=gte(n\,100)" -vframes 1 -s %sx%s -y "%s"''' \
+    arg = '''"%s" -threads 4 -i "%s" -an -r 1 -vf "select=gte(n\,100)" -vframes 1 -s %sx%s -y "%s"''' \
         % (ffmpeg, path, w, h, thpath)
     
     pr = process(arg)

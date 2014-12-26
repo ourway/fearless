@@ -13,7 +13,7 @@ Clean code is much better than Cleaner comments!
 '''
 
 import falcon
-
+import os
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 import ujson as json
 import commands
@@ -22,6 +22,19 @@ from sqlalchemy.ext import associationproxy
 import datetime
 import time
 import csv
+import base64
+import uuid
+from opensource.contenttype import contenttype
+
+
+def process(cmd):
+    '''General external process'''
+    from gevent.subprocess import Popen, PIPE, call  # everything nedded to handle external commands
+    p = Popen(cmd, shell=True, stderr=PIPE, stdout=PIPE,
+            )
+            #universal_newlines=True)  # process
+    (stdout, stderr) = p.communicate()
+    return (stdout, stderr)
 
 
 def get_ip():
@@ -29,18 +42,23 @@ def get_ip():
     ip = commands.getoutput("/sbin/ifconfig").split("\n")[1].split()[1][5:]
     return ip
 
-
-def commit(req, resp):
+def Commit():
     from models import session
     try:
         session.commit()
+        return True
     except Exception, e:
         print '*'*80
         print e
         print '*'*80
         session.rollback()
-        resp.status = falcon.HTTP_400
-        resp.body = e
+
+
+
+def commit(req, resp):
+        if not Commit():
+            resp.status = falcon.HTTP_500
+            resp.body = {'message':'Database Error'}
 
 
 
@@ -128,4 +146,26 @@ def parse_tjcsv(csvfile):
         count += 1
     
     return obj
+
+
+def generateImageThumbnail(path, w=146, h=110, text=None):
+    '''generate thumbnails using convert command'''
+    content_type = contenttype(path)
+    fmt = 'png'
+    extra = ''
+    page=''
+    if content_type == 'image/vnd.adobe.photoshop':
+        extra = '-flatten'
+    if content_type == 'application/pdf':
+        page = '[0]'
+    newthmbPath = os.path.join('/home/farsheed/Desktop', str(uuid.uuid4())+'.png')
+    cmd = 'convert "%s%s" -resize %sx%s %s "%s"' % (path,page, w, h, extra, newthmbPath)
+    pr = process(cmd)
+    if os.path.isfile(newthmbPath):
+        with open(newthmbPath, 'rb') as newThumb:
+            webmode = 'data:image/%s;base64,' % fmt
+            return webmode + base64.encodestring(newThumb.read())
+
+
+    
 

@@ -91,7 +91,11 @@ class DB:
             id = args[4]
             query = 'session.query({t}).filter({t}.{key}=="{id}").order_by(desc({t}.{order}))'.format(
                 t=table, id=id, key=key, order=order_by)
-            data = eval(query).all()
+            if start and end:
+                data = eval(query).slice(start, end).all()
+            else:
+                data = eval(query).all()
+
         else:
             if not show:
                 query = 'session.query({t}).order_by(desc({t}.{order}))'.format(t=table, order=order_by)
@@ -100,7 +104,7 @@ class DB:
             
             try:
                 if start and end:
-                    data = eval(query).slice(start, end)
+                    data = eval(query).slice(start, end).all()
                 else:
                     data = eval(query).all()
             except (AttributeError):
@@ -119,11 +123,12 @@ class DB:
 
                 elif len(args) == 5:
                     '''/api/db/user/1?field=tasks'''
-                    finalResult = []
+                    print 'here'
                     for i in data:
                         #_d = eval('i.%s'%field)
                         _d = getattr(i, field)
                         if isinstance(_d, list):
+                            finalResult = []
                             for item in _d:
                                 newDataDict = dict()
                                 for key in item.__dict__.keys():
@@ -131,6 +136,7 @@ class DB:
                                     if isinstance(value, (str, type(None), unicode, int, float, long, datetime)):
                                         newDataDict[key] = value
                                 finalResult.append(newDataDict)
+                            data = finalResult
                         else:
                             newDataDict = dict()
                             for key in _d.__dict__.keys():
@@ -138,7 +144,8 @@ class DB:
                                 if isinstance(value, (str, type(None), unicode, int, float, long, datetime)):
                                     newDataDict[key] = value
 
-                    data = finalResult
+                            data = newDataDict
+
 
                             
 
@@ -152,8 +159,8 @@ class DB:
 
 
         try:
-            data = repr(data)
-            d = json.loads(data)
+            _data = repr(data)
+            d = json.loads(_data)
             if d and isinstance(d, dict):
                 for i in banned:
                     if d.get(i):
@@ -165,13 +172,20 @@ class DB:
                         for i in banned:
                             if each.get(i):
                                 del(each[i])
-
             resp.body = d
         except (TypeError, ValueError):
             resp.body = data
 
         if len(args)==5 and len(data)==1 and not listMe:
-            resp.body = data[0]
+            data = data[0]
+            _d = {}
+            for i in dir(data):
+                if not '_' in i:
+                    value=getattr(data, i)
+                    if isinstance(value, (str, unicode, int, float, bool)):
+                        _d[i] = value
+
+            resp.body = _d
         # Ok, We have an id
 
     @falcon.after(commit)

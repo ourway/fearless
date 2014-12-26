@@ -24,6 +24,7 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from mixin import IDMixin, Base, db_files_path, getUUID
 import os
+from . import rdb
 
 class Report(IDMixin, Base):
 
@@ -37,17 +38,20 @@ class Report(IDMixin, Base):
         self.data = data
 
     @validates('data')
-    def compress_body(self, key, data):
+    def save_data_in_riak(self, key, data):
         self.uuid = getUUID()
-        c = bz2.compress(data)
+        #c = bz2.compress(data)
+        newReportObject = rdb.new(self.uuid, base64.encodestring(data))
         #result = base64.encodestring(c)
-        with open(os.path.join(db_files_path, self.uuid), 'wb') as f:
-            f.write(c)
+        #with open(os.path.join(db_files_path, self.uuid), 'wb') as f:
+        #    f.write(c)
+        newReportObject.store()
         return self.uuid
 
     @property
     def body(self):
-        with open(os.path.join(db_files_path, self.uuid), 'rb') as f:
-            data = bz2.decompress(f.read())
-        return data
+        #with open(os.path.join(db_files_path, self.uuid), 'rb') as f:
+        #    data = bz2.decompress(f.read())
+        dataObject = rdb.get(self.uuid)
+        return base64.decodestring(dataObject.data)
 

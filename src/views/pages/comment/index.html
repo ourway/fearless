@@ -1,6 +1,6 @@
 
-<div class="container">
-    <div class="col-lg-4 col-sm-6 text-center">
+<div class="container" ng-if="$parent.comment_id">
+    <div class="col-lg-4 col-sm-6 text-center" ng-init="$parent.getComments()">
     <div class="well">
         <h4>What is on your mind?<br/><small>Write only about this page</small></h4>
     <div class="input-group">

@@ -250,6 +250,7 @@ padding:10px;
 border-radius:5px;
 border: 2px solid #ccc;
 box-shadow: inset 0px 0px 35px #9B9B9B;
+text-shadow: 0px 1px 1px #FFF;
 }
 .asm_thumb{
 box-shadow: 1px 1px 4px rgba(0,0,0,0.16);
@@ -257,19 +258,24 @@ background: #E0E0E0;
 }
 .asm_upper{
 height: 130px;
-border:1px solid #ccc;
+border:1px solid #AEAEAE;
 margin-bottom: 10px;
 background:#fff;
+box-shadow: inset 0px 0px 60px #C5C5C5;
+}
+
+.asm_upper:hover {
+
 }
 
 .asm_upper video{
     margin-top:10px !important;
-
 }
 
 .asm_thumb:hover {
-transform: scale(1.1,1.1);
-transform: rotate(30);
+transform: scale(1.1,1.1) rotate(2deg);
+box-shadow: 0px 0px 60px #333;
+z-index:999;
 }
 
 #invoice{

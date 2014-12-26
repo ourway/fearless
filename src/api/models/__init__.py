@@ -23,7 +23,8 @@ usage:
 __all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
            'Repository', 'Project', 'now', 'Ticket', 'session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
-           'Document', 'Account', 'Collection', 'r', 'es', 'Departement', 'Comment']
+           'Document', 'Account', 'Collection', 'r', 'es', 'Departement',
+           'Comment', 'fdb', 'vdb', 'adb', 'rdb']
 
 import os
 
@@ -37,6 +38,13 @@ es = Elasticsearch()
 
 # db number 1 and 2 are for celery
 r = redis.StrictRedis(host='localhost', port=6379, db=3)
+
+import riak
+riakClient = riak.RiakClient(pb_port=8087)
+fdb = riakClient.bucket('fearless_file_database')
+vdb = riakClient.bucket('fearless_video_database')
+adb = riakClient.bucket('fearless_asset_database')
+rdb = riakClient.bucket('fearless_reports_database')
 #r.flushdb()
 
 from db import session, engine, Base

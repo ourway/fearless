@@ -116,11 +116,14 @@
                         <input type="text" class="form-control" placeholder="Search for {{collection.name}} Assets here" ng-model="collection.CollectionAssetFilter" />
                     </div>
 
+					<div class="col-sm-8">
                     <ul ng-if="collection.assets_count>10" class="pagination" style="display:inline">
-                        <li ng-class="{'active':collection.page==$index+1}" ng-repeat="i in [] | range:(collection.assets_count/10)+1" ><a style="cursor:pointer"
-                            ng-click="getCollectionDetails($index)">{{$index+1}}</a></li>
+                        <li ng-class="{'active':collection.page==$index+1}" ng-repeat="i in [] | range:(collection.assets_count/10)+1" >
+                            <a style="cursor:pointer" class="btn-sm" ng-click="getCollectionDetails($index)">{{$index+1}}</a>
+                        </li>
 
-</ul>
+                    </ul>
+                </div>
 
 
 

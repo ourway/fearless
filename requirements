@@ -16,6 +16,7 @@ MySQL-Python
 oursql
 psycopg2
 lxml
+bottle
 ipython
 sh
 eventlet

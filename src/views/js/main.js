@@ -148,6 +148,10 @@ var TITLE = 'TITLE';
                 controller: 'collectionCtrl',
                  reloadOnSearch: false // dont reload the page on $location.search
             })
+             .when('/ams/a/:assetId', {
+                templateUrl: 'pages/ams/asset.html',
+                controller: 'assetCtrl',
+            })
     })
 
 
@@ -492,7 +496,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
 
         userInfoReq = $http.get('/api/db/user/'+userId);
         userInfoReq.success(function(resp){
-            resp = resp[0];
+            //resp = resp[0];
             resp.agreement_start = timeConverter(resp.agreement_start);
             resp.agreement_end = timeConverter(resp.agreement_end);
             delete resp.created_on;
@@ -816,6 +820,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.projId = $routeParams.projId;
             $scope.$watch($scope.projId, function(){
                     $scope.getProjectDetails();
+                    $scope.$parent.getComments();
                     })
             $scope.toTitleCase = toTitleCase;
             $rootScope.title = "Project " + $scope.projId + " - Fearless";
@@ -845,6 +850,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         resp.updatedWatchers = [];
                         resp.watchers.forEach(function(e){resp.updatedWatchers.push(e)});
                         $scope.project = resp;
+                        $scope.$parent.comment_id = resp.uuid;
                     }
                 else
                     $location.path('/pms')
@@ -1152,6 +1158,25 @@ fearlessApp.controller('sequenceDetailCtrl', function($scope, $rootScope, $route
         });
 
 
+fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
+        assetId = $routeParams.assetId;
+
+        $scope.getAssetInfo = function(){
+            req = $http.get('/api/db/asset/'+assetId).success(function(resp){
+                    $scope.$parent.comment_id = resp.uuid;
+                })
+
+
+        }
+        $scope.$watch(assetId, function(){
+                $scope.getAssetInfo();
+                $scope.$parent.getComments();
+            })
+
+
+        });
+
+
 fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
 
 
@@ -1213,6 +1238,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         ci = $routeParams.collectionId;
         $scope.$watch(ci, function(){
                 $scope.getCollectionDetails();
+                $scope.$parent.getComments();
                 })
         Dropzone.autoDiscover = false;
         $scope.dropzone = new Dropzone("#my-awesome-dropzone", {
@@ -1237,24 +1263,24 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                         $scope.$apply();
                     });
                 this.on("thumbnail", function(file, dataUrl) {
-                        file.thumbnail = dataUrl;
-                        file.generateThumbnailFinished();
+                        //file.thumbnail = dataUrl;
+                        //file.generateThumbnailFinished();
 
                     });
                 this.on("sending", function(file, b, c) {
-                        if (file.thumbnail)
-                            c.append('thumbnail', file.thumbnail);
+                        //if (file.thumbnail)
+                        //    c.append('thumbnail', file.thumbnail);
 
                     });
             },
-            accept: function(file, done){
+            //accept: function(file, done){
                     // this will be called before thumbnails
-                    _t = file.type.split('/')[0];
-                    if (_t=='image')
-                        file.generateThumbnailFinished = done;
-                    else
-                        done();
-                },
+                   // _t = file.type.split('/')[0];
+                    //if (_t=='image')
+                    //    file.generateThumbnailFinished = done;
+                    //else
+                    //    done();
+                //},
 
             url: 'NULL',
             //autoDiscover: false,
@@ -1287,7 +1313,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     $scope.collection.page = (page||0)+1;
                     $location.search('page', (page||0)+1);
                     $scope.$parent.comment_id = resp.uuid;
-                    $scope.$parent.getComments();
+                    //$scope.$parent.getComments();
                     $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+"&multipart=true";
                     $scope.dropzone.options.url = $scope.attachurl;
                     //$scope.activateVideo();

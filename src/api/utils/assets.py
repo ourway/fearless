@@ -20,7 +20,7 @@ import falcon
 from urllib import unquote
 import os
 import cgi
-from helpers import commit, get_params
+from helpers import commit, Commit, get_params
 from sys import stderr
 from os import path
 from tasks import add_asset
@@ -47,8 +47,9 @@ This is a funtion that lets api to get a big/small file from user.
 #@asset_api.post('/save/<user>/<repo>')
 
 
-class AssetSave:
 
+
+class AssetSave:
     @falcon.after(commit)
     def on_put(self, req, resp, repo):
         '''Get data based on a file object or b64 data, save and commit it'''
@@ -147,7 +148,7 @@ class AssetSave:
             if thumbnail:
                 #print 'i am a thumbnail'
                 thumbnail = unquote(thumbnail)
-                asset.thumbnail = thumbnail 
+                asset.thmb = thumbnail 
 
 
             if attach_to:
@@ -159,10 +160,11 @@ class AssetSave:
                 
                 #newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
                 #asset.task_id = newAsset.task_id
-            resp.body = {'message': 'Asset created|updated', 'key': asset.key,
-                         'url': asset.url, 'fullname':asset.fullname,
-                         'name':asset.name, 'content_type':asset.content_type.split('/')[0],
-                         'datetime':time.time()}
+            if Commit(): ## cause we need data
+                resp.body = {'message': 'Asset created|updated', 'key': asset.key,
+                             'url': asset.url, 'fullname':asset.fullname, 'id':asset.id,
+                             'name':asset.name, 'content_type':asset.content_type.split('/')[0],
+                             'datetime':time.time(), 'thumbnail':asset.thumbnail}
                 #resp.body = "I am working"
         else:  ## lets consume the stream!
             while True:
