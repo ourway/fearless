@@ -29,21 +29,28 @@ from datetime import datetime
 import elasticsearch
 import requests
 import os
+import uuid
 from envelopes import Envelope, GMailSMTP
 from utils.validators import email_validator
+from models import session
 from opensource.contenttype import contenttype
 # riak bucket for our files
 from mako.template import Template
-from models import session, es, Asset, Repository
 from utils.fagit import GIT
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from mako.template import Template
+from utils.defaults import public_upload_folder, public_repository_path
+
+current_dir = os.path.abspath(os.path.dirname(__file__))
+ffmpeg = os.path.join(current_dir, '../../bin/ffmpeg/ffmpeg')
+ffprobe = os.path.join(current_dir, '../../bin/ffmpeg/ffprobe')
+
+
 templates_folder = os.path.join(os.path.dirname(__file__), 'templates')
 # BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 # BACKEND_URL = 'amqp'
 # BACKEND_URL = 'redis://localhost:6379/0'
 
-__all__ = ['app', 'download', 'add_asset', 'send_envelope']
 
 BROKER_URL = 'redis://localhost:6379/0'
 BACKEND_URL = 'redis://localhost:6379/1'
@@ -52,7 +59,7 @@ from celery import Celery
 from utils.validators import checkPath, md5_for_file
 
 
-app = Celery('tasks',
+Capp = Celery('tasks',
              broker=BROKER_URL,
              backend=BACKEND_URL,
              include=[])
@@ -61,7 +68,25 @@ storage = '../../STATIC'
 STORAGE = checkPath(storage)
 
 
-@app.task
+def process(cmd):
+    '''General external process'''
+    from gevent.subprocess import Popen, PIPE, call  # everything nedded to handle external commands
+    p = Popen(cmd, shell=True, stderr=PIPE, stdout=PIPE,
+            )
+            #universal_newlines=True)  # process
+    (stdout, stderr) = p.communicate()
+    return (stdout, stderr)
+
+
+
+
+
+
+
+
+
+
+@Capp.task
 def download(url):
     basename = url.split('/')[-1]
     r = requests.head(url)
@@ -79,7 +104,7 @@ class mydatatype(object):
     pass
 
 
-@app.task
+@Capp.task
 def add_asset(dataMD5, uploadedFilePath):
     ''' Add asset to database
         Why I provide the md5? Cause we can get md5 in uploading process before.
@@ -131,12 +156,12 @@ def add_asset(dataMD5, uploadedFilePath):
         return 'Error'
 
 
-@app.task
+@Capp.task
 def remove_asset(name):
     pass
 
 
-@app.task
+@Capp.task
 def send_envelope(to, cc, bcc, subject, message, attach=None):
 
     _et = os.path.join(templates_folder, 'email.html')
@@ -169,6 +194,107 @@ def send_envelope(to, cc, bcc, subject, message, attach=None):
 
 
 
-@app.task()
+@Capp.task()
 def show_secrets(stream):
     return stream
+
+
+
+
+###########################################################################
+def duration(path):
+    '''Find video duration'''
+    arg = '''nice "%s" -show_format "%s" 2>&1''' % (ffprobe, path)
+    pr = process(arg)
+    dupart = pr[0].split('duration=')  # text processing output of a file
+    if pr and len(dupart) > 1:
+        du = dupart[1].split()[0]
+        try:
+            return float(du)
+        except ValueError:
+            return
+
+@Capp.task
+def generateVideoThumbnail(path, w=146, h=110, text=None):
+    '''generate a thumbnail from a video file and return a vfile db'''
+    upf = '/tmp'
+    #upf = '/home/farsheed/Desktop'
+    fid = str(uuid.uuid4())
+    fmt = 'png'
+    thpath = '%s/%s.%s' % (upf, fid, fmt)
+    arg = '''"%s" -i "%s" -an -r 1 -vf "select=gte(n\,100)" -vframes 1 -s %sx%s -y "%s"''' \
+        % (ffmpeg, path, w, h, thpath)
+    
+    pr = process(arg)
+    if os.path.isfile(thpath):
+        with open(thpath, 'rb') as newThumb:
+            webmode = 'data:image/%s;base64,' % fmt
+            result =  webmode + base64.encodestring(newThumb.read())
+
+
+        return result
+
+
+@Capp.task
+def generateVideoPreview(path, asset=None):
+    '''generate a thumbnail from a video file and return a vfile db'''
+    if asset:
+        from models import Asset
+        target = session.query(Asset).filter_by(id=asset).first()
+    fid = str(uuid.uuid4())
+    fmt = 'm4v'
+    previewPath = os.path.join(public_upload_folder, fid+'.'+fmt)
+    arg = '''"%s" -i "%s" -preset ultrafast -s hd480 "%s"''' \
+        % (ffmpeg, path, previewPath)
+    
+    pr = process(arg)
+    if os.path.isfile(previewPath):
+        result =  os.path.join('uploads', fid+'.'+fmt)
+        if asset and target:
+            target.preview = result
+            session.commit()
+            return result
+
+@Capp.task
+def generateImageThumbnail(path, w=146, h=110, asset=None, text=None):
+    '''generate thumbnails using convert command'''
+    content_type = contenttype(path)
+    fmt = 'png'
+    extra = ''
+    page=''
+    if content_type == 'image/vnd.adobe.photoshop':
+        extra = '-flatten'
+    if content_type == 'application/pdf':
+        page = '[0]'
+    newthmbPath = os.path.join('/tmp', str(uuid.uuid4())+'.png')
+    cmd = 'convert "%s%s" -resize %sx%s %s "%s"' % (path,page, w, h, extra, newthmbPath)
+    pr = process(cmd)
+    if os.path.isfile(newthmbPath):
+        with open(newthmbPath, 'rb') as newThumb:
+            webmode = 'data:image/%s;base64,' % fmt
+            result = webmode + base64.encodestring(newThumb.read())
+
+        if asset and result:
+            from models import Asset
+            target = session.query(Asset).filter_by(id=asset).first()
+            target.pst = result;
+            session.commit()
+
+        
+
+        return result
+
+        #return os.path.realpath(public_repository_path, previewPath)
+
+        
+def getTimecode(frame, rate):
+    '''Get standard timecode'''
+    seconds = frame / rate
+    m, s = divmod(seconds, 60)
+    h, m = divmod(m, 60)
+    timecode = "%02d:%02d:%04f" % (h, m, s)
+    return timecode
+
+
+######################################################
+######################################################

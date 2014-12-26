@@ -53,7 +53,7 @@ class AssetSave:
     @falcon.after(commit)
     def on_put(self, req, resp, repo):
         '''Get data based on a file object or b64 data, save and commit it'''
-        userInfo = getUserInfoFromSession(req)
+        userInfo = getUserInfoFromSession(req, resp)
         uploader = userInfo.get('alias')
         targetRepo = session.query(Repository).filter(
             Repository.name == repo).first()
@@ -126,6 +126,7 @@ class AssetSave:
             asset = session.query(Asset).filter(
                 Asset.repository == targetRepo).filter_by(collection=collection)\
                         .filter_by(key=bodyMd5).first()
+            print targetUser
             if not asset:
                 asset = Asset(key=bodyMd5, repository=targetRepo,
                               collection=collection, name=name[-20:].replace('_', ' '), fullname=name,
@@ -296,7 +297,7 @@ class DeleteAsset:
     @falcon.after(commit)
     def on_delete(self, req, resp, id):
         target = session.query(Asset).filter(Asset.id == id).first()
-        userInfo = getUserInfoFromSession(req)
+        userInfo = getUserInfoFromSession(req, resp)
         if userInfo.get('id') == target.owner.id:
             session.delete(target)
             resp.status = falcon.HTTP_202

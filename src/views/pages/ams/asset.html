@@ -1,7 +1,7 @@
 
 
 
-<div class="container assetDiv">
+<div class="container assetDiv" >
     <br/>
     <div class="row clearfix" ng-cloak>
 
@@ -70,6 +70,14 @@
                    data-setup='{"techOrder": ["flash", "html5", "links"]}'
                     ng-src="{{'/static/'+asset.preview}}" type="video/mp4" /></video>
                 </div>
+
+
+                <div ng-if="asset.content_type.split('/')[0]=='image'">
+                    <img ng-src="{{asset.poster}}" width="720" class="thumbnail"/>
+                </div>
+
+
+
             </div>
 
 

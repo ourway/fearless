@@ -26,17 +26,6 @@ import base64
 import uuid
 from opensource.contenttype import contenttype
 
-
-def process(cmd):
-    '''General external process'''
-    from gevent.subprocess import Popen, PIPE, call  # everything nedded to handle external commands
-    p = Popen(cmd, shell=True, stderr=PIPE, stdout=PIPE,
-            )
-            #universal_newlines=True)  # process
-    (stdout, stderr) = p.communicate()
-    return (stdout, stderr)
-
-
 def get_ip():
     '''Simple method'''
     ip = commands.getoutput("/sbin/ifconfig").split("\n")[1].split()[1][5:]
@@ -148,23 +137,7 @@ def parse_tjcsv(csvfile):
     return obj
 
 
-def generateImageThumbnail(path, w=146, h=110, text=None):
-    '''generate thumbnails using convert command'''
-    content_type = contenttype(path)
-    fmt = 'png'
-    extra = ''
-    page=''
-    if content_type == 'image/vnd.adobe.photoshop':
-        extra = '-flatten'
-    if content_type == 'application/pdf':
-        page = '[0]'
-    newthmbPath = os.path.join('/tmp', str(uuid.uuid4())+'.png')
-    cmd = 'convert "%s%s" -resize %sx%s %s "%s"' % (path,page, w, h, extra, newthmbPath)
-    pr = process(cmd)
-    if os.path.isfile(newthmbPath):
-        with open(newthmbPath, 'rb') as newThumb:
-            webmode = 'data:image/%s;base64,' % fmt
-            return webmode + base64.encodestring(newThumb.read())
+
 
 
     

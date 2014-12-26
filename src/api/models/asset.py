@@ -25,8 +25,6 @@ from utils.fagit import GIT
 from db import session, Session
 from . import fdb
 import uuid
-from utils.videoTools import generateVideoThumbnail, generateVideoPreview
-from utils.helpers import generateImageThumbnail
 from opensource.contenttype import contenttype
 
 users_assets = Table('users_assets', Base.metadata,
@@ -150,6 +148,7 @@ class Asset(IDMixin, Base):
 
 def AfterAssetCreationFuncs(mapper, connection, target):
     '''Some operations after getting ID'''
+    from tasks import generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
     session = Session()
     Target = session.query(Asset).filter_by(id=target.id).first()
 
@@ -166,6 +165,7 @@ def AfterAssetCreationFuncs(mapper, connection, target):
 
 
     if Target.content_type.split('/')[0] == 'image' or Target.content_type.split('/')[1] in ['pdf']:
+        poster = generateImageThumbnail.delay(Target.full_path, 720, 480, Target.id)
         newThumb = generateImageThumbnail(Target.full_path)
         if newThumb:
             Target.thmb = newThumb

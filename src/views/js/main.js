@@ -121,27 +121,36 @@ var TITLE = 'TITLE';
             .when('/pms/:projId/seq/:seqId', {
 
                 templateUrl: 'pages/pms/sequence.html',
-                controller: 'sequenceDetailCtrl'
+                controller: 'sequenceDetailCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
             })
             .when('/profile', {
 
                 templateUrl: 'pages/auth/profile.html',
-                controller: 'profileCtrl'
+                controller: 'profileCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
+
             })
             .when('/user/:userId', {
 
                 templateUrl: 'pages/auth/profile.html',
-                controller: 'profileCtrl'
+                controller: 'profileCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
+
             })
             .when('/report', {
 
                 templateUrl: 'pages/crew/report.html',
-                controller: 'reportCtrl'
+                controller: 'reportCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
+
+
             })
              .when('/ua', {
 
                 templateUrl: 'pages/auth/access.html',
-                controller: 'userAccessCtrl'
+                controller: 'userAccessCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
             })
              .when('/ams/c/:collectionId', {
                 templateUrl: 'pages/ams/collection.html',
@@ -151,6 +160,7 @@ var TITLE = 'TITLE';
              .when('/ams/a/:assetId', {
                 templateUrl: 'pages/ams/asset.html',
                 controller: 'assetCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
             })
     })
 
@@ -1214,7 +1224,8 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
 
                         ureq = $http.get('/api/db/user/'+Resp.owner_id).success(function(resp){
                                 $scope.asset.owner = resp;
-                                videojs('video_'+$scope.asset.id);
+                                if (Resp.content_type.split('/')[0]=='video')
+                                    videojs('video_'+$scope.asset.id);
                             })
 
                         creq = $http.get('/api/db/collection/'+Resp.collection_id).success(function(resp){
@@ -1234,7 +1245,7 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                 $scope.getAssetInfo();
                 $scope.$parent.getComments();
             })
-
+        
 
         });
 

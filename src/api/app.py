@@ -70,7 +70,7 @@ class DB:
                   'latest_session_id', 'lastLogIn', 'password2']
         args = req.path.split('/')
         table = args[3]
-        u = getUserInfoFromSession(req)
+        u = getUserInfoFromSession(req, resp)
         #if not isAuthorizedTo(u.get('id'), 'see_%s'%table):
         #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         key = req.get_param('key') or 'id'
@@ -195,7 +195,7 @@ class DB:
     def on_put(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
-        u = getUserInfoFromSession(req)
+        u = getUserInfoFromSession(req, resp)
         #if not isAuthorizedTo(u.get('id'), 'create_%s'%table):
         #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         query_params = get_params(req.stream, flat=False)

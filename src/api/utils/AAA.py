@@ -439,7 +439,7 @@ class Logout:
 
 
 
-def getUserInfoFromSession(req):
+def getUserInfoFromSession(req, resp):
         sid = req.cookie('session-id')
         if sid:
             hashed_sid = hashlib.sha1(sid).hexdigest()
@@ -447,6 +447,12 @@ def getUserInfoFromSession(req):
             if target:
                 return {'email':target.email, 'alias':target.alias, 'firstname':target.firstname,
                             'lastname':target.lastname, 'id':target.id, 'server':{'name':'Fearless API', 'ip':get_ip()}}
+
+            else:
+
+                resp.append_header('set-cookie', 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
+                resp.append_header('set-cookie', 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
+                r.delete(hashed_sid)
             
         return {'message':'ERROR'}
 

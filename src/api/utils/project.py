@@ -65,7 +65,7 @@ class GetProjectDetails:
 
 class ListProjects:
     def on_get(self, req, resp):
-        user = getUserInfoFromSession(req)
+        user = getUserInfoFromSession(req, resp)
 
         if user.get('id') != 1:
             project = session.query(Project).order_by(desc(Project.modified_on)).all()
@@ -78,7 +78,7 @@ class ListProjects:
 class AddProject:
     @falcon.after(commit)
     def on_put(self, req, resp):
-        user = getUserInfoFromSession(req)
+        user = getUserInfoFromSession(req, resp)
         projectData = get_params(req.stream, flat=False)
         start, end, name, lead_id, description = None, None, None, None, None
         if projectData.get('start'):
@@ -221,7 +221,7 @@ class GetProjectLatestReport:
 class UpdateProject:
     @falcon.after(commit)
     def on_post(self, req, resp, projId):
-        user = getUserInfoFromSession(req)
+        user = getUserInfoFromSession(req, resp)
         data = get_params(req.stream, flat=False)
         project = session.query(Project).filter(Project.id==int(projId)).first()
         if project:
@@ -248,7 +248,7 @@ class UpdateProject:
 class AddTask:
     @falcon.after(commit)
     def on_put(self, req, resp, projId):
-        user = getUserInfoFromSession(req)
+        user = getUserInfoFromSession(req, resp)
         taskData = get_params(req.stream, flat=False)
         resources, depends, manager, effort = list(), list(), 0, 0
         title = taskData.get('title')
@@ -287,7 +287,7 @@ class AddTask:
 
 class ListTasks:
     def on_get(self, req, resp, projId):
-        user = getUserInfoFromSession(req)
+        user = getUserInfoFromSession(req, resp)
         project = session.query(Project).filter(Project.id==projId).first()
         if project:
             resp.body = [{
@@ -320,7 +320,7 @@ class GetTask:
 class UpdateTask:
     @falcon.after(commit)
     def on_post(self, req,resp, taskId):
-        user = getUserInfoFromSession(req)
+        user = getUserInfoFromSession(req, resp)
         resources, depends, responsibles, effort , alternative_resources = list(), list(), list(), 0, list()
         taskData = get_params(req.stream, flat=False)
         if taskData.get('resources'): resources = [int(i.get('id')) for i in taskData.get('resources')]
@@ -367,7 +367,7 @@ class UpdateTask:
 class DeleteTask:
     @falcon.after(commit)
     def on_delete(self, req, resp, taskId):
-        user = getUserInfoFromSession(req)
+        user = getUserInfoFromSession(req, resp)
         target = session.query(Task).filter(Task.id==taskId).first()
         if target:
             session.delete(target)
