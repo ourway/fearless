@@ -114,9 +114,27 @@ class Asset(IDMixin, Base):
     @validates('version')
     def commit(self, key, data):
         from tasks import addFileToGit
+        from tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
         if self.uuid:
-            version = addFileToGit(self.full_path, self.uuid, data)
-            return data
+            addFileToGit.delay(self.full_path, self.uuid, data)
+        if self.id:
+            if self.content_type.split('/')[0] == 'video':
+                generateVideoPreview.delay(self.full_path, self.id)
+                newThumb = generateVideoThumbnail(self.full_path)
+                if newThumb:
+                    self.thmb = newThumb
+                newPoster = generateVideoThumbnail(self.full_path, 720, 480)  ## hd480 
+                if newPoster:
+                    self.pst = newPoster
+
+
+            if self.content_type.split('/')[0] == 'image' or self.content_type.split('/')[1] in ['pdf']:
+                poster = generateImageThumbnail.delay(self.full_path, 720, 480, self.id)
+                newThumb = generateImageThumbnail(self.full_path)
+                if newThumb:
+                    self.thmb = newThumb
+
+        return data
         #wt = os.path.join(self.collection.repository.path, self.collection.path)
         #git = GIT(self.full_path, wt=wt)
         #git.add(self.name, version=data)
@@ -131,6 +149,14 @@ class Asset(IDMixin, Base):
                             self.collection.path,
                             self.fullname)
 
+        return result
+
+    @hybrid_property
+    def git_tags(self):
+        from tasks import getTags
+        if self.uuid and self.full_path:
+            result = getTags(self.full_path, self.uuid)
+            print result
         return result
 
     @property
@@ -154,6 +180,8 @@ class Asset(IDMixin, Base):
     def url(self):
         return os.path.join(os.path.basename(self.collection.repository.path),
                             self.collection.path, self.fullname)
+
+
 
 
 def AfterAssetCreationFuncs(mapper, connection, target):
@@ -181,11 +209,6 @@ def AfterAssetCreationFuncs(mapper, connection, target):
         if newThumb:
             Target.thmb = newThumb
 
-
-
-
-    
-    
     session.commit()
 
     

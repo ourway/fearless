@@ -216,6 +216,7 @@ def duration(path):
         except ValueError:
             return
 
+@Capp.task
 def addFileToGit(path, assetUuid, version):
     from models import Asset
     asset = session.query(Asset).filter_by(uuid=assetUuid).first()
@@ -240,7 +241,18 @@ def addFileToGit(path, assetUuid, version):
     commit, error = process(arg)
     command = 'tag v_%s' % version
     arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
-    print process(arg)
+    process(arg)
+
+
+def getTags(path, assetUuid):
+    path = path.encode("utf-8")
+    directory = os.path.dirname(path)
+    git_dir = os.path.join('/home/farsheed/Desktop', assetUuid)
+    command = 'tag -l'
+    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
+    result, error = process(arg)
+    return ','.join(result.strip().split('\n'))
+
 
 
 
