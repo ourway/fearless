@@ -135,8 +135,6 @@ class AssetSave:
                               collection=collection, name=name, fullname=fullname,
                               path=assetPath, ext=assetExt, owner_id=targetUser.id)
                 session.add(asset)
-                if not Commit():
-                    return ## commit as soon as posiible
             else:
                 if not bodyMd5 == asset.key:
                     asset.version += 1
@@ -145,6 +143,7 @@ class AssetSave:
                 asset.key = bodyMd5
 
             # Asset descriptions
+
             if req.get_param('description'):
                 asset.description = req.get_param('description')
             
@@ -482,18 +481,30 @@ class AddCollection:
                 resp.body = {'message':'ERROR', 'info':'Collection is available on server'}
 
 
-class GetAssetThumbnails:
-    def on_get(self, req, resp, assetId):
+class AssetCheckout:
+    def on_post(self, req, resp, assetId):
         '''Get asset thumbnails from riak'''
         target = session.query(Asset).filter_by(id=int(assetId)).first()
-        versions = xrange(target.version)
-        result = {}
-        for i in versions:
-            thmbKey = '%s_thmb_v%s'%(target.uuid, i+1)
-            thmb = fdb.get(thmbKey).data
-            if thmb:
-                result[i+1] = thmb
-        resp.body = result
+        from tasks import process
+        from utils.defaults import ASSETS
+        asset_folder = os.path.join(ASSETS, target.uuid)
+        if not os.path.isdir(asset_folder):
+            resp.status = falcon.HTTP_404
+            return
+
+        version = req.get_param('version')
+        command = 'checkout %s' % version
+        arg = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(d=asset_folder, c=command)
+        error, result = process(arg)
+        pstKey = '%s_poster_v%s'%(target.uuid, version.split('_')[1])
+        thmbKey = '%s_thmb_v%s'%(target.uuid, version.split('_')[1])
+        poster = fdb.get(pstKey).data
+        thumbnail = fdb.get(thmbKey).data
+        resp.body = {'poster':poster, 'thumbnail':thumbnail}
+
+
+        
+
  
         
         

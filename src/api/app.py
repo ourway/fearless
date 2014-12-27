@@ -22,7 +22,7 @@ import urlparse
 from urllib import unquote
 from string import ascii_uppercase
 import ujson as json
-from utils.assets import GetAssetThumbnails, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection
+from utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection
 from utils.reports import Mailer, AddReport
 from gevent import wsgi
 from models import __all__ as av
@@ -296,7 +296,7 @@ app.add_route('/api/asset/save/{repo}', AssetSave())
 app.add_route('/api/asset', ListAssets())
 app.add_route('/api/asset/{key}', GetAsset())
 app.add_route('/api/asset/delete/{id}', DeleteAsset())
-app.add_route('/api/asset/thmbs/{assetId}', GetAssetThumbnails())
+app.add_route('/api/asset/checkout/{assetId}', AssetCheckout())
 app.add_route('/api/showtime/{userid}', GetUserShows())
 app.add_route('/api/project', ListProjects())
 app.add_route('/api/project/add', AddProject())

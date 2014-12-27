@@ -1219,13 +1219,23 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
 
 
 
+        $scope.checkout = function(v){
+                    $scope.checkout_load = v;
+            req = $http.post('/api/asset/checkout/'+$scope.asset.id+'?version='+v).success(function(resp){
+                    //$scope.getAssetInfo();
+                    $scope.asset.poster = resp.poster;
+                    $scope.checkout_load = null;
+                    $scope.checkouted = v;
+                    //document.location='/static/ASSETS/'+$scope.asset.uuid+'/'+$scope.asset.fullname;
+                    
+                    }) 
+        }
         $scope.getAssetInfo = function(){
             req = $http.get('/api/db/asset/'+assetId).success(function(Resp){
                     $scope.$parent.comment_id = Resp.uuid;
                     //$location.search('version', Resp.version)
                     $scope.asset = Resp;
                     $scope.assetVersions = Resp.git_tags.split(',');
-                    console.log($scope.assetVersions)
                     $rootScope.title = 'Asset: ' + Resp.name + ' - ' + 'Fearless'
                     if (Resp.owner_id){
 

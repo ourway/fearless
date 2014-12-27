@@ -64,7 +64,22 @@
             </div>
                 <div class="col-md-12" ng-if="asset">
                     <h4>Asset Versions</h4>
-                    <button class="btn btn-sm btn-default" ng-repeat="version in assetVersions">{{version.split('v_')[1]}}</button>
+                    <button ng-click="checkout(version)" class="btn btn-sm btn-default"
+                        ng-class="{'btn-success':asset.version==version.split('v_')[1],
+                        'btn-warning':checkout_load==version, 'btn-primary':checkouted==version}"
+                        ng-repeat="version in assetVersions">{{version.split('v_')[1]}}</button>
+                    
+                <div style="opacity:0.75;">
+                    <br/>
+                    <button class="btn btn-sm btn-default"></button> <small>Available versions</small> </br>
+                    <button class="btn btn-sm btn-primary"></button> <small>Retrived version</small></br>
+                    <button class="btn btn-sm btn-warning"></button> <small>Version is loading</small></br>
+                    <button class="btn btn-sm btn-danger"></button> <small>Error in version</small></br>
+                    <button class="btn btn-sm btn-success"></button> <small>Current version</small></br>
+                </div>
+
+                <hr/>
+
                 </div>
             </div>
 
