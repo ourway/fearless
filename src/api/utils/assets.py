@@ -500,7 +500,7 @@ class AssetCheckout:
         thmbKey = '%s_thmb_v%s'%(target.uuid, version.split('_')[1])
         poster = fdb.get(pstKey).data
         thumbnail = fdb.get(thmbKey).data
-        resp.body = {'poster':poster, 'thumbnail':thumbnail}
+        resp.body = {'poster':poster, 'thumbnail':thumbnail, 'version':version}
 
 
         

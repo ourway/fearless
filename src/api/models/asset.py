@@ -77,21 +77,6 @@ class Asset(IDMixin, Base):
     collection_id = Column( Integer, ForeignKey('collection.id'), nullable=False)
 
 
-    @validates('thmb')
-    def save_thumbnail_to_riak(self, key, data):
-        thmbKey = '%s_thmb_v%s'%(self.uuid, self.version)
-        newThmb = fdb.new(thmbKey, data)
-        newThmb.store()
-        return thmbKey
-
-
-    @validates('pst')
-    def save_poster_to_riak(self, key, data):
-        pstKey = '%s_poster_v%s'%(self.uuid, self.version)
-        newPoster = fdb.new(pstKey, data)
-        newPoster.store()
-        return pstKey
-
     @validates('name')
     def check_name(self, key, name):
         return name
@@ -129,8 +114,8 @@ class Asset(IDMixin, Base):
 
 
             if self.content_type.split('/')[0] == 'image' or self.content_type.split('/')[1] in ['pdf']:
-                poster = generateImageThumbnail.delay(self.full_path, 720, 480, self.id)
-                newThumb = generateImageThumbnail(self.full_path)
+                poster = generateImageThumbnail.delay(self.full_path, data, 720, 480, self.id, 'poster')
+                newThumb = generateImageThumbnail(self.full_path, data, 146, 110, self.id, 'thmb')
                 if newThumb:
                     self.thmb = newThumb
 
@@ -195,7 +180,7 @@ def AfterAssetCreationFuncs(mapper, connection, target):
     ## videos using ffmpeg
     if Target.content_type.split('/')[0] == 'video':
         generateVideoPreview.delay(Target.full_path, Target.id)
-        newThumb = generateVideoThumbnail(Target.full_path)
+        newThumb = generateVideoThumbnail.delay(Target.full_path)
         if newThumb:
             Target.thmb = newThumb
         newPoster = generateVideoThumbnail(Target.full_path, 720, 480)  ## hd480 
@@ -205,8 +190,8 @@ def AfterAssetCreationFuncs(mapper, connection, target):
 
 
     if Target.content_type.split('/')[0] == 'image' or Target.content_type.split('/')[1] in ['pdf']:
-        poster = generateImageThumbnail.delay(Target.full_path, 720, 480, Target.id)
-        newThumb = generateImageThumbnail(Target.full_path)
+        poster = generateImageThumbnail.delay(Target.full_path, Target.version, 720, 480, Target.id, 'poster')
+        newThumb = generateImageThumbnail(Target.full_path, Target.version, 146, 110, Target.id, 'thmb')
         if newThumb:
             Target.thmb = newThumb
 

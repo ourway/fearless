@@ -32,7 +32,7 @@ import os
 import uuid
 from envelopes import Envelope, GMailSMTP
 from utils.validators import email_validator
-from models import session
+from models import session, fdb
 from opensource.contenttype import contenttype
 # riak bucket for our files
 import sh
@@ -319,7 +319,7 @@ def generateVideoPreview(path, asset=None):
             return result
 
 @Capp.task
-def generateImageThumbnail(path, w=146, h=110, asset=None, text=None):
+def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb'):
     '''generate thumbnails using convert command'''
     path = path.encode('utf-8')
     content_type = contenttype(path)
@@ -337,16 +337,16 @@ def generateImageThumbnail(path, w=146, h=110, asset=None, text=None):
         with open(newthmbPath, 'rb') as newThumb:
             webmode = 'data:image/%s;base64,' % fmt
             result = webmode + base64.encodestring(newThumb.read())
-
         if asset and result:
             from models import Asset
             target = session.query(Asset).filter_by(id=asset).first()
-            target.pst = result;
-            session.commit()
+            key = '%s_%s_v%s'%(target.uuid, text, version)
+            new = fdb.new(key, result)
+            new.store()
 
         
 
-        return result
+            return key
 
         #return os.path.realpath(public_repository_path, previewPath)
 
