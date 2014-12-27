@@ -278,7 +278,7 @@ def identify(path, assetId):
 
 
 @Capp.task
-def generateVideoThumbnail(path, w=146, h=110, text=None):
+def generateVideoThumbnail(path, assetUuid, version, w=146, h=110, text='thmb'):
     '''generate a thumbnail from a video file and return a vfile db'''
     path = path.encode('utf-8')
     upf = '/tmp'
@@ -294,29 +294,32 @@ def generateVideoThumbnail(path, w=146, h=110, text=None):
         with open(thpath, 'rb') as newThumb:
             webmode = 'data:image/%s;base64,' % fmt
             result =  webmode + base64.encodestring(newThumb.read())
+            from models import Asset
+            target = session.query(Asset).filter_by(uuid=assetUuid).first()
+            key = '%s_%s_v%s'%(target.uuid, text, version)
+            new = fdb.new(key, result)
+            new.store()
         return result
 
 
 @Capp.task
-def generateVideoPreview(path, asset=None):
+def generateVideoPreview(path, version, assetUuid):
+    '''
+        version: asset.version
+        asset: asset.uuid
+    '''
     path = path.encode('utf-8')
     '''generate a thumbnail from a video file and return a vfile db'''
-    if asset:
-        from models import Asset
-        target = session.query(Asset).filter_by(id=asset).first()
-    fid = str(uuid.uuid4())
+
+    fid = assetUuid + '_preview_' + str(version)
     fmt = 'm4v'
     previewPath = os.path.join(public_upload_folder, fid+'.'+fmt)
     arg = '''"%s" -i "%s" -preset ultrafast -s hd480 "%s"''' \
         % (ffmpeg, path, previewPath)
-    
     pr = process(arg)
     if os.path.isfile(previewPath):
         result =  os.path.join('uploads', fid+'.'+fmt)
-        if asset and target:
-            target.preview = result
-            session.commit()
-            return result
+        return result
 
 @Capp.task
 def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb'):

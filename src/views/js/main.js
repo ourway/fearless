@@ -1223,9 +1223,11 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                     $scope.checkout_load = v;
             req = $http.post('/api/asset/checkout/'+$scope.asset.id+'?version='+v).success(function(resp){
                     //$scope.getAssetInfo();
-                    console.log(resp.version)
+                    console.log(resp.preview)
                     if (resp.poster)
                         $scope.asset.poster = resp.poster;
+                    if (resp.preview)
+                        $scope.asset.preview = resp.preview;
                     $scope.checkout_load = null;
                     $scope.checkouted = v;
                     //document.location='/static/ASSETS/'+$scope.asset.uuid+'/'+$scope.asset.fullname;

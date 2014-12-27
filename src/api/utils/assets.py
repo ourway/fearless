@@ -170,7 +170,7 @@ class AssetSave:
             resp.body = {'message': 'Asset created|updated', 'key': asset.key,
                          'url': asset.url, 'fullname':asset.fullname, 'id':asset.id,
                          'name':asset.name, 'content_type':asset.content_type.split('/')[0],
-                         'datetime':time.time(), 'thumbnail':asset.thumbnail}
+                         'datetime':time.time()}
                 #resp.body = "I am working"
         else:  ## lets consume the stream!
             while True:
@@ -500,7 +500,10 @@ class AssetCheckout:
         thmbKey = '%s_thmb_v%s'%(target.uuid, version.split('_')[1])
         poster = fdb.get(pstKey).data
         thumbnail = fdb.get(thmbKey).data
-        resp.body = {'poster':poster, 'thumbnail':thumbnail, 'version':version}
+        fid = target.uuid + '_preview_' + version.split('_')[1]
+        fmt = 'm4v'
+        preview =  os.path.join('uploads', fid+'.'+fmt)
+        resp.body = {'poster':poster, 'thumbnail':thumbnail, 'version':version, 'preview':preview}
 
 
         

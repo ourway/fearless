@@ -52,9 +52,9 @@ class Asset(IDMixin, Base):
     fullname = Column(String(256))
     description = Column(String(512))
     fileinfo = Column(String(512))  ## information about this file. usually using identify command
-    thmb = Column(String(64))  ##thmbnail image id in riak
-    pst = Column(String(64)) #poster image id in riak
-    preview = Column(String(256)) #preview video url
+    #thmb = Column(String(64))  ##thmbnail image id in riak
+    #pst = Column(String(64)) #poster image id in riak
+    #preview = Column(String(256)) #preview video url
     ext = Column(String(32))
     content_type = Column(String(64))
     version = Column(Integer, default=1)  ## asset versioning
@@ -102,27 +102,21 @@ class Asset(IDMixin, Base):
         from tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
         if self.uuid:
             addFileToGit.delay(self.full_path, self.uuid, data)
-        if self.id:
+        if self.id and self.uuid:
             if self.content_type.split('/')[0] == 'video':
-                generateVideoPreview.delay(self.full_path, self.id)
-                newThumb = generateVideoThumbnail(self.full_path)
-                if newThumb:
-                    self.thmb = newThumb
-                newPoster = generateVideoThumbnail(self.full_path, 720, 480)  ## hd480 
-                if newPoster:
-                    self.pst = newPoster
+                generateVideoPreview.delay(self.full_path, data, self.uuid)
+                newThumb = generateVideoThumbnail.delay(self.full_path, self.uuid, data)
+                newPoster = generateVideoThumbnail.delay(self.full_path, self.uuid, data, 720, 480, 'poster')  ## hd480 
+
 
 
             if self.content_type.split('/')[0] == 'image' or self.content_type.split('/')[1] in ['pdf']:
                 poster = generateImageThumbnail.delay(self.full_path, data, 720, 480, self.id, 'poster')
-                newThumb = generateImageThumbnail(self.full_path, data, 146, 110, self.id, 'thmb')
-                if newThumb:
-                    self.thmb = newThumb
+                newThumb = generateImageThumbnail.delay(self.full_path, data, 146, 110, self.id, 'thmb')
+
 
         return data
-        #wt = os.path.join(self.collection.repository.path, self.collection.path)
-        #git = GIT(self.full_path, wt=wt)
-        #git.add(self.name, version=data)
+
 
     @hybrid_property
     def full_path(self):
@@ -145,17 +139,21 @@ class Asset(IDMixin, Base):
 
     @property
     def thumbnail(self):
-        if not self.thmb:
-            return
-        obj = fdb.get(self.thmb)
+        key = '%s_thmb_v%s'%(self.uuid, self.version)
+        obj = fdb.get(key)
         if obj:
             return obj.data
+    @property
+    def preview(self):
+        fid = self.uuid + '_preview_' + str(self.version)
+        fmt = 'm4v'
+        result =  os.path.join('uploads', fid+'.'+fmt)
+        return result
 
     @property
     def poster(self):
-        if not self.pst:
-            return
-        obj = fdb.get(self.pst)
+        key = '%s_poster_v%s'%(self.uuid, self.version)
+        obj = fdb.get(key)
         if obj:
             return obj.data
 
@@ -179,21 +177,17 @@ def AfterAssetCreationFuncs(mapper, connection, target):
 
     ## videos using ffmpeg
     if Target.content_type.split('/')[0] == 'video':
-        generateVideoPreview.delay(Target.full_path, Target.id)
-        newThumb = generateVideoThumbnail.delay(Target.full_path)
+        generateVideoPreview.delay(Target.full_path, Target.version, Target.uuid)
+        newThumb = generateVideoThumbnail.delay(Target.full_path, Target.uuid, Target.version)
         if newThumb:
             Target.thmb = newThumb
-        newPoster = generateVideoThumbnail(Target.full_path, 720, 480)  ## hd480 
-        if newPoster:
-            Target.pst = newPoster
-            session.add(Target)
+        newPoster = generateVideoThumbnail.delay(Target.full_path, Target.uuid, Target.version,  720, 480, 'poster')  ## hd480 
 
 
     if Target.content_type.split('/')[0] == 'image' or Target.content_type.split('/')[1] in ['pdf']:
         poster = generateImageThumbnail.delay(Target.full_path, Target.version, 720, 480, Target.id, 'poster')
-        newThumb = generateImageThumbnail(Target.full_path, Target.version, 146, 110, Target.id, 'thmb')
-        if newThumb:
-            Target.thmb = newThumb
+        newThumb = generateImageThumbnail.delay(Target.full_path, Target.version, 146, 110, Target.id, 'thmb')
+
 
     session.commit()
 
