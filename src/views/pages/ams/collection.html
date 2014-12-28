@@ -57,16 +57,16 @@
                 <a href="#/pms/{{collection.project.id}}">{{collection.project.name}}</a> <span class="divider"></span>
                 </li>
                 <li ng-if="collection.parent.parent.parent.parent">
-                <a href="#/ams/c/{{collection.parent.parent.parent.parent.id}}">{{collection.parent.parent.parent.parent.name}}</a> <span class="divider"></span>
+                <a href="#/ams/c/{{collection.parent.parent.parent.parent.id}}?page=1">{{collection.parent.parent.parent.parent.name}}</a> <span class="divider"></span>
 				</li>
                 <li ng-if="collection.parent.parent.parent">
-                <a href="#/ams/c/{{collection.parent.parent.parent.id}}">{{collection.parent.parent.parent.name}}</a> <span class="divider"></span>
+                <a href="#/ams/c/{{collection.parent.parent.parent.id}}?page=1">{{collection.parent.parent.parent.name}}</a> <span class="divider"></span>
 				</li>
                 <li ng-if="collection.parent.parent">
-                <a href="#/ams/c/{{collection.parent.parent.id}}">{{collection.parent.parent.name}}</a> <span class="divider"></span>
+                <a href="#/ams/c/{{collection.parent.parent.id}}?page=1">{{collection.parent.parent.name}}</a> <span class="divider"></span>
 				</li>
                 <li ng-if="collection.parent">
-                <a href="#/ams/c/{{collection.parent.id}}">{{collection.parent.name}}</a> <span class="divider"></span>
+                <a href="#/ams/c/{{collection.parent.id}}?page=1">{{collection.parent.name}}</a> <span class="divider"></span>
 				</li>
 				<li class="active">
 				    {{collection.name}}
@@ -86,10 +86,10 @@
             <h3>{{collection.name | uppercase}}</h3>
                 <div class="col-md-4" ng-repeat="subcol in collection.children track by $index">
 					<div class="thumbnail asm_thumb">
-                        <a href="#ams/c/{{subcol.id}}" title="{{subcol.description}}"
+                        <a href="#ams/c/{{subcol.id}}?page=1" title="{{subcol.description}}"
                         ><img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
 						<div class="caption">
-                            <h5><a href="#ams/c/{{subcol.id}}" style="color:#333">{{subcol.name}}</a></h5>
+                            <h5><a href="#ams/c/{{subcol.id}}?page=1" style="color:#333">{{subcol.name}}</a></h5>
 							<p>
 							</p>
 						</div>

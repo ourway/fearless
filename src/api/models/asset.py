@@ -146,7 +146,7 @@ class Asset(IDMixin, Base):
     @property
     def preview(self):
         fid = self.uuid + '_preview_' + str(self.version)
-        fmt = 'm4v'
+        fmt = 'ogv'
         result =  os.path.join('uploads', fid+'.'+fmt)
         return result
 

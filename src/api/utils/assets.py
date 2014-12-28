@@ -501,7 +501,7 @@ class AssetCheckout:
         poster = fdb.get(pstKey).data
         thumbnail = fdb.get(thmbKey).data
         fid = target.uuid + '_preview_' + version.split('_')[1]
-        fmt = 'm4v'
+        fmt = 'ogv'
         preview =  os.path.join('uploads', fid+'.'+fmt)
         resp.body = {'poster':poster, 'thumbnail':thumbnail, 'version':version, 'preview':preview}
 

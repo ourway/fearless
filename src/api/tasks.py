@@ -312,9 +312,9 @@ def generateVideoPreview(path, version, assetUuid):
     '''generate a thumbnail from a video file and return a vfile db'''
 
     fid = assetUuid + '_preview_' + str(version)
-    fmt = 'm4v'
+    fmt = 'ogv'
     previewPath = os.path.join(public_upload_folder, fid+'.'+fmt)
-    arg = '''"%s" -i "%s" -preset ultrafast -s hd480 "%s"''' \
+    arg = '''"%s" -i "%s" -q:v 7 -s hd480 "%s"''' \
         % (ffmpeg, path, previewPath)
     pr = process(arg)
     if os.path.isfile(previewPath):

@@ -46,6 +46,7 @@ class GetProjectDetails:
                 'effort_done':project.effort_done,
                 'duration':project.duration,
                 'effort':project.effort,
+                'uuid':project.uuid,
                 'complete':project.complete,
                 'watchers':[{'firstname':i.firstname, 'lastname':i.lastname, 'fullname':i.fullname, 'id':i.id} for i in project.watchers], 
                 'tasks':[{'title':i.title, 'id':i.id} for i in project.tasks],

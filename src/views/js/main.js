@@ -663,7 +663,7 @@ cellTemplate: '<div>  <a style="position:absolute;margin:5px" href="#pms/{{row.e
         }
 
         $scope.getProjData = function(){
-            _pR = $http.get('/api/project');
+            _pR = $http.get('/api/db/project');
 
             _pR.error(function(resp){
                    if (resp.title == 'Not Authorized')
