@@ -49,6 +49,22 @@ from utils.sequence import AddSequence
 tables = [i for i in av if i[0] in ascii_uppercase]
 
 
+def getSession(req, resp, params):
+    from models.db import Session
+    session=Session()
+
+def closeSession(req, resp):
+    try:
+        session.commit()
+    except Exception, e:
+        print '*'*80
+        print e
+        print '*'*80
+        session.rollback()
+    finally:
+        session.close()
+
+
 class ThingsResource:
     #@Authorize('create_collection')
     def on_get(self, req, resp):
@@ -270,7 +286,7 @@ class DB:
 
 # falcon.API instances are callable WSGI apps
 #app = falcon.API()
-app = falcon.API(before=[Authenticate], after=[jsonify])
+app = falcon.API(before=[getSession, Authenticate], after=[jsonify, closeSession])
 things = ThingsResource()
 
 ########################################################

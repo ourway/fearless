@@ -33,15 +33,7 @@ def get_ip():
     return ip
 
 def Commit():
-    try:
-        session.commit()
-        return True
-    except Exception, e:
-        print '*'*80
-        print e
-        print '*'*80
-        session.rollback()
-
+    return True
 
 
 def commit(req, resp):
