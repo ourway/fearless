@@ -324,6 +324,10 @@ def generateVideoPreview(path, version, assetUuid):
 @Capp.task
 def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb'):
     '''generate thumbnails using convert command'''
+    from models import Asset
+    target = session.query(Asset).filter_by(id=asset).first()
+    if not target:
+        return
     path = path.encode('utf-8')
     content_type = contenttype(path)
     fmt = 'png'
@@ -333,23 +337,13 @@ def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb')
         extra = '-flatten'
     if content_type == 'application/pdf':
         page = '[0]'
-    newthmbPath = os.path.join('/tmp', str(uuid.uuid4())+'.png')
+    fid = target.uuid + '_' + text + '_' + str(version)
+    fmt = 'png'
+    newthmbPath = os.path.join(public_upload_folder, fid+'.'+fmt)
     cmd = 'convert "%s%s" %s -resize %sx%s "%s"' % (path, page, extra, w, h, newthmbPath)
     pr = process(cmd)
     if os.path.isfile(newthmbPath):
-        with open(newthmbPath, 'rb') as newThumb:
-            webmode = 'data:image/%s;base64,' % fmt
-            result = webmode + base64.encodestring(newThumb.read())
-        if asset and result:
-            from models import Asset
-            target = session.query(Asset).filter_by(id=asset).first()
-            key = '%s_%s_v%s'%(target.uuid, text, version)
-            new = fdb.new(key, result)
-            new.store()
-
-        
-
-            return key
+        return key
 
         #return os.path.realpath(public_repository_path, previewPath)
 

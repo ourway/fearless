@@ -233,6 +233,8 @@
             "seq_props": [""],
             "seq_sets": [""],
             "shots": [""],
+            "preview": [""],
+            "output": [""],
         },
         "copy": {
             "thumb.png": "icons/sequences.png"
@@ -263,6 +265,9 @@
             "nuke/data": [""],
             "nuke/script": [""],
             "nuke/output": [""],
+            "preview": [""],
+            "output": [""],
+
         },
         "copy": {
             "thumb.png": "icons/sequences.png"

@@ -41,7 +41,7 @@ def Authorize(action):
     def request_checked(func):
         def _f(self, req, resp, *args, **kw):
             u = getUserInfoFromSession(req)
-            if isAuthorizedTo(u.get('id'), action):
+            if isAuthorizedTo(req, u.get('id'), action):
                 return func(self, req, resp, *args, **kw)
             else:
                 raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
@@ -412,13 +412,12 @@ class Logout:
     '''Account activation
     '''
 
-    @falcon.after(commit)
     def on_post(self, req, resp):
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         sid = req.cookie('session-id')
         if sid:
             hashed_sid = hashlib.sha1(sid).hexdigest()
-            target = session.query(User).filter(User.latest_session_id == hashed_sid).first()
+            target = req.session.query(User).filter(User.latest_session_id == hashed_sid).first()
             if not target:
                 logger.warning(
                     '{ip}|tried to logout of an invalid session'.format(ip=ip))
@@ -466,9 +465,9 @@ class GetPermissions:
 
 
 
-def isAuthorizedTo(userId, actionName):
+def isAuthorizedTo(req, userId, actionName):
     '''authorization function'''
-    target = session.query(User).filter(User.id == userId).first()
+    target = req.session.query(User).filter(User.id == userId).first()
     if not target:
         return
 

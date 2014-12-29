@@ -139,7 +139,6 @@ class DB:
 
                 elif len(args) == 5:
                     '''/api/db/user/1?field=tasks'''
-                    print 'here'
                     for i in data:
                         #_d = eval('i.%s'%field)
                         _d = getattr(i, field)

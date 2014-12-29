@@ -194,16 +194,16 @@ table {
 }
 .projectCollectionsA:hover {
     text-decoration: none;
-    color: black;
-    background: #FFDF00;
+    color: white;
+    background: #1D1D1D;
     border: 1px solid #C3C3C3;
     transform: scale(1.25,1.25);
-    box-shadow: 1px 1px 20px #FFCB00;
+    box-shadow: 1px 1px 20px #FFFFFF;
 }
 #AssetsAndSequencesOfProject{
-    background:#FFFAE7;
-    padding:10px;
-    border-radius:5px;
+    background: #F5F5F5;
+    padding: 10px;
+    border-radius: 5px;
 }
 #ManagementDivProject{
     background:#f8f8f8;

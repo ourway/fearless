@@ -1408,6 +1408,11 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             req = $http.get('/api/collection/'+ci+'?s='+start+'&e='+end);
             req.success(function(resp){
                     $scope.collection = resp;
+                    for (i in $scope.collection.assets){
+                        _asset = $scope.collection.assets[i];
+
+
+                    }
                     $rootScope.title = 'Collection: ' + resp.name + ' - ' + 'Fearless'
                     $scope.collection.page = (page||0)+1;
                     $location.search('page', (page||0)+1);

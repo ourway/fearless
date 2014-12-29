@@ -32,7 +32,7 @@
                         <div class="col-md-12 asm_upper">
                             <div ng-if="asset.thumbnail"> 
                                 <a title="{{asset.fullname}} {{asset.description}}" class="collectionImages" title="{{asset.description}}">
-                                <img class="thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{asset.thumbnail}}" /></a>
+                                <img class="thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{'/static/'+asset.thumbnail}}" /></a>
                             </div>
                             <div ng-if="!asset.thumbnail"> 
                                 <a title="{{asset.fullname}} {{asset.description}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
@@ -89,7 +89,7 @@
             <small style="color:grey">{{asset.fileinfo}}</small>
                 <div ng-if="asset.preview && asset.content_type.split('/')[0]=='video'">
                     <video id="video_{{asset.id}}" class="video-js vjs-default-skin thumbnail" controls 
-                    preload="metadata" ng-attr-poster="{{asset.poster}}" width="720" height="480" >
+                    preload="metadata" ng-attr-poster="{{'/static/'+asset.poster}}" width="720" height="480" >
                     <source 
                    data-setup='{"techOrder": ["flash", "html5", "links"]}'
                     ng-src="{{'/static/'+asset.preview}}" type="video/mp4" /></video>
@@ -97,7 +97,7 @@
 
 
                 <div ng-if="asset.content_type.split('/')[0]=='image'">
-                    <img ng-src="{{asset.poster}}" width="720" class="thumbnail"/>
+                    <img ng-src="{{'/static/'+asset.poster}}" width="720" class="thumbnail"/>
                 </div>
 
             </div>

@@ -139,20 +139,20 @@
                         <div class="col-md-12 asm_upper">
                             <div ng-if="isImage(asset)"> 
                                 <a title="{{asset.fullname}} {{asset.description}}" href="/static/{{asset.url}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}" data-gallery="collectionLinks">
-                                <img class="thumbnail" ng-if="!asset.thumbnail" class="asm_col_thumb_img thumbnail" style="height:110px;" ng-src="/static/{{asset.url}}" />
-                                <img class="thumbnail" ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{asset.thumbnail}}" /></a>
+                                <img class="thumbnail" ng-if="!asset.thumbnail" class="asm_col_thumb_img thumbnail" style="width:146px;height:110px;" ng-src="/static/{{asset.url}}" />
+                                <img class="thumbnail" ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{'/static/'+asset.thumbnail}}" /></a>
                             </div>
                             <div ng-if="!isImage(asset) && !isVideo(asset)"> 
                                 <a title="{{asset.fullname}} {{asset.description}}" href="#/ams/a/{{asset.id}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
                                 <img class="thumbnail" ng-if="!asset.thumbnail" class="asm_col_thumb_img thumbnail" ng-src="/app/images/icons/P_Movie.svg.png" />
-                                <img class="thumbnail" ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail" ng-src="{{asset.thumbnail}}" />
+                                <img class="thumbnail" ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail" ng-src="{{'/static/'+asset.thumbnail}}" />
                                 
                                 </a>
                             </div>
                             <div ng-if="asset.content_type.split('/')[0]=='video'" >
                                 <a title="{{asset.fullname}} {{asset.description}}" href="#/ams/a/{{asset.id}}" class="collectionImages" style="cursor:pointer" title="{{asset.description}}">
                                 <img class="thumbnail" ng-if="!asset.thumbnail" class="asm_col_thumb_img thumbnail" ng-src="/app/images/icons/video.png"/>
-                                <img class="thumbnail" ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{asset.thumbnail}}" /></a>
+                                <img class="thumbnail" ng-if="asset.thumbnail" class="asm_col_thumb_img thumbnail"  ng-src="{{'/static/'+asset.thumbnail}}" /></a>
                             </div>
 						</div>
                         <hr/>

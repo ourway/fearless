@@ -407,8 +407,8 @@ class CollectionInfo:
         end = max(start, end)
 
         if target:
-            assets = req.session.query(Asset).filter_by(collection=target).order_by(desc(Asset.modified_on)).slice(start, end)
-            assets_count = req.session.query(Asset).filter_by(collection=target).count()
+            assets = req.session.query(Asset).filter_by(collection_id=target.id).order_by(desc(Asset.modified_on)).slice(start, end)
+            assets_count = req.session.query(Asset).filter_by(collection_id=target.id).count()
             data = dict()
             data['name'] = target.name
             data['name'] = target.name
@@ -422,7 +422,7 @@ class CollectionInfo:
                                    'version':i.version,
                                    'thumbnail':i.thumbnail,
                                    'preview':i.preview,
-                                   #'poster':i.poster,
+                                   'poster':i.poster,
                                    'owner':{
                                             'id':i.owner.id if i.owner else 0,
                                             'name':i.owner.fullname if i.owner else None

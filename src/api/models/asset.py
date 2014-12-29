@@ -26,6 +26,7 @@ from db import Session
 from . import fdb
 import uuid
 from opensource.contenttype import contenttype
+from utils.defaults import public_upload_folder, public_repository_path, GIT_folder, ASSETS
 
 users_assets = Table('users_assets', Base.metadata,
                      Column('id', Integer, primary_key=True),
@@ -139,10 +140,10 @@ class Asset(IDMixin, Base):
 
     @property
     def thumbnail(self):
-        key = '%s_thmb_v%s'%(self.uuid, self.version)
-        obj = fdb.get(key)
-        if obj:
-            return obj.data
+        fmt = 'png'
+        fid = self.uuid + '_thmb_' + str(self.version)
+        return os.path.join('uploads', fid+'.'+fmt)
+
     @property
     def preview(self):
         fid = self.uuid + '_preview_' + str(self.version)
@@ -152,10 +153,10 @@ class Asset(IDMixin, Base):
 
     @property
     def poster(self):
-        key = '%s_poster_v%s'%(self.uuid, self.version)
-        obj = fdb.get(key)
-        if obj:
-            return obj.data
+        fmt = 'png'
+        fid = self.uuid + '_poster_' + str(self.version)
+        return os.path.join('uploads', fid+'.'+fmt)
+
 
 
     @property
