@@ -20,7 +20,7 @@ from helpers import commit, get_ip, get_params
 from validators import email_validator
 from tasks import send_envelope
 import os
-from models import session, User, Report
+from models import User, Report
 from AAA import getUserInfoFromSession
 
 
@@ -49,10 +49,9 @@ class Mailer(object):
 
 
 class AddReport:
-    @falcon.after(commit)
     def on_put(self, req, resp, **kw):
         u = getUserInfoFromSession(req)
-        targetUser = session.query(User).filter(User.id==u.get('id')).first()
+        targetUser = req.session.query(User).filter(User.id==u.get('id')).first()
         data = get_params(req.stream, flat=False)
         if data and data.get('body'):
             targetUser.reports.append(data.get('body'))

@@ -31,7 +31,7 @@ from base64 import encode, decode, decodestring
 from sqlalchemy import desc
 
 # from celery.result import AsyncResult
-from models import Asset, Repository, Collection, es, session, User, fdb
+from models import Asset, Repository, Collection, es, User, fdb
 from AAA import getUserInfoFromSession
 from defaults import public_repository_path
 
@@ -50,40 +50,39 @@ This is a funtion that lets api to get a big/small file from user.
 
 
 class AssetSave:
-    @falcon.after(commit)
     def on_put(self, req, resp, repo):
         '''Get data based on a file object or b64 data, save and commit it'''
         userInfo = getUserInfoFromSession(req, resp)
         uploader = userInfo.get('alias')
-        targetRepo = session.query(Repository).filter(
+        targetRepo = req.session.query(Repository).filter(
             Repository.name == repo).first()
 
         if not uploader:
             uploader = 'anonymous'
-            targetRepo = session.query(Repository).filter(Repository.name == 'public').first()
+            targetRepo = req.session.query(Repository).filter(Repository.name == 'public').first()
 
-        targetUser = session.query(User).filter(User.alias == uploader).first()
+        targetUser = req.session.query(User).filter(User.alias == uploader).first()
         
         if not targetRepo:
-            pr = session.query(Repository).filter(Repository.name == repo).first()
+            pr = req.session.query(Repository).filter(Repository.name == repo).first()
             if not pr:
                 targetRepo = Repository(name=repo,
                                         path=os.path.join(public_repository_path, repo))
-                session.add(targetRepo)
+                req.session.add(targetRepo)
             else:
                 targetRepo = pr
 
         _cid = req.get_param('collection_id')
         if _cid:
-            collection = session.query(Collection).filter_by(repository=targetRepo)\
+            collection = req.session.query(Collection).filter_by(repository=targetRepo)\
                             .filter_by(id=_cid).first()
         _cname = req.get_param('collection')
         if _cname:
-            collection = session.query(Collection).filter_by(repository=targetRepo)\
+            collection = req.session.query(Collection).filter_by(repository=targetRepo)\
                             .filter_by(name=_cname).first()
         if not collection:
             collection = Collection(path='danger', repository=targetRepo)
-            session.add(collection)
+            req.session.add(collection)
 
 
         
@@ -122,10 +121,10 @@ class AssetSave:
             tempraryStoragePath = path.join(targetRepo.path, collection.path,
                                             name)
 
-            name, bodyMd5 = safeCopyAndMd5(body, tempraryStoragePath, targetRepo.id, b64=b64)
+            name, bodyMd5 = safeCopyAndMd5(req, body, tempraryStoragePath, targetRepo.id, b64=b64)
             fullname = name
             name = (name[:10] + '..') if len(name) > 10 else name
-            asset = session.query(Asset).filter(
+            asset = req.session.query(Asset).filter(
                 Asset.repository == targetRepo).filter_by(collection=collection)\
                         .filter_by(fullname=fullname).first()
 
@@ -134,7 +133,7 @@ class AssetSave:
                 asset = Asset(key=bodyMd5, version=1, repository=targetRepo, uuid=_uuid,
                               collection=collection, name=name, fullname=fullname,
                               path=assetPath, ext=assetExt, owner_id=targetUser.id)
-                session.add(asset)
+                req.session.add(asset)
             else:
                 if not bodyMd5 == asset.key:
                     asset.version += 1
@@ -160,7 +159,7 @@ class AssetSave:
 
             if attach_to:
                 parent_id = int(attach_to)
-                parent = session.query(Asset).filter(Asset.id == parent_id).first()
+                parent = req.session.query(Asset).filter(Asset.id == parent_id).first()
                 asset.attached_to.append(parent)
 
 
@@ -181,7 +180,7 @@ class AssetSave:
             resp.body = {'message': 'Repo is not available'}
 
 
-def safeCopyAndMd5(fileobj, destinationPath, repoId, b64=False):
+def safeCopyAndMd5(req, fileobj, destinationPath, repoId, b64=False):
     '''copy a file in chunked mode safely'''
 
     destDir = path.dirname(destinationPath)
@@ -215,11 +214,11 @@ def safeCopyAndMd5(fileobj, destinationPath, repoId, b64=False):
     dataMd5 = md5.hexdigest()
     ## check if there is an asset with same key
     if not repoId:
-        availableAsset = session.query(Asset).filter_by(key=dataMd5).first()
+        availableAsset = req.session.query(Asset).filter_by(key=dataMd5).first()
     else:
-        availableAsset = session.query(Asset).filter_by(key=dataMd5).join(Collection).filter_by(repository_id=repoId).first()
+        availableAsset = req.session.query(Asset).filter_by(key=dataMd5).join(Collection).filter_by(repository_id=repoId).first()
     if availableAsset and not os.path.isfile(availableAsset.full_path):
-        session.delete(availableAsset)
+        req.session.delete(availableAsset)
     elif availableAsset:
         if os.path.isfile(availableAsset.full_path) and availableAsset.full_path!=destinationPath:
             os.remove(destinationPath) ## we dont need it anymore
@@ -287,9 +286,9 @@ class GetAsset:
         '''Serve asset based on a key (riak key for finding path'''
         name = req.get_param('name')
         if name == 'true':
-            target = session.query(Asset).filter(Asset.name == key).first()
+            target = req.session.query(Asset).filter(Asset.name == key).first()
         else:
-            target = session.query(Asset).filter(Asset.key == key).first()
+            target = req.session.query(Asset).filter(Asset.key == key).first()
         if target:
             sz = os.path.getsize(target.full_path)
             modifier = target.modifiers[-1]
@@ -305,12 +304,11 @@ class GetAsset:
 
 
 class DeleteAsset:
-    @falcon.after(commit)
     def on_delete(self, req, resp, id):
-        target = session.query(Asset).filter(Asset.id == id).first()
+        target = req.session.query(Asset).filter(Asset.id == id).first()
         userInfo = getUserInfoFromSession(req, resp)
         if userInfo.get('id') == target.owner.id:
-            session.delete(target)
+            req.session.delete(target)
             resp.status = falcon.HTTP_202
 
         
@@ -397,7 +395,7 @@ class ListAssets:
 
 class CollectionInfo:
     def on_get(self, req, resp, collectionId):
-        target = session.query(Collection).filter(Collection.id==int(collectionId)).first()
+        target = req.session.query(Collection).filter(Collection.id==int(collectionId)).first()
         start = req.get_param('s')
         end = req.get_param('e')
         if start: start = int(start)
@@ -409,8 +407,8 @@ class CollectionInfo:
         end = max(start, end)
 
         if target:
-            assets = session.query(Asset).filter_by(collection=target).order_by(desc(Asset.modified_on)).slice(start, end)
-            assets_count = session.query(Asset).filter_by(collection=target).count()
+            assets = req.session.query(Asset).filter_by(collection=target).order_by(desc(Asset.modified_on)).slice(start, end)
+            assets_count = req.session.query(Asset).filter_by(collection=target).count()
             data = dict()
             data['name'] = target.name
             data['name'] = target.name
@@ -459,7 +457,6 @@ class CollectionInfo:
             resp.body = data
 
 class AddCollection:
-    @falcon.after(commit)
     def on_put(self, req, resp):
         data = get_params(req.stream, flat=False)
         name = data.get('name')
@@ -475,7 +472,7 @@ class AddCollection:
                 newC.template = template
 
             if not os.path.isdir(newC.url):
-                session.add(newC)
+                req.session.add(newC)
                 resp.body = {'message':'OK', 'info':'Collection created'}
             else:
                 resp.body = {'message':'ERROR', 'info':'Collection is available on server'}
@@ -484,7 +481,7 @@ class AddCollection:
 class AssetCheckout:
     def on_post(self, req, resp, assetId):
         '''Get asset thumbnails from riak'''
-        target = session.query(Asset).filter_by(id=int(assetId)).first()
+        target = req.session.query(Asset).filter_by(id=int(assetId)).first()
         from tasks import process
         from utils.defaults import ASSETS
         asset_folder = os.path.join(ASSETS, target.uuid)

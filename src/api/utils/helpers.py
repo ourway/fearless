@@ -24,7 +24,6 @@ import time
 import csv
 import base64
 import uuid
-from models import session
 from opensource.contenttype import contenttype
 
 def get_ip():
@@ -47,7 +46,6 @@ def commit(req, resp):
 
 def jsonify(self, resp):
     '''Everything is json here'''
-    from models.db import session, Session
     if isinstance(resp.body, associationproxy._AssociationList):
         #resp.body = str(resp.body)
         resp.body = repr(resp.body)

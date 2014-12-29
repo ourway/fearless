@@ -32,9 +32,7 @@ db_files_path = os.path.join( os.path.dirname(__file__), '../database/files')
 if not os.path.isdir(db_files_path):
     os.makedirs(db_files_path)
 
-def get_session():
-    from models import session
-    return session
+
 
 
 def getUUID():

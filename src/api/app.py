@@ -51,18 +51,18 @@ tables = [i for i in av if i[0] in ascii_uppercase]
 
 def getSession(req, resp, params):
     from models.db import Session
-    session=Session()
+    req.session=Session()
 
 def closeSession(req, resp):
     try:
-        session.commit()
+        req.session.commit()
     except Exception, e:
         print '*'*80
         print e
         print '*'*80
-        session.rollback()
+        req.session.rollback()
     finally:
-        session.close()
+        req.session.close()
 
 
 class ThingsResource:
@@ -105,7 +105,7 @@ class DB:
             end = start+10
         if len(args) == 5:
             id = args[4]
-            query = 'session.query({t}).filter({t}.{key}=="{id}").order_by(desc({t}.{order}))'.format(
+            query = 'req.session.query({t}).filter({t}.{key}=="{id}").order_by(desc({t}.{order}))'.format(
                 t=table, id=id, key=key, order=order_by)
             if start and end:
                 data = eval(query).slice(start, end).all()
@@ -114,9 +114,9 @@ class DB:
 
         else:
             if not show:
-                query = 'session.query({t}).order_by(desc({t}.{order}))'.format(t=table, order=order_by)
+                query = 'req.session.query({t}).order_by(desc({t}.{order}))'.format(t=table, order=order_by)
             else:
-                query = 'session.query({t}.{f}).order_by(desc({t}.{order}))'.format(t=table, f=show, order=order_by)
+                query = 'req.session.query({t}.{f}).order_by(desc({t}.{order}))'.format(t=table, f=show, order=order_by)
             
             try:
                 if start and end:
@@ -207,7 +207,6 @@ class DB:
             resp.body = _d
         # Ok, We have an id
 
-    @falcon.after(commit)
     def on_put(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
@@ -220,13 +219,12 @@ class DB:
         for i in query_params:
             setattr(new, i, query_params.get(i))
         resp.status = falcon.HTTP_201
-        session.add(new)
+        req.session.add(new)
         data = repr(new)
         resp.body = json.dumps(json.loads(data))
         # commit()
 
 
-    @falcon.after(commit)
     def on_post(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
@@ -238,7 +236,7 @@ class DB:
             return
         id = args[4]
         # lets get the table data
-        query = 'session.query({t}).filter({t}.id=={id})'.format(
+        query = 'req.session.query({t}).filter({t}.id=={id})'.format(
             t=table, id=int(id))
         result = eval(query).first()
         ##
@@ -262,7 +260,6 @@ class DB:
         #query = 'result({q})'.format(q=query_params)
         # print eval(query)
 
-    @falcon.after(commit)
     def on_delete(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
@@ -274,11 +271,11 @@ class DB:
             return
         id = args[4]
         # lets get the table data
-        query = 'session.query({t}).filter({t}.id=={id})'.format(
+        query = 'req.session.query({t}).filter({t}.id=={id})'.format(
             t=table, id=int(id))
         result = eval(query).all()
         ##
-        session.delete(result)
+        req.session.delete(result)
         resp.status = falcon.HTTP_202
         #query = 'result({q})'.format(q=query_params)
         # print eval(query)

@@ -16,7 +16,7 @@ Clean code is much better than Cleaner comments!
 #sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
 
-from models import User, Group, Role, session, r, now  # r is redis
+from models import User, Group, Role, r, now  # r is redis
 from helpers import commit, get_ip, get_params
 import ujson as json
 import hmac
@@ -89,7 +89,7 @@ def Authenticate(req, resp, params):
                 # ok, we need to check it
                 if auth_mode and auth_64 and auth_mode == 'Basic':
                     username, password = decodestring(auth_64).split(':')
-                    user = session.query(User).filter(
+                    user = req.session.query(User).filter(
                         User.email == username).first()
                     if user and user.password == password:
                         logger.info(
@@ -129,7 +129,6 @@ class Login:
 
     '''Main login class
     '''
-    @falcon.after(commit)
     def on_post(self, req, resp):
         '''Add a user to database'''
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
@@ -142,7 +141,7 @@ class Login:
         email = form.get('email')
         if email:
             email = email.lower()
-        target = session.query(User).filter(
+        target = req.session.query(User).filter(
             User.email == email).first()
         if not sid:
             sid = getANewSessionId()
@@ -205,7 +204,6 @@ class Signup:
 
     '''Main login class
     '''
-    @falcon.after(commit)
     def on_post(self, req, resp):
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         sid = req.cookie('session-id')
@@ -219,7 +217,7 @@ class Signup:
         email=form.get('email')
         if email:
             email = email.lower()
-        olduser = session.query(User).filter(
+        olduser = req.session.query(User).filter(
             User.email == email).first()
         if not olduser:
             newuser = User(email=email,
@@ -229,7 +227,7 @@ class Signup:
                            token=str(uuid.uuid4()))
 
 
-            session.add(newuser)
+            req.session.add(newuser)
 
             activation_link = host + \
                 '/api/auth/activate?token=' + newuser.token
@@ -253,12 +251,11 @@ class Verify:
     '''Account activation
     '''
 
-    @falcon.after(commit)
     def on_get(self, req, resp):
 
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         token = req.get_param('token')
-        target = session.query(User).filter(User.token == token).first()
+        target = req.session.query(User).filter(User.token == token).first()
         if not target:
             logger.warning(
                 '{ip}|Entered an expired activation key'.format(ip=ip))
@@ -280,7 +277,6 @@ class Reactivate:
     '''Account activation
     '''
 
-    @falcon.after(commit)
     def on_post(self, req, resp):
         sid = req.cookie('session-id')
         if sid and r.get('reactivation_%s' % sid):
@@ -297,7 +293,7 @@ class Reactivate:
         r.expire('reactivation_' + sid, 60)
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         form = json.loads(req.stream.read())
-        target = session.query(User).filter(
+        target = req.session.query(User).filter(
             User.email == form.get('email')).first()
         if target and target.active:
             resp.body = {
@@ -332,11 +328,10 @@ class ChangePasswordVerify:
     '''Account password token
     '''
 
-    @falcon.after(commit)
     def on_get(self, req, resp):
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         token = req.get_param('token')
-        target = session.query(User).filter(User.token == token).first()
+        target = req.session.query(User).filter(User.token == token).first()
         if not target:
             logger.warning(
                 '{ip}|Entered an expired reset key'.format(ip=ip))
@@ -357,14 +352,13 @@ class ChangePassword:
     '''Account pass change
     '''
 
-    @falcon.after(commit)
     def on_post(self, req, resp):
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         form = json.loads(req.stream.read())
         token = req.get_param('token')
         pass1 = form.get('password')
         pass2 = form.get('password2')
-        target = session.query(User).filter(User.token == token).first()
+        target = req.session.query(User).filter(User.token == token).first()
         if target and pass1 and pass2 and len(pass1)>5 and pass1==pass2:
             new_token = str(uuid.uuid4())
             target.token = new_token
@@ -386,7 +380,6 @@ class Reset:
     '''Account activation
     '''
 
-    @falcon.after(commit)
     def on_post(self, req, resp):
         sid = req.cookie('session-id')
         if sid and r.get('reactivation_%s' % sid):
@@ -403,7 +396,7 @@ class Reset:
         r.expire('reactivation_' + sid, 60)
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         form = json.loads(req.stream.read())
-        target = session.query(User).filter(
+        target = req.session.query(User).filter(
             User.email == form.get('email')).first()
         if target:
             host = req.protocol + '://' + req.headers.get('HOST')
@@ -443,7 +436,7 @@ def getUserInfoFromSession(req, resp):
         sid = req.cookie('session-id')
         if sid:
             hashed_sid = hashlib.sha1(sid).hexdigest()
-            target = session.query(User).filter(User.latest_session_id==hashed_sid).first()
+            target = req.session.query(User).filter(User.latest_session_id==hashed_sid).first()
             if target:
                 return {'email':target.email, 'alias':target.alias, 'firstname':target.firstname,
                             'lastname':target.lastname, 'id':target.id, 'server':{'name':'Fearless API', 'ip':get_ip()}}
@@ -464,7 +457,7 @@ class GetUserInfo:
 
 class GetPermissions:
     def on_get(self, req, resp, userId):
-        target = session.query(User).filter(User.id==int(userId)).first()
+        target = req.session.query(User).filter(User.id==int(userId)).first()
         resp.body =  [i.rls for i in target.grps]
 
 
@@ -491,7 +484,7 @@ def isAuthorizedTo(userId, actionName):
 class Users:
     def on_get(self, req, resp, **kw):
 
-        target = session.query(User).all()
+        target = req.session.query(User).all()
         data = [{'firstname':user.lastname, 'lastname':user.firstname, 
                  'fullname':user.fullname, 'id':user.id} for user in target]
         resp.body = data
@@ -500,20 +493,19 @@ class UpdateGroups:
     def on_get(self, req, resp, userId, **kw):
         pass
 
-    @falcon.after(commit)
     def on_post(self, req, resp, userId):
-        target = session.query(User).filter_by(id=int(userId)).first()
+        target = req.session.query(User).filter_by(id=int(userId)).first()
         data = get_params(req.stream, False)
         added = []
-        user_group = session.query(Group).filter_by(name='users').first()
-        admin_group = session.query(Group).filter_by(name='admin').first()
+        user_group = req.session.query(Group).filter_by(name='users').first()
+        admin_group = req.session.query(Group).filter_by(name='admin').first()
         if data.get('groups'):
             target.grps = []
 
             for grpinfo in data.get('groups'):
                 if grpinfo.get('name') != 'guests' and user_group and not user_group in target.grps:
                     target.grps.append(user_group)
-                group = session.query(Group).filter_by(id=grpinfo.get('id')).first()
+                group = req.session.query(Group).filter_by(id=grpinfo.get('id')).first()
                 if group:
                     target.grps.append(group)
                     added.append(group.name)

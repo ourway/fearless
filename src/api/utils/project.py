@@ -14,7 +14,7 @@ Clean code is much better than Cleaner comments!
 
 import ujson as json
 from models import Project, User, Report, Departement, Task, \
-    session, Sequence, Repository, Collection
+    Sequence, Repository, Collection
 from AAA import Authorize, getUserInfoFromSession
 import falcon
 from helpers import get_params
@@ -29,7 +29,7 @@ from cStringIO import StringIO
 class GetProjectDetails:
     #@Authorize('see_project')
     def on_get(self, req, resp, id):
-        project = session.query(Project).filter(Project.id==id).first()
+        project = req.session.query(Project).filter(Project.id==id).first()
         collections = list()
         if project:
             if project.repositories:
@@ -69,9 +69,9 @@ class ListProjects:
         user = getUserInfoFromSession(req, resp)
 
         if user.get('id') != 1:
-            project = session.query(Project).order_by(desc(Project.modified_on)).all()
+            project = req.session.query(Project).order_by(desc(Project.modified_on)).all()
         else:
-            project = session.query(Project).order_by(desc(Project.modified_on)).all()
+            project = req.session.query(Project).order_by(desc(Project.modified_on)).all()
 
         resp.body = project
 
@@ -101,7 +101,7 @@ class AddProject:
             newRepoFolder = os.path.join(home, '.fearlessrepo', repoName)
             if not os.path.isdir(newRepoFolder):
                 os.makedirs(newRepoFolder)
-            new_repository = session.query(Repository).filter(Repository.name == repoName).first()
+            new_repository = req.session.query(Repository).filter(Repository.name == repoName).first()
             if not new_repository:
                 new_repository = Repository(name=repoName, path= newRepoFolder)
             
@@ -117,7 +117,7 @@ class AddProject:
 
 
             new.repositories.append(new_repository)
-            session.add(new)
+            req.session.add(new)
             resp.body = falcon.HTTP_202
             resp.body = {'message':'OK'}
 
@@ -130,14 +130,14 @@ class GetProjectLatestReport:
     #@Authorize('see_project')
     @falcon.after(commit)
     def on_get(self, req, resp, id):
-        project = session.query(Project).filter(Project.id==id).first()
+        project = req.session.query(Project).filter(Project.id==id).first()
         if project:
             project.plan() ## first let it plan
             if project.reports:
                 try:
                     csvfile = StringIO()
                     csvdataid = project.reports[-1]
-                    csvdata = session.query(Report).filter(Report.id==csvdataid).first()
+                    csvdata = req.session.query(Report).filter(Report.id==csvdataid).first()
                     if csvdata:
                         csvdata = csvdata.body
                     csvfile.write(csvdata)
@@ -147,10 +147,10 @@ class GetProjectLatestReport:
                         typ = d.get('type')
                         if typ == 'task':
                             taskid = int(d.get('taskid'))
-                            target = session.query(Task).filter(Task.id==taskid).first()
+                            target = req.session.query(Task).filter(Task.id==taskid).first()
                         elif typ == 'project':
                             projectid = int(d.get('projectid'))
-                            target = session.query(Project).filter(Project.id==projectid).first()
+                            target = req.session.query(Project).filter(Project.id==projectid).first()
                         if target: ## donble check
                             start = d.get('start')
                             end = d.get('end')
@@ -179,28 +179,28 @@ class GetProjectLatestReport:
                             target.duration = duration
 
                     ganttdataid = project.reports[-2]
-                    ganttdata = session.query(Report).filter(Report.id==ganttdataid).first()
+                    ganttdata = req.session.query(Report).filter(Report.id==ganttdataid).first()
                     if ganttdata:
                         ganttdata = str(ganttdata.body)
 
                     plandataid = project.reports[-3]
-                    plandata = session.query(Report).filter(Report.id==plandataid).first()
+                    plandata = req.session.query(Report).filter(Report.id==plandataid).first()
                     if plandata:
                         plandata = str(plandata.body)
 
 
                     resourcedataid = project.reports[-4]
-                    resourcedata = session.query(Report).filter(Report.id==resourcedataid).first()
+                    resourcedata = req.session.query(Report).filter(Report.id==resourcedataid).first()
                     if resourcedata:
                         resourcedata = str(resourcedata.body)
 
                     profitandlossid = project.reports[-6]
-                    profitandloss = session.query(Report).filter(Report.id==profitandlossid).first()
+                    profitandloss = req.session.query(Report).filter(Report.id==profitandlossid).first()
                     if profitandloss:
                         profitandloss = str(profitandloss.body)
 
                     msprojectid = project.reports[-5]
-                    msproject = session.query(Report).filter(Report.id==msprojectid).first()
+                    msproject = req.session.query(Report).filter(Report.id==msprojectid).first()
                     if msproject:
                         msproject = str(msproject.body)
 
@@ -224,7 +224,7 @@ class UpdateProject:
     def on_post(self, req, resp, projId):
         user = getUserInfoFromSession(req, resp)
         data = get_params(req.stream, flat=False)
-        project = session.query(Project).filter(Project.id==int(projId)).first()
+        project = req.session.query(Project).filter(Project.id==int(projId)).first()
         if project:
             project.start = data.get('start')
             project.name = data.get('name')
@@ -235,7 +235,7 @@ class UpdateProject:
             if data.get('watchers'):
                 for eachWatcherId in data.get('watchers'):
                     _id = int(eachWatcherId.get('id'))
-                    watcher = session.query(User).filter(User.id == _id).first()
+                    watcher = req.session.query(User).filter(User.id == _id).first()
                     project.watchers.append(watcher)
 
 
@@ -257,7 +257,7 @@ class AddTask:
         start = taskData.get('start')
         end = taskData.get('end')
         priority = taskData.get('priority')
-        project = session.query(Project).filter(Project.id==int(projId)).first()
+        project = req.session.query(Project).filter(Project.id==int(projId)).first()
         if not start:
            start = project.start
         else:
@@ -272,24 +272,24 @@ class AddTask:
         if taskData.get('depends'): depends = [int(i.get('id')) for i in taskData.get('depends')]
         if taskData.get('manager'): manager = int(taskData.get('manager').get('id'))
         for i in resources:
-            resource = session.query(User).filter(User.id==i).first()
+            resource = req.session.query(User).filter(User.id==i).first()
             if resource: newTask.resources.append(resource)
         if manager:
-            manager = session.query(User).filter(User.id==manager).first()
+            manager = req.session.query(User).filter(User.id==manager).first()
             if manager: newTask.responsibles.append(manager)
         for i in depends:
-            depend = session.query(Task).filter(Task.id==i).first()
+            depend = req.session.query(Task).filter(Task.id==i).first()
             if depend: newTask.depends.append(depend)
         #depend = session.query(Task).filter(Task.id==depends).first()
         #newTask.depends.append(depend)
-        session.add(newTask)
+        req.session.add(newTask)
         resp.body = {'message':'OK'}
 
 
 class ListTasks:
     def on_get(self, req, resp, projId):
         user = getUserInfoFromSession(req, resp)
-        project = session.query(Project).filter(Project.id==projId).first()
+        project = req.session.query(Project).filter(Project.id==projId).first()
         if project:
             resp.body = [{
                     'start':i.start, 
@@ -301,7 +301,7 @@ class ListTasks:
 
 class GetTask:
     def on_get(self, req, resp, taskId):
-        task = session.query(Task).filter(Task.id==taskId).first()
+        task = req.session.query(Task).filter(Task.id==taskId).first()
         resp.body = {'title':task.title, 'id':task.id, 'start':task.start, 
                      'end':task.end, 'effort':task.effort, 
                      'depends':[{'title':i.title, 'id':i.id} for i in task.depends],
@@ -338,7 +338,7 @@ class UpdateTask:
         priority = taskData.get('priority')
         _id = int(taskData.get('id'))
         priority = int(taskData.get('priority'))
-        target = session.query(Task).filter(Task.id==_id).first()
+        target = req.session.query(Task).filter(Task.id==_id).first()
         if target:
             target.title = title
             target.start = start
@@ -350,14 +350,14 @@ class UpdateTask:
             if resources:
                 target.resources = []
             for i in resources:
-                resource = session.query(User).filter(User.id==i).first()
+                resource = req.session.query(User).filter(User.id==i).first()
                 if not resource in target.project.users:
                     target.project.users.append(resource)
                 if resource: target.resources.append(resource)
             if depends:
                 target.depends = []
             for i in depends:
-                depend = session.query(Task).filter(Task.id==i).first()
+                depend = req.session.query(Task).filter(Task.id==i).first()
                 if depend: target.depends.append(depend)
             
             resp.body = {'message':'Task Updated'}
@@ -369,9 +369,9 @@ class DeleteTask:
     @falcon.after(commit)
     def on_delete(self, req, resp, taskId):
         user = getUserInfoFromSession(req, resp)
-        target = session.query(Task).filter(Task.id==taskId).first()
+        target = req.session.query(Task).filter(Task.id==taskId).first()
         if target:
-            session.delete(target)
+            req.session.delete(target)
             resp.status = falcon.HTTP_202
 
         else:

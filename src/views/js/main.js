@@ -631,7 +631,8 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
         enableSorting:true,
         enablePinning: true,
         columnDefs: [
-                    { field: "name", displayName : 'Project', width: 200,
+                    { field: "id", enableFiltering: false, enableSorting:false, width:45 },
+                    { field: "name", displayName : 'Project', width: 270,
 cellTemplate: '<div>  <a style="position:absolute;margin:5px" href="#pms/{{row.entity.id}}"><span class="glyphicon glyphicon-folder-close"></span> {{row.entity.name}}</a></div>'
                     },
                     { field: "calculate_number_of_tasks", displayName : 'Tasks', enableFiltering: true, enableSorting:true, width:70,
@@ -641,14 +642,13 @@ cellTemplate: '<div>  <a style="position:absolute;margin:5px" href="#pms/{{row.e
                     { field: "duration", enableFiltering: true, enableSorting:true, width:100,
                     cellTemplate: '<div style="padding:5px"><span style="opacity:0.5" class="glyphicon glyphicon-road"></span><Span> {{row.entity.duration}}</span></div>'
                     },
-                    { field: "start", enableFiltering: false, enableSorting:true, width:155,
+                    { field: "start", enableFiltering: false, enableSorting:true, width:110,
                     cellTemplate: '<div style="padding:5px"><span style="opacity:0.5" class="glyphicon glyphicon-calendar"></span><Span> {{row.entity.start}}</span></div>'
                     },
-                    { field: "end", enableFiltering: false, enableSorting:true, width:155,
+                    { field: "end", enableFiltering: false, enableSorting:true, width:110,
                     cellTemplate: '<div style="padding:5px"><span style="opacity:0.5" class="glyphicon glyphicon-calendar"></span><Span> {{row.entity.end}}</span></div>'
                     },
                     { field: "description", enableFiltering: true, enableSorting:false, width:190 },
-                    { field: "id", enableFiltering: false, enableSorting:false, width:45 },
 
                 ] 
         };

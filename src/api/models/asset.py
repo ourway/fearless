@@ -22,7 +22,7 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from mixin import IDMixin, Base
 from utils.fagit import GIT
-from db import session, Session
+from db import Session
 from . import fdb
 import uuid
 from opensource.contenttype import contenttype
@@ -190,6 +190,7 @@ def AfterAssetCreationFuncs(mapper, connection, target):
 
 
     session.commit()
+    session.close()
 
     
 

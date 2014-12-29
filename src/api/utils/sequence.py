@@ -17,17 +17,16 @@ import falcon
 import ujson
 import hashlib
 from helpers import commit, get_ip, get_params
-from models import Sequence, Shot, session, Project, User, Collection
+from models import Sequence, Shot, Project, User, Collection
 
 class AddSequence:
-    @falcon.after(commit)
     def on_put(self, req, resp, projId):
-        targetProject = session.query(Project).filter(Project.id==int(projId)).first()
+        targetProject = req.session.query(Project).filter(Project.id==int(projId)).first()
         form = get_params(req.stream, flat=False)
         if targetProject and form.get('number') and form.get('lead'):
-            lead = session.query(User).filter(User.id == int(form.get('lead').get('id'))).first()
+            lead = req.session.query(User).filter(User.id == int(form.get('lead').get('id'))).first()
             repository = targetProject.repositories[0]
-            seqCollection = session.query(Collection).filter_by(repository=repository)\
+            seqCollection = req.session.query(Collection).filter_by(repository=repository)\
                 .filter_by(name='Sequences').first()
             lenOfSeqs = len(targetProject.sequences)
             if lead and seqCollection:

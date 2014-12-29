@@ -227,6 +227,7 @@ def AfterUserCreationFuncs(mapper, connection, target):
         #repo_git = GIT('.', wt=os.path.join(self.path))
 
     session.commit()
+    session.close()
 
 
 
