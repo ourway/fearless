@@ -102,15 +102,12 @@ class Asset(IDMixin, Base):
         from tasks import addFileToGit
         from tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
         if self.uuid:
-            addFileToGit.delay(self.full_path, self.uuid, data)
+            addFileToGit(self.full_path, self.uuid, data)
         if self.id and self.uuid:
             if self.content_type.split('/')[0] == 'video':
                 generateVideoPreview.delay(self.full_path, data, self.uuid)
                 newThumb = generateVideoThumbnail.delay(self.full_path, self.uuid, data)
                 newPoster = generateVideoThumbnail.delay(self.full_path, self.uuid, data, 720, 480, 'poster')  ## hd480 
-
-
-
             if self.content_type.split('/')[0] == 'image' or self.content_type.split('/')[1] in ['pdf']:
                 poster = generateImageThumbnail.delay(self.full_path, data, 720, 480, self.id, 'poster')
                 newThumb = generateImageThumbnail.delay(self.full_path, data, 146, 110, self.id, 'thmb')
@@ -142,20 +139,26 @@ class Asset(IDMixin, Base):
     def thumbnail(self):
         fmt = 'png'
         fid = self.uuid + '_thmb_' + str(self.version)
-        return os.path.join('uploads', fid+'.'+fmt)
+        result = os.path.join('uploads', fid+'.'+fmt)
+        if os.path.isfile(os.path.join(public_upload_folder, fid+'.'+fmt)):
+            return result
 
     @property
     def preview(self):
         fid = self.uuid + '_preview_' + str(self.version)
         fmt = 'ogv'
         result =  os.path.join('uploads', fid+'.'+fmt)
-        return result
+        if os.path.isfile(os.path.join(public_upload_folder, fid+'.'+fmt)):
+            return result
 
     @property
     def poster(self):
         fmt = 'png'
         fid = self.uuid + '_poster_' + str(self.version)
-        return os.path.join('uploads', fid+'.'+fmt)
+        result = os.path.join('uploads', fid+'.'+fmt)
+        if os.path.isfile(os.path.join(public_upload_folder, fid+'.'+fmt)):
+            return result
+
 
 
 
@@ -173,21 +176,21 @@ def AfterAssetCreationFuncs(mapper, connection, target):
     from tasks import addFileToGit
     session = Session()
     Target = session.query(Asset).filter_by(id=target.id).first()
-    addFileToGit.delay(Target.full_path, Target.uuid, Target.version)
+    addFileToGit(Target.full_path, Target.uuid, Target.version)
     identify.delay(Target.full_path, Target.id)
 
     ## videos using ffmpeg
     if Target.content_type.split('/')[0] == 'video':
         generateVideoPreview.delay(Target.full_path, Target.version, Target.uuid)
         newThumb = generateVideoThumbnail.delay(Target.full_path, Target.uuid, Target.version)
-        if newThumb:
-            Target.thmb = newThumb
-        newPoster = generateVideoThumbnail.delay(Target.full_path, Target.uuid, Target.version,  720, 480, 'poster')  ## hd480 
-
+        newPoster = generateVideoThumbnail.delay(Target.full_path, Target.uuid, Target.version,
+                    720, 480, 'poster')  ## hd480 
 
     if Target.content_type.split('/')[0] == 'image' or Target.content_type.split('/')[1] in ['pdf']:
-        poster = generateImageThumbnail.delay(Target.full_path, Target.version, 720, 480, Target.id, 'poster')
-        newThumb = generateImageThumbnail.delay(Target.full_path, Target.version, 146, 110, Target.id, 'thmb')
+        poster = generateImageThumbnail.delay(Target.full_path, 
+                            Target.version, 720, 480, Target.id, 'poster')
+        newThumb = generateImageThumbnail.delay(Target.full_path, Target.version, 
+                            146, 110, Target.id, 'thmb')
 
 
     session.commit()

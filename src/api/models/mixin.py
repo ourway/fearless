@@ -23,6 +23,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from sqlalchemy_mptt.mixins import BaseNestedSets
 from utils.general import setup_logger
 from uuid import uuid4  # for random guid generation
+import base64
 
 now = datetime.datetime.utcnow
 
@@ -36,7 +37,8 @@ if not os.path.isdir(db_files_path):
 
 
 def getUUID():
-    return str(uuid4())
+    data = base64.encodestring(uuid4().get_bytes()).strip()[:-2]
+    return data.replace('/', '-')
 
 
 def convert_to_datetime(inp):

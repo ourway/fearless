@@ -129,8 +129,7 @@ class AssetSave:
                         .filter_by(fullname=fullname).first()
 
             if not asset:
-                _uuid = str(uuid.uuid4())
-                asset = Asset(key=bodyMd5, version=1, repository=targetRepo, uuid=_uuid,
+                asset = Asset(key=bodyMd5, version=1, repository=targetRepo,
                               collection=collection, name=name, fullname=fullname,
                               path=assetPath, ext=assetExt, owner_id=targetUser.id)
                 req.session.add(asset)
@@ -495,8 +494,8 @@ class AssetCheckout:
         error, result = process(arg)
         pstKey = '%s_poster_v%s'%(target.uuid, version.split('_')[1])
         thmbKey = '%s_thmb_v%s'%(target.uuid, version.split('_')[1])
-        poster = fdb.get(pstKey).data
-        thumbnail = fdb.get(thmbKey).data
+        poster =  os.path.join('uploads', target.uuid + '_poster_' + version.split('_')[1] + '.png')
+        thumbnail =  os.path.join('uploads', target.uuid + '_thmb_' + version.split('_')[1] + '.png')
         fid = target.uuid + '_preview_' + version.split('_')[1]
         fmt = 'ogv'
         preview =  os.path.join('uploads', fid+'.'+fmt)

@@ -280,26 +280,20 @@ def identify(path, assetId):
 @Capp.task
 def generateVideoThumbnail(path, assetUuid, version, w=146, h=110, text='thmb'):
     '''generate a thumbnail from a video file and return a vfile db'''
+    from models import Asset
+    target = session.query(Asset).filter_by(uuid=assetUuid).first()
+    if not target:
+        return
     path = path.encode('utf-8')
-    upf = '/tmp'
-    #upf = '/home/farsheed/Desktop'
-    fid = str(uuid.uuid4())
+
+    fid = target.uuid + '_' + text + '_' + str(version)
     fmt = 'png'
-    thpath = '%s/%s.%s' % (upf, fid, fmt)
+    thpath = os.path.join(public_upload_folder, fid+'.'+fmt)
     arg = '''"%s" -i "%s" -an -r 1 -vf "select=gte(n\,100)" -vframes 1 -s %sx%s -y "%s"''' \
         % (ffmpeg, path, w, h, thpath)
-    
     pr = process(arg)
     if os.path.isfile(thpath):
-        with open(thpath, 'rb') as newThumb:
-            webmode = 'data:image/%s;base64,' % fmt
-            result =  webmode + base64.encodestring(newThumb.read())
-            from models import Asset
-            target = session.query(Asset).filter_by(uuid=assetUuid).first()
-            key = '%s_%s_v%s'%(target.uuid, text, version)
-            new = fdb.new(key, result)
-            new.store()
-        return result
+        return thpath
 
 
 @Capp.task
@@ -343,7 +337,7 @@ def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb')
     cmd = 'convert "%s%s" %s -resize %sx%s "%s"' % (path, page, extra, w, h, newthmbPath)
     pr = process(cmd)
     if os.path.isfile(newthmbPath):
-        return key
+        return newthmbPath
 
         #return os.path.realpath(public_repository_path, previewPath)
 

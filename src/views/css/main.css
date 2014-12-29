@@ -322,6 +322,13 @@ user-select: none;
 .vjs-default-skin .vjs-play-progress { background: #999; }
 
 
+.iconized{
+transform: rotate(5deg) scale(1.05,1.05);
+opacity:1 !important;
+box-shadow: -6px 6px 8px #B0B0B0;
+}
+
+
 
 
 

@@ -512,7 +512,8 @@ border-bottom: 1px solid #57BEDD;
         <div class="col-md-9 column">
                         <h4>Project Assets</h4>
                         <div id="CollectionsDiv" >
-                            <a class="projectCollectionsA" href="#/ams/c/{{collection.id}}" ng-repeat="collection in project.collections track by $index" 
+                            <a class="projectCollectionsA" href="#/ams/c/{{collection.id}}?page=1" ng-repeat="collection in project.collections track by $index" 
+
                                 title="{{collection.name}}">{{collection.name}}</a>
                         </div>
                     <hr/>

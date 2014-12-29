@@ -832,7 +832,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.projId = $routeParams.projId;
             $scope.$watch($scope.projId, function(){
                     $scope.getProjectDetails();
-                    $scope.$parent.getComments();
                     })
             $scope.toTitleCase = toTitleCase;
             $rootScope.title = "Project " + $scope.projId + " - Fearless";
@@ -864,6 +863,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         resp.watchers.forEach(function(e){resp.updatedWatchers.push(e)});
                         $scope.project = resp;
                         $scope.$parent.comment_id = resp.uuid;
+                        $scope.$parent.getComments();
                     }
                 else
                     $location.path('/pms')
@@ -1216,31 +1216,42 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
         }
 
 
+        $scope.range = function(from, to){
+            result = [];
+            for(var x = Math.ceil(1); x <= to; x++)
+                result.push(x);
+            return result;
+
+        }
 
 
-
-        $scope.checkout = function(v){
+        $scope.checkout = function(v, download){
                     $scope.checkout_load = v;
             req = $http.post('/api/asset/checkout/'+$scope.asset.id+'?version='+v).success(function(resp){
                     //$scope.getAssetInfo();
-                    console.log(resp.preview)
                     if (resp.poster)
                         $scope.asset.poster = resp.poster;
                     if (resp.preview)
                         $scope.asset.preview = resp.preview;
                     $scope.checkout_load = null;
                     $scope.checkouted = v;
+                    if (download)
+                        window.location = '/static/ASSETS/'+ $scope.asset.uuid + '/' + $scope.asset.fullname;
                     //document.location='/static/ASSETS/'+$scope.asset.uuid+'/'+$scope.asset.fullname;
                     
                     }) 
         }
         $scope.getAssetInfo = function(){
             req = $http.get('/api/db/asset/'+assetId).success(function(Resp){
-                    $scope.$parent.comment_id = Resp.uuid;
+
                     //$location.search('version', Resp.version)
                     $scope.asset = Resp;
+
+                    $scope.checkout('v_'+Resp.version);
                     $scope.assetVersions = Resp.git_tags.split(',');
-                    $rootScope.title = 'Asset: ' + Resp.name + ' - ' + 'Fearless'
+                    $rootScope.title = 'Asset: ' + Resp.name + ' - ' + 'Fearless';
+                    $scope.$parent.comment_id = Resp.uuid;
+                    $scope.$parent.getComments();
                     if (Resp.owner_id){
 
                         ureq = $http.get('/api/db/user/'+Resp.owner_id).success(function(resp){
@@ -1264,7 +1275,6 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
         }
         $scope.$watch(assetId, function(){
                 $scope.getAssetInfo();
-                $scope.$parent.getComments();
             })
         
 
@@ -1336,7 +1346,6 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         ci = $routeParams.collectionId;
         $scope.$watch(ci, function(){
                 $scope.getCollectionDetails();
-                $scope.$parent.getComments();
                 })
         Dropzone.autoDiscover = false;
         $scope.dropzone = new Dropzone("#my-awesome-dropzone", {
@@ -1416,10 +1425,11 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     $rootScope.title = 'Collection: ' + resp.name + ' - ' + 'Fearless'
                     $scope.collection.page = (page||0)+1;
                     $location.search('page', (page||0)+1);
-                    $scope.$parent.comment_id = resp.uuid;
-                    //$scope.$parent.getComments();
                     $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+"&multipart=true";
                     $scope.dropzone.options.url = $scope.attachurl;
+                    $scope.$parent.comment_id = resp.uuid;
+                    $scope.$parent.getComments();
+
                     //$scope.activateVideo();
 
                 })
