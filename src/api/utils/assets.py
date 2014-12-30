@@ -33,7 +33,8 @@ from sqlalchemy import desc
 # from celery.result import AsyncResult
 from models import Asset, Repository, Collection, es, User, fdb
 from AAA import getUserInfoFromSession
-from defaults import public_repository_path
+from defaults import public_upload_folder, public_repository_path, GIT_folder, ASSETS
+from models.mixin import getUUID
 
 def _generate_id():
     return os.urandom(2).encode('hex') + hex(int(time.time() * 10))[5:]
@@ -129,7 +130,8 @@ class AssetSave:
                         .filter_by(fullname=fullname).first()
 
             if not asset:
-                asset = Asset(key=bodyMd5, version=1, repository=targetRepo,
+                _uid = getUUID()
+                asset = Asset(key=bodyMd5, version=1, repository=targetRepo,uuid=_uid,
                               collection=collection, name=name, fullname=fullname,
                               path=assetPath, ext=assetExt, owner_id=targetUser.id)
                 req.session.add(asset)
@@ -150,10 +152,14 @@ class AssetSave:
             if targetUser:
                 asset.modifiers.append(targetUser)
                 asset.users.append(targetUser)
-            if thumbnail:
-                #print 'i am a thumbnail'
-                thumbnail = unquote(thumbnail)
-                asset.thmb = thumbnail 
+            if thumbnail:  ## thumbnail is base64 format
+                fmt = 'png'
+                fid = asset.uuid + '_thmb_' + str(asset.version)
+                result = os.path.join('uploads', fid+'.'+fmt)
+                thmbpath = os.path.join(public_upload_folder, fid+'.'+fmt)
+                thmb_data = decodestring(unquote(thumbnail).split(',')[1])
+                with open(thmbpath, 'wb') as f:
+                    f.write(thmb_data)
 
 
             if attach_to:

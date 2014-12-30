@@ -115,7 +115,8 @@
 
                 <div style="color:#ccc">
                     <div class="showsListDiv" ng-class="{'activeShow':name==ua.name}" ng-repeat="ua in userShows">
-                           <a title="{{ua.description || ua.name }}" href="#/{{ua.name}}" ><img class="showListThmbs" height="54" width="96" ng-src="{{ua.thumbnail}}" alt="{{ua.name}} thumbnail" /></a>
+                        <a title="{{ua.description || ua.name }}" href="#/{{ua.name}}" ><img class="showListThmbs" 
+                            height="54" width="96" ng-src="{{'/static/'+ua.thumbnail}}" alt="{{ua.name}} thumbnail" /></a>
                            <p></p>
                     </div>
 

@@ -20,7 +20,6 @@ from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
 
-from sqlalchemy_mptt.mixins import BaseNestedSets
 from utils.general import setup_logger
 from uuid import uuid4  # for random guid generation
 import base64

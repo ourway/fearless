@@ -26,6 +26,7 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, now, convert_to_datetime
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from .task import Task
 
 project_users = Table('project_users', Base.metadata,
                       Column('id', Integer, primary_key=True),
@@ -144,7 +145,7 @@ class Project(IDMixin, Base):
     def compress_report(self, key, data):
         return data
 
-    @property
+    #@property
     def plan(self):
         # lets select just one task
         templateFile = os.path.join(
@@ -156,16 +157,13 @@ class Project(IDMixin, Base):
         task = self.tasks[0]
         resources = list()
         tasks = list()
-        All_tasks = session.query(Asset).all()
-        print All_tasks
-        for each in task.get_tree(session):
-            target = each.get('node')
-            if target.project == self:
-                resources.extend(target.resources)
-                for i in target.resources:
-                    if not i in target.project.users:
-                        target.project.users.append(i)
-                tasks.append(target.tjp_task())
+        project_tasks = session.query(Task).filter_by(project_id=self.id).all()
+        for target in project_tasks:
+            resources.extend(target.resources)
+            for i in target.resources:
+                if not i in target.project.users:
+                    target.project.users.append(i)
+            tasks.append(target.tjp_task())
         
         #return tasks
         plan_path = '/tmp/_Fearless_project_%s.tjp' % self.id

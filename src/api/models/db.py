@@ -3,7 +3,6 @@
 import os
 from sqlalchemy import create_engine  # for database
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy_mptt import mptt_sessionmaker
 from sqlalchemy.pool import SingletonThreadPool
 from mixin import Base
 
@@ -38,6 +37,6 @@ engine = create_engine(DB, echo=False, convert_unicode=True, pool_recycle=3600)
 #engine = create_engine("postgresql+psycopg2://farsheed:rrferl@localhost:5432/fearless2")
 #engine.raw_connection().connection.text_factory = str
 #Session = mptt_sessionmaker(sessionmaker(bind=engine, expire_on_commit=False))
-Session = mptt_sessionmaker(sessionmaker(bind=engine))
+Session = sessionmaker(bind=engine)
 
 session = Session()

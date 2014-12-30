@@ -24,7 +24,7 @@ from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
-from mixin import IDMixin, Base, convert_to_datetime, now, BaseNestedSets
+from mixin import IDMixin, Base, convert_to_datetime, now
 from sqlalchemy.orm.collections import attribute_mapped_collection
 
 task_users = Table('task_users', Base.metadata,
@@ -59,7 +59,7 @@ task_relations = Table(
     Column('task_b_id', Integer, ForeignKey('task.id')))
 
 
-class Task(IDMixin, Base, BaseNestedSets):
+class Task(IDMixin, Base):
 
     """Task management
     """
@@ -84,6 +84,7 @@ class Task(IDMixin, Base, BaseNestedSets):
     milestone = Column(Boolean, default=False) # is task a milestone?
     parent_id = Column(Integer, ForeignKey("task.id"))
 
+    parent = relationship('Task', backref='children', remote_side=[id], uselist=True)
     resources = relationship('User', backref='tasks', secondary='task_users')
     alternative_resources = relationship(
         'User', backref='alternative_for', secondary='task_alternative')
