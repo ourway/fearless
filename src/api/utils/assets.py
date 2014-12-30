@@ -285,7 +285,7 @@ class GetAsset:
         '''Serve asset based on a key (riak key for finding path'''
         name = req.get_param('name')
         if name == 'true':
-            target = req.session.query(Asset).filter(Asset.name == key).first()
+            target = req.session.query(Asset).filter(Asset.fullname == key).first()
         else:
             target = req.session.query(Asset).filter(Asset.key == key).first()
         if target:

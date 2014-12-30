@@ -40,7 +40,7 @@ def getANewSessionId():
 def Authorize(action):
     def request_checked(func):
         def _f(self, req, resp, *args, **kw):
-            u = getUserInfoFromSession(req)
+            u = getUserInfoFromSession(req, resp)
             if isAuthorizedTo(req, u.get('id'), action):
                 return func(self, req, resp, *args, **kw)
             else:
@@ -452,7 +452,7 @@ def getUserInfoFromSession(req, resp):
 class GetUserInfo:
     #@falcon.after(commit)
     def on_post(self, req, resp):
-        resp.body = getUserInfoFromSession(req)
+        resp.body = getUserInfoFromSession(req, resp)
 
 class GetPermissions:
     def on_get(self, req, resp, userId):

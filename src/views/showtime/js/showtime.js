@@ -367,7 +367,7 @@ function convertImgToBase64(data) {
     //ctx.drawImage(img, 0, 0, currentWidth, currentHeight);
     //console.log(project.width);
     ctx.drawImage(img,0,0,img.width, img.height, 0,0,project.width,project.height);
-    addText(canvas, 'FearLess® ShowTime™', 10, canvas.height-16, 16, 0.5);
+    addText(canvas, 'Pooyamehr FearLess® ShowTime™', 10, canvas.height-16, 16, 0.5);
     addText(canvas, 'Asset ID: '+ project.projectName + ' | ' + timestamp(project.currentFrame()+1), 10, canvas.height-36, 10, 1);
     dataURL = canvas.toDataURL("image/webp");
     canvas = null;
@@ -907,7 +907,7 @@ function showtime() {
                 lastframe = frame;
                 //hContext.globalAlpha = 0.5
                 //hContext.drawImage(qr,project.width-96,project.height-96);
-                addText(hCanvas, 'FearLess® ShowTime™', 10, hCanvas.height-16, 16, 0.5);
+                addText(hCanvas, 'Pooyamehr FearLess® ShowTime™', 10, hCanvas.height-16, 16, 0.5);
                 addText(hCanvas, 'Asset ID: '+ project.projectName + ' | ' + timestamp(count+1), 10, hCanvas.height-36, 10, 1);
                 //project.encoder.add(hContext);  //make a video
                 frame = hCanvas.toDataURL('image/webp');

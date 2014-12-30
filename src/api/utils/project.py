@@ -132,7 +132,7 @@ class GetProjectLatestReport:
     def on_get(self, req, resp, id):
         project = req.session.query(Project).filter(Project.id==id).first()
         if project:
-            project.plan() ## first let it plan
+            project.plan## first let it plan
             if project.reports:
                 try:
                     csvfile = StringIO()

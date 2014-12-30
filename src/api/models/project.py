@@ -144,7 +144,7 @@ class Project(IDMixin, Base):
     def compress_report(self, key, data):
         return data
 
-    #@property
+    @property
     def plan(self):
         # lets select just one task
         templateFile = os.path.join(
@@ -156,6 +156,8 @@ class Project(IDMixin, Base):
         task = self.tasks[0]
         resources = list()
         tasks = list()
+        All_tasks = session.query(Asset).all()
+        print All_tasks
         for each in task.get_tree(session):
             target = each.get('node')
             if target.project == self:

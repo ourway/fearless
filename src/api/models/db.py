@@ -4,7 +4,6 @@ import os
 from sqlalchemy import create_engine  # for database
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy_mptt import mptt_sessionmaker
-from sqlalchemy.orm import scoped_session
 from sqlalchemy.pool import SingletonThreadPool
 from mixin import Base
 
