@@ -54,6 +54,7 @@
             "art/colorkey": [""],
             "art/modelsheet": [""],
             "art/design": [""],
+            "art/motion": [""],
         },
         "files": {
             "README.txt": "readme.txt",
@@ -125,6 +126,7 @@
         },
         "ignore": []
     },
+
     "seq_props": {
         "folders": {
             "maya/scenes/model": ["ma", "mb"],
@@ -275,6 +277,21 @@
         "files": {
             "README.txt": "readme.txt",
             "sequence.txt": "sequences_guideline.txt"
+        },
+        "ignore": []
+    },
+    "editorial": {
+        "folders": {
+            "output": [],
+            "review": [],
+            "script": [],
+            },
+        "copy": {
+            "thumb.png": "icons/props.png"
+        },
+        "files": {
+            "README.txt": "readme.txt",
+            "Characters.txt": "characters_guideline.txt"
         },
         "ignore": []
     }
