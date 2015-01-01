@@ -11,14 +11,13 @@ OPENSOURCE="src/api/opensource"
 
 build:
 	@if test ! -d $(PYENVDIR); then python2.7 -m virtualenv $(PYENVDIR); fi
-	@pyenv/bin/pip install -U setuptools
+	@pyenv/bin/pip install Cython
 	@pyenv/bin/pip install -r requirements
 	#@pyenv/bin/pip install git+https://github.com/hydrogen18/multipart-python
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fearless.template > $(CURDIR)/config/supervisor/fearless.conf
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/uwsgi/api.ini.template > $(CURDIR)/config/uwsgi/api.ini
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/nginx/fearless.conf.template > $(CURDIR)/config/nginx/fearless.conf
 	@sed 's:{HOME}:'$(HOME)':' $(CURDIR)/config/nginx/fearless.conf.template > $(CURDIR)/config/nginx/fearless.conf
-	#@if test ! -f $(OPENSOURCE)/contenttype.py; then wget --no-check-certificate  -P $(OPENSOURCE) https://raw.githubusercontent.com/web2py/web2py/2b50cf27e2704ad4b5f20e1e0b71f21d4fd04e20/gluon/contenttype.py; fi
 	@wget http://nginx.org/download/nginx-$(NGINX).tar.gz
 	@tar xf nginx-$(NGINX).tar.gz
 	@mkdir -p bin/nginx
@@ -61,22 +60,20 @@ install:
 	#@sudo -u postgres createdb -O vserver -E UTF8 vserver
 
 prepare:
-	@rpm --nosignature -i https://repo.varnish-cache.org/redhat/varnish-4.0.el6.rpm
-	@yum install gcc php-devel php-pear ImageMagick ImageMagick-devel nginx mysql-server mysql-devel varnish redis rubygems libxslt-devel libxml2-devel libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel python27 python27-devel -y
-	@yum install http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.1/rhel/6/riak-2.0.1-1.el6.x86_64.rpm -y
+	@yum groupinstall "development Tools"
+	@yum install gcc php-devel php-pear ImageMagick ImageMagick-devel nginx mysql-server mysql-devel libxslt-devel libxml2-devel libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel python27 python27-devel -y
+	@yum install http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.2/rhel/6/riak-2.0.2-1.el6.x86_64.rpm -y
+	@ gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+	@curl -sSL https://get.rvm.io | bash -s stable --ruby
+	@gem install taskjuggler
 	@yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u55-linux-x64.rpm -y
 	@ln -s -f '/usr/java/default/bin/java' /usr/bin/java
 	@yum install https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.4.noarch.rpm -y
-	@gpg --keyserver hkp://keys.gnupg.net --recv-keys D39DC0E3
-	@curl -sSL https://get.rvm.io | bash -s stable --ruby
-	@gem install taskjuggler
 	@service riak start
 	@service elasticsearch start
 	@service supervisord start
 	@service redis start
-	@python2.7 etc/ez_setup.py
-	@python2.7 -m easy_install pip
-	@python2.7 -m pip install -U setuptools
+	@python2.7 config/get-pip.py
 	@python2.7 -m pip install -U pip virtualenv
 	@python2.7 -m pip install supervisor
 

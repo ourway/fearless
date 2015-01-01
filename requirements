@@ -1,5 +1,3 @@
-setuptools
-Cython
 redis
 celery
 requests
