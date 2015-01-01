@@ -20,9 +20,17 @@ stderr_logfile={dir}/logs/socket_error.log
 
 [program:fearless-celery]
 command={dir}/pyenv/bin/celery -A tasks worker -P gevent -c 10 -l info
-autostart=false
+autostart=true
 directory={dir}/src/api
 stopsignal=TERM
 user=farsheed
 stdout_logfile={dir}/logs/celery.log
 stderr_logfile={dir}/logs/celery_error.log
+
+[program:fearless-redis]
+command={dir}/bin/redis/redis-server
+autostart=true
+directory={dir}/bin/redis
+stopsignal=TERM
+stdout_logfile={dir}/logs/redis.log
+stderr_logfile={dir}/logs/redis_error.log

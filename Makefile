@@ -13,7 +13,6 @@ build:
 	@if test ! -d $(PYENVDIR); then python2.7 -m virtualenv $(PYENVDIR); fi
 	@pyenv/bin/pip install Cython
 	@pyenv/bin/pip install -r requirements
-	#@pyenv/bin/pip install git+https://github.com/hydrogen18/multipart-python
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fearless.template > $(CURDIR)/config/supervisor/fearless.conf
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/uwsgi/api.ini.template > $(CURDIR)/config/uwsgi/api.ini
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/nginx/fearless.conf.template > $(CURDIR)/config/nginx/fearless.conf
@@ -38,7 +37,6 @@ update:
 	@pyenv/bin/pip install -U -r requirements
 
 install:
-	#
 	@if test -d /etc/rc.d/init.d; then ln -f -s  $(CURDIR)/config/supervisord /etc/rc.d/init.d/supervisord;else ln -f -s  $(CURDIR)/config/supervisord /etc/init.d/supervisord; fi
 	@if test -d /etc/rc.d/init.d; then chmod +x /etc/rc.d/init.d/supervisord; else chmod +x /etc/init.d/supervisord; fi
 	@if test -f /sbin/insserv; then chkconfig --add supervisord; fi
