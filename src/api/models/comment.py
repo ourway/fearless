@@ -27,6 +27,7 @@ class Comment(IDMixin, Base):
     """
     item = Column(String(256), nullable=False)
     content = Column(Text, nullable=False)
+    tag = Column(String(64))
     user_id = Column(Integer, ForeignKey("user.id"))
     user = relationship("User", backref='comments')
 

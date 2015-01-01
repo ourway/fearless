@@ -56,10 +56,9 @@
                     <em >{{asset.content_type.split('/')[1].split(';')[0] | uppercase}}</em>
 
                     <ul>
-                        <li style="list-style:none;"><strong>{{asset.name || asset.fullname}}</strong>
-                        
-                        
+                        <li style="list-style:none;word-wrap: break-word"><strong>{{asset.fullname}}</strong>
                         </li>
+                        <hr/>
                         <li style="list-style:none;"><Small><b>{{$parent.prettyDate(asset.modified_on)}}</b> ago</small></li>
                         <li ng-if="asset.owner" style="list-style:none;"> <a href="#/user/{{asset.owner.id}}" 
                             style="font-size:9pt;color:grey">{{asset.owner.firstname}} {{asset.owner.lastname}}</a></li> 

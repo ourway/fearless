@@ -329,6 +329,10 @@ box-shadow: -6px 6px 8px #B0B0B0;
 }
 
 
+.commentText{
+word-wrap: break-word;
+}
+
 
 
 

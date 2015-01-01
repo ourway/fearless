@@ -14,10 +14,16 @@
         <div ng-repeat="comment in $parent.comments[$parent.comment_id] track by $index">
             <a ng-if="$parent.userInfo.userid != comment.user_id " href="#user/{{comment.user_id}}" class="pull-left primary-font">{{$parent.members[comment.user_id].firstname}} {{$parent.members[comment.user_id].lastname}}</a>
             <strong ng-if="$parent.userInfo.userid == comment.user_id " class="pull-left primary-font">Me</strong>
+
+
+
         <small class="pull-right text-muted">
-            <span class="glyphicon glyphicon-time"></span> {{$parent.prettyDate(comment.modified_on)}} ago</small>
+            <span class="glyphicon glyphicon-time"></span> 
+            {{$parent.prettyDate(comment.modified_on)}} ago
+        </small>
+
         </br>
-        <li class="ui-state-default" ng-class="{'farsi':!$parent.isASCII(comment.content)}"><p>{{comment.content}}</p></li>
+        <li class="ui-state-default" ng-class="{'farsi':!$parent.isASCII(comment.content)}"><p class="commentText">{{comment.content}}</p></li>
         </br>
         <div>
     </ul>

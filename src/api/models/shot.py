@@ -46,8 +46,10 @@ class Shot(IDMixin, Base):
     code = Column(String(64), nullable=False)  # SHOO1
     timerate = Column(Integer, default=1)
     project_id = Column(Integer, ForeignKey("project.id"))
+    asset_id = Column(Integer, ForeignKey("asset.id"))
     collection_id = Column(Integer, ForeignKey("collection.id"))
     collection = relationship("Collection", backref='shots')
+    preview = relationship("Asset", backref='shots')
     scenes = relationship("Scene", backref='shots', secondary="shots_scenes")
 
     @validates('number')

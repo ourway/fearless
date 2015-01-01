@@ -227,14 +227,7 @@ function updateImageSize(img, maxWidth, maxHeight){
         }
 
 
-        userInfoReq = $http.get('/api/db/user/');
-        userInfoReq.success(function(resp){
-                _members = {};
-                for (i in resp){
-                    _members[resp[i].id] = resp[i];
-                }
-                $scope.members = _members;
-            });
+
 
         $scope.getComments = function(){
             req = $http.get('/api/db/comment/'+$scope.comment_id+'?key=item&list=true');
@@ -420,6 +413,24 @@ function updateImageSize(img, maxWidth, maxHeight){
                 if (!$scope.userInfo.userid)
                     $scope.userInfo.userid = userid;
                 $scope.userInfo.logged_in = true;
+
+                userInfoReq = $http.get('/api/db/user/');
+
+                userInfoReq.error(function(resp, code){
+                        if (code==401)
+                        {
+                            $location.path('/auth/login')
+                            return
+                        }
+                        });
+                userInfoReq.success(function(resp, code){
+                        _members = {};
+                        for (i in resp){
+                            _members[resp[i].id] = resp[i];
+                        }
+                        $scope.members = _members;
+                    });
+
                 return true
             }
         else {

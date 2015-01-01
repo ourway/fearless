@@ -196,6 +196,14 @@ def AfterAssetCreationFuncs(mapper, connection, target):
     session.commit()
     session.close()
 
-    
+def before_delete(mapper, connection, target):
+    if os.path.isfile(target.full_path):
+        try:
+            os.remove(full_path)
+        except:
+            pass
+
+
 
 event.listen(Asset, 'after_insert', AfterAssetCreationFuncs)
+event.listen(Asset, 'before_delete', before_delete)
