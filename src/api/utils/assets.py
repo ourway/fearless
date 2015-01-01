@@ -486,7 +486,11 @@ class AddCollection:
 class AssetCheckout:
     def on_post(self, req, resp, assetId):
         '''Get asset thumbnails from riak'''
-        target = req.session.query(Asset).filter_by(id=int(assetId)).first()
+        try:
+            target = req.session.query(Asset).filter_by(id=int(assetId)).first()
+        except ValueError:
+            resp.status = falcon.HTTP_404
+            return
         from tasks import process
         from utils.defaults import ASSETS
         asset_folder = os.path.join(ASSETS, target.uuid)

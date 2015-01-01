@@ -273,9 +273,12 @@ class DB:
         query = 'req.session.query({t}).filter({t}.id=={id})'.format(
             t=table, id=int(id))
         result = eval(query).all()
-        ##
-        req.session.delete(result)
+        deleted = []
+        for each in result:
+            req.session.delete(each)
+            deleted.append(each.id)
         resp.status = falcon.HTTP_202
+        resp.body = {'message':'deleted', 'info':deleted}
         #query = 'result({q})'.format(q=query_params)
         # print eval(query)
 

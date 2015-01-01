@@ -162,6 +162,11 @@ var TITLE = 'TITLE';
                 controller: 'assetCtrl',
                  reloadOnSearch: false // dont reload the page on $location.search
             })
+             .when('/404', {
+                templateUrl: 'pages/404.html',
+                controller: 'errorsCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
+            })
     })
 
 
@@ -1224,6 +1229,16 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
 
         }
 
+        $scope.deleteAsset = function(){
+            if (confirm('Are you sure you want to rmove this asset?'))
+                req= $http.delete('/api/db/asset/'+$scope.asset.id).success(function(resp){
+                            cid = $scope.asset.collection_id;
+                            url = '/ams/c/' + cid;
+                            $location.path(url);
+                        });
+
+        }
+
 
         $scope.checkout = function(v, download){
                     $scope.checkout_load = v;
@@ -1242,8 +1257,12 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                     }) 
         }
         $scope.getAssetInfo = function(){
-            req = $http.get('/api/db/asset/'+assetId).success(function(Resp){
-
+            req = $http.get('/api/db/asset/'+assetId).success(function(Resp, code){
+                    if (!Resp.id)
+                        {
+                        $location.path('404');
+                        return null;
+                        }
                     //$location.search('version', Resp.version)
                     $scope.asset = Resp;
 
@@ -1459,6 +1478,10 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
 
         });
+
+fearlessApp.controller('errorsCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
+        
+        })
 //////////////////////////////////////////////////////
 
 

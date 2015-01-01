@@ -7,7 +7,7 @@
 
 
 		<div class="col-md-12 column">
-			<ul class="breadcrumb">
+			<ul class="breadcrumb"  style="height: 48px;">
 				<li>
 					<a href="#/pms">Projects</a> <span class="divider"></span>
 				</li>
@@ -19,7 +19,13 @@
 				</li>
 				<li class="active">
 				    {{asset.fullname}}
-				</li>
+                    </li>
+                    <span class="pull-right">
+                        <button id="collectionAddButton" class="btn btn-danger btn-sm" ng-click="deleteAsset()" type="button"> 
+                            <em class="glyphicon glyphicon-trash"></em>
+                        </button>
+                    </span>
+
 			</ul>
         </div>
 
@@ -44,12 +50,11 @@
                         <hr/>
 
                 <div class="caption" >
-                    <A href="/static/{{asset.url}}">
-                        <button id="collectionAddButton" class="btn btn-default btn-sm" type="button">
+                    <A href="/static/{{asset.url}}"><button id="collectionAddButton" class="btn btn-default btn-sm" type="button">
                             <em class="glyphicon glyphicon-download"></em>
-                        </button>
-                    </a>
+                        </button></a>
                     <em >{{asset.content_type.split('/')[1].split(';')[0] | uppercase}}</em>
+
                     <ul>
                         <li style="list-style:none;"><strong>{{asset.name || asset.fullname}}</strong>
                         
