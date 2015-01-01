@@ -241,7 +241,7 @@ function updateImageSize(img, maxWidth, maxHeight){
             if ($scope.userInfo.userid && $scope.newComment.content){
                 req = $http.put('/api/db/comment', $scope.newComment);
                 req.success(function(resp){
-                            $scope.newComment.modified_on = moment().unix();
+                            //$scope.newComment.modified_on = moment().unix();
                             if (!$scope.comments[$scope.comment_id])
                                 $scope.comments[$scope.comment_id] = [];
                             $scope.comments[$scope.comment_id].splice(0, 0, $scope.newComment);

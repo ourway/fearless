@@ -72,8 +72,7 @@ class IDMixin(object):
     id = Column(Integer, primary_key=True)
     uuid = Column(String(64), default=getUUID)
     created_on = Column(DateTime, default=now)
-    modified_on = Column(
-        DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    modified_on = Column(DateTime, default=now, onupdate=now)
 
     @property
     def columns(self):
@@ -85,10 +84,10 @@ class IDMixin(object):
     def columnitems(self):
         try:
             data =  dict([(c, getattr(self, c)) for c in self.columns])
-            for i in data:
+            #for i in data:
                 ## convert datetime to unix time
-                if isinstance(data[i], datetime.datetime):
-                    data[i] = data[i].strftime('%s')
+                #if isinstance(data[i], datetime.datetime):
+                #    data[i] = data[i].strftime('%s')
             return data
         except AttributeError, e:
             print e
