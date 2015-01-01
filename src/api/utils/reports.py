@@ -50,7 +50,7 @@ class Mailer(object):
 
 class AddReport:
     def on_put(self, req, resp, **kw):
-        u = getUserInfoFromSession(req)
+        u = getUserInfoFromSession(req, resp)
         targetUser = req.session.query(User).filter(User.id==u.get('id')).first()
         data = get_params(req.stream, flat=False)
         if data and data.get('body'):
