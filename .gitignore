@@ -61,7 +61,6 @@ config/supervisor/*.conf
 config/nginx/*.conf
 config/uwsgi/*.ini
 bin/
-src/api/opensource/*.py
 src/api/opensource/*.py[cod]
 *.sqlite
 *.db
