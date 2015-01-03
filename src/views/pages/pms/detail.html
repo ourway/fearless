@@ -551,12 +551,12 @@ border-bottom: 1px solid #57BEDD;
                 <div class="col-md-3 column">
                     <br/>
 
-                        <input ng-if="tasks" type="text" class="form-control" placeholder="Filter Tasks" ng-model="filterTaskName" />
+                        <input ng-if="tasks" type="text" class="form-control" placeholder="Filter Tasks" ng-model="project.filterTaskName" />
                     <br/>
                     <div id="tasksDiv">
                         <ol class="">
                             <li ng-click="taskDetail(task.id)" title="{{task.name}}" class="taskA" 
-                            ng-repeat="task in tasks | orderBy:'start' | filter:filterTaskName ">
+                            ng-repeat="task in tasks | orderBy:'start' | filter:project.filterTaskName ">
                             
                             <a class="btn-sm" ng-class="{'farsi':!$parent.isASCII(task.title)}" style="color: #13560C;" data-task-title="{{toTitleCase(task.title)}}" 
                                 ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" id="task_{{task.id}}" >{{toTitleCase(task.title).slice(0,30)}}</a></li>
