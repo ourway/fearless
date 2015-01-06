@@ -2,6 +2,10 @@
 
 depends = list()
 isMilestone = False
+
+if task.project.start > task.start:
+    task.start=task.project.start
+
 %>
 % for dependency in task.depends:
     <%

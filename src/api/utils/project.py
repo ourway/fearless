@@ -298,7 +298,7 @@ class ListTasks:
                     'end':i.end, 
                     'title':i.title, 
                     'id':i.id, 
-                    'dependent_of':[{'title':j.title} for j in i.dependent_of]} for i in project.tasks]
+                    'dependent_of':[{'title':j.title, 'id':j.id} for j in i.dependent_of]} for i in project.tasks]
 
 
 class GetTask:

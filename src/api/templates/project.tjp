@@ -6,7 +6,7 @@ project _${project.id} "${project.name}" ${project.start.strftime('%Y-%m-%d')} -
     workinghours mon 09:00 - 13:00, 14:00 - 18:00
     workinghours tue 09:00 - 13:00, 14:00 - 18:00
     workinghours wed 09:00 - 13:00, 14:00 - 18:00
-    workinghours thu 09:00 - 13:00
+    workinghours thu off
     workinghours sat 09:00 - 13:00, 14:00 - 18:00
     workinghours sun 09:00 - 13:00, 14:00 - 18:00
     workinghours fri off
