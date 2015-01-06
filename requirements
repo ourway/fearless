@@ -2,11 +2,13 @@ redis
 celery
 requests
 gevent
+moviepy
 wsaccel
 gevent-websocket
 ujson
 uwsgi
 falcon
+scikits.audiolab
 riak
 pyinotify
 jsonschema

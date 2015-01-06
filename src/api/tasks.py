@@ -38,6 +38,7 @@ from opensource.contenttype import contenttype
 import sh
 from mako.template import Template
 from utils.fagit import GIT
+from utils.svt import create_png as wav2png
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from mako.template import Template
 from utils.defaults import public_upload_folder, public_repository_path, GIT_folder, ASSETS
@@ -215,6 +216,13 @@ def duration(path):
             return float(du)
         except ValueError:
             return
+
+@Capp.tasl
+def generateAudioThumbnail(path, assetUuid, version):
+    path = path.encode("utf-8")
+    #wav2png(output_filename_w=None, output_filename_s=None, image_width=146, image_height=110, fft_size=2048, f_max=22050, f_min=10, wavefile=0, palette=1, channel=1, window="hanning", logspec=0)
+
+
 
 @Capp.task
 def addFileToGit(path, assetUuid, version):
