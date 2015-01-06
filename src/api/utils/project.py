@@ -36,7 +36,7 @@ class GetProjectDetails:
                 collections = project.repositories[0].collections
             data = {
                 'name':project.name.title(), 
-                'tasks':dict.fromkeys(project.tasks, True),
+                #'tasks':dict.fromkeys(project.tasks, True),
                 'id':project.id, 
                 'sequences':[{'number':i.number, 'name':i.name, 'code':i.code} for i in project.sequences],
                 'description':project.description,
@@ -49,7 +49,7 @@ class GetProjectDetails:
                 'uuid':project.uuid,
                 'complete':project.complete,
                 'watchers':[{'firstname':i.firstname, 'lastname':i.lastname, 'fullname':i.fullname, 'id':i.id} for i in project.watchers], 
-                'tasks':[{'title':i.title, 'id':i.id} for i in project.tasks],
+                #'tasks':[{'title':i.title, 'id':i.id} for i in project.tasks],
                 'collections':[{'name':i.name.title(), 'id':i.id, 'path':i.path, 
                                 'repository':i.repository.name.title(),
                                 'repository_path':i.repository.path} for i in collections if not i.parent]}

@@ -1,4 +1,5 @@
-var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular', 'ui.grid', 'ui.bootstrap']);
+var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular', 'ui.grid', 
+                        'ui.bootstrap', 'checklist-model']);
 
 fearlessApp.factory('authFactory', function($resource) {
   return $resource('/api/auth/:what',
@@ -414,7 +415,7 @@ function updateImageSize(img, maxWidth, maxHeight){
                     $scope.userInfo.userid = userid;
                 $scope.userInfo.logged_in = true;
 
-                userInfoReq = $http.get('/api/db/user/');
+                userInfoReq = $http.get('/api/users');
 
                 userInfoReq.error(function(resp, code){
                         if (code==401)
@@ -424,6 +425,7 @@ function updateImageSize(img, maxWidth, maxHeight){
                         }
                         });
                 userInfoReq.success(function(resp, code){
+                        $scope.resources = resp;
                         _members = {};
                         for (i in resp){
                             _members[resp[i].id] = resp[i];
@@ -710,14 +712,7 @@ cellTemplate: '<div>  <a style="position:absolute;margin:5px" href="#pms/{{row.e
                    });
         }
 
-        $scope.getResources = function(){
-            $http.get('/api/users').success(function(resp){
-                    $scope.resources = resp;
-                    }).error(function(resp, status){
-                        if (status == 401)
-                            $location.path('auth/login');
-                        });
-        }
+
 
 
         });
@@ -846,6 +841,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             var progressPyChart = new Chart(ctx).Pie(progressData, progressChartOptions);
 
             $scope.projId = $routeParams.projId;
+            newTask = {};
             $scope.$watch($scope.projId, function(){
                     $scope.getProjectDetails();
                     })
@@ -871,7 +867,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             projectDetails.success(function(resp){
                 if (resp!='null')
                     {
-                        resp.tasks = Object.keys(resp.tasks);
+                        //resp.tasks = Object.keys(resp.tasks);
                         resp.start = timeConverter(resp.start);
                         resp.end = timeConverter(resp.end);
                         $rootScope.title = resp.name + ' - ' + 'Fearless'
@@ -946,11 +942,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             
 
          }
-
-
             $scope.generateReport();
             }
-
 
     $scope.print = function(){
         styles = '<html><head><link rel="stylesheet" href="css/tjmanual.css"> <link rel="stylesheet" href="css/tjreport.css"></head><body>';
@@ -962,15 +955,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         myWindow.print(); 
     }
 
-    $scope.getResources = function(){
-            $http.get('/api/users').success(function(resp){
-                    $scope.resources = resp;
-                    });
-        }
-    $scope.getResources();
     $scope.getTasksList = function(){
         $http.get('/api/task/list/'+$scope.projId).success(function(resp){
                 $scope.tasks = resp;
+                $scope.resources = $scope.$parent.resources;
+                //$scope.project.tasks = resp;
                 $scope.calTasks = [];
                 for (x in $scope.tasks){
                         ev = $scope.tasks[x];
