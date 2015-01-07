@@ -133,8 +133,9 @@
             <div ng-show="asset.attachments" class="sidebar" >
                 
                 <div ng-repeat="sa in asset.attachments" class="attchments">
-                    <img ng-src="{{sa.thumbnail || '../images/icons/P_Movie.svg.png'}}" width="48" height="48"/>
-                    <a title="{{sa.name}}" ng-href="/static/{{sa.url}}">{{validate_display_name(sa.name)}}</a>
+                    <img ng-if="!sa.thumbnail" ng-src="../images/icons/P_Movie.svg.png" width="146"/>
+                    <img ng-if="sa.thumbnail" ng-src="/static/{{sa.thumbnail}}" width="146"/>
+                    <a title="{{sa.name}}" ng-href="/app/#/ams/a/{{sa.id}}">{{sa.name}}</a>
                 </div>
 
                 <div style="color:#ccc">

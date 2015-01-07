@@ -272,10 +272,10 @@ def identify(path, assetId):
     '''Find video duration'''
     path = path.encode('utf-8')
     content_type = contenttype(path)
-    if content_type.split('/')[0]=='image':
-        arg = '''nice identify "%s" 2>&1''' % (path)
-    else:
-        arg = '''nice file "%s" 2>&1''' % (path)
+    #if content_type.split('/')[0]=='image':
+    #    arg = '''nice identify "%s" 2>&1''' % (path)
+    #else:
+    arg = '''nice file "%s" 2>&1''' % (path)
     result, error = process(arg)
     if assetId:
         from models import Asset
@@ -337,12 +337,14 @@ def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb')
     page=''
     if content_type == 'image/vnd.adobe.photoshop':
         extra = '-flatten'
-    if content_type == 'application/pdf':
+    if content_type == 'application/pdf' or content_type.split('/')[1] in ['gif']:
         page = '[0]'
     fid = target.uuid + '_' + text + '_' + str(version)
     fmt = 'png'
     newthmbPath = os.path.join(public_upload_folder, fid+'.'+fmt)
     cmd = 'convert "%s%s" %s -resize %sx%s "%s"' % (path, page, extra, w, h, newthmbPath)
+    if content_type == 'image/webp':
+        cmd = '%s -i "%s" -s %sx%s "%s"' % (ffmpeg, path, w, h, newthmbPath)
     pr = process(cmd)
     if os.path.isfile(newthmbPath):
         return newthmbPath

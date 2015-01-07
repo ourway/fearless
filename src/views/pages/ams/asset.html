@@ -114,6 +114,9 @@
                         style="cursor:pointer;width:130px;opacity:0.75" ng-src="{{'/static/uploads/'+asset.uuid+'_thmb_'+v+'.png'}}" />
                     </div>
                 </div>
+                <div ng-if="asset.content_type.split('/')[1]=='x-python; charset=utf-8'" ng-init="loadAssetData()">
+                    <pre><code class="lang-py">{{asset.data}}</code></pre>
+                </div>
 
 
 

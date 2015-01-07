@@ -835,6 +835,8 @@ CONTENT_TYPE = {
     '.zabw': 'application/x-abiword',
     '.zip': 'application/zip',
     '.zoo': 'application/x-zoo',
+    '.webp': 'image/webp',
+    '.webm': 'video/webm',
 }
 
 

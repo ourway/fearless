@@ -297,9 +297,16 @@ class GetAsset:
         if target:
             sz = os.path.getsize(target.full_path)
             modifier = target.modifiers[-1]
-            attachments = [{'name':i.name, 'url':i.url, 
+            attachments = [
+                        {
+                            'name':i.name,
+                            'url':i.url, 
+                            'id':i.id,
                             'description':i.description, 
-                            'thumbnail':i.thumbnail, 'content_type':i.content_type} for i in target.attachments]
+                            'thumbnail':i.thumbnail,
+                            'content_type':i.content_type
+                        }
+                        for i in target.attachments]
             resp.body = {'url':os.path.join('/static', target.url),
                          'size':sz, 'key':target.key, 'id':target.id,
                          'version':target.version, 'datetime':target.modified_on,

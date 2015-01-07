@@ -1176,7 +1176,7 @@ fearlessApp.controller('sequenceDetailCtrl', function($scope, $rootScope, $route
         });
 
 
-fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
+fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
         assetId = $routeParams.assetId;
 
 
@@ -1238,6 +1238,22 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                         });
 
         }
+
+        $scope.highlightCode = function(){
+              $('pre code').each(function(i, block) {
+                hljs.highlightBlock(block);
+              });
+        }
+
+        $scope.loadAssetData = function(){
+            $http.get('/static/' + $scope.asset.url).success(function(resp){
+
+                        $scope.asset.data = resp;
+                        $timeout($scope.highlightCode, 10);
+
+                    });
+        }
+
 
 
         $scope.checkout = function(v, download){
