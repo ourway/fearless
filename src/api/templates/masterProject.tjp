@@ -1,6 +1,6 @@
 project FEARLESS_MAIN_PROJECT "Fearless Main Project" 2015-01-01 - 2018-01-01 {
     timingresolution 60min
-    now  ${now.strftime('%Y-%m-%d')}
+    #now  ${now.strftime('%Y-%m-%d')}
   currencyformat "(" ")" "," "." 0
    #timezone "Asia/Tehran"
     workinghours mon 09:00 - 13:00, 14:00 - 18:00
@@ -88,4 +88,9 @@ task fearless "Fearless Projects" {
 % for report in reports:
   ${report}
 % endfor
-    
+
+tracereport burn "TraceReport" {
+  formats html
+  columns complete
+  hidetask plan.id != "fearless"
+}

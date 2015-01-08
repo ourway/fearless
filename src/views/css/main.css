@@ -336,7 +336,19 @@ word-wrap: break-word;
 .error-actions {margin-top:15px;margin-bottom:15px;}
 .error-actions .btn { margin-right:10px; }
 
+.progress {
+background-image: -webkit-linear-gradient(top,#ebebeb 0,#f5f5f5 100%);
+background-image: linear-gradient(to bottom,#FFFFFF 0,#f5f5f5 100%);
+background-repeat: repeat-x;
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffebebeb', endColorstr='#fff5f5f5', GradientType=0);
+}
 
+.progress-bar {
+background-image: -webkit-linear-gradient(top,#428bca 0,#3071a9 100%);
+background-image: linear-gradient(to bottom,rgba(83, 164, 215, 0.99) 0,#FAF1AE 100%);
+background-repeat: repeat-x;
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff428bca', endColorstr='#ff3071a9', GradientType=0);
+}
 
 
 

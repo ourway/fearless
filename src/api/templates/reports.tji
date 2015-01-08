@@ -61,3 +61,11 @@ accountreport "ProfiAndLossCsv_${subproject.id}" {
   columns no, name, yearly
   accountroot resourceCost
 }
+
+tracereport burn_${subproject.id} "TraceReport_${subproject.id}" {
+  formats html
+  columns complete
+  hidetask plan.id != "fearless.__${subproject.id}"
+}
+
+

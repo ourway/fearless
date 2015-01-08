@@ -1143,7 +1143,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         $scope.taskDetail = function(taskId) {
             //console.log(taskId);
             $http.get('/api/task/'+taskId).success(function(resp){
-                resp.start = timeConverter(Math.max(resp.start, resp.project_start));
+                resp.start = timeConverter(resp.start);
+                //resp.start = timeConverter(Math.max(resp.start, resp.project_start));
                 resp.end = timeConverter(Math.min(resp.end, resp.project_end));
                 $scope.editTaskInfo = resp;
                 $scope.editTaskInfo.updatedResources = [];

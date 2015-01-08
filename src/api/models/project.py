@@ -14,7 +14,7 @@ Clean code is much better than Cleaner comments!
 
 import os
 import sh
-
+import ujson as json
 from lxml import etree
 import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
@@ -185,13 +185,14 @@ class Project(IDMixin, Base):
                        now=now(), subprojects = projects, resources=resources
                        )
 
+        #plan_path = '/tmp/Fearless_project.tjp'
         plan_path = '/home/farsheed/Desktop/Fearless_project.tjp'
         with open(plan_path, 'wb') as f:
             f.write(finalplan.encode('utf-8'))
 
         tj3 = sh.Command('/usr/local/bin/tj3')
         try:
-            tj = tj3(plan_path, '--silent', '--no-color', o='/tmp')
+            tj = tj3(plan_path, '--silent', '--no-color', '--add-trace', o='/tmp', c='8')
         except Exception,e:
             #print type(repr(e))
             for i in xrange(3):
@@ -201,25 +202,47 @@ class Project(IDMixin, Base):
             session.commit()
             return
         #if not tj.stderr:
-        for i in ['ProfiAndLoss', 'MS-Project', 'resource', 'plan', 'guntt', 'csv']:
-            html_path = '/tmp/%s_%s.html' % (i, self.id)
-            xml_path = '/tmp/%s_%s.xml' % (i, self.id)
-            csv_path = '/tmp/csv_%s.csv' % (self.id)
-            if os.path.isfile(html_path):
-                report = open(html_path)
+        plan, guntt, resource, msproject, profit, csvfile, trace = None, None, None, None, None, None, None
+        plan_path = '/tmp/plan_%s.html' % (self.id)
+        guntt_path = '/tmp/guntt_%s.html' % (self.id)
+        resource_path = '/tmp/resource_%s.html' % (self.id)
+        msproject_path = '/tmp/MS-project_%s.xml' % (self.id)
+        profit_path = '/tmp/ProfiAndLossCsv_%s.html' % (self.id)
+        csv_path = '/tmp/csv_%s.csv' % (self.id)
+        trace_path = '/tmp/TraceReport_%s.csv' % (self.id)
+
+        def saveTable(path):
+            '''Read main table from these files'''
+            if os.path.isfile(path):
+                report = open(path)
                 root = etree.parse(report)
                 main_table = root.xpath('//table')[0]
                 tosave = etree.tostring(main_table)
-                self.reports.append(tosave)
-            elif os.path.isfile(xml_path):
-                self.reports.append(open(xml_path, 'rb').read())  # msproject file
-            elif os.path.isfile(csv_path):
-                self.reports.append(open(csv_path, 'rb').read())  # msproject file
+                return tosave
+                #self.reports.append(tosave)
 
-            else:
-                print '%s is not available' % html_path
+        if os.path.isfile(msproject_path):
+            msproject = open(msproject_path, 'rb').read()  # msproject file
+        if os.path.isfile(csv_path):
+            csvfile = open(csv_path, 'rb').read()  # msproject file
+        if os.path.isfile(trace_path):
+            trace = open(trace_path, 'rb').read()  # msproject file
 
-            session.commit()
+        plan = saveTable(plan_path)
+        guntt = saveTable(guntt_path)
+        resource = saveTable(resource_path)
+        profit = saveTable(profit_path)
+        data = {}
+        if plan: data['plan'] = plan
+        if guntt: data['guntt'] = guntt
+        if resource: data['resource'] = resource
+        if profit: data['profit'] = profit
+        if msproject: data['msproject'] = msproject
+        if csvfile: data['csvfile'] = csvfile
+        if trace: data['trace'] = trace
+
+        self.reports.append(json.dumps(data))
+        session.commit()
 
         print tj.stderr
         return True

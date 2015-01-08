@@ -134,9 +134,16 @@ class GetProjectLatestReport:
         if project:
             project.plan()  ## first let it plan
             if project.reports:
+                reportId = project.reports[-1]
+                report = req.session.query(Report).filter_by(id=reportId).first()
+                if report:
+                    data = report.body
+                    print json.loads(data).keys()
+                return
+
                 try:
                     csvfile = StringIO()
-                    csvdataid = project.reports[-1]
+                    csvdataid = project.reports[-2]
                     csvdata = req.session.query(Report).filter(Report.id==csvdataid).first()
                     if csvdata:
                         csvdata = csvdata.body
@@ -178,28 +185,28 @@ class GetProjectLatestReport:
                             target.effort_done = effort_done
                             target.duration = duration
 
-                    ganttdataid = project.reports[-2]
+                    ganttdataid = project.reports[-3]
                     ganttdata = req.session.query(Report).filter(Report.id==ganttdataid).first()
                     if ganttdata:
                         ganttdata = str(ganttdata.body)
 
-                    plandataid = project.reports[-3]
+                    plandataid = project.reports[-4]
                     plandata = req.session.query(Report).filter(Report.id==plandataid).first()
                     if plandata:
                         plandata = str(plandata.body)
 
 
-                    resourcedataid = project.reports[-4]
+                    resourcedataid = project.reports[-5]
                     resourcedata = req.session.query(Report).filter(Report.id==resourcedataid).first()
                     if resourcedata:
                         resourcedata = str(resourcedata.body)
 
-                    profitandlossid = project.reports[-6]
+                    profitandlossid = project.reports[-7]
                     profitandloss = req.session.query(Report).filter(Report.id==profitandlossid).first()
                     if profitandloss:
                         profitandloss = str(profitandloss.body)
 
-                    msprojectid = project.reports[-5]
+                    msprojectid = project.reports[-6]
                     msproject = req.session.query(Report).filter(Report.id==msprojectid).first()
                     if msproject:
                         msproject = str(msproject.body)
@@ -290,11 +297,15 @@ class ListTasks:
         project = req.session.query(Project).filter(Project.id==projId).first()
         if project:
             resp.body = [{
-                    'start':i.start, 
-                    'end':i.end, 
-                    'title':i.title, 
-                    'id':i.id, 
-                    'dependent_of':[{'title':j.title, 'id':j.id} for j in i.dependent_of]} for i in project.tasks]
+                    'start':i.start,
+                    'end':i.end,
+                    'title':i.title,
+                    'id':i.id,
+                    'complete':i.complete,
+                    'dependent_of':[{'title':j.title, 'id':j.id} for j in i.dependent_of],
+                    'resources':[{'id':k.id, 'lastname':k.lastname} for k in i.resources]
+            
+            } for i in project.tasks]
 
 
 class GetTask:

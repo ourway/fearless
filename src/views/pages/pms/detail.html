@@ -19,7 +19,7 @@ border-spacing: 0;
     tfoot { display:table-footer-group }
 
 .tj_table_frame {
-/* line-height: 1; */
+line-height: 1;
 /* margin-left: 0px; */
 /* margin-right: 0px; */
 text-align: center;
@@ -584,6 +584,16 @@ border-bottom: 1px solid #57BEDD;
                             <td>
                                 <a class="taskA" ng-class="{'farsi':!$parent.isASCII(task.title)}" style="font-size: 13px;" data-task-title="{{toTitleCase(task.title)}}" 
                                     ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" id="task_{{task.id}}" >{{toTitleCase(task.title).slice(0,30)}}</a>
+                            <div class="progress" style="height:3px;">
+                              <div class="progress-bar" role="progressbar" aria-valuenow="{{task.complete}}" aria-valuemin="0" aria-valuemax="100" style="width: {{task.complete}}%;">
+                                  <span class="sr-only">{{task.complete}}% Complete</span>
+                              </div>
+                            </div>
+                            <small style="color:grey" ng-repeat="person in task.resources track by $index">
+                                <a style="color:grey" href="#/user/{{person.id}}">{{person.lastname}}</a><small ng-if="$index!=task.resources.length-1">, <small>
+
+                            </small>
+
                             </td>
                         
                         </tr>
