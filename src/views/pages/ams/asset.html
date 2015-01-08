@@ -53,7 +53,7 @@
                     <A href="/static/{{asset.url}}"><button id="collectionAddButton" class="btn btn-default btn-sm" type="button">
                             <em class="glyphicon glyphicon-download"></em>
                         </button></a>
-                    <em >{{asset.content_type.split('/')[1].split(';')[0] | uppercase}}</em>
+                    <em style="list-style:none;word-wrap: break-word">{{asset.content_type.split('/')[1].split(';')[0].slice(0, 15) | uppercase}}</em>
 
                     <ul>
                         <li style="list-style:none;word-wrap: break-word"><strong>{{asset.fullname}}</strong>

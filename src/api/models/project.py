@@ -27,6 +27,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, now, convert_to_datetime
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from .task import Task
+from .user import User
 
 project_users = Table('project_users', Base.metadata,
                       Column('id', Integer, primary_key=True),
@@ -145,35 +146,48 @@ class Project(IDMixin, Base):
     def compress_report(self, key, data):
         return data
 
+    def tjp_subproject(self):
+        subProjectTemplateFile = os.path.join(
+            os.path.dirname(__file__), '../templates/subProject.tji')
+        subProjectReportFile = os.path.join(
+            os.path.dirname(__file__), '../templates/reports.tji')
+        sp = Template(filename=subProjectTemplateFile)
+        sr = Template(filename=subProjectReportFile)
+        _tasks = []
+        #_resources = list()
+        for task in self.tasks:
+            _tasks.append(task.tjp_task())
+            #_resources.extend(task.resources)
+        subProjectTasks = sp.render(tasks=_tasks, subproject=self)
+        report = sr.render(subproject=self)
+        return {'report':report, 'subProjectTasks':subProjectTasks}
+
+
+
+
+
     #@property
     def plan(self):
         # lets select just one task
         templateFile = os.path.join(
-            os.path.dirname(__file__), '../templates/project.tjp')
+            os.path.dirname(__file__), '../templates/masterProject.tjp')
         t = Template(filename=templateFile)
-        if not self.tasks:
-            self.rep = []
-            return
-        task = self.tasks[0]
-        resources = list()
-        tasks = list()
-        project_tasks = session.query(Task).filter_by(project_id=self.id).all()
-        for target in project_tasks:
-            resources.extend(target.resources)
-            for i in target.resources:
-                if not i in target.project.users:
-                    target.project.users.append(i)
-            tasks.append(target.tjp_task())
-        
-        #return tasks
-        plan_path = '/tmp/_Fearless_project_%s.tjp' % self.id
-        report_path = '/tmp/report.html'
-        data = t.render(
-            project=self, resources=set(resources), tasks=set(tasks), now=now())
-        data = data.encode('utf-8')
-        with open(plan_path, 'w') as f:
+        projects = session.query(Project).all()
+        resources = session.query(User).all()
+        subProjectTasks = []
+        reports = []
+        for p in projects:
+            planData = p.tjp_subproject()
+            subProjectTasks.append(planData.get('subProjectTasks'))
+            reports.append(planData.get('report'))
 
-            f.write(data)
+        finalplan = t.render(reports=reports, subProjectTasks=subProjectTasks, 
+                       now=now(), subprojects = projects, resources=resources
+                       )
+
+        plan_path = '/home/farsheed/Desktop/Fearless_project.tjp'
+        with open(plan_path, 'wb') as f:
+            f.write(finalplan.encode('utf-8'))
 
         tj3 = sh.Command('/usr/local/bin/tj3')
         try:

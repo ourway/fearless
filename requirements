@@ -34,3 +34,5 @@ pillow
 qrcode
 mako
 python-multipart
+awesome-slugify
+misaka

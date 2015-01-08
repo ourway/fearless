@@ -163,9 +163,9 @@
                             <em class="glyphicon glyphicon-download"></em>
                         </button>
                     </a>
-                    <em >{{asset.content_type.split('/')[1].split(';')[0] | uppercase}}</em>
+                    <em style="list-style:none;word-wrap: break-word">{{asset.content_type.split('/')[1].split(';')[0].slice(0, 15) | uppercase}}</em>
                     <ul>
-                        <li style="list-style:none;"><a title="{{asset.fullname}}" href="#ams/a/{{asset.id}}"><strong>{{asset.name || asset.fullname}}</strong></a>
+                        <li style="list-style:none;"><a title="{{asset.fullname}}" href="#ams/a/{{asset.id}}"><strong style="list-style:none;word-wrap: break-word">{{asset.name || asset.fullname}}</strong></a>
                         
                         
                         </li>
@@ -181,7 +181,7 @@
                 
 			</div>
 		</div>
-    <hr/>
+    <hr ng-show="collection.assets.length>0"/>
     </div>
 
 

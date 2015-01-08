@@ -1,0 +1,63 @@
+taskreport breakdown_${subproject.id} "csv_${subproject.id}"{
+            formats csv
+            loadunit hours
+                columns id, line, name, opentasks, start, end, managers, effort, resources,  effortdone, gauge, effortleft, criticalness, duration, complete, efficiency
+                taskreport breakdown1_${subproject.id} "plan_${subproject.id}"{
+                    formats html
+                    loadunit longauto
+                    columns name, start, end, effortleft, alert, gauge, pathcriticalness {title "Critical path"}, complete {title "Progress"}
+                    sorttasks plan.start.up
+                    taskroot fearless.__${subproject.id}
+                }
+                taskreport breakdown2_${subproject.id} "guntt_${subproject.id}"{
+                    formats html
+                    loadunit longauto
+                    columns name, chart { scale day width 400 }, complete {title "Progress"}
+                    sorttasks plan.start.up
+                    taskroot fearless.__${subproject.id}
+                }
+              #tracereport pb "Product Burndown" {
+              #  columns opentasks
+              #}
+        }
+
+textreport "resource_${subproject.id}" {
+    formats html
+    title "Resource Graph"
+    center '<[report id="resourceGraph_${subproject.id}"]>'
+    taskroot fearless.__${subproject.id}
+  }
+
+
+
+resourcereport resourceGraph_${subproject.id} "" {
+  scenarios plan
+  columns bsi, name, effort, chart {scale day width 400}
+  loadunit hours
+  # We only like to show leaf tasks for leaf resources.
+  hidetask ~(isleaf() & isleaf_())
+  #hideresource plan.effort = 0.0
+  hideresource ~(p${subproject.id})
+  sorttasks plan.start.down
+  taskroot fearless.__${subproject.id}
+}
+
+export "MS-project_${subproject.id}" {
+  formats mspxml
+  loadunit days
+  taskroot fearless.__${subproject.id}
+}
+
+accountreport "ProfiAndLoss_${subproject.id}" {
+  formats html
+  balance -
+  columns no, name, yearly
+  accountroot resourceCost
+}
+
+accountreport "ProfiAndLossCsv_${subproject.id}" {
+  formats csv
+  currencyformat "(" ")" "" "." 0
+  columns no, name, yearly
+  accountroot resourceCost
+}

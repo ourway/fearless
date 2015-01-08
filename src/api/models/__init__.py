@@ -31,6 +31,7 @@ import os
 # for models
 from mixin import now
 from sqlalchemy.exc import IntegrityError  # for exception handeling
+from sqlalchemy.sql import between
 import redis
 
 from elasticsearch import Elasticsearch

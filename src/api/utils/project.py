@@ -77,7 +77,6 @@ class ListProjects:
 
 
 class AddProject:
-    @falcon.after(commit)
     def on_put(self, req, resp):
         user = getUserInfoFromSession(req, resp)
         projectData = get_params(req.stream, flat=False)
@@ -130,7 +129,6 @@ class AddProject:
 
 class GetProjectLatestReport:
     #@Authorize('see_project')
-    @falcon.after(commit)
     def on_get(self, req, resp, id):
         project = req.session.query(Project).filter(Project.id==id).first()
         if project:
@@ -222,7 +220,6 @@ class GetProjectLatestReport:
 
 
 class UpdateProject:
-    @falcon.after(commit)
     def on_post(self, req, resp, projId):
         user = getUserInfoFromSession(req, resp)
         data = get_params(req.stream, flat=False)
@@ -249,7 +246,6 @@ class UpdateProject:
 
 
 class AddTask:
-    @falcon.after(commit)
     def on_put(self, req, resp, projId):
         user = getUserInfoFromSession(req, resp)
         taskData = get_params(req.stream, flat=False)
@@ -316,12 +312,10 @@ class GetTask:
                      'complete':task.complete,
                      'uuid':task.uuid,
                      'duration':task.duration,
-                     'project_start':task.project.start,
-                     'project_end':task.project.end
+                     'project':{'id':task.project.id, 'name':task.project.name, 'start':task.project.start, 'end':task.project.end}
                      }
 
 class UpdateTask:
-    @falcon.after(commit)
     def on_post(self, req,resp, taskId):
         user = getUserInfoFromSession(req, resp)
         resources, depends, responsibles, effort , alternative_resources = list(), list(), list(), 0, list()
@@ -368,7 +362,6 @@ class UpdateTask:
             resp.body = {'message':'Task Not Found'}
 
 class DeleteTask:
-    @falcon.after(commit)
     def on_delete(self, req, resp, taskId):
         user = getUserInfoFromSession(req, resp)
         target = req.session.query(Task).filter(Task.id==taskId).first()
@@ -378,6 +371,35 @@ class DeleteTask:
 
         else:
             resp.status = falcon.HTTP_404
+
+class UserTasksCard:
+    def on_get(self, req, resp, date):
+        user = getUserInfoFromSession(req, resp)
+        uid = int(user.get('id'))
+        now = datetime.datetime.utcnow
+        today = now().strftime('%Y-%m-%d') 
+        tomorrow = (now() + datetime.timedelta(hours=24)).strftime('%Y-%m-%d')
+        if date == 'today':
+            '''These are tasks that started today and not finished yet'''
+            data = req.session.query(Task).filter(Task.resources.any(id=uid))\
+                .filter(Task.start<=now())\
+                .filter(Task.complete<100).filter(Task.end>now()).all()
+        elif date == 'before':
+            '''These are tasks that should have been ended before nut not completed yet'''
+            data = req.session.query(Task).filter(Task.resources.any(id=uid))\
+                .filter(Task.end<=now()).filter(Task.complete<100).all()
+
+
+        resp.body = [
+            {
+                'title':i.title,
+                'id':i.id,
+                'project':{
+                    'id':i.project.id,
+                    'name':i.project.name,
+                }
+            }
+            for i in data]
 
 
 

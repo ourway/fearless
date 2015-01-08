@@ -6,6 +6,7 @@ isMilestone = False
 if task.project.start > task.start:
     task.start=task.project.start
 
+responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
 %>
 % for dependency in task.depends:
     <%
@@ -43,6 +44,9 @@ if task.project.start > task.start:
     % endif
     % if task.resources:
         allocate ${','.join(['_'+str(i.id) for i in task.resources])}
+    % endif
+    % if responsibles:
+        responsible ${responsibles}
     % endif
     % if task.effort and not task.children:
         effort ${task.effort}h

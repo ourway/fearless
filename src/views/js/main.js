@@ -163,14 +163,22 @@ var TITLE = 'TITLE';
                 controller: 'assetCtrl',
                  reloadOnSearch: false // dont reload the page on $location.search
             })
+             .when('/pms/t/:taskId', {
+                templateUrl: 'pages/pms/task.html',
+                controller: 'taskCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
+            })
              .when('/404', {
-                templateUrl: 'pages/404.html',
+                templateUrl: 'pages/errors/404.html',
                 controller: 'errorsCtrl',
                  reloadOnSearch: false // dont reload the page on $location.search
             })
     })
 
-
+function choose(choices) {
+  var index = Math.floor(Math.random() * choices.length);
+  return choices[index];
+}
 
 function updateImageSize(img, maxWidth, maxHeight){
         currentWidth = img.width,
@@ -297,7 +305,21 @@ function updateImageSize(img, maxWidth, maxHeight){
 
 		$scope.appName = 'fearless';
         $scope.$parent.showLogin = false;
-		$scope.message = $scope.appName + ', A Revolutionary Animation Production Management System!';
+		messages = [
+                    "Life is what happens to you while you're busy making other plans.",
+                    'A goal without a plan is just a wish!',
+                    'By failing to prepare, you are preparing to fail.',
+                    "You can't plow a field simply by turning it over in your mind.",
+                    "If you don't know where you are going, you'll end up someplace else.",
+                    "Plans are useless, but planning is indispensable.",
+                    "Someone's sitting in the shade today because someone planted a tree a long time ago.",
+                    "Always, Always have a plan",
+                    "You need to stop getting into situations where all your options are potentially bad.",
+                    "The time to repair the roof is when the sun is shining.",
+                    "Do not let the universe surprise you!",
+                    "Fearless is worrying, only in a productive, proactive form"
+                 ];
+		$scope.message = choose(messages);
         $scope.userInfo = {'logged_in':false};
 
 
@@ -414,6 +436,7 @@ function updateImageSize(img, maxWidth, maxHeight){
                 if (!$scope.userInfo.userid)
                     $scope.userInfo.userid = userid;
                 $scope.userInfo.logged_in = true;
+                $scope.user = $scope.userInfo;
 
                 userInfoReq = $http.get('/api/users');
 
@@ -446,12 +469,30 @@ function updateImageSize(img, maxWidth, maxHeight){
        }
 
 
-      $scope.go = function ( path ) {
+      $scope.go = function (path) {
           $location.path( path );
         };
 
+    $scope.getUserTasks = function(){
+        if (!$scope.user.logged_in)
+            return null;
+        uid = $scope.user.userid;
+        $http.get('/api/taskcard/today').success(function(resp){
+                $scope.user.tasksForToday = resp;
+                })
+    }
+
+    $scope.getUnfinishedTasks = function(){
+        if (!$scope.user.logged_in)
+            return null;
+        uid = $scope.user.userid;
+        $http.get('/api/taskcard/before').success(function(resp){
+                $scope.user.unfinishedTasks = resp;
+                })
+    }
 
 	});
+
 
 	fearlessApp.controller('aboutController', function($scope) {
 		$scope.message = $scope.appName + '! I am an about page.';
@@ -1497,6 +1538,20 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
 fearlessApp.controller('errorsCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
         
+        })
+
+
+fearlessApp.controller('taskCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
+        taskId = $routeParams.taskId;
+        $scope.getTaskDetails = function(){
+            req = $http.get('/api/task/'+taskId).success(function(resp){
+                    $scope.task = resp;
+                
+                })
+
+        }
+
+
         })
 //////////////////////////////////////////////////////
 

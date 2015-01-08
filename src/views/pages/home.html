@@ -1,6 +1,6 @@
-    <div class="jumbotron">
+    <div class="jumbotron" style="background: url(images/home-bg.jpg); background-position: 6px -223px; color: #fff;">
       <div ng-cloak class="container">
-          <h1>Welcome</h1>
+          <h1>FEAR:LESS</h1>
           <p>{{message}}</p>
         <p><a class="btn btn-primary btn-lg" role="button" href="#about">Learn more &raquo;</a></p>
       </div>
@@ -9,6 +9,85 @@
     <div class="container">
       <!-- Example row of columns -->
       <div class="row">
+
+
+		<div class="col-md-5 column" ng-init="getUserTasks()">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+                        Ongoing Tasks
+					</h3>
+				</div>
+				<div class="panel-body" ng-if="user.tasksForToday">
+                    <table class="table table-responsive">
+                        <tr class="success">
+                            <td></td>
+                            <td>Task</td>
+                            <td>Project</td>
+                    </tr>
+                    <tr ng-repeat="t in user.tasksForToday track by $index">
+                        <td>{{$index+1}}</td>
+                        <td> <a href="#/pms/t/{{t.id}}">{{t.title}}</a> </td>
+                        <td> <a href="#/pms/{{t.project.id}}">{{t.project.name}}</a> </td>
+                    
+                </tr>
+            </table>
+				</div>
+                <div class="panel-body" ng-if="user.tasksForToday.length<1 && user.unfinishedTasks.length<1">
+                    <em class="glyphicon glyphicon-cutlery btn btn-sm btn-primary"></em>
+                    You do not have any schedule tasks for right now!
+                </div>
+                <div class="panel-body" ng-if="user.tasksForToday.length<1 && user.unfinishedTasks.length>0">
+                    <em class="glyphicon glyphicon-exclamation-sign btn btn-sm btn-warning"></em>
+                    You have Unfinished tasks! You are behind schedule!
+                </div>
+				<div class="panel-footer">
+                    <small ng-if="user.tasksForToday.length>0 && user.unfinishedTasks.length<1" style="color:grey">These are the task you work on them</small>
+                    <small ng-if="user.tasksForToday.length>0 && user.unfinishedTasks.length>0" style="color:darkorange">You have tasks you need to start doing today and also unfinished tasks</small>
+                    <small ng-if="user.tasksForToday.length<1 && user.unfinishedTasks.length<1" style="color:green">Well, You are free for now!</small>
+                    <small ng-if="user.tasksForToday.length<1 && user.unfinishedTasks.length>0" style="color:darkorange">Well, You have unfinish jobs!</small>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-5 column" ng-init="getUnfinishedTasks()">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">
+                        Unfinished Tasks
+					</h3>
+				</div>
+				<div class="panel-body" ng-if="user.unfinishedTasks">
+                    <table class="table table-responsive">
+                        <tr class="warning">
+                            <td></td>
+                            <td>Task</td>
+                            <td>Project</td>
+                    </tr>
+                    <tr ng-repeat="t in user.unfinishedTasks track by $index">
+                        <td>{{$index+1}}</td>
+                        <td> <a href="#/pms/t/{{t.id}}">{{t.title}}</a> </td>
+                        <td> <a href="#/pms/{{t.project.id}}">{{t.project.name}}</a> </td>
+                    
+                </tr>
+            </table>
+				</div>
+                <div class="panel-body" ng-if="user.unfinishedTasks.length<1">
+                    <em class="glyphicon glyphicon-ok btn btn-sm btn-success"></em>
+                    Congrats! You don't miss any tasks yet!
+                </div>
+				<div class="panel-footer">
+                    <small ng-if="user.unfinishedTasks.length>0" style="color:darkorange">These are your unfinished tasks.  Finish them ASAP</small>
+                    <small ng-if="user.unfinishedTasks.length<1" style="color:grey">Well, You are on time!</small>
+				</div>
+			</div>
+		</div>
+		</div>
+
+
+        <hr/>
+      <div class="row">
+
         <div class="col-md-4">
           <h2>Administration</h2>
           <p></p>

@@ -40,7 +40,7 @@ from utils.AAA import Login, Signup, Authenticate,\
 from utils.showtime import GetUserShows
 from utils.project import GetProjectDetails, GetProjectLatestReport, \
         ListProjects, AddProject, AddTask, ListTasks, GetTask, UpdateTask, \
-        DeleteTask, UpdateProject
+        DeleteTask, UpdateProject, UserTasksCard
 
 from utils.sequence import AddSequence
 
@@ -325,6 +325,7 @@ app.add_route('/api/task/list/{projId}', ListTasks())
 app.add_route('/api/task/{taskId}', GetTask())
 app.add_route('/api/task/update/{taskId}', UpdateTask())
 app.add_route('/api/task/delete/{taskId}', DeleteTask())
+app.add_route('/api/taskcard/{date}', UserTasksCard())
 app.add_route('/api/sequence/add/{projId}', AddSequence())
 app.add_route('/api/sendmail', Mailer())
 app.add_route('/api/report', AddReport())

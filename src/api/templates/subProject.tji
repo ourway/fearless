@@ -1,0 +1,8 @@
+  task __${subproject.id} "${subproject.name.title()}" {
+    start  ${subproject.start.strftime('%Y-%m-%d')}
+    chargeset productCost_${subproject.id}
+    % for task in tasks:
+      ${task}
+    % endfor
+  }
+

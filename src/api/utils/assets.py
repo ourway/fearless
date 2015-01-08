@@ -17,6 +17,7 @@ import time
 import hashlib
 from cStringIO import StringIO
 import falcon
+from slugify import slugify, slugify_filename
 from urllib import unquote
 import os
 import cgi
@@ -114,6 +115,9 @@ class AssetSave:
                 name = req.get_param('name') or 'undefined.%s.raw' % _generate_id()
             else:
                 name = mtname
+
+            if name:
+                name = slugify_filename(name)
 
             name = name.decode('utf-8')
             assetExt = name.split('.')[-1]

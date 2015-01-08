@@ -1,0 +1,91 @@
+project FEARLESS_MAIN_PROJECT "Fearless Main Project" 2015-01-01 - 2018-01-01 {
+    timingresolution 60min
+    now  ${now.strftime('%Y-%m-%d')}
+  currencyformat "(" ")" "," "." 0
+   #timezone "Asia/Tehran"
+    workinghours mon 09:00 - 13:00, 14:00 - 18:00
+    workinghours tue 09:00 - 13:00, 14:00 - 18:00
+    workinghours wed 09:00 - 13:00, 14:00 - 18:00
+    workinghours thu 09:00 - 13:00
+    workinghours sat 09:00 - 13:00, 14:00 - 18:00
+    workinghours sun 09:00 - 13:00, 14:00 - 18:00
+    workinghours fri off
+    timeformat "%y-%m-%d %H-%M"
+    scenario plan "Plan" {
+        #scenario delayed "Delayed"
+        }
+}
+
+
+% for vy in xrange(2014,2021):
+    vacation "Martyrdom of Imam Reza" ${vy}-1-2
+    vacation "Birthday of Muhammad and Imam Sadeq" ${vy}-1-19
+    vacation "Revolution Day" ${vy}-2-11
+    vacation "Nourooz" ${vy}-3-20 - ${vy}-3-25
+    vacation "Islamic Republic Day" ${vy}-4-1
+    vacation "Nature Day" ${vy}-4-2
+    vacation "Martyrdom of Fatima" ${vy}-4-3
+    vacation "Birthday of Imam Ali" ${vy}-5-13
+    vacation "Prophet's Ascension" ${vy}-5-27
+    vacation "Anniversary of Khomeini's Death" ${vy}-6-4
+    vacation "Revolt of Khordad 15" ${vy}-6-5
+    vacation "Imam Mahdi's birthday" ${vy}-7-13
+    vacation "June Solstice" ${vy}-7-21
+    vacation "Martyrdom of Imam Ali" ${vy}-8-19
+    vacation "Eid-e-Fetr (End of Ramadan)" ${vy}-8-29 - ${vy}-8-30
+    vacation "Martyrdom of Imam Sadeq" ${vy}-9-22
+    vacation "September equinox" ${vy}-9-23
+    vacation "Eid-e-Ghorban (Feast of Sacrifice)" ${vy}-10-5
+    vacation "Eid-al-Ghadir" ${vy}-10-13
+    vacation "Tassoua/Ashoura" ${vy}-11-26
+    vacation "Arbaeen" ${vy}-12-13
+    vacation "December Solstice / Demise of Prophet Muhammad" ${vy}-12-21
+    vacation "Martyrdom of Imam Reza" ${vy}-12-23
+% endfor
+
+% for subproject in subprojects:
+flags p${subproject.id}
+% endfor
+
+account resourceCost "Resource Cost" {
+aggregate resources
+% for resource in resources:
+  account _${resource.id} "${resource.firstname} ${resource.lastname}"
+% endfor
+}
+
+% for subproject in subprojects:
+  account productCost_${subproject.id} "Product Cost of ${subproject.name}" {
+    aggregate tasks
+}
+% endfor
+% for subproject in subprojects:
+  account customerPayments_${subproject.id} "Customer Payments" {
+  }
+% endfor
+% for subproject in subprojects:
+  balance resourceCost customerPayments_${subproject.id}
+% endfor
+resource members "members" {
+% for resource in resources:
+  resource _${resource.id} "${resource.firstname} ${resource.lastname}" {
+    efficiency ${resource.efficiency}
+    % if resource.tasks:
+      flags ${','.join(set(['p%s'%i.project.id for i in resource.tasks]))}
+    % endif
+    rate ${resource.rate}
+    chargeset _${resource.id}
+    email "${resource.email}"
+  }
+
+% endfor
+}
+task fearless "Fearless Projects" {
+% for subProjectTask in subProjectTasks:
+  ${subProjectTask}
+% endfor
+}
+% for report in reports:
+  ${report}
+% endfor
+    
