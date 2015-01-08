@@ -57,10 +57,8 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
     % if task.complete:
         complete ${task.complete}
     % endif
-    %if not task.depends and not task.parent and not isMilestone:
+    %if not task.effort and not isMilestone:
         start ${task.start.strftime('%Y-%m-%d')}
-    % endif
-    %if not task.children and not task.effort and not isMilestone:
         end ${task.end.strftime('%Y-%m-%d')}
     % endif
     % if depends:

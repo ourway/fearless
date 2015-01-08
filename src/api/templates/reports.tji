@@ -5,7 +5,7 @@ taskreport breakdown_${subproject.id} "csv_${subproject.id}"{
                 taskreport breakdown1_${subproject.id} "plan_${subproject.id}"{
                     formats html
                     loadunit longauto
-                    columns name, start, end, effortleft, alert, gauge, pathcriticalness {title "Critical path"}, complete {title "Progress"}
+                    columns name, start, end, gauge, pathcriticalness {title "Critical path"}, complete {title "Progress"}
                     sorttasks plan.start.up
                     taskroot fearless.__${subproject.id}
                 }
@@ -32,7 +32,7 @@ textreport "resource_${subproject.id}" {
 
 resourcereport resourceGraph_${subproject.id} "" {
   scenarios plan
-  columns bsi, name, effort, chart {scale day width 400}
+  columns name, effort, chart {scale day width 400}
   loadunit hours
   # We only like to show leaf tasks for leaf resources.
   hidetask ~(isleaf() & isleaf_())

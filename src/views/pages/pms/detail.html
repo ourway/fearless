@@ -19,21 +19,23 @@ border-spacing: 0;
     tfoot { display:table-footer-group }
 
 .tj_table_frame {
-line-height: 1;
-margin-left: 0px;
-margin-right: 0px;
+/* line-height: 1; */
+/* margin-left: 0px; */
+/* margin-right: 0px; */
 text-align: center;
-background-color: #9a9a9a;
-margin-top: 15px;
-margin-bottom: 15px;
-box-shadow: 1px 1px 17px #000D1A;
-border: 7px solid #E0E0E0;
-border-radius: 2px;
+background-color: rgba(56, 129, 192, 0.28);
+/* margin-top: 15px; */
+/* margin-bottom: 15px; */
+/* box-shadow: 1px 1px 17px #000D1A; */
+/* border: 1px solid #A8A8A8; */
+border-radius: 5px;
+padding: 3px;
 border-spacing: 0px;
-text-rendering: geometricPrecision;
-text-shadow: 1px 1px 3px #ccc;
+/* text-rendering: geometricPrecision; */
+/* text-shadow: 1px 1px 3px #ccc; */
 text-color: #fff;
 }
+
 .taskbarframe {
 background-color: #000000;
 position: absolute;
@@ -115,8 +117,8 @@ border-bottom: 1px solid #57BEDD;
 </style>
 
 <div class="container pmsmaindiv">
-    <br/>
-	<div class="row clearfix" ng-cloak>
+
+	<div ng-cloak>
 			<ul class="breadcrumb">
 				<li>
 					<a href="#/pms">Projects</a> <span class="divider"></span>
@@ -126,7 +128,6 @@ border-bottom: 1px solid #57BEDD;
 				</li>
 			</ul>
     </div>
-	<div class="row clearfix" ng-cloak>
 
 
 
@@ -459,18 +460,26 @@ border-bottom: 1px solid #57BEDD;
 
 
 
-    <div class="row clearfix" id="projectSummery">
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h3 class="panel-title" style="font-size:72pt;">
+            {{project.name | uppercase}}
         <button id="editProjectButton" ng-click="updateProjectModalPrepare()" class="btn btn-default btn-sm" type="button"><em class="glyphicon glyphicon-pencil"></em> Edit</button>
+        </h3>
+    </div>
 
-    <div class="row clearfix">
+     <div class="panel-body">
         <div class="col-md-3 column" id="projectDescription">
+             <div id="canvasDiv" >
+                <canvas style="padding:10px;" id="progressChart" width="96" height="96"></canvas>		
+            </div>
             <p>
             <em>{{project.description || 'Project has no description'}}</em>
             </p>
+
 		</div>
-		<div class="col-md-6 column">
+		<div class="col-md-8 column">
             <br/>
-                        <h4>Project Details</h4>
             <table class="table table-bordered table-responsive">
             <tr class="active">
                 <td >Name</td>
@@ -489,6 +498,11 @@ border-bottom: 1px solid #57BEDD;
                 <td ><a href="#/user/{{project.leader.id}}">{{project.leader.fullname}}</a></td>
             </tr>
         </table>
+
+		</div>
+
+    </div>
+				<div class="panel-footer">
             <div ng-if="project.watchers">
             This project is under supervision of 
             <span ng-repeat="watcher in project.watchers track by $index">
@@ -497,74 +511,83 @@ border-bottom: 1px solid #57BEDD;
                 <em ng-show="$index+2 == project.watchers.length">and</em>
             </span>
             </div>
-		</div>
-
-        <div class="col-md-3 column">
-             <div id="canvasDiv" >
-                <canvas style="padding:10px;" id="progressChart" width="96" height="96"></canvas>		
             </div>
-		</div>
+
     </div>
+
+
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            Assets
+                            <button id="taskSeqButton" class="btn btn-default btn-sm" type="button"><em class="glyphicon glyphicon-plus"></em> Add SEQUENCES</button>
+        </h3>
     </div>
 
-    <hr/>
-
-    <div class="row clearfix" id="AssetsAndSequencesOfProject">
-
-
-
-        <div class="col-md-9 column">
-                        <h4>Project Assets</h4>
+     <div class="panel-body">
+        <div class="col-md-12 column">
+            <br/>
+                <div class="col-md-4 column">
                         <div id="CollectionsDiv" >
                             <a class="projectCollectionsA" href="#/ams/c/{{collection.id}}?page=1" ng-repeat="collection in project.collections track by $index" 
-
                                 title="{{collection.name}}">{{collection.name}}</a>
                         </div>
-                    <hr/>
-                        <h4 style="display:inline">Sequences</h4>
-                            <button id="taskSeqButton" class="btn btn-default btn-sm" type="button"><em class="glyphicon glyphicon-plus"></em> Add SEQUENCES</button>
-                        <div id="SequencesDiv" >
-                            <a class="projectSeqA" href="#pms/{{project.id}}/seq/{{seq.number}}" ng-repeat="seq in project.sequences track by $index" title="{{req.code}}">{{seq.number}}</a>
-                        </div>
-                    </div>
-
-
                 </div>
-
-    <hr/>
-            <h3>Project Management</h3>
+                <div class="col-md-8 column">
+                            <a class="projectSeqA" href="#pms/{{project.id}}/seq/{{seq.number}}" ng-repeat="seq in project.sequences track by $index" title="{{req.code}}">{{seq.number}}</a>
+            <br/>
+            <br/>
+                    </div>
+        </div>
     </div>
-            <div class="row clearfix" id="ManagementDivProject">
-		<div class="col-md-12 column">
+
+</div>
+
+
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            Plan
+        </h3>
+        <br/>
 			<div class="btn-group">
-                <button id="taskAddButton" class="btn btn-default" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
-                <button class="btn btn-default" ng-class="{'active':mode=='cal', 'btn-success':mode=='cal'}" 
+                <button id="taskAddButton" class="btn btn-primary" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
+                <button class="btn btn-primary" ng-class="{'active':mode=='cal', 'btn-success':mode=='cal'}" 
                         ng-class="{'active':mode=='cal'}" ng-click="showCal();prepareCal();" type="button"><em class="glyphicon glyphicon-calendar"></em> Calendar</button>
-                <button class="btn btn-default" ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
+                <button class="btn btn-primary" ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
                         ng-class="{'active':mode=='plan'}" ng-click="generateReport('plan')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</button>
-                    <button class="btn btn-default" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" 
+                    <button class="btn btn-primary" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" 
                         ng-click="generateReport('guntt')" type="button"><em class="glyphicon glyphicon-tasks"></em> Gantt</button>
-                    <button class="btn btn-default" ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}"
+                    <button class="btn btn-primary" ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}"
                         ng-click="generateReport('resource')" type="button"><em class="glyphicon glyphicon-list-alt"></em> Resources</button>
-                    <button class="btn btn-default" ng-class="{'active':mode=='profitAndLoss', 'btn-success':mode=='profitAndLoss'}" 
+                    <button class="btn btn-primary" ng-class="{'active':mode=='profitAndLoss', 'btn-success':mode=='profitAndLoss'}" 
                         ng-click="generateReport('profitAndLoss')" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
-                <button class="btn btn-default" ng-click="print()" type="button"><em class="glyphicon glyphicon-print"></em> </button>
-                <button ng-show="mode!='cal'" class="btn btn-default" ng-click="replan=true;generateReport(mode)" type="button"><em class="glyphicon glyphicon-repeat"></em> </button>
+                <button class="btn btn-primary" ng-click="print()" type="button"><em class="glyphicon glyphicon-print"></em> </button>
+                <button ng-show="mode!='cal'" class="btn btn-primary" ng-click="replan=true;generateReport(mode)" type="button"><em class="glyphicon glyphicon-repeat"></em> </button>
 			</div>
-			</div>
-                <div class="col-md-3 column">
-                    <br/>
+	</div>
+
+    <div class="panel-body" style="background: #E6E6E6;">
+                <div class="col-md-3 column"  style="background: #E6E6E6; padding: 1px; color: #333; border-radius: 5px; border: 1px solid #419641;">
 
                         <input ng-if="tasks" type="text" class="form-control" placeholder="Filter Tasks" ng-model="project.filterTaskName" />
-                    <br/>
+
                     <div id="tasksDiv">
-                        <ol class="">
-                            <li ng-click="taskDetail(task.id)" title="{{task.name}}" class="taskA" 
+                        <table class="table table-responsive table-bordered">
+                        <tr ng-click="taskDetail(task.id)" title="{{task.name}}" class="active" 
                             ng-repeat="task in tasks | orderBy:'start' | filter:project.filterTaskName ">
-                            
-                            <a class="btn-sm" ng-class="{'farsi':!$parent.isASCII(task.title)}" style="color: #13560C;" data-task-title="{{toTitleCase(task.title)}}" 
-                                ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" id="task_{{task.id}}" >{{toTitleCase(task.title).slice(0,30)}}</a></li>
-                        </ol>
+                            <td>
+                                {{$index+1}}
+                            </td>
+                            <td>
+                                <a class="taskA" ng-class="{'farsi':!$parent.isASCII(task.title)}" style="font-size: 13px;" data-task-title="{{toTitleCase(task.title)}}" 
+                                    ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" id="task_{{task.id}}" >{{toTitleCase(task.title).slice(0,30)}}</a>
+                            </td>
+                        
+                        </tr>
+                        </table>
 
                     </div>
 				</div>
@@ -585,6 +608,8 @@ border-bottom: 1px solid #57BEDD;
             </div>
 
 
+</div>
+</div>
 </div>
 
 

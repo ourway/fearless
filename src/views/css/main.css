@@ -206,7 +206,6 @@ table {
     border-radius: 5px;
 }
 #ManagementDivProject{
-    background:#f8f8f8;
     padding:10px;
     border-radius:5px;
 }
@@ -221,14 +220,12 @@ table {
 }
 #projectDescription p{ 
     padding:5px;
-    background:#F7F7F7;
-    border:1px dotted #ccc;
+    word-wrap: break-word;
 }
 #projectDescription p::first-letter { 
     font-size: 300%;
 }
 #projectDetailContainer{
-    padding-top:1em;
 }
 #calendar{
 box-shadow: inset 0px 0px 9px #B5B5B5;
