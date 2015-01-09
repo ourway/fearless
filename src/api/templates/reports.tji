@@ -1,13 +1,17 @@
 taskreport breakdown_${subproject.id} "csv_${subproject.id}"{
-            formats csv
-            scenarios actual
-            loadunit hours
-            columns id, line, name, opentasks, start, end, managers, effort, resources,  effortdone, gauge, effortleft, criticalness, duration, complete, efficiency
-            taskroot fearless.__${subproject.id}
+    formats csv
+    start ${subproject.start.strftime('%Y-%m-%d')}
+    end ${subproject.end.strftime('%Y-%m-%d')}
+    scenarios actual
+    loadunit hours
+    columns id, line, name, opentasks, start, end, managers, effort, resources,  effortdone, gauge, effortleft, criticalness, duration, complete, efficiency
+    taskroot fearless.__${subproject.id}
 }
 
 taskreport breakdown1_${subproject.id} "plan_${subproject.id}"{
     formats html
+    start ${subproject.start.strftime('%Y-%m-%d')}
+    end ${subproject.end.strftime('%Y-%m-%d')}
     loadunit longauto
     columns name, start, end, gauge, pathcriticalness {title "Critical path"}, complete {title "Progress"}
     sorttasks actual.start.up
@@ -15,6 +19,8 @@ taskreport breakdown1_${subproject.id} "plan_${subproject.id}"{
 }
 taskreport breakdown2_${subproject.id} "guntt_${subproject.id}"{
     formats html
+    start ${subproject.start.strftime('%Y-%m-%d')}
+    end ${subproject.end.strftime('%Y-%m-%d')}
     loadunit longauto
     columns name, chart { scale day width 400 }, complete {title "Progress"}
     sorttasks actual.start.up
@@ -23,6 +29,8 @@ taskreport breakdown2_${subproject.id} "guntt_${subproject.id}"{
 
 resourcereport resourceGraph_${subproject.id} "resource_${subproject.id}" {
   scenarios actual
+  start ${subproject.start.strftime('%Y-%m-%d')}
+  end ${subproject.end.strftime('%Y-%m-%d')}
   formats html
   columns name, effort, chart {scale day width 400}
   loadunit hours
@@ -35,13 +43,15 @@ resourcereport resourceGraph_${subproject.id} "resource_${subproject.id}" {
 
 export "MS-project_${subproject.id}" {
   formats mspxml
-  end ${"${now}"}
+  start ${subproject.start.strftime('%Y-%m-%d')}
+  end ${subproject.end.strftime('%Y-%m-%d')}
   loadunit days
   taskroot fearless.__${subproject.id}
 }
 
 accountreport "ProfiAndLoss_${subproject.id}" {
   formats html
+  start ${subproject.start.strftime('%Y-%m-%d')}
   end ${"${now}"}
   balance -
   columns no, name, weekly
@@ -50,6 +60,7 @@ accountreport "ProfiAndLoss_${subproject.id}" {
 
 accountreport "ProfiAndLossCsv_${subproject.id}" {
   formats csv
+  start ${subproject.start.strftime('%Y-%m-%d')}
   end ${"${now}"}
   currencyformat "(" ")" "" "." 0
   columns no, name, yearly
@@ -58,7 +69,8 @@ accountreport "ProfiAndLossCsv_${subproject.id}" {
 
 tracereport burn_${subproject.id} "TraceReport_${subproject.id}" {
   formats html
-  end ${"${now}"}
+  start ${subproject.start.strftime('%Y-%m-%d')}
+  end ${subproject.end.strftime('%Y-%m-%d')}
   columns complete
   hidetask actual.id != "fearless.__${subproject.id}"
 }

@@ -1,11 +1,8 @@
 <%
-
 depends = list()
 isMilestone = False
-
 if task.project.start > task.start:
     task.start=task.project.start
-
 responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
 %>
 % for dependency in task.depends:
@@ -19,7 +16,6 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
         while True:
             parent = target.parent
             if not parent:
-                #parent = target
                 break
             level +=1
             hr.append(str(parent.id))
@@ -38,6 +34,9 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
         milestone
         start ${task.end.strftime('%Y-%m-%d')}
         end ${task.end.strftime('%Y-%m-%d')}
+        % if all([i.complete==100 for i in task.depends]):
+          complete 100
+        % endif
     % endif
     % if task.note:
         note "${task.note}"
@@ -54,7 +53,7 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
     % if task.priority:
         priority ${task.priority}
     % endif
-    % if task.complete:
+    % if task.complete!=None and not isMilestone and all([i.complete==100 for i in task.depends]):
         complete ${task.complete}
     % endif
     %if not task.effort and not isMilestone:
@@ -68,5 +67,3 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
         ${subtask}
     % endif
     }
-
-

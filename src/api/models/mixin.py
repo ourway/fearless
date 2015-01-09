@@ -24,7 +24,7 @@ from utils.general import setup_logger
 from uuid import uuid4  # for random guid generation
 import base64
 
-now = datetime.datetime.utcnow
+now = datetime.datetime.now
 
 Base = declarative_base()
 logger = setup_logger('model', 'model.log')
@@ -42,6 +42,8 @@ def getUUID():
 
 def convert_to_datetime(inp):
     '''converts input string to a valid datetime object'''
+    if inp == 'None':
+        return
     if isinstance(inp, datetime.datetime):
         return inp
 
@@ -54,8 +56,13 @@ def convert_to_datetime(inp):
         if ':' in inp:
             length = length + 1
         format = '%Y-%m-%d:%H-%M-%S'
+
         fmtlen = (length * 3) - 1
         fmt = format[:fmtlen]
+        if 'T' in inp:
+            ''' 2015-01-08T00:00:00.000Z '''
+            inp = inp.split('T')[0]
+            fmt = '%Y-%m-%d'
         #inp = '-'.join(map(str, map( int, inp.split(';')[0].split('-'))) )
         #print inp, fmt
         return datetime.datetime.strptime(inp, fmt)

@@ -166,7 +166,12 @@ var TITLE = 'TITLE';
             })
              .when('/pms/t/:taskId', {
                 templateUrl: 'pages/pms/task.html',
-                controller: 'taskCtrl',
+                controller: 'taskDetailCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
+            })
+             .when('/tasks', {
+                templateUrl: 'pages/pms/tasks.html',
+                controller: 'tasksCtrl',
                  reloadOnSearch: false // dont reload the page on $location.search
             })
              .when('/404', {
@@ -567,8 +572,8 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
         userInfoReq = $http.get('/api/db/user/'+userId);
         userInfoReq.success(function(resp){
             //resp = resp[0];
-            resp.agreement_start = timeConverter(resp.agreement_start);
-            resp.agreement_end = timeConverter(resp.agreement_end);
+            resp.agreement_start = new Date(resp.agreement_start*1000);
+            resp.agreement_end = new Date(resp.agreement_end*1000);
             delete resp.created_on;
             delete resp.modified_on;
             $scope.user = resp; 
@@ -683,6 +688,8 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
     
     //$scope.newProjectStartDate = new Date();Centeral Auth
     //Centeral Auth
+    $scope.newProject = {};
+    $scope.newProject.start = new Date();
     $rootScope.title = "Projects - Fearless";
     $scope.timeConverter = timeConverter;
     $scope.gridOptions = {
@@ -734,10 +741,10 @@ cellTemplate: '<div>  <a style="position:absolute;margin:5px" href="#pms/{{row.e
                 for (i=0;i<resp.length;i++){
                     resp[i].duration = Math.round((resp[i].end - resp[i].start)/(3600*24)) + ' days';
                         
-                    resp[i].start = timeConverter(resp[i].start);
-                    resp[i].end = timeConverter(resp[i].end);
-                    resp[i].created_on = timeConverter(resp[i].start);
-                    resp[i].modified_on = timeConverter(resp[i].start);
+                    resp[i].start = new Date(resp[i].start*1000);
+                    resp[i].end = new Date(resp[i].end*1000);
+                    resp[i].created_on = new Date(resp[i].start*1000);
+                    resp[i].modified_on = new Date(resp[i].start*1000);
                 }
                 $scope.myData = resp;
                 });
@@ -851,56 +858,29 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
 
 fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
         $scope.$parent.page = 'pms';
-            progressChartOptions = {
-                segmentShowStroke : false,
-                segmentStrokeColor : "#ccc",
-                segmentStrokeWidth : 1,
-                percentageInnerCutout : 0, // This is 0 for Pie charts
-                animationSteps : 100,
 
-                //animationEasing : "liner",
-                animateRotate : true,
-                animateScale : false,
-                animation : true,
-                responsive: true,
-                maintainAspectRatio: true,
 
-            }
-            var progressData = [
-                {
-                    value: 0,
-                    color:"#419641",
-                    highlight: "#58C758",
-                    label: "Done"
-
-                },
-                 {
-                    value: 100,
-                    color:"#ccc",
-                    highlight: "#555",
-                    label: "Left"
-                },
-
-            ]
-
-            var burndownChart = new Morris.Line({
+            burndownChart = new Morris.Line({
               element: 'burndown_chart_div',
               xkey: 'date',
+              data:[{'date':new Date().toDateString(), 'value':0}],
               ykeys: ['value'],
               labels: ['Completed'],
               fillOpacity:0.85,
               goals: [0, 100],
               parseTime:true,
-              postUnits:'%',
               hideHover:'auto',
               resize:true,
             });
 
+            progressPyChart = Morris.Donut({
+              element: 'progress_chart_div',
+              data: [{}],
+              colors:['green','lightgrey'],
+              postUnits:'%',
+              resize:true
+            });
 
-
-
-            var progress_ctx = $("#progressChart").get(0).getContext("2d");
-            var progressPyChart = new Chart(progress_ctx).Pie(progressData, progressChartOptions);
             $scope.projId = $routeParams.projId;
             newTask = {};
             $scope.$watch($scope.projId, function(){
@@ -914,8 +894,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.newtask = {};
             $scope.resetNewtask = function(){
                 $scope.newtask = {};
-                $scope.newtask.start = timeConverter();
-                $scope.newtask.end = timeConverter();
+                $scope.newtask.start = new Date();
+                $scope.newtask.end = new Date();
                 $scope.newtask.priority = 500;
                 $scope.newtask.effort = null;
             }
@@ -930,8 +910,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     if (resp!='null')
                         {
                             //resp.tasks = Object.keys(resp.tasks);
-                            resp.start = timeConverter(resp.start);
-                            resp.end = timeConverter(resp.end);
+                            resp.start = new Date(resp.start*1000);
+                            resp.end = new Date(resp.end*1000);
                             $rootScope.title = resp.name + ' - ' + 'Fearless'
                             resp.updatedWatchers = [];
                             resp.watchers.forEach(function(e){resp.updatedWatchers.push(e)});
@@ -961,19 +941,25 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 return null;
             else
             {
-                data = 'No data available yet!'
-                if (!$scope.tasks)
-                    data = ''
+                $('.tj_table_frame').fadeOut();
+                data = '<div id="canvasloader-container" style="display:none;padding:20%;padding-top:5%" class="col-md-12"><h1>Adventure in life is good; consistency in coffee even better!</h1></div>'
                 $('#projectDetailDiv').html(data);
 
+                var cl = new CanvasLoader('canvasloader-container');
+                cl.setColor('#3A83C2'); // default is '#000000'
+                cl.setShape('spiral'); // default is 'oval'
+                cl.setDiameter($('#projectDetailDiv').width()*0.6); // default is 40
+                cl.setDensity(34); // default is 40
+                cl.setRange(0.8); // default is 1.3
+                cl.setFPS(24); // default is 24
+                cl.show(); // Hidden by default
             }
+            $('#canvasloader-container').fadeIn();
             $scope.mode=mode;
             //$('.tj_table_frame').fadeOut(2000);
             data = localStorage.getItem(getprefix +  mode);
             if ($scope.replan || !data){
-
                 localStorage.clear();
-
             projectReport = $http.get('/api/project/report/'+$scope.projId);
             projectReport.success(function(resp){
                 localStorage.setItem(getprefix + 'plan', resp.plan);
@@ -982,9 +968,14 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 localStorage.setItem(getprefix + 'resource', resp.resource);
                 localStorage.setItem(getprefix + 'profit', resp.profit);
                 localStorage.setItem(getprefix + 'trace', JSON.stringify(resp.trace));
-                data = resp[mode];
+                if (resp[mode])
+                    data = resp[mode];
+                else
+                    data = '<div id="planerrordiv" style="padding:20%;padding-top:5%" class="col-md-12"><h1>Something is not right!</h1></div>'
                 $scope.printable = data;
                 //$scope.projectTjData = data;
+                //
+                $('#canvasloader-container').fadeOut();
                 $('#projectDetailDiv').html(data);
                 $('.tj_table_frame').fadeIn();
                 $scope.getProjectDetails();
@@ -1035,8 +1026,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         n = {
                                 'id':ev.id,
                                 'title':ev.title, 
-                                'start':timeConverter(ev.start, true), 
-                                'end':timeConverter(ev.end, true),
+                                'start':new Date(ev.start*1000), 
+                                'end':new Date(ev.end*1000),
 
                             };
                         $scope.calTasks.push(n);
@@ -1123,9 +1114,12 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     complete = parseInt(info.completion.split('%')[0]);
                }
             }
-                progressPyChart.segments[0].value = complete;
-                progressPyChart.segments[1].value = 100-complete;
-                progressPyChart.update();
+                  data =  [
+                    {label: "Completed", value: complete},
+                    {label: "Remaining", value: 100-complete},
+                  ]
+            progressPyChart.setData(data);
+            
         }
 
         $scope.generateBurndownChart = function(){
@@ -1198,9 +1192,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         $scope.taskDetail = function(taskId) {
             //console.log(taskId);
             $http.get('/api/task/'+taskId).success(function(resp){
-                resp.start = timeConverter(resp.start);
+                resp.start = new Date(resp.start*1000);
                 //resp.start = timeConverter(Math.max(resp.start, resp.project_start));
-                resp.end = timeConverter(Math.min(resp.end, resp.project_end));
+                resp.end = new Date(Math.min(resp.end, resp.project_end)*1000);
                 $scope.editTaskInfo = resp;
                 $scope.editTaskInfo.updatedResources = [];
                 $scope.editTaskInfo.updatedDepends = [];
@@ -1229,6 +1223,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
     $scope.updateProject = function(){
         $scope.projectUpdateInfo = {};
+        console.log($scope.project.start)
         req = $http.post('/api/project/update/'+$scope.projId, $scope.project);
         req.success(function(resp){
                     if (resp.message == 'OK'){
@@ -1597,7 +1592,7 @@ fearlessApp.controller('errorsCtrl', function($scope, $rootScope, $routeParams, 
         })
 
 
-fearlessApp.controller('taskCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
+fearlessApp.controller('taskDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
         taskId = $routeParams.taskId;
         $scope.getTaskDetails = function(){
             req = $http.get('/api/task/'+taskId).success(function(resp){

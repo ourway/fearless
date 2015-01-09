@@ -10,8 +10,8 @@
 
 
 table {
-border-collapse: 0px;
-border-spacing: 0;
+    border-collapse: 0px;
+    border-spacing: 0;
 }
     table { page-break-inside:auto }
     tr    { page-break-inside:avoid; page-break-after:auto }
@@ -19,54 +19,54 @@ border-spacing: 0;
     tfoot { display:table-footer-group }
 
 .tj_table_frame {
-line-height: 1;
-/* margin-left: 0px; */
-/* margin-right: 0px; */
-text-align: center;
-background-color: rgba(56, 129, 192, 0.28);
-/* margin-top: 15px; */
-/* margin-bottom: 15px; */
-/* box-shadow: 1px 1px 17px #000D1A; */
-/* border: 1px solid #A8A8A8; */
-border-radius: 5px;
-padding: 3px;
-border-spacing: 0px;
-/* text-rendering: geometricPrecision; */
-/* text-shadow: 1px 1px 3px #ccc; */
-text-color: #fff;
+    line-height: 1;
+    /* margin-left: 0px; */
+    /* margin-right: 0px; */
+    text-align: center;
+    background-color: rgba(56, 129, 192, 0.28);
+    /* margin-top: 15px; */
+    /* margin-bottom: 15px; */
+    /* box-shadow: 1px 1px 17px #000D1A; */
+    /* border: 1px solid #A8A8A8; */
+    border-radius: 5px;
+    padding: 3px;
+    display:none;
+    border-spacing: 0px;
+    /* text-rendering: geometricPrecision; */
+    /* text-shadow: 1px 1px 3px #ccc; */
+    text-color: #fff;
 }
-
 .taskbarframe {
-background-color: #000000;
-position: absolute;
-box-shadow: 0px 0px 28px #8FB4C7;
+    background-color: #000000;
+    position: absolute;
+    box-shadow: 0px 0px 28px #8FB4C7;
 }
 
 .offduty {
-background-color: rgba(185, 206, 219, 1);
-white-space: nowrap;
-position: absolute;
+    background-color: rgba(185, 206, 219, 1);
+    white-space: nowrap;
+    position: absolute;
 }
 .taskbar {
-background-color: #36B0D5;
-position: absolute;
+    background-color: #36B0D5;
+    position: absolute;
 }
 .tabhead {
-white-space: nowrap;
-background-color: #E6E6E6;
-color: #373737;
-text-align: center;
+    white-space: nowrap;
+    background-color: #E6E6E6;
+    color: #373737;
+    text-align: center;
 }
 .progressbar {
-background-color: #510062;
-position: absolute;
+    background-color: #510062;
+    position: absolute;
 }
 .tj_table_header_cell {
-padding: 1px 5px 1px 3px;
-white-space: nowrap;
-border-spacing: 0px;
-color: #000000;
-overflow: hidden;
+    padding: 1px 5px 1px 3px;
+    white-space: nowrap;
+    border-spacing: 0px;
+    color: #000000;
+    overflow: hidden;
 }
 .free {
 background-color: #D7FFA5;
@@ -79,8 +79,8 @@ margin: 0px;
 border-spacing: 1px;
 }
 .busy {
-background-color: #C399FF;
-position: absolute;
+    background-color: #C399FF;
+    position: absolute;
 }
 .caltask1 {
 background-color: #FFEDA5;
@@ -468,7 +468,7 @@ border-bottom: 1px solid #57BEDD;
         </h3>
     </div>
 
-     <div class="panel-body">
+     <div class="panel-body" style="background: #FAFAFA;">
          <div class="col-md-4" id="projectDescription">
              <div class="col-md-12">
             <p>
@@ -477,7 +477,7 @@ border-bottom: 1px solid #57BEDD;
             </div>
             <div class="col-md-12" style="border-top: 1px solid #F0F0F0;">
                 <h3 style="color:grey">Progress</h3>
-                <canvas id="progressChart"></canvas>		
+                <div id="progress_chart_div"></div>		
             </div>
 
 		</div>
@@ -511,7 +511,7 @@ border-bottom: 1px solid #57BEDD;
 
     </div>
 				<div class="panel-footer">
-            <div ng-if="project.watchers">
+                    <div ng-if="project.watchers.length>0">
             This project is under supervision of 
             <span ng-repeat="watcher in project.watchers track by $index">
                 <a href="#user/{{watcher.id}}">{{watcher.firstname}} {{watcher.lastname}}</a>
@@ -550,15 +550,9 @@ border-bottom: 1px solid #57BEDD;
     </div>
 
 </div>
-
-
-
+<hr/>
 <div class="panel panel-primary">
     <div class="panel-heading">
-        <h3 class="panel-title">
-            Plan
-        </h3>
-        <br/>
 			<div class="btn-group">
                 <button id="taskAddButton" class="btn btn-primary" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
                 <button class="btn btn-primary" ng-class="{'active':mode=='cal', 'btn-success':mode=='cal'}" 
@@ -576,7 +570,7 @@ border-bottom: 1px solid #57BEDD;
 			</div>
 	</div>
 
-    <div class="panel-body" style="background: #E6E6E6;" ng-show="tasks">
+    <div class="panel-body" style="background: #FAFAFA;" ng-show="tasks.length>0">
                 <div class="col-md-3 column"  style="background: #E6E6E6; padding: 1px; color: #333; border-radius: 5px; border: 1px solid #419641;">
 
                         <input ng-if="tasks" type="text" class="form-control" placeholder="Filter Tasks" ng-model="project.filterTaskName" />

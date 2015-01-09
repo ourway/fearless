@@ -22,7 +22,7 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.associationproxy import association_proxy
-from mixin import IDMixin, Base, getUUID, logger
+from mixin import IDMixin, Base, getUUID, logger, convert_to_datetime
 import datetime
 
 users_groups = Table('users_groups', Base.metadata,
@@ -114,9 +114,20 @@ class User(IDMixin, Base):
     def capitalize_firstname(self, key, data):
         return data.title()
 
-    @validates('id')
-    def authorize_first_user(self, key, data):
+    @validates('agreement_start')
+    def check_agreement_start(self, key, data):
+        data = convert_to_datetime(data)
+        if not data:
+            data = now()
         return data
+
+    @validates('agreement_end')
+    def check_agreement_end(self, key, data):
+        data = convert_to_datetime(data)
+        if not data:
+            data = now()
+        return data
+
 
     @hybrid_property
     def fullname(self):

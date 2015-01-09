@@ -197,9 +197,11 @@ class GetProjectLatestReport:
             resp.body = data
 
         else:
-            message = "There is no report available. Try adding some tasks."
+            resp.status = falcon.HTTP_201
+            message = None
             data = {'guntt':message, 'plan':message, 'resource':message, 
                     'profitAndLoss':message, 'msproject':message, 'csv':message }
+            resp.body = data
 
 
 class UpdateProject:
