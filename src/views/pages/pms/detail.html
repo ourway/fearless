@@ -469,7 +469,7 @@ border-bottom: 1px solid #57BEDD;
     </div>
 
      <div class="panel-body">
-         <div class="col-md-4 column" id="projectDescription">
+         <div class="col-md-4" id="projectDescription">
              <div class="col-md-12">
             <p>
             <em>{{project.description || 'Project has no description'}}</em>
@@ -481,7 +481,7 @@ border-bottom: 1px solid #57BEDD;
             </div>
 
 		</div>
-		<div class="col-md-8 column" style="border-left: 1px solid #ECECEC;">
+		<div class="col-md-8" style="border-left: 1px solid #ECECEC;">
             <br/>
             <table class="table table-bordered table-responsive">
             <tr class="active">
@@ -533,19 +533,18 @@ border-bottom: 1px solid #57BEDD;
         </h3>
     </div>
 
-     <div class="panel-body">
+     <div class="panel-body" style="background: #F9F5FF;">
         <div class="col-md-12 column">
-            <br/>
                 <div class="col-md-4 column">
+                     <h3 style="color:grey">Root Collections</h3>
                         <div id="CollectionsDiv" >
                             <a class="projectCollectionsA" href="#/ams/c/{{collection.id}}?page=1" ng-repeat="collection in project.collections track by $index" 
                                 title="{{collection.name}}">{{collection.name}}</a>
                         </div>
                 </div>
                 <div class="col-md-8 column">
-                            <a class="projectSeqA" href="#pms/{{project.id}}/seq/{{seq.number}}" ng-repeat="seq in project.sequences track by $index" title="{{req.code}}">{{seq.number}}</a>
-            <br/>
-            <br/>
+                    <h3 style="color:grey">Sequences</h3>
+                    <a class="projectSeqA" href="#pms/{{project.id}}/seq/{{seq.number}}" ng-repeat="seq in project.sequences track by $index" title="{{req.code}}">{{seq.number}}</a>
                     </div>
         </div>
     </div>

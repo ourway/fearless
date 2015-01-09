@@ -167,7 +167,7 @@ table {
     color: white;
     background: #c12e2a;
     border: 1px solid #F7C2C2;
-    transform: scale(2,2);
+    transform: scale(2,2) rotate(-2deg);
     box-shadow: 1px 1px 20px #FF3F3F;
 
 }
@@ -179,8 +179,8 @@ table {
 
 
 .projectCollectionsA {
-    background: #FFE09D;
-    color: #000000;
+    background: #48B8D9;
+    color: #fff;
     padding-left: 5px;
     padding-right: 5px;
     /* font-weight: bold; */
@@ -197,7 +197,7 @@ table {
     color: white;
     background: #1D1D1D;
     border: 1px solid #C3C3C3;
-    transform: scale(1.25,1.25);
+    transform: scale(1.2,1.2) rotate(1deg);
     box-shadow: 1px 1px 20px #FFFFFF;
 }
 #AssetsAndSequencesOfProject{

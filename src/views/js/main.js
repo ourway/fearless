@@ -64,6 +64,7 @@ var TITLE = 'TITLE';
     function TagToTip(a, b,c){
         task = c;
         target  = $("[data-task-title*='" + task + "']")
+            console.log(target)
         if (target.length)
             target[0].click();
         //console.log(angular.element('#projectDetailContainer').scope.taskInfo);
@@ -903,7 +904,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.projId = $routeParams.projId;
             newTask = {};
             $scope.$watch($scope.projId, function(){
-                    $scope.getProjectDetails();
+                    //$scope.getProjectDetails();
+                    $scope.generateReport();
                     })
             $scope.toTitleCase = toTitleCase;
             $rootScope.title = "Project " + $scope.projId + " - Fearless";
@@ -936,7 +938,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                             $scope.project = resp;
                             $scope.$parent.comment_id = resp.uuid;
                             $scope.$parent.getComments();
-                            $scope.generateReport('guntt');
+                            //$scope.generateReport('guntt');
                         }
                     else
                         $location.path('/pms')
@@ -985,7 +987,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 //$scope.projectTjData = data;
                 $('#projectDetailDiv').html(data);
                 $('.tj_table_frame').fadeIn();
-                //$scope.getProjectDetails();
+                $scope.getProjectDetails();
                 $scope.generateProgressChart();
                 $scope.generateBurndownChart();
                 $scope.getTasksList();
@@ -1003,8 +1005,10 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     $scope.getTasksList();
                     $scope.generateProgressChart();
                     $scope.generateBurndownChart();
+                    $scope.getProjectDetails();
                 }
             }
+
            
 
          }
@@ -1048,7 +1052,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 {
                     if (resp.message == 'OK'){
                         $('#taskSeqModal').modal('hide');
-                        $scope.getProjectDetails();
+                        $scope.generateReport();
 
                     }
                 });
@@ -1069,6 +1073,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                $('#taskAddModal').modal('hide');
                 $scope.replan = true;
                 $scope.getTasksList();
+                //$scope.getProjectDetails();
                 $scope.generateReport();
                
                });
@@ -1138,7 +1143,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             for (i in lables){
                 label = lables[i];
                 key = keys[2];
-                console.log(key)
                 if (key != 'Date'){
                     value = data[key][i];
                     chartData.push({date:new Date(label).getTime(), value:parseInt(value)})
@@ -1146,7 +1150,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 //$scope.burndownLineChart.addData(values, label);
 
             }
-            console.log(chartData)
             burndownChart.setData(chartData)
 
         }
@@ -1229,7 +1232,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         req = $http.post('/api/project/update/'+$scope.projId, $scope.project);
         req.success(function(resp){
                     if (resp.message == 'OK'){
-                        $scope.getProjectDetails();
+                        $scope.generateReport();
                         $('#projectEditModal').modal('hide');
                         
                     }
@@ -1240,6 +1243,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
     $scope.updateTask = function(taskId){
         $http.post('/api/task/update/'+taskId, $scope.editTaskInfo).success(function(resp){
             $scope.getTasksList();
+            //$scope.getProjectDetails();
             $scope.replan = true;
             $scope.generateReport();
             $scope.editTaskInfo = {};
