@@ -202,14 +202,15 @@ class Project(IDMixin, Base):
             session.commit()
             return
         #if not tj.stderr:
-        plan, guntt, resource, msproject, profit, csvfile, trace = None, None, None, None, None, None, None
+        plan, guntt, resource, msproject, profit, csvfile, trace, burndown = None, None, None, None, None, None, None, None
         plan_path = '/tmp/plan_%s.html' % (self.id)
         guntt_path = '/tmp/guntt_%s.html' % (self.id)
         resource_path = '/tmp/resource_%s.html' % (self.id)
         msproject_path = '/tmp/MS-project_%s.xml' % (self.id)
-        profit_path = '/tmp/ProfiAndLossCsv_%s.html' % (self.id)
+        profit_path = '/tmp/ProfiAndLoss_%s.html' % (self.id)
         csv_path = '/tmp/csv_%s.csv' % (self.id)
         trace_path = '/tmp/TraceReport_%s.csv' % (self.id)
+        traceSvg_path = '/tmp/TraceReport_%s.html' % (self.id)
 
         def saveTable(path):
             '''Read main table from these files'''
@@ -220,6 +221,14 @@ class Project(IDMixin, Base):
                 tosave = etree.tostring(main_table)
                 return tosave
                 #self.reports.append(tosave)
+        def getSvg(path):
+            '''extract svg element of report'''
+            if os.path.isfile(path):
+                report = open(path)
+                root = etree.parse(report)
+                svg = root.xpath('//svg')[0]
+                tosave = etree.tostring(svg)
+                return tosave
 
         if os.path.isfile(msproject_path):
             msproject = open(msproject_path, 'rb').read()  # msproject file
@@ -232,6 +241,8 @@ class Project(IDMixin, Base):
         guntt = saveTable(guntt_path)
         resource = saveTable(resource_path)
         profit = saveTable(profit_path)
+        burndown = getSvg(traceSvg_path)
+
         data = {}
         if plan: data['plan'] = plan
         if guntt: data['guntt'] = guntt
@@ -240,12 +251,11 @@ class Project(IDMixin, Base):
         if msproject: data['msproject'] = msproject
         if csvfile: data['csvfile'] = csvfile
         if trace: data['trace'] = trace
-
-        self.reports.append(json.dumps(data))
+        if burndown: data['burndown'] = burndown
+        data = json.dumps(data)
+        self.reports.append(data)
         session.commit()
-
-        print tj.stderr
-        return True
+        return data 
         #else:
         #return tj.stderr
 

@@ -19,7 +19,7 @@ from AAA import Authorize, getUserInfoFromSession
 import falcon
 from helpers import get_params
 from sqlalchemy import desc
-from helpers import commit, jsonify, parse_tjcsv
+from helpers import commit, jsonify, parse_tjcsv, csv2json
 from defaults import home
 import datetime
 import os
@@ -131,99 +131,75 @@ class GetProjectLatestReport:
     #@Authorize('see_project')
     def on_get(self, req, resp, id):
         project = req.session.query(Project).filter(Project.id==id).first()
-        if project:
-            project.plan()  ## first let it plan
-            if project.reports:
-                reportId = project.reports[-1]
-                report = req.session.query(Report).filter_by(id=reportId).first()
-                if report:
-                    data = report.body
-                    print json.loads(data).keys()
+        if not project:
+            resp.status = falcon.HTTP_404
+            return
+        data = project.plan()  ## first let it plan
+        if data:
+            datajson = json.loads(data)
+            csvfile = StringIO()
+            csvdata = datajson.get('csvfile')
+            if csvdata:
+                csvfile.write(csvdata.encode('utf-8'))
+            try:
+                csvjsondata = parse_tjcsv(csvfile)
+            except IndexError:
                 return
+            csvfile = StringIO()
+            tracecsv = datajson.get('trace')
+            if tracecsv:
+                csvfile.write(tracecsv.encode('utf-8'))
+            try:
+                traceJsonData = csv2json(csvfile)
+            except IndexError:
+                return
+            
 
-                try:
-                    csvfile = StringIO()
-                    csvdataid = project.reports[-2]
-                    csvdata = req.session.query(Report).filter(Report.id==csvdataid).first()
-                    if csvdata:
-                        csvdata = csvdata.body
-                    csvfile.write(csvdata)
-                    jsondata = parse_tjcsv(csvfile)
-                    for each in jsondata:
-                        d =  jsondata[each]
-                        typ = d.get('type')
-                        if typ == 'task':
-                            taskid = int(d.get('taskid'))
-                            target = req.session.query(Task).filter(Task.id==taskid).first()
-                        elif typ == 'project':
-                            projectid = int(d.get('projectid'))
-                            target = req.session.query(Project).filter(Project.id==projectid).first()
-                        if target: ## donble check
-                            start = d.get('start')
-                            end = d.get('end')
-                            duration = d.get('duration')
-                            criticalness = d.get('criticalness')
-                            complete = d.get('completion')
-                            if complete:
-                                complete = complete[:-1]
-                            effort = d.get('effort')
-                            effort_left = d.get('effort left')
-                            effort_done = d.get('effort done')
-                            gauge = d.get('gauge')
+            for each in csvjsondata:
+                d =  csvjsondata[each]
+                typ = d.get('type')
+                if typ == 'task':
+                    taskid = int(d.get('taskid'))
+                    target = req.session.query(Task).filter(Task.id==taskid).first()
+                elif typ == 'project':
+                    projectid = int(d.get('projectid'))
+                    target = req.session.query(Project).filter(Project.id==projectid).first()
+                if target: ## donble check
+                    start = d.get('start')
+                    end = d.get('end')
+                    duration = d.get('duration')
+                    criticalness = d.get('criticalness')
+                    complete = d.get('completion')
+                    if complete:
+                        complete = complete[:-1]
+                    effort = d.get('effort')
+                    effort_left = d.get('effort left')
+                    effort_done = d.get('effort done')
+                    gauge = d.get('gauge')
 
-                            if typ == 'task':
-                                target.start = start
-                                target.computed_start = start
-                                target.computed_end = end
-                                target.end = end
-                            target.complete = complete
-                            target.criticalness = criticalness
-                            target.computed_complete = complete
-                            target.gauge = gauge
-                            target.effort = effort
-                            target.effort_left = effort_left
-                            target.effort_done = effort_done
-                            target.duration = duration
+                    if typ == 'task':
+                        target.start = start
+                        target.computed_start = start
+                        target.computed_end = end
+                        target.end = end
+                    target.complete = complete
+                    target.criticalness = criticalness
+                    target.computed_complete = complete
+                    target.gauge = gauge
+                    target.effort = effort
+                    target.effort_left = effort_left
+                    target.effort_done = effort_done
+                    target.duration = duration
 
-                    ganttdataid = project.reports[-3]
-                    ganttdata = req.session.query(Report).filter(Report.id==ganttdataid).first()
-                    if ganttdata:
-                        ganttdata = str(ganttdata.body)
+            data = datajson
+            data['json'] = csvjsondata
+            data['trace'] = traceJsonData
+            resp.body = data
 
-                    plandataid = project.reports[-4]
-                    plandata = req.session.query(Report).filter(Report.id==plandataid).first()
-                    if plandata:
-                        plandata = str(plandata.body)
-
-
-                    resourcedataid = project.reports[-5]
-                    resourcedata = req.session.query(Report).filter(Report.id==resourcedataid).first()
-                    if resourcedata:
-                        resourcedata = str(resourcedata.body)
-
-                    profitandlossid = project.reports[-7]
-                    profitandloss = req.session.query(Report).filter(Report.id==profitandlossid).first()
-                    if profitandloss:
-                        profitandloss = str(profitandloss.body)
-
-                    msprojectid = project.reports[-6]
-                    msproject = req.session.query(Report).filter(Report.id==msprojectid).first()
-                    if msproject:
-                        msproject = str(msproject.body)
-
-
-                    data = {'guntt':ganttdata, 'plan':plandata, 'resource':resourcedata, 
-                            'profitAndLoss':profitandloss, 'msproject': msproject, 'json': jsondata }
-                except IndexError:
-                    message = "We're busy planning your project. Please wait a bit or reload."
-                    data = {'guntt':message, 'plan':message, 'resource':message, 
-                            'profitAndLoss':message, 'msproject':message, 'csv':message }
-
-                resp.body = data
-            else:
-                message = "There is no report available. Try adding some tasks."
-                data = {'guntt':message, 'plan':message, 'resource':message, 
-                        'profitAndLoss':message, 'msproject':message, 'csv':message }
+        else:
+            message = "There is no report available. Try adding some tasks."
+            data = {'guntt':message, 'plan':message, 'resource':message, 
+                    'profitAndLoss':message, 'msproject':message, 'csv':message }
 
 
 class UpdateProject:

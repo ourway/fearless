@@ -1,7 +1,9 @@
 taskreport breakdown_${subproject.id} "csv_${subproject.id}"{
             formats csv
             loadunit hours
-                columns id, line, name, opentasks, start, end, managers, effort, resources,  effortdone, gauge, effortleft, criticalness, duration, complete, efficiency
+            columns id, line, name, opentasks, start, end, managers, effort, resources,  effortdone, gauge, effortleft, criticalness, duration, complete, efficiency
+            taskroot fearless.__${subproject.id}
+
                 taskreport breakdown1_${subproject.id} "plan_${subproject.id}"{
                     formats html
                     loadunit longauto

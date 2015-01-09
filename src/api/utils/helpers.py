@@ -22,6 +22,7 @@ from sqlalchemy.ext import associationproxy
 import datetime
 import time
 import csv
+from collections import defaultdict
 import base64
 import uuid
 from opensource.contenttype import contenttype
@@ -125,8 +126,24 @@ def parse_tjcsv(csvfile):
             if tid or pid:
                 obj[count][key.strip().lower()] = value
         count += 1
-    
     return obj
+
+
+def csv2json(csvfile):
+    '''A general function'''
+    csvfile.seek(0);
+    spamreader = csv.reader(csvfile, delimiter=';', quotechar='"')
+    keys = spamreader.next()
+    all = list(spamreader)
+    obj = defaultdict(list)
+    count = 0
+    for s in all:
+        for key in keys:
+            index = keys.index(key)
+            value = s[index].strip()
+            obj[key].append(value)
+    return dict(obj)
+
 
 
 

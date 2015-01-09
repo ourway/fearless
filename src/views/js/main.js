@@ -956,7 +956,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 localStorage.setItem(getprefix + 'json', JSON.stringify(resp.json));
                 localStorage.setItem(getprefix + 'guntt', resp.guntt);
                 localStorage.setItem(getprefix + 'resource', resp.resource);
-                localStorage.setItem(getprefix + 'profitAndLoss', resp.profitAndLoss);
+                localStorage.setItem(getprefix + 'profit', resp.profit);
+                localStorage.setItem(getprefix + 'trace', JSON.stringify(resp.trace));
                 data = resp[mode];
                 $scope.printable = data;
                 //$scope.projectTjData = data;
