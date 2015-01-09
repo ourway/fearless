@@ -1,5 +1,6 @@
 project FEARLESS_MAIN_PROJECT "Fearless Main Project" 2015-01-01 - 2018-01-01 {
     timingresolution 60min
+    now 2015-01-19
   #now  ${now.strftime('%Y-%m-%d')}
   currencyformat "(" ")" "," "." 0
    #timezone "Asia/Tehran"

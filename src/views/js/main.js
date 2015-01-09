@@ -858,11 +858,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 animationSteps : 100,
 
                 //animationEasing : "liner",
-                //animateRotate : true,
+                animateRotate : true,
                 animateScale : false,
                 animation : true,
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
 
             }
             var progressData = [
@@ -881,57 +881,25 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 },
 
             ]
-        burndown_chart_data = {
-            labels: [],
-            datasets: [
-                {
-                    label: "BurnDown",
-                    fillColor: "rgba(220,220,220,0.2)",
-                    strokeColor: "rgba(220,220,220,1)",
-                    pointColor: "rgba(220,220,220,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(220,220,220,1)",
-                    data: []
-                },
-                {
-                    label: "Normal",
-                    fillColor: "rgba(151,187,205,0.2)",
-                    strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(151,187,205,1)",
-                    data: []
-                }
-            ]
-        };
 
-    burndown_chart_options = {
-                scaleShowGridLines : true,
-                scaleGridLineColor : "rgba(0,0,0,.05)",
-                scaleGridLineWidth : 1,
-                scaleShowHorizontalLines: true,
-                scaleShowVerticalLines: true,
-                bezierCurve : false,
-                bezierCurveTension : 0.4,
-                pointDot : true,
-                pointDotRadius : 4,
-                pointDotStrokeWidth : 2,
-                pointHitDetectionRadius : 10,
-                datasetStroke : true,
-                datasetStrokeWidth : 2,
-                datasetFill : true,
-                responsive: true,
-                maintainAspectRatio: false,
-            };
+            var burndownChart = new Morris.Line({
+              element: 'burndown_chart_div',
+              xkey: 'date',
+              ykeys: ['value'],
+              labels: ['Completed'],
+              fillOpacity:0.85,
+              goals: [0, 100],
+              parseTime:true,
+              postUnits:'%',
+              hideHover:'auto',
+              resize:true,
+            });
+
 
 
 
             var progress_ctx = $("#progressChart").get(0).getContext("2d");
-            var burndown_ctx = $("#burndownChart").get(0).getContext("2d");
             var progressPyChart = new Chart(progress_ctx).Pie(progressData, progressChartOptions);
-            $scope.burndownLineChart = new Chart(burndown_ctx).Line(burndown_chart_data, burndown_chart_options);
             $scope.projId = $routeParams.projId;
             newTask = {};
             $scope.$watch($scope.projId, function(){
@@ -1163,29 +1131,24 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             complete = 0;
             lables = data.Date;
             keys = Object.keys(data);
-            for (i in $scope.burndownLineChart.datasets[0].points)
-            {
-                $scope.burndownLineChart.removeData();
-            }
+
 
             //$scope.burndownLineChart.addData([100,0], 'Project Start');
+            chartData = [];
             for (i in lables){
                 label = lables[i];
-                values = [];
-                for (j in keys){
-                    key = keys[j];
-                    if (key != 'Date'){
-                        value = data[key][i];
-                        values.push(parseInt(value))
-                        }
+                key = keys[2];
+                console.log(key)
+                if (key != 'Date'){
+                    value = data[key][i];
+                    chartData.push({date:new Date(label).getTime(), value:parseInt(value)})
                     }
-                $scope.burndownLineChart.addData(values, label);
+                //$scope.burndownLineChart.addData(values, label);
 
             }
-            //burndownLineChart.clear();
-            $scope.burndownLineChart.update();
-            console.log($scope.burndownLineChart.datasets)
-            //burndownLineChart.addData([0, 166],"sdsd");
+            console.log(chartData)
+            burndownChart.setData(chartData)
+
         }
 
 

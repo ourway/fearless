@@ -212,14 +212,11 @@ table {
 
 #projectSummery{
     background:#F2F6FF;
-    padding:10px;
     border-radius:5px;
 }
 #projectDescription{
-    padding:20px;
 }
 #projectDescription p{ 
-    padding:5px;
     word-wrap: break-word;
 }
 #projectDescription p::first-letter { 
