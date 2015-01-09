@@ -151,7 +151,7 @@ table {
     padding:20px;
 }
 .projectSeqA {
-    background:#53658C;
+    background:#6EA4B5;
     color:#f2f2f2;
     padding:1px;
     margin:1px;
@@ -165,10 +165,10 @@ table {
 .projectSeqA:hover {
     text-decoration: none;
     color: white;
-    background: #c12e2a;
-    border: 1px solid #F7C2C2;
-    transform: scale(2,2) rotate(-2deg);
-    box-shadow: 1px 1px 20px #FF3F3F;
+    background: #2aabd2;
+    border: 1px solid #ccc;
+    transform: scale(2,2);
+    box-shadow: 1px 1px 20px #333;
 
 }
 
@@ -179,7 +179,7 @@ table {
 
 
 .projectCollectionsA {
-    background: #48B8D9;
+    background: #467A89;
     color: #fff;
     padding-left: 5px;
     padding-right: 5px;
@@ -197,7 +197,7 @@ table {
     color: white;
     background: #1D1D1D;
     border: 1px solid #C3C3C3;
-    transform: scale(1.2,1.2) rotate(1deg);
+    transform: scale(1.2,1.2);
     box-shadow: 1px 1px 20px #FFFFFF;
 }
 #AssetsAndSequencesOfProject{
@@ -223,6 +223,7 @@ table {
     font-size: 300%;
 }
 #projectDetailContainer{
+    overflow: auto;
 }
 #calendar{
 box-shadow: inset 0px 0px 9px #B5B5B5;
@@ -345,6 +346,15 @@ background-image: -webkit-linear-gradient(top,#428bca 0,#3071a9 100%);
 background-image: linear-gradient(to bottom,rgba(83, 164, 215, 0.99) 0,#FAF1AE 100%);
 background-repeat: repeat-x;
 filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff428bca', endColorstr='#ff3071a9', GradientType=0);
+}
+
+#taskList{
+background: #E6E6E6;
+padding: 1px; 
+color: #333; 
+border-radius: 5px; 
+border: 1px solid #419641;
+box-shadow: 1px 6px 64px rgba(5, 50, 77, 0.17);
 }
 
 

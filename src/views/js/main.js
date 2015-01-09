@@ -884,8 +884,10 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.projId = $routeParams.projId;
             newTask = {};
             $scope.$watch($scope.projId, function(){
-                    //$scope.getProjectDetails();
+                    $scope.getProjectDetails();
+                    $scope.getTasksList();
                     $scope.generateReport();
+
                     })
             $scope.toTitleCase = toTitleCase;
             $rootScope.title = "Project " + $scope.projId + " - Fearless";
@@ -946,7 +948,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $('#projectDetailDiv').html(data);
 
                 var cl = new CanvasLoader('canvasloader-container');
-                cl.setColor('#3A83C2'); // default is '#000000'
+                cl.setColor('#2aabd2'); // default is '#000000'
                 cl.setShape('spiral'); // default is 'oval'
                 cl.setDiameter($('#projectDetailDiv').width()*0.6); // default is 40
                 cl.setDensity(34); // default is 40
