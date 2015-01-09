@@ -1,64 +1,56 @@
 taskreport breakdown_${subproject.id} "csv_${subproject.id}"{
             formats csv
+            scenarios actual
             loadunit hours
             columns id, line, name, opentasks, start, end, managers, effort, resources,  effortdone, gauge, effortleft, criticalness, duration, complete, efficiency
             taskroot fearless.__${subproject.id}
+}
 
-                taskreport breakdown1_${subproject.id} "plan_${subproject.id}"{
-                    formats html
-                    loadunit longauto
-                    columns name, start, end, gauge, pathcriticalness {title "Critical path"}, complete {title "Progress"}
-                    sorttasks plan.start.up
-                    taskroot fearless.__${subproject.id}
-                }
-                taskreport breakdown2_${subproject.id} "guntt_${subproject.id}"{
-                    formats html
-                    loadunit longauto
-                    columns name, chart { scale day width 400 }, complete {title "Progress"}
-                    sorttasks plan.start.up
-                    taskroot fearless.__${subproject.id}
-                }
-              #tracereport pb "Product Burndown" {
-              #  columns opentasks
-              #}
-        }
-
-textreport "resource_${subproject.id}" {
+taskreport breakdown1_${subproject.id} "plan_${subproject.id}"{
     formats html
-    title "Resource Graph"
-    center '<[report id="resourceGraph_${subproject.id}"]>'
+    loadunit longauto
+    columns name, start, end, gauge, pathcriticalness {title "Critical path"}, complete {title "Progress"}
+    sorttasks actual.start.up
     taskroot fearless.__${subproject.id}
-  }
+}
+taskreport breakdown2_${subproject.id} "guntt_${subproject.id}"{
+    formats html
+    loadunit longauto
+    columns name, chart { scale day width 400 }, complete {title "Progress"}
+    sorttasks actual.start.up
+    taskroot fearless.__${subproject.id}
+}
 
-
-
-resourcereport resourceGraph_${subproject.id} "" {
-  scenarios plan
+resourcereport resourceGraph_${subproject.id} "resource_${subproject.id}" {
+  scenarios actual
+  formats html
   columns name, effort, chart {scale day width 400}
   loadunit hours
   # We only like to show leaf tasks for leaf resources.
   hidetask ~(isleaf() & isleaf_())
-  #hideresource plan.effort = 0.0
   hideresource ~(p${subproject.id})
-  sorttasks plan.start.down
+  sorttasks actual.start.down
   taskroot fearless.__${subproject.id}
 }
 
 export "MS-project_${subproject.id}" {
   formats mspxml
+  end ${"${now}"}
   loadunit days
   taskroot fearless.__${subproject.id}
 }
 
 accountreport "ProfiAndLoss_${subproject.id}" {
   formats html
+  end ${"${now}"}
   balance -
-  columns no, name, yearly
+  columns no, name, weekly
   accountroot resourceCost
 }
 
 accountreport "ProfiAndLossCsv_${subproject.id}" {
   formats csv
+  end ${"${now}"}
   currencyformat "(" ")" "" "." 0
   columns no, name, yearly
   accountroot resourceCost
@@ -66,8 +58,9 @@ accountreport "ProfiAndLossCsv_${subproject.id}" {
 
 tracereport burn_${subproject.id} "TraceReport_${subproject.id}" {
   formats html
+  end ${"${now}"}
   columns complete
-  hidetask plan.id != "fearless.__${subproject.id}"
+  hidetask actual.id != "fearless.__${subproject.id}"
 }
 
 

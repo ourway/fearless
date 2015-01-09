@@ -471,7 +471,7 @@ border-bottom: 1px solid #57BEDD;
      <div class="panel-body">
         <div class="col-md-3 column" id="projectDescription">
              <div id="canvasDiv" >
-                <canvas style="padding:10px;" id="progressChart" width="96" height="96"></canvas>		
+                <canvas style="padding:10px;" id="progressChart"></canvas>		
             </div>
             <p>
             <em>{{project.description || 'Project has no description'}}</em>
@@ -498,8 +498,14 @@ border-bottom: 1px solid #57BEDD;
                 <td ><a href="#/user/{{project.leader.id}}">{{project.leader.fullname}}</a></td>
             </tr>
         </table>
+             <div id="burndown_chart_div" >
+                <canvas style="padding:10px;" id="burndownChart"></canvas>		
+            </div>
+
+
 
 		</div>
+
 
     </div>
 				<div class="panel-footer">
@@ -569,7 +575,7 @@ border-bottom: 1px solid #57BEDD;
 			</div>
 	</div>
 
-    <div class="panel-body" style="background: #E6E6E6;">
+    <div class="panel-body" style="background: #E6E6E6;" ng-show="tasks">
                 <div class="col-md-3 column"  style="background: #E6E6E6; padding: 1px; color: #333; border-radius: 5px; border: 1px solid #419641;">
 
                         <input ng-if="tasks" type="text" class="form-control" placeholder="Filter Tasks" ng-model="project.filterTaskName" />

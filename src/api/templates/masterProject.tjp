@@ -1,6 +1,6 @@
 project FEARLESS_MAIN_PROJECT "Fearless Main Project" 2015-01-01 - 2018-01-01 {
     timingresolution 60min
-    #now  ${now.strftime('%Y-%m-%d')}
+  #now  ${now.strftime('%Y-%m-%d')}
   currencyformat "(" ")" "," "." 0
    #timezone "Asia/Tehran"
     workinghours mon 09:00 - 13:00, 14:00 - 18:00
@@ -11,13 +11,16 @@ project FEARLESS_MAIN_PROJECT "Fearless Main Project" 2015-01-01 - 2018-01-01 {
     workinghours sun 09:00 - 13:00, 14:00 - 18:00
     workinghours fri off
     timeformat "%y-%m-%d %H-%M"
-    scenario plan "Plan" {
-        #scenario delayed "Delayed"
-        }
+    scenario plan "Planned Scenario" {
+      scenario actual "Actual Scenario"
+      scenario test "Test Scenario" {
+        active no
+      }
+    }
 }
 
 
-% for vy in xrange(2014,2021):
+% for vy in xrange(2015,2019):
     vacation "Martyrdom of Imam Reza" ${vy}-1-2
     vacation "Birthday of Muhammad and Imam Sadeq" ${vy}-1-19
     vacation "Revolution Day" ${vy}-2-11

@@ -856,10 +856,14 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 segmentStrokeWidth : 1,
                 percentageInnerCutout : 0, // This is 0 for Pie charts
                 animationSteps : 100,
+
                 //animationEasing : "liner",
                 //animateRotate : true,
                 animateScale : false,
-                animation : true
+                animation : true,
+                responsive: true,
+                maintainAspectRatio: false,
+
             }
             var progressData = [
                 {
@@ -877,10 +881,57 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 },
 
             ]
+        burndown_chart_data = {
+            labels: [],
+            datasets: [
+                {
+                    label: "BurnDown",
+                    fillColor: "rgba(220,220,220,0.2)",
+                    strokeColor: "rgba(220,220,220,1)",
+                    pointColor: "rgba(220,220,220,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(220,220,220,1)",
+                    data: []
+                },
+                {
+                    label: "Normal",
+                    fillColor: "rgba(151,187,205,0.2)",
+                    strokeColor: "rgba(151,187,205,1)",
+                    pointColor: "rgba(151,187,205,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(151,187,205,1)",
+                    data: []
+                }
+            ]
+        };
 
-            var ctx = $("#progressChart").get(0).getContext("2d");
-            var progressPyChart = new Chart(ctx).Pie(progressData, progressChartOptions);
+    burndown_chart_options = {
+                scaleShowGridLines : true,
+                scaleGridLineColor : "rgba(0,0,0,.05)",
+                scaleGridLineWidth : 1,
+                scaleShowHorizontalLines: true,
+                scaleShowVerticalLines: true,
+                bezierCurve : false,
+                bezierCurveTension : 0.4,
+                pointDot : true,
+                pointDotRadius : 4,
+                pointDotStrokeWidth : 2,
+                pointHitDetectionRadius : 10,
+                datasetStroke : true,
+                datasetStrokeWidth : 2,
+                datasetFill : true,
+                responsive: true,
+                maintainAspectRatio: false,
+            };
 
+
+
+            var progress_ctx = $("#progressChart").get(0).getContext("2d");
+            var burndown_ctx = $("#burndownChart").get(0).getContext("2d");
+            var progressPyChart = new Chart(progress_ctx).Pie(progressData, progressChartOptions);
+            $scope.burndownLineChart = new Chart(burndown_ctx).Line(burndown_chart_data, burndown_chart_options);
             $scope.projId = $routeParams.projId;
             newTask = {};
             $scope.$watch($scope.projId, function(){
@@ -906,21 +957,24 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.getProjectDetails = function(){
             projectDetails = $http.get('/api/project/get/'+$scope.projId);
             projectDetails.success(function(resp){
-                if (resp!='null')
-                    {
-                        //resp.tasks = Object.keys(resp.tasks);
-                        resp.start = timeConverter(resp.start);
-                        resp.end = timeConverter(resp.end);
-                        $rootScope.title = resp.name + ' - ' + 'Fearless'
-                        resp.updatedWatchers = [];
-                        resp.watchers.forEach(function(e){resp.updatedWatchers.push(e)});
-                        $scope.project = resp;
-                        $scope.$parent.comment_id = resp.uuid;
-                        $scope.$parent.getComments();
-                    }
-                else
-                    $location.path('/pms')
+                    if (resp!='null')
+                        {
+                            //resp.tasks = Object.keys(resp.tasks);
+                            resp.start = timeConverter(resp.start);
+                            resp.end = timeConverter(resp.end);
+                            $rootScope.title = resp.name + ' - ' + 'Fearless'
+                            resp.updatedWatchers = [];
+                            resp.watchers.forEach(function(e){resp.updatedWatchers.push(e)});
+                            $scope.project = resp;
+                            $scope.$parent.comment_id = resp.uuid;
+                            $scope.$parent.getComments();
+                            $scope.generateReport('guntt');
+                        }
+                    else
+                        $location.path('/pms')
                 })
+            };
+
             
             _t = timeConverter(false, true).split('-').slice(0, 3).toString().split(' ').toString();
             getprefix = 'project_'+ $scope.projId+ '_' + _t + '_';
@@ -931,6 +985,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     mode = $scope.mode;
                 else
                     mode = 'guntt';
+                    $scope.mode = mode;
                 }
             if (mode=='cal')
                 return null;
@@ -943,13 +998,12 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
             }
             $scope.mode=mode;
-            $('.tj_table_frame').fadeOut(2000);
+            //$('.tj_table_frame').fadeOut(2000);
             data = localStorage.getItem(getprefix +  mode);
             if ($scope.replan || !data){
 
                 localStorage.clear();
-            //if (1){
-            //console.log('getting')
+
             projectReport = $http.get('/api/project/report/'+$scope.projId);
             projectReport.success(function(resp){
                 localStorage.setItem(getprefix + 'plan', resp.plan);
@@ -963,8 +1017,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 //$scope.projectTjData = data;
                 $('#projectDetailDiv').html(data);
                 $('.tj_table_frame').fadeIn();
-                $scope.getProjectDetails();
+                //$scope.getProjectDetails();
                 $scope.generateProgressChart();
+                $scope.generateBurndownChart();
                 $scope.getTasksList();
                 })
                 if ($scope.replan)
@@ -977,15 +1032,15 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     $scope.printable = data;
                     $('#projectDetailDiv').html(data);
                     $('.tj_table_frame').fadeIn();
+                    $scope.getTasksList();
                     $scope.generateProgressChart();
+                    $scope.generateBurndownChart();
                 }
-                $scope.getTasksList();
             }
-            
+           
 
          }
-            $scope.generateReport();
-            }
+
 
     $scope.print = function(){
         styles = '<html><head><link rel="stylesheet" href="css/tjmanual.css"> <link rel="stylesheet" href="css/tjreport.css"></head><body>';
@@ -1098,9 +1153,42 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 progressPyChart.segments[0].value = complete;
                 progressPyChart.segments[1].value = 100-complete;
                 progressPyChart.update();
-
-
         }
+
+        $scope.generateBurndownChart = function(){
+            _data = localStorage.getItem(getprefix + 'trace');
+            if (!_data || _data=='undefined')
+                return null;
+            data = JSON.parse(_data);
+            complete = 0;
+            lables = data.Date;
+            keys = Object.keys(data);
+            for (i in $scope.burndownLineChart.datasets[0].points)
+            {
+                $scope.burndownLineChart.removeData();
+            }
+
+            //$scope.burndownLineChart.addData([100,0], 'Project Start');
+            for (i in lables){
+                label = lables[i];
+                values = [];
+                for (j in keys){
+                    key = keys[j];
+                    if (key != 'Date'){
+                        value = data[key][i];
+                        values.push(parseInt(value))
+                        }
+                    }
+                $scope.burndownLineChart.addData(values, label);
+
+            }
+            //burndownLineChart.clear();
+            $scope.burndownLineChart.update();
+            console.log($scope.burndownLineChart.datasets)
+            //burndownLineChart.addData([0, 166],"sdsd");
+        }
+
+
         $scope.showCal = function(){
             $scope.mode = 'cal';
             $('.tj_table_frame').fadeOut(1000);
@@ -1190,7 +1278,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         $http.post('/api/task/update/'+taskId, $scope.editTaskInfo).success(function(resp){
             $scope.getTasksList();
             $scope.replan = true;
-            $scope.getTasksList();
             $scope.generateReport();
             $scope.editTaskInfo = {};
             $('#taskDetailModal').modal('hide');
