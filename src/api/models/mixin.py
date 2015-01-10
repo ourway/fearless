@@ -44,6 +44,12 @@ def convert_to_datetime(inp):
     '''converts input string to a valid datetime object'''
     if inp == 'None':
         return
+    try:
+        unixtime = int(inp);
+        return datetime.datetime.fromtimestamp(unixtime)
+    except (ValueError, TypeError):
+        pass
+
     if isinstance(inp, datetime.datetime):
         return inp
 

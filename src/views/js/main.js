@@ -918,6 +918,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                             resp.updatedWatchers = [];
                             resp.watchers.forEach(function(e){resp.updatedWatchers.push(e)});
                             $scope.project = resp;
+                            $scope.projectBackup = resp;
                             $scope.$parent.comment_id = resp.uuid;
                             $scope.$parent.getComments();
                             //$scope.generateReport('guntt');
@@ -971,19 +972,46 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 localStorage.setItem(getprefix + 'profit', resp.profit);
                 localStorage.setItem(getprefix + 'trace', JSON.stringify(resp.trace));
                 if (resp[mode])
+                    {
                     data = resp[mode];
+                    if ($scope.project)
+                        {
+                            $scope.getTasksList();
+                            $scope.getProjectDetails();
+                        }
+
+                    }
                 else
-                    data = '<div id="planerrordiv" style="padding:20%;padding-top:5%" class="col-md-12"><h1>Something is not right!</h1></div>'
-                $scope.printable = data;
+                    {
+                    data = '<div id="planerrordiv" style="padding:20%;padding-top:5%" class="col-md-12"><h1>Something is not right! Trying to use backup data. Please reload.</h1></div>';
+                    $('#projectDetailDiv').html(data);
+                    if ($scope.projectBackup)
+                        {
+                            console.log('Something went wrong.  Sending backup information;')
+                            _projectData = $scope.projectBackup;
+                            $scope.updateProject(_projectData);
+                        if ($scope.tasksBackup){
+                            for (i in $scope.tasksBackup){
+                                _task = $scope.tasksBackup[i];
+                                $scope.updateTask(_task.id, _task);
+                            }
+
+                            $scope.getTasksList();
+                        }
+                            
+
+                            
+                        }
+                    //$('#canvasloader-container').fadeOut();
+                    }
+
                 //$scope.projectTjData = data;
                 //
                 $('#canvasloader-container').fadeOut();
                 $('#projectDetailDiv').html(data);
                 $('.tj_table_frame').fadeIn();
-                $scope.getProjectDetails();
                 $scope.generateProgressChart();
                 $scope.generateBurndownChart();
-                $scope.getTasksList();
                 })
                 if ($scope.replan)
                     $scope.replan = false;
@@ -1020,6 +1048,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
     $scope.getTasksList = function(){
         $http.get('/api/task/list/'+$scope.projId).success(function(resp){
                 $scope.tasks = resp;
+                //$scope.tasksBackup = [];
                 $scope.resources = $scope.$parent.resources;
                 //$scope.project.tasks = resp;
                 $scope.calTasks = [];
@@ -1194,6 +1223,14 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         $scope.taskDetail = function(taskId) {
             //console.log(taskId);
             $http.get('/api/task/'+taskId).success(function(resp){
+                newBackup = [];
+                $scope.tasks.forEach(function(e){
+                        if (e.id==taskId){
+                            _bk = JSON.parse(JSON.stringify(resp))
+                            newBackup.push(_bk);
+                        }
+                    })
+                $scope.tasksBackup = newBackup;
                 resp.start = new Date(resp.start*1000);
                 //resp.start = timeConverter(Math.max(resp.start, resp.project_start));
                 resp.end = new Date(Math.min(resp.end, resp.project_end)*1000);
@@ -1223,10 +1260,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     });
             }
 
-    $scope.updateProject = function(){
+    $scope.updateProject = function(data){
         $scope.projectUpdateInfo = {};
-        console.log($scope.project.start)
-        req = $http.post('/api/project/update/'+$scope.projId, $scope.project);
+        if (!data)
+            data = $scope.project;
+        req = $http.post('/api/project/update/'+$scope.projId, data);
         req.success(function(resp){
                     if (resp.message == 'OK'){
                         $scope.generateReport();
@@ -1237,12 +1275,12 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
         };
         
-    $scope.updateTask = function(taskId){
-        $http.post('/api/task/update/'+taskId, $scope.editTaskInfo).success(function(resp){
-            $scope.getTasksList();
-            //$scope.getProjectDetails();
+    $scope.updateTask = function(taskId, data){
+        if (!data)
+            data = $scope.editTaskInfo
+        $http.post('/api/task/update/'+taskId, data).success(function(resp){
             $scope.replan = true;
-            $scope.generateReport();
+            $scope.getTasksList();
             $scope.editTaskInfo = {};
             $('#taskDetailModal').modal('hide');
 
@@ -1259,6 +1297,20 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     });
 
 
+    };
+
+    $scope.isMyTask = function(task){
+        result = false;
+        task.resources.forEach(function(e){
+                if (e.id==$scope.$parent.userInfo.userid) 
+                    result = true;
+            })
+        return result;
+    };
+
+    $scope.isTaskLate = function(task){
+        if (task.complete != 100)
+            return new Date() > new Date(task.end*1000);
     };
 
         });
