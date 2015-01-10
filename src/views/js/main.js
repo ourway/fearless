@@ -928,6 +928,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     else
                         $location.path('/pms')
                 })
+            projectDetails.error(function(resp){
+                    $location.path('/404')
+                    });
             };
 
             

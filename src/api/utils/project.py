@@ -60,6 +60,8 @@ class GetProjectDetails:
 
 
             resp.body = data
+        else:
+            resp.status = falcon.HTTP_404
 
 
 
@@ -279,8 +281,10 @@ class ListTasks:
                     'end':i.end,
                     'title':i.title,
                     'id':i.id,
+                    'effort':i.effort,
                     'complete':i.complete,
                     'dependent_of':[{'title':j.title, 'id':j.id} for j in i.dependent_of],
+                    'depends':[{'title':g.title, 'id':g.id} for g in i.depends],
                     'resources':[{'id':k.id, 'lastname':k.lastname} for k in i.resources]
             
             } for i in project.tasks]
