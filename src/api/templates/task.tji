@@ -35,8 +35,8 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
         %>
         milestone
         start ${task.start.strftime('%Y-%m-%d')}
-        end ${task.end.strftime('%Y-%m-%d')}
-        % if all([i.complete==100 for i in task.depends]) and now>=task.end:
+        end ${task.start.strftime('%Y-%m-%d')}
+        % if all([i.complete==100 for i in task.depends]) and now>=task.start:
           complete 100
         % endif
     % endif
