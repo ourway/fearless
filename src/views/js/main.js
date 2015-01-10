@@ -919,8 +919,10 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                             resp.watchers.forEach(function(e){resp.updatedWatchers.push(e)});
                             $scope.project = resp;
                             $scope.projectBackup = resp;
-                            $scope.$parent.comment_id = resp.uuid;
-                            $scope.$parent.getComments();
+                            if ($scope.$parent){
+                                $scope.$parent.comment_id = resp.uuid;
+                                $scope.$parent.getComments();
+                                }
                             //$scope.generateReport('guntt');
                         }
                     else
