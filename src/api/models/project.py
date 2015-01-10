@@ -15,6 +15,7 @@ Clean code is much better than Cleaner comments!
 import os
 import sh
 import ujson as json
+import lxml
 from lxml import etree
 import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
@@ -177,9 +178,10 @@ class Project(IDMixin, Base):
         subProjectTasks = []
         reports = []
         for p in projects:
-            planData = p.tjp_subproject()
-            subProjectTasks.append(planData.get('subProjectTasks'))
-            reports.append(planData.get('report'))
+            if p.tasks:
+                planData = p.tjp_subproject()
+                subProjectTasks.append(planData.get('subProjectTasks'))
+                reports.append(planData.get('report'))
 
         finalplan = t.render(reports=reports, subProjectTasks=subProjectTasks, 
                        now=now(), subprojects = projects, resources=resources
@@ -217,7 +219,11 @@ class Project(IDMixin, Base):
             if os.path.isfile(path):
                 report = open(path)
                 root = etree.parse(report)
-                main_table = root.xpath('//table')[0]
+                try:
+                    main_table = root.xpath('//table')[0]
+                except lxml.etree.XMLSyntaxError:
+                    return
+
                 tosave = etree.tostring(main_table)
                 return tosave
                 #self.reports.append(tosave)
@@ -225,7 +231,10 @@ class Project(IDMixin, Base):
             '''extract svg element of report'''
             if os.path.isfile(path):
                 report = open(path)
-                root = etree.parse(report)
+                try:
+                    root = etree.parse(report)
+                except lxml.etree.XMLSyntaxError:
+                    return
                 svg = root.xpath('//svg')[0]
                 tosave = etree.tostring(svg)
                 return tosave

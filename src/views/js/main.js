@@ -1613,8 +1613,10 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     $location.search('page', (page||0)+1);
                     $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+"&multipart=true";
                     $scope.dropzone.options.url = $scope.attachurl;
-                    $scope.$parent.comment_id = resp.uuid;
-                    $scope.$parent.getComments();
+                    if ($scope.$parent){
+                        $scope.$parent.comment_id = resp.uuid;
+                        $scope.$parent.getComments();
+                        }
 
                     //$scope.activateVideo();
 

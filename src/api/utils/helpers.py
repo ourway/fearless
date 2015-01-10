@@ -97,7 +97,10 @@ def get_params(stream, flat=True):
 def parse_tjcsv(csvfile):
     csvfile.seek(0);
     spamreader = csv.reader(csvfile, delimiter=';', quotechar='"')
-    keys = spamreader.next()
+    try:
+        keys = spamreader.next()
+    except StopIteration:
+        return
     all = list(spamreader)
     obj = {}
     count = 0
@@ -133,7 +136,10 @@ def csv2json(csvfile):
     '''A general function'''
     csvfile.seek(0);
     spamreader = csv.reader(csvfile, delimiter=';', quotechar='"')
-    keys = spamreader.next()
+    try:
+        keys = spamreader.next()
+    except StopIteration:
+        return
     all = list(spamreader)
     obj = defaultdict(list)
     count = 0

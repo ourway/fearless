@@ -156,7 +156,9 @@ class GetProjectLatestReport:
             except IndexError:
                 return
             
-
+            if not csvjsondata:
+                resp.body = {}
+                return
             for each in csvjsondata:
                 d =  csvjsondata[each]
                 typ = d.get('type')
