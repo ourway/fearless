@@ -1,7 +1,7 @@
 taskreport breakdown_${subproject.id} "csv_${subproject.id}"{
     formats csv
-    start ${subproject.start.strftime('%Y-%m-%d')}
-    end ${subproject.end.strftime('%Y-%m-%d')}
+    #start ${subproject.start.strftime('%Y-%m-%d')}
+    #end ${subproject.end.strftime('%Y-%m-%d')}
     scenarios actual
     loadunit hours
     columns id, line, name, opentasks, start, end, managers, effort, resources,  effortdone, gauge, effortleft, criticalness, duration, complete, efficiency

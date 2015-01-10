@@ -1,4 +1,6 @@
 <%
+import datetime
+now = datetime.datetime.now()
 depends = list()
 isMilestone = False
 if task.project.start > task.start:
@@ -32,9 +34,9 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
           isMilestone = True
         %>
         milestone
-        start ${task.end.strftime('%Y-%m-%d')}
+        start ${task.start.strftime('%Y-%m-%d')}
         end ${task.end.strftime('%Y-%m-%d')}
-        % if all([i.complete==100 for i in task.depends]):
+        % if all([i.complete==100 for i in task.depends]) and now>=task.end:
           complete 100
         % endif
     % endif
