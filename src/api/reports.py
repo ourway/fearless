@@ -26,7 +26,7 @@ def dailyTasks():
     todays_tasks = session.query(Task).filter(Task.start<now).filter(Task.end>now).all()
     to = ['farsheed.ashouri@gmail.com']
     subject = 'Studio Reports - daily tasks list'
-    tasks = ['<li>%s on <span style="color:rgb(113, 62, 0);">%s</span> of <b style="color:darkblue">%s</b> - </li>'\
+    tasks = ['<li>%s on <span style="color:rgb(113, 62, 0);">%s</span> of <b style="color:darkblue">%s</b></li>'\
              %(', '.join(['<span style="color:darkgreen">%s %s</span>'%(u.firstname, u.lastname) for u in i.resources]), i.title, i.project.name) for i in todays_tasks]
     intro = "Good morning, Here is a basic simple (alpha version) report about studio's daily tasks for %s<br/>." % today 
     message = '<hr/>'.join(tasks)
