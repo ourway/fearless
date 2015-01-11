@@ -19,7 +19,7 @@ Clean code is much better than Cleaner comments!
 @version: 0.1.8
 '''
 
-from gevent import monkey; monkey.patch_all()
+#from gevent import monkey; monkey.patch_all()
 import ujson
 import hashlib
 import base64
@@ -350,7 +350,7 @@ def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb')
     if os.path.isfile(newthmbPath):
         return newthmbPath
 
-        #return os.path.realpath(public_repository_path, previewPath)
+        #return os.path.realpath(public_repository_path, previewPath)print task.title
 
         
 def getTimecode(frame, rate):
