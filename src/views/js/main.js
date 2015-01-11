@@ -956,9 +956,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 var cl = new CanvasLoader('canvasloader-container');
                 cl.setColor('#2aabd2'); // default is '#000000'
                 cl.setShape('spiral'); // default is 'oval'
-                cl.setDiameter($('#projectDetailDiv').width()*0.6); // default is 40
-                cl.setDensity(34); // default is 40
-                cl.setRange(0.8); // default is 1.3
+                cl.setDiameter($('#projectDetailDiv').width()*0.4); // default is 40
+                cl.setDensity(20); // default is 40
+                cl.setRange(2); // default is 1.3
                 cl.setFPS(24); // default is 24
                 cl.show(); // Hidden by default
             }

@@ -13,6 +13,7 @@ Clean code is much better than Cleaner comments!
 '''
 
 import os
+from ftfy import fix_text
 import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event, Unicode
@@ -119,10 +120,11 @@ class Task(IDMixin, Base):
     def dump(self, _indent=0):
         return repr(self)
 
-    @validates('name')
-    def check_name(self, key, task):
+    @validates('title')
+    def check_name(self, key, data):
         # print key, task
-        return task
+        return fix_text(data)
+
 
     @validates('responsibles')
     def update_resources(self, key, data):

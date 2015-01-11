@@ -29,6 +29,7 @@ from mixin import IDMixin, Base, now, convert_to_datetime
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from .task import Task
 from .user import User
+from . import r
 
 project_users = Table('project_users', Base.metadata,
                       Column('id', Integer, primary_key=True),
@@ -170,6 +171,11 @@ class Project(IDMixin, Base):
     #@property
     def plan(self):
         # lets select just one task
+        if not r.get('fearless_tj3_lock'):
+            r.set('fearless_tj3_lock', 'OK')
+            r.expire('fearless_tj3_lock', 60)
+        else:
+            return
         templateFile = os.path.join(
             os.path.dirname(__file__), '../templates/masterProject.tjp')
         t = Template(filename=templateFile)
@@ -194,7 +200,11 @@ class Project(IDMixin, Base):
 
         tj3 = sh.Command('/usr/local/bin/tj3')
         try:
-            tj = tj3(plan_path, '--silent', '--no-color', '--add-trace', o='/tmp', c='8')
+            print 'Start Calculating project %s' % self.id
+            import time
+            s = time.time()
+            tj = tj3(plan_path, '--silent', '--no-color', '--add-trace', o='/tmp', c='1')
+            print 'Finished in %s seconds' % round(time.time()-s, 3)
         except Exception,e:
             #print type(repr(e))
             for i in xrange(3):

@@ -487,11 +487,11 @@ class AddCollection:
             if template:
                 newC.template = template
 
-            if not os.path.isdir(newC.url):
-                req.session.add(newC)
-                resp.body = {'message':'OK', 'info':'Collection created'}
-            else:
-                resp.body = {'message':'ERROR', 'info':'Collection is available on server'}
+            #if not os.path.isdir(newC.url):
+            req.session.add(newC)
+            resp.body = {'message':'OK', 'info':'Collection created'}
+            #else:
+            #    resp.body = {'message':'ERROR', 'info':'Collection is available on server'}
 
 
 class AssetCheckout:

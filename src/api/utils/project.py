@@ -137,6 +137,13 @@ class GetProjectLatestReport:
             resp.status = falcon.HTTP_404
             return
         data = project.plan()  ## first let it plan
+        if not data:
+            reports = project.reports
+            if reports:
+                repid = reports[-1]
+                report = req.session.query(Report).filter_by(id=repid).first()
+                if report:
+                    data = report.body
         if data:
             datajson = json.loads(data)
             csvfile = StringIO()

@@ -24,7 +24,7 @@ from utils.general import setup_logger
 from uuid import uuid4  # for random guid generation
 import base64
 
-now = datetime.datetime.now
+now = datetime.datetime.utcnow
 
 Base = declarative_base()
 logger = setup_logger('model', 'model.log')

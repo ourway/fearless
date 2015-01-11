@@ -44,7 +44,6 @@ class SyncShow:
                     want_to_be_master = data.get('i_want_to_be_master')
                     client = json.loads(showInfo).get('client') or req.env.get('HTTP_X_FORWARDED_FOR')
                     if assetId:
-                        
                         if not str(client) in r.lrange('show_%s_watchers'%assetId, 0, -1):
                             r.rpush('show_%s_watchers'%assetId, client)
                             r.expire('show_%s_watchers'%assetId, 1)
@@ -53,13 +52,11 @@ class SyncShow:
                             if master and str(client) != master:  ## check if not other master
                                pass
                             else:
-
                                 r.set('show_%s_master'%assetId, str(client))
                                 r.set('show_%s_command'%assetId, command)
                                 r.set('show_%s_frame'%assetId, frame)
                                 r.set('show_%s_note'%assetId, note)
                                 r.set('show_%s_slide'%assetId, slide)
-
                                 r.expire('show_%s_master'%assetId, 1)
                                 r.expire('show_%s_command'%assetId, 1)
                                 r.expire('show_%s_frame'%assetId, 1)

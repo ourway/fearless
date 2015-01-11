@@ -4,10 +4,13 @@ requests
 gevent
 moviepy
 wsaccel
+ftfy
 gevent-websocket
 ujson
+numpy
 uwsgi
 falcon
+scikits.audiolab
 riak
 pyinotify
 jsonschema
