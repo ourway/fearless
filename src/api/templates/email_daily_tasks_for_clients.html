@@ -1,0 +1,101 @@
+Hello,  here is a daily tasks report for ${jtoday} (${today}):
+<br/>
+<br/>
+<div id="fearless_report_ongoing_tasks_div" style="border-radius:5px;border:1px solid #f2f2f2;padding:10px;background:#fafafa">
+<h3>Ongoing on-schedule tasks:</h3>
+    <table style="border:1px solid #ccc;" >
+        <tr style="background:#6EA4B5;color:white">
+            <th>No</th>
+            <th>project</th>
+            <th>Task</th>
+            <th>Progress</th>
+            <th>Resources</th>
+        </tr>
+        % for task in ongoing_tasks:
+        <tr style="border-top:1px solid #ddd; background:
+                    % if task.complete > 75:
+                        #d0e9c6
+                    % elif task.complete > 50:
+                        #D9EDF7
+                    % elif task.complete > 10:
+                        #D1DCE4
+                    % elif task.complete > 0:
+                        #F5F5F5
+                    % else:
+                        #F2DEDE
+                    % endif
+            ">
+                <td style="background:#6EA4B5;color:white">${ongoing_tasks.index(task)+1}</td>
+                <td style="background:#6EA4B5;color:white">
+                    <span>${task.project.name[:20]}</span><br/>
+                        <small style="color:lightgrey">${task.project.complete}% completed</small>
+                </td>
+                <td >
+                    <span>${task.title}</span><br/>
+                    <small style="color:grey">Task description</small>
+                </td>
+                <td ><strong>${task.complete}%</strong></td>
+                <td><table>
+                        % for resource in task.resources:
+                            <tr stlye="border-bottom:1px solid #ccc">
+                                <td style="background:#5bc0de;color:white"><small>${resource.firstname} ${resource.lastname}</small></td>
+                            </tr>
+                        % endfor
+                </table></td>
+            </tr>
+        % endfor
+
+    </table>
+</div>
+
+
+<div id="fearless_report_unfinished_tasks_div" style="border-radius:5px;border:1px solid #f2f2f2;padding:10px;background:#fafafa">
+<h3>Unfinished behind-schedule tasks:</h3>
+<table style="border:1px solid #ccc;" >
+        <tr style="background:#6EA4B5;color:white">
+            <th>No</th>
+            <th>project</th>
+            <th>Task</th>
+            <th>Progress</th>
+            <th>Due Date</th>
+            <th>Resources</th>
+        </tr>
+        % for task in behind_tasks:
+        <tr style="border-top:1px solid #ddd; background:
+                    % if task.complete > 75:
+                        #D1DCE4
+                    % elif task.complete > 50:
+                        #F5F5F5
+                    % else:
+                        #F2DEDE
+                    % endif
+            ">
+                <td style="background:#6EA4B5;color:white">${behind_tasks.index(task)+1}</td>
+                <td style="background:#6EA4B5;color:white">
+                    <span>${task.project.name[:20]}</span><br/>
+                        <small style="color:lightgrey">${task.project.complete}% completed</small>
+                </td>
+                <td >
+                    <span>${task.title}</span><br/>
+                    <small style="color:grey">A reason why this task has not finished yet</small>
+                </td>
+                <td ><strong>${task.complete}%</strong></td>
+                <td ><strong>${arrow.get(task.end).humanize()}</strong></td>
+                <td><table>
+                        % for resource in task.resources:
+                            <tr stlye="border-bottom:1px solid #ccc">
+                                <td style="background:#5bc0de;color:white"><small>${resource.firstname} ${resource.lastname}</small></td>
+                            </tr>
+                        % endfor
+                </table></td>
+            </tr>
+
+
+        % endfor
+
+    </table>
+
+
+
+</div>
+

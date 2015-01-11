@@ -56,7 +56,7 @@ templates_folder = os.path.join(os.path.dirname(__file__), 'templates')
 BROKER_URL = 'redis://localhost:6379/0'
 BACKEND_URL = 'redis://localhost:6379/1'
 from celery import Celery
-
+CELERY_ACCEPT_CONTENT = ['json']
 from utils.validators import checkPath, md5_for_file
 
 

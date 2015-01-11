@@ -13,6 +13,7 @@ falcon
 scikits.audiolab
 riak
 pyinotify
+pyCalverter
 jsonschema
 MySQL-Python
 oursql
@@ -38,3 +39,4 @@ mako
 python-multipart
 awesome-slugify
 misaka
+arrow
