@@ -2,7 +2,6 @@ redis
 celery
 requests
 gevent
-moviepy
 wsaccel
 ftfy
 gevent-websocket
@@ -11,6 +10,7 @@ numpy
 uwsgi
 falcon
 scikits.audiolab
+moviepy
 riak
 pyinotify
 pyCalverter

@@ -1,6 +1,7 @@
 <%
 import datetime
 now = datetime.datetime.now()
+today = now.strftime('%Y-%m-%d')
 depends = list()
 isMilestone = False
 if task.project.start > task.start:
@@ -35,7 +36,9 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
         %>
         milestone
         start ${task.start.strftime('%Y-%m-%d')}
+        actual:start ${task.start.strftime('%Y-%m-%d')}
         end ${task.start.strftime('%Y-%m-%d')}
+        actual:end ${task.start.strftime('%Y-%m-%d')}
         % if all([i.complete==100 for i in task.depends]) and now>=task.start:
           complete 100
         % endif
@@ -58,9 +61,14 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
     % if task.complete!=None and not isMilestone and all([i.complete==100 for i in task.depends]):
         complete ${task.complete}
     % endif
-    %if not task.effort and not isMilestone:
+    % if (not task.effort and not isMilestone):
         start ${task.start.strftime('%Y-%m-%d')}
+        actual:start ${task.start.strftime('%Y-%m-%d')}
         end ${task.end.strftime('%Y-%m-%d')}
+        actual:end ${task.end.strftime('%Y-%m-%d')}
+    % elif task.effort and task.start.strftime('%Y-%m-%d')==today and not task.depends and not task.parent:
+        start ${today}
+        actual:start ${today}
     % endif
     % if depends:
         depends ${','.join(depends[::-1])}

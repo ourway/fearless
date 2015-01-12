@@ -17,6 +17,7 @@ import arrow
 from tasks import send_envelope  ## send emails
 from mako.template import Template
 import os
+from collections import defaultdict
 from sqlalchemy import desc, asc
 from calverter import Calverter
 cal = Calverter()
@@ -52,7 +53,8 @@ def getTemplate(name):
 def dailyTasksReportForClients():
     '''generate an email report of all tasks and send it to users and managers'''
     message =  getTemplate('email_daily_tasks_for_clients.html')\
-        .render(ongoing_tasks=ongoing_tasks, behind_tasks=behind_tasks, today=today, jtoday=jtoday, arrow=arrow)
+        .render(ongoing_tasks=ongoing_tasks, behind_tasks=behind_tasks, today=today, 
+                jtoday=jtoday, arrow=arrow, recipient='product owner', responsibility='managing')
     #to = ['hamid2177@gmail.com']
     to = ['farsheed.ashouri@gmail.com']
     subject = 'Studio Reports - Daily Tasks - %s' % jtoday
@@ -60,9 +62,69 @@ def dailyTasksReportForClients():
     #message = '<hr/>'.join(tasks)
     sent = send_envelope.delay(to, cc, bcc, subject, message)
     return sent
+
+
+def dailyTasksReportForProjectLeads():
+    '''Daily tasks report for project leaders'''
+    managerOngoingTasks = defaultdict(list)
+    managerBehindTasks = defaultdict(list)
+    for task in ongoing_tasks:
+        managerOngoingTasks[task.project.lead].append(task)
+    for task in behind_tasks:
+        managerBehindTasks[task.project.lead].append(task)
+    target_users = list(set(managerBehindTasks.keys() + managerOngoingTasks.keys()))
+    for target in target_users:
+        target_behind_tasks = managerBehindTasks[target]
+        target_ongoing_tasks = managerOngoingTasks[target]
+        to = [target.email]
+        #to = ['hamid2177@gmail.com']
+        #to = [target.email]
+        subject = 'Studio Reports - Daily Tasks for your projects - %s' % jtoday
+        message =  getTemplate('email_daily_tasks_for_clients.html')\
+        .render(ongoing_tasks=target_ongoing_tasks, behind_tasks=target_behind_tasks,
+                today=today, jtoday=jtoday, arrow=arrow, recipient=target.firstname,
+                responsibility='leading')
+
+        sent = send_envelope.delay(to, cc, bcc, subject, message)
+        print 'Report sent to %s' % target.email
+    return True
+
+
+def dailyTaskCardForResources():
+    '''Daily tasks card for reources'''
+    resourceOngoingTasks = defaultdict(list)
+    resourceBehindTasks = defaultdict(list)
+    for task in ongoing_tasks:
+        for resource in task.resources:
+            resourceOngoingTasks[resource].append(task)
+    for task in behind_tasks:
+        for resource in task.resources:
+            resourceBehindTasks[resource].append(task)
+    target_users = list(set(resourceBehindTasks.keys() + resourceOngoingTasks.keys()))
+    for target in target_users:
+        target_behind_tasks = resourceBehindTasks[target]
+        target_ongoing_tasks = resourceOngoingTasks[target]
+        to = [target.email]
+        #to = ['hamid2177@gmail.com']
+        #to = ['farsheed.ashouri@gmail.com']
+        to = [target.email]
+        subject = 'Studio Reports - Task card - %s' % jtoday
+        message =  getTemplate('email_daily_tasks_for_clients.html')\
+        .render(ongoing_tasks=target_ongoing_tasks, behind_tasks=target_behind_tasks,
+                today=today, jtoday=jtoday, arrow=arrow, recipient=target.firstname,
+                responsibility='contributing to')
+
+        sent = send_envelope.delay(to, cc, bcc, subject, message)
+        print 'Report sent to %s' % target.email
+    return True
+
+
+
+
         
+
+
         
-    
 
 
 
@@ -74,7 +136,9 @@ if __name__ == '__main__':
         print '\tUsage: reports <command>'
         print '\t------------------'
         print '\tAvailable commands are:'
-        print '\t\tdailyTasksReportForClients'
+        print '\t\t dailyTasksReportForClients'
+        print '\t\t dailyTasksReportForProjectLeads'
+        print '\t\t dailyTaskCardForResources'
         print '\t------------------'
         sys.exit()
     command = sys.argv[1]+'()'

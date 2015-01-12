@@ -1052,6 +1052,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
     $scope.getTasksList = function(){
         $http.get('/api/task/list/'+$scope.projId).success(function(resp){
+                if (!resp)
+                    return null;
                 $scope.tasks = resp;
                 //$scope.tasksBackup = [];
                 $scope.resources = $scope.$parent.resources;

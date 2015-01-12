@@ -13,7 +13,7 @@ from mako.template import Template
 import copy
 
 
-user1 = User(email='farsheed.ashouri@gmail.com', password='rrferl', active=True, firstname='admin2', lastname='admin2')
+user1 = User(email='farsheed.ashouri@gmail.com', password='rrferl', active=True, firstname='Farsheed', lastname='Ashouri')
 user2 = User(email='mehdieyazdani@gmail.com', password='123456', active=True, firstname='Mehdi', lastname='Yazdani')
 user3 = User(email='mostafarayaneh@gmail.com', password='123456', active=True, firstname='Morteza', lastname='Gaamari')
 user4 = User(email='amirgholamzadeh@gmail.com', password='123456', active=True, firstname='Amir', lastname='Gholam Zadeh')
@@ -35,7 +35,7 @@ user19 = User(email='khalil66@gmail.com', password='123456', active=True, firstn
 user20 = User(email='hamid2117@gmail.com', password='123456', active=True, firstname='Hamid', lastname='Lak')
 user21 = User(email='mepayam@gmail.com', password='123456', active=True, firstname='Payam', lastname='Memar')
 user22 = User(email='alishahdad1353@yahoo.com', password='123456', active=True, firstname='Ali', lastname='Shahdad')
-user23 = User(email='hamid_sohrabi_vale@yahoo.com', password='123456', active=True, firstname='Hamid', lastname='Sohrabi')
+user23 = User(email='hamid_sohrabi_vahe@yahoo.com', password='123456', active=True, firstname='Hamid', lastname='Sohrabi')
 user24 = User(email='rangekhod.2000@yahoo.com', password='123456', active=True, firstname='Majid', lastname='Majidi')
 user25 = User(email='banomo1982@yahoo.com', password='123456', active=True, firstname='Bahare', lastname='Mogaddam')
 user26 = User(email='amirhoseinkasraee@yahoo.com', password='123456', active=True, firstname='AmirHossein', lastname='Kasrayi')
@@ -43,13 +43,15 @@ user27 = User(email='nsns_1300@yahoo.com', password='123456', active=True, first
 user28 = User(email='zahra.mansouriyeh@gmail.com', password='123456', active=True, firstname='Zahra', lastname='Mansooriye')
 user29 = User(email='alenhue@gmail.com', password='123456', active=True, firstname='Arash', lastname='Mogaddam')
 user30 = User(email='sara_kayvan@hotmail.com', password='123456', active=True, firstname='Sara', lastname='Keyvan')
+user31 = User(email='bitarafali@yahoo.com', password='123456', active=True, firstname='Ali', lastname='Bitaraf')
+user32 = User(email='mj.hagh@gmail.com', password='123456', active=True, firstname='Majid', lastname='Hagighighatjoo')
 
 
 
 session.add_all([ user1, user2, user3, user4, user5, user6, user7, user8, user9,
                  user10, user11, user12, user13, user14, user15, user16, user17,
                  user18, user19, user20, user21, user22, user23, user24, user25,
-                    user26, user27, user28, user29, user30])
+                    user26, user27, user28, user29, user30, user31, user32])
 session.commit()
     #import shutil
 #print animate.get_tree(session, json=True)

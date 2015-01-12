@@ -27,6 +27,7 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, now, convert_to_datetime
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from sqlalchemy import desc, asc
 from .task import Task
 from .user import User
 from . import r
@@ -160,7 +161,7 @@ class Project(IDMixin, Base):
         for task in self.tasks:
             _tasks.append(task.tjp_task())
             #_resources.extend(task.resources)
-        subProjectTasks = sp.render(tasks=_tasks, subproject=self)
+        subProjectTasks = sp.render(tasks=_tasks, subproject=self)  ## send tasks in reverse order
         report = sr.render(subproject=self)
         return {'report':report, 'subProjectTasks':subProjectTasks}
 
@@ -179,7 +180,7 @@ class Project(IDMixin, Base):
         templateFile = os.path.join(
             os.path.dirname(__file__), '../templates/masterProject.tjp')
         t = Template(filename=templateFile)
-        projects = session.query(Project).all()
+        projects = session.query(Project).order_by(asc(Project.id)).all()
         resources = session.query(User).all()
         subProjectTasks = []
         reports = []
