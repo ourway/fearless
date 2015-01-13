@@ -55,8 +55,8 @@ def dailyTasksReportForClients():
     message =  getTemplate('email_daily_tasks_for_clients.html')\
         .render(ongoing_tasks=ongoing_tasks, behind_tasks=behind_tasks, today=today, 
                 jtoday=jtoday, arrow=arrow, recipient='product owner', responsibility='managing')
-    #to = ['hamid2177@gmail.com']
-    to = ['farsheed.ashouri@gmail.com']
+    to = ['hamid2177@gmail.com']
+    #to = ['farsheed.ashouri@gmail.com']
     subject = 'Studio Reports - Daily Tasks - %s' % jtoday
     #intro = "Good morning, Here is a basic simple (alpha version) report about studio's daily tasks for %s<br/>." % today 
     #message = '<hr/>'.join(tasks)
