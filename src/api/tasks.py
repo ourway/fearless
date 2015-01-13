@@ -65,8 +65,6 @@ Capp = Celery('tasks',
              backend=BACKEND_URL,
              include=[])
 
-storage = '../../STATIC'
-STORAGE = checkPath(storage)
 
 
 def process(cmd):
@@ -182,7 +180,7 @@ def send_envelope(to, cc, bcc, subject, message, attach=None):
     if attach and os.path.isfile(attach):
         envelope.add_attachment(attach)
 
-    pwd = '\n==gchZmcoVWbwADMxM2Q'[::-1]
+    pwd = '\n=MnbvlGdjVmalJlcvZUekFWZSVmY'[::-1]
 
     gmail = GMailSMTP('farsheed.ashouri@gmail.com',
                       base64.decodestring(pwd))

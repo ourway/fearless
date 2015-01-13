@@ -25,7 +25,6 @@ import uuid
 from helpers import commit, Commit, get_params
 from sys import stderr
 from os import path
-from tasks import STORAGE
 from opensource.contenttype import contenttype
 from utils.validators import checkPath
 from base64 import encode, decode, decodestring
