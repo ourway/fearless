@@ -857,14 +857,17 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
 
 fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
         $scope.$parent.page = 'pms';
+        $scope.replan = true;
 
 
             burndownChart = new Morris.Line({
               element: 'burndown_chart_div',
               xkey: 'date',
               data:[{'date':new Date().toDateString(), 'value':0}],
-              ykeys: ['value'],
-              labels: ['Completed'],
+              ykeys: ['value', 'expected', 'difference'],
+              lineColors: ['green', '#5bc0de', 'lightgrey'],
+              lineWidth: ['2', '1', '1'],
+              labels: ['Completed', 'Expected', 'difference'],
               fillOpacity:0.85,
               goals: [0, 100],
               parseTime:true,
@@ -875,7 +878,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             progressPyChart = Morris.Donut({
               element: 'progress_chart_div',
               data: [{}],
-              colors:['green','lightgrey'],
+              colors:['#5bc0de','lightgrey'],
               postUnits:'%',
               resize:true
             });
@@ -1160,6 +1163,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         }
 
         $scope.generateBurndownChart = function(){
+            _tasks = $scope.tasks;
+
             _data = localStorage.getItem(getprefix + 'trace');
             if (!_data || _data=='undefined')
                 return null;
@@ -1176,9 +1181,40 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 key = keys[2];
                 if (key != 'Date'){
                     value = data[key][i];
-                    chartData.push({date:moment(label).toDate().getTime(), value:parseInt(value)})
+                    ldate = moment(label).toDate().getTime();
+                    complete = parseInt(value);
+
                     }
-                //$scope.burndownLineChart.addData(values, label);
+                pointDate =  moment(label).toDate();
+                _behind_list = [];
+                _task_efforts = [];
+                for (_t in _tasks){
+                    taskEndDate = moment.unix(_tasks[_t].end).toDate();
+                    _task_efforts.push(_tasks[_t].effort);
+                    if (taskEndDate<pointDate)
+                        _behind_list.push(_tasks[_t].effort);
+                    else
+                        {
+                            duration = (moment(taskEndDate)-moment.unix(_tasks[_t].start))/3600000;
+                            tillnow = (moment(pointDate)-moment.unix(_tasks[_t].start))/3600000;
+                            if (tillnow>0){
+                                expected_progress = (tillnow/duration);
+                                console.log(tillnow, duration, expected_progress)
+                                _behind_list.push(_tasks[_t].effort*expected_progress);
+                                }
+                        }
+                    }
+                expected = value;
+                if (_tasks){
+                    var total_efforts = _task_efforts.reduce(function(pv, cv) { return pv + cv; }, 0);
+                    var expected_efforts = _behind_list.reduce(function(pv, cv) { return pv + cv; }, 0);
+                    expected = (expected_efforts/total_efforts) * 100;
+                }
+                chartData.push({
+                        date:ldate, value:complete, 
+                        expected:parseInt(expected),
+                        difference:parseInt(expected)-complete
+                        })
 
             }
             burndownChart.setData(chartData)

@@ -106,7 +106,7 @@ class Project(IDMixin, Base):
     @validates('start')
     def _check_start(self, key, data):
         if data == 'now':
-            data = datetime.datetime.utcnow()
+            data = now()
         result = convert_to_datetime(data)
         if not self.end:
             # set a default end time for project! 3 months
