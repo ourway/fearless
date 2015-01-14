@@ -863,12 +863,13 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             burndownChart = new Morris.Line({
               element: 'burndown_chart_div',
               xkey: 'date',
+              events:[timeConverter()],
               data:[{'date':new Date().toDateString(), 'value':0}],
               ykeys: ['value', 'expected', 'difference'],
-              lineColors: ['green', '#5bc0de', 'lightgrey'],
-              lineWidth: ['2', '1', '1'],
+              lineColors: ['#5bc0de', 'green', '#c2aeae'],
+              lineWidth: ['5', '1', '1'],
               labels: ['Completed', 'Expected', 'difference'],
-              fillOpacity:0.85,
+              fillOpacity:1,
               goals: [0, 100],
               parseTime:true,
               hideHover:'auto',
@@ -952,7 +953,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             else
             {
                 $('.tj_table_frame').fadeOut();
-                data = '<div id="canvasloader-container" style="display:none;padding:20%;padding-top:5%" class="col-md-12"><h1>Adventure in life is good; consistency in coffee even better!</h1></div>'
+                data = '<div id="canvasloader-container" style="display:none;padding:20%;padding-top:5%" class="col-md-12"><h1 align="center">Calculating ...</h1></div>'
                 $('#projectDetailDiv').html(data);
 
                 var cl = new CanvasLoader('canvasloader-container');
@@ -1030,10 +1031,10 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     $scope.printable = data;
                     $('#projectDetailDiv').html(data);
                     $('.tj_table_frame').fadeIn();
-                    $scope.getTasksList();
-                    $scope.generateProgressChart();
-                    $scope.generateBurndownChart();
-                    $scope.getProjectDetails();
+                    //$scope.getTasksList();
+                    //$scope.generateProgressChart();
+                    //$scope.generateBurndownChart();
+                    //$scope.getProjectDetails();
                 }
             }
 
@@ -1199,7 +1200,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                             tillnow = (moment(pointDate)-moment.unix(_tasks[_t].start))/3600000;
                             if (tillnow>0){
                                 expected_progress = (tillnow/duration);
-                                console.log(tillnow, duration, expected_progress)
                                 _behind_list.push(_tasks[_t].effort*expected_progress);
                                 }
                         }
