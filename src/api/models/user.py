@@ -31,6 +31,37 @@ users_groups = Table('users_groups', Base.metadata,
                      Column('group_id', Integer, ForeignKey('group.id'))
                      )
 
+
+user_vacations = Table('user_vacations', Base.metadata,
+    Column('user_id', Integer, ForeignKey("user.id"),
+           primary_key=True),
+    Column('date_id', Integer, ForeignKey("date.id"),
+           primary_key=True)
+)
+
+user_leaves = Table('user_leaves', Base.metadata,
+    Column('user_id', Integer, ForeignKey("user.id"),
+           primary_key=True),
+    Column('date_id', Integer, ForeignKey("date.id"),
+           primary_key=True)
+)
+
+user_shifts = Table('user_shifts', Base.metadata,
+    Column('user_id', Integer, ForeignKey("user.id"),
+           primary_key=True),
+    Column('date_id', Integer, ForeignKey("date.id"),
+           primary_key=True)
+)
+
+
+user_offdays = Table('user_offdays', Base.metadata,
+    Column('user_id', Integer, ForeignKey("user.id"),
+           primary_key=True),
+    Column('date_id', Integer, ForeignKey("date.id"),
+           primary_key=True)
+)
+
+
 user_reports = Table('user_reports', Base.metadata,
     Column('user_id', Integer, ForeignKey("user.id"),
            primary_key=True),
@@ -38,18 +69,11 @@ user_reports = Table('user_reports', Base.metadata,
            primary_key=True)
 )
 
-user_documents = Table('user_documents', Base.metadata,
+
+user_accounts = Table('user_accounts', Base.metadata,
     Column('user_id', Integer, ForeignKey("user.id"),
            primary_key=True),
-    Column('document_id', Integer, ForeignKey("document.id"),
-           primary_key=True)
-)
-
-
-user_departement = Table('user_departement', Base.metadata,
-    Column('user_id', Integer, ForeignKey("user.id"),
-           primary_key=True),
-    Column('departement_id', Integer, ForeignKey("departement.id"),
+    Column('account_id', Integer, ForeignKey("account.id"),
            primary_key=True)
 )
 
@@ -57,7 +81,9 @@ class User(IDMixin, Base):
 
     '''Main users group
     '''
+    id = Column( Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     email = Column(String(64), unique=True, nullable=False)
+    paypal = Column(String(64), unique=True)
     password = Column(PasswordType(schemes=['pbkdf2_sha512']), nullable=False)
     avatar = Column(Text())
     token = Column(String(64), default=getUUID, unique=True)
@@ -72,31 +98,36 @@ class User(IDMixin, Base):
     lastLogIn = Column(DateTime)
     age = Column(Integer)
     efficiency = Column(Float(precision=3), default=1.0)
+    effectiveness = Column(Float(precision=3), default=1.0)
     cell = Column(String(16))
     address = Column(String(512))
     budget_account = Column(Integer, default=0) 
     bank = Column(String(64), default='Paarsian')
     bank_account_number = Column(String(64))
-    debit_card_number = Column(String(64))
+    debit_card_number = Column(String(64), default='0000-0000-0000-0000')
     daily_working_hours = Column(Integer, default=8)
+    weeklymax = Column(Integer, default=44)
     monthly_working_hours = Column(Integer, default=192)
     monthly_present_hours = Column(Float(precision=3), default=0)
     off_days = Column(String(32), default='fri')
     latest_session_id = Column(String(64))
     active = Column(Boolean, default=False)
-    rate = Column(Float(precision=3), default=80000)
-    monthly_salary = Column(Float(precision=3), default=1000000)
+    fulltime = Column(Boolean, default=True)
+    rate = Column(Float(precision=3), default=0)
+    monthly_salary = Column(Float(precision=3), default=0)
     retention = Column(Float(precision=3), default=10)
     payroll_tax = Column(Float(precision=3), default=3)
     insurance_deductions = Column(Float(precision=3), default=7.8)
-    rep = relationship("Report", secondary=lambda: user_reports, backref='user')
-    agreements = relationship("Document", backref='agreement_of', secondary="user_documents")
-    payment_invoices = relationship("Document", backref='invoice_of', secondary="user_documents")
+    reps = relationship("Report", secondary=lambda: user_reports, backref='user')
+    agreements = relationship("Document", backref='agreement_of')
+    payment_invoices = relationship("Document", backref='invoice_of')
+    chargeset = relationship("Account", backref='account_of', secondary="user_accounts")
     agreement_start = Column(DateTime, nullable=False, default=now)
     agreement_end = Column(DateTime, nullable=False, default=now)
-    reports = association_proxy('rep', 'id') # when we refer to reports, id will be returned.
+    reports = association_proxy('reps', 'id') # when we refer to reports, id will be returned.
     grps = relationship('Group', backref='users', secondary='users_groups')
     groups = association_proxy('grps', 'name')
+
 
     @validates('email')
     def _validate_email(self, key, data):

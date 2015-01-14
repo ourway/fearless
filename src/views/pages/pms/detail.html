@@ -118,32 +118,6 @@ background-color: #FFEDA5;
 .tabhead .tj_table_cell_label{
     color:white;
 }
-
-
-/*
-.taskcell1{
-border-right: 1px solid #57BEDD;
-border-bottom: 1px solid #57BEDD;
-}
-
-.taskcell2{
-border-right: 1px solid #57BEDD;
-border-bottom: 1px solid #57BEDD;
-}
-.resourcecell1{
-border-right: 1px solid #57BEDD;
-border-bottom: 1px solid #57BEDD;
-
-}
-.resourcecell2{
-border-right: 1px solid #57BEDD;
-border-bottom: 1px solid #57BEDD;
-}
-.tabcell{
-border-right: 1px solid #57BEDD;
-border-bottom: 1px solid #57BEDD;
-}
-*/
 </style>
 
 <div class="container pmsmaindiv">
@@ -160,333 +134,27 @@ border-bottom: 1px solid #57BEDD;
     </div>
 
 
+    <!--     Project edit MODAL       --!>
 
-			<div class="modal fade" id="projectEditModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-							<h4 class="modal-title" id="myModalLabel">
-                                Edit project: {{project.name}}
-							</h4>
-						</div>
-                        <div class="modal-body">
+    <div class="modal fade" id="projectEditModal" ng-include="'pages/pms/projectEditModalTemplate.html'" 
+        role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
 
-			<form class="form-horizontal" role="form">
-				<div class="form-group">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Project Name</label>
-					<div class="col-sm-6">
-                        <input type="text" class="form-control" ng-class="{'farsi':!$parent.isASCII(project.name)}"  placeholder="New project name. Must be unique" 
-                        ng-model="project.name" />
-					</div>
-				</div>
-				<div class="form-group" ng-init="newProject.start=timeConverter()">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Start Date</label>
-					<div class="col-sm-6">
-                        <input type="date" class="form-control" ng-model="project.start" required/>
-					</div>
-				</div>
-				<div class="form-group">
-					 <label for="inputPassword3" class="col-sm-4 control-label">End Date</label>
-					<div class="col-sm-6">
-						<input type="date" class="form-control" ng-model="project.end" required />
-					</div>
-				</div>
+    <!--     SEQUENCE MODAL       --!>
+    <div class="modal fade" id="taskSeqModal" role="dialog" ng-include="'pages/pms/taskSeqModalTemplate.html'" 
+        aria-labelledby="AddNewSequences" aria-hidden="true"></div>
 
-				<div class="form-group">
-					 <label for="inputPassword3" class="col-sm-4 control-label">Leader</label>
-					<div class="col-sm-6">
-                        <select class="form-control" ng-model="project.leader" placeholder="Who's running the project?" 
-                            ng-options="resource.fullname for resource in resources track by resource.id">
-                        </select>
-                </div>
-                </div>
 
-				<div class="form-group">
-					 <label for="inputPassword3" class="col-sm-4 control-label">Watchers</label>
-					<div class="col-sm-6">
-                        <select class="form-control" ng-model="project.watchers" multiple 
-                            ng-options="resource.fullname for resource in resources track by resource.id">
-                            <option value="0"></option>
-                        </select>
-                </div>
 
-            </div>
-				<div class="form-group">
-					 <label for="inputPassword3" class="col-sm-4 control-label">Description</label>
-					<div class="col-sm-6">
-                        <textarea placeholder="Write a brief description about project goal here ..." class="form-control" ng-model="project.description" ></textarea>
-					</div>
-				</div>
+    <!--     Task Add modal       --!>
+    <div class="modal fade" id="taskAddModal" ng-include="'pages/pms/taskAddModalTemplate.html'" 
+        role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
 
-			</form>
-						</div>
-						<div class="modal-footer">
-                            <button type="button" ng-click="getProjectDetails()" class="btn btn-default" data-dismiss="modal">Close</button> 
-                            <button type="button" ng-show="project.name && project.start && project.end && project.leader.id" 
-                                ng-click="updateProject()" class="btn btn-primary">Update project information</button>
-						</div>
-					</div>
-					
-				</div>
-				
-	</div>
 
 
 
-
-
-
-
-
-
-
-
-			<div class="modal fade" id="taskSeqModal" role="dialog" ng-init="" aria-labelledby="AddNewSequences" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-							<h4 class="modal-title" id="myModalLabel">
-								Append new sequences
-							</h4>
-						</div>
-                        <div class="modal-body">
-
-			<form class="form-horizontal" role="form">
-				<div class="form-group">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Number of new sequences</label>
-					<div class="col-sm-6">
-                        <input type="number" class="form-control" placeholder="Enter number of new sequences" ng-model="newSequences.number" />
-					</div>
-				</div>
-				<div class="form-group">
-					 <label for="inputPassword3" class="col-sm-4 control-label">Sequence Lead</label>
-					<div class="col-sm-6">
-                        <select class="form-control" ng-model="newSequences.lead" 
-                            ng-options="resource.fullname for resource in resources track by resource.id">
-                        </select>
-                     </div>
-                 </div>
-
-			</form>
-						</div>
-						<div class="modal-footer">
-                            <button type="button" class="btn btn-default" ng-click="resetNewSequnences()" data-dismiss="modal">Close</button>
-                            <button type="button" ng-disabled="!newSequences.number || newSequences.number<1 || !newSequences.lead"
-                                ng-click="createNewSeq()" class="btn btn-success">Create new Sequences</button>
-						</div>
-					</div>
-
-				</div>
-
-			</div>
-
-
-
-
-
-
-
-			<div class="modal fade" id="taskAddModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-							<h4 class="modal-title" id="myModalLabel">
-								Create a new task
-							</h4>
-						</div>
-                        <div class="modal-body">
-
-			<form class="form-horizontal" role="form">
-				<div class="form-group">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Task title</label>
-					<div class="col-sm-6">
-                        <input type="text" class="form-control" ng-class="{'farsi':!$parent.isASCII(newtask.title)}"  placeholder="New task name" ng-model="newtask.title" />
-					</div>
-				</div>
-				<div class="form-group">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Make task a milestone</label>
-					<div class="col-sm-6">
-                        <input type="checkbox" class="form-control" placeholder="New task name" ng-model="newtask.isMilestone" />
-					</div>
-				</div>
-				<div class="form-group" ng-show="!newtask.isMilestone" >
-					 <label for="inputEmail3" class="col-sm-4 control-label">Start</label>
-					<div class="col-sm-6">
-                        <input type="date" class="form-control" placeholder="Task start date" ng-model="newtask.start" />
-					</div>
-				</div>
-				<div class="form-group" ng-show="newtask.isMilestone">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Delivery</label>
-					<div class="col-sm-6">
-                        <input type="date" class="form-control" placeholder="Task End date" ng-model="newtask.end" />
-					</div>
-				</div>
-				<div class="form-group" ng-show="!newtask.isMilestone">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Effort</label>
-					<div class="col-sm-6">
-                        <input type="number" min="0" max="96" class="form-control" placeholder="How many hours?" ng-model="newtask.effort" required/>
-					</div>
-				</div>
-
-				<div class="form-group">
-					 <label for="inputPassword3" class="col-sm-4 control-label">Task Manager</label>
-					<div class="col-sm-6">
-                        <select class="form-control" ng-model="newtask.manager" 
-                            ng-options="resource.fullname for resource in resources track by resource.id">
-                        </select>
-                     </div>
-                 </div>
-
-
-
-				<div class="form-group" ng-show="!newtask.isMilestone">
-					 <label for="inputPassword3" class="col-sm-4 control-label">Resources</label>
-					<div class="col-sm-6">
-                        <input type="text" class="form-control" placeholder="Type person name here" ng-model="newtask.filterResources" />
-                        <select class="form-control" ng-model="newtask.resources" multiple 
-                            ng-options="resource.fullname for resource in resources | filter:newtask.filterResources track by resource.id">
-                        </select>
-                     </div>
-                </div>
-
-				<div class="form-group">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Task Priority</label>
-					<div class="col-sm-6">
-                        <input type="number" min="1" max="1000" class="form-control" placeholder="How many hours?" ng-init="newTaskEffort=0" ng-model="newtask.priority" required/>
-					</div>
-				</div>
-
-
-
-				<div class="form-group">
-					 <label for="inputPassword3" class="col-sm-4 control-label">Depends On</label>
-					<div class="col-sm-6">
-                        <input type="text" class="form-control" placeholder="Type task name here" ng-model="newtask.dependencyFilter" />
-                        <select class="form-control" ng-model="newtask.depends" multiple 
-                            ng-options="task.title for task in tasks | filter:newtask.dependencyFilter track by task.id">
-                        </select>
-                     </div>
-                </div>
-
-			</form>
-
-
-						</div>
-						<div class="modal-footer">
-                            <button type="button" class="btn btn-default" ng-click="resetNewtask()" data-dismiss="modal">Close</button>
-                            <button type="button" ng-disabled="!newtask.title || !newtask.manager || (newtask.effort && !newtask.resources)"
-                                ng-click="createNewTask()" class="btn btn-success">Create new task</button>
-						</div>
-					</div>
-
-				</div>
-
-			</div>
-
-
-
-
-
-
-
-			<div class="modal fade" id="taskDetailModal" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<h4 class="modal-title" id="myModalLabel">
-								Task edit area
-                                <a target="_new" href="#/pms/t/{{editTaskInfo.id}}"><button type="button" 
-                                    class="btn btn-default btn-sm pull-right">Go to Task Page</button></a>
-							</h4>
-						</div>
-                        <div class="modal-body">
-
-			<form class="form-horizontal" role="form">
-				<div class="form-group">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Task title</label>
-					<div class="col-sm-6">
-                        <input type="text" class="form-control" ng-class="{'farsi':!$parent.isASCII(editTaskInfo.title)}"  placeholder="Task name" 
-                        ng-model="editTaskInfo.title" />
-					</div>
-				</div>
-				<div class="form-group">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Start</label>
-					<div class="col-sm-6">
-                        <input type="date" class="form-control" placeholder="Task start date" ng-model="editTaskInfo.start"/>
-					</div>
-				</div>
-				<div class="form-group" ng-show="editTaskInfo.effort==0">
-					 <label for="inputEmail3"  class="col-sm-4 control-label">end</label>
-					<div class="col-sm-6">
-                        <input type="date" class="form-control" placeholder="Task end date" ng-model="editTaskInfo.end" />
-					</div>
-                </div>
-
-				<div class="form-group">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Effort</label>
-					<div class="col-sm-6">
-                        <input type="number" min="0" max="96" class="form-control" placeholder="Task effort" ng-model="editTaskInfo.effort" />
-					</div>
-                </div>
-				<div class="form-group">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Priority</label>
-					<div class="col-sm-6">
-                        <input type="number" min="1" max="1000" class="form-control" placeholder="Task effort" ng-model="editTaskInfo.priority" />
-					</div>
-                </div>
-
-				<div class="form-group" >
-					 <label for="inputPassword3" class="col-sm-4 control-label">Resources</label>
-					<div class="col-sm-6">
-
-                        <input type="text" class="form-control" placeholder="Type person name here" ng-model="editTaskInfo.resourceFilter" />
-                        <select class="form-control" ng-model="editTaskInfo.resources" multiple 
-                            ng-options="resource.fullname for resource in resources  | filter:editTaskInfo.resourceFilter track by resource.id">
-                        </select>
-                     </div>
-                </div>
-				<div class="form-group" ng-if="can_depend">
-					 <label for="inputPassword3" class="col-sm-4 control-label">Depends On</label>
-					<div class="col-sm-6">
-                        <input type="text" class="form-control" placeholder="Type task name here" ng-model="editTaskInfo.dependencyFilter" />
-                        <select class="form-control" ng-model="editTaskInfo.depends" multiple 
-                            ng-options="task.title for task in can_depend | filter:editTaskInfo.dependencyFilter track by task.id">
-                        </select>
-                     </div>
-                </div>
-
-            	<div ng-show="editTaskInfo.effort" class="form-group">
-					 <label for="inputEmail3" class="col-sm-4 control-label">Complete</label>
-					<div class="col-sm-6">
-                        <div class="input-group-addon">{{editTaskInfo.complete}}</div>
-                        <input type="range" class="form-control" min="0" max="100" placeholder="Task effort" ng-model="editTaskInfo.complete" />
-					</div>
-                </div>
-
-
-			</form>
-
-
-						</div>
-						<div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" ng-click="deleteTask(editTaskInfo.id)" class="btn btn-danger" >Delete Task</button>
-                            <button type="button" ng-show="editTaskInfo.resources || editTaskInfo.effort==0"
-                                ng-click="updateTask(editTaskInfo.id)" class="btn btn-primary">Update task</button>
-						</div>
-					</div>
-
-				</div>
-
-			</div>
-
-
-
-
-
+    <!--     Task edit modal       --!>
+    <div class="modal fade" id="taskDetailModal" ng-include="'pages/pms/taskDetailModalTemplate.html'" 
+        role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"></div>
 
 
 
@@ -608,55 +276,8 @@ border-bottom: 1px solid #57BEDD;
 			</div>
 	</div>
 
-    <div class="panel-body" style="background: #FAFAFA;" ng-show="tasks.length>0">
-                <div id="taskList" class="col-md-3 column" >
-
-                        <input ng-if="tasks" type="text" class="form-control" placeholder="Filter Tasks" ng-model="project.filterTaskName" />
-
-                    <div id="tasksDiv">
-                        <table class="table table-responsive table-bordered">
-                        <tr ng-click="taskDetail(task.id)" title="{{task.name}}" class="active" 
-                            ng-repeat="task in tasks | orderBy:'start' | filter:project.filterTaskName ">
-                            <td class="info">
-                                <div style="color:grey"><b>{{$index+1}}</b></div>
-                                <br/>
-                                <div ng-show="isMyTask(task)">
-                                    <a><em style="color:rgb(96, 139, 181);" class="glyphicon glyphicon-user"></em></a>
-                                </div>
-                                <div ng-show="task.effort==0">
-                                    <a><em style="color:#515151" class="glyphicon glyphicon-screenshot"></em></a>
-                                </div>
-                               <div ng-show="task.complete==100">
-                                    <em style="color:green" class="glyphicon glyphicon-ok"></em>
-                                </div>
-                                <div ng-show="task.dependent_of.length>0">
-                                    <em style="color:grey" class="glyphicon glyphicon-export"></em>
-                                </div>
-                                <div ng-show="task.depends.length>0">
-                                    <em style="color:grey" class="glyphicon glyphicon-import"></em>
-                                </div>
-
-                            </td>
-                            <td ng-class="{'success':task.complete==100, 'warning':task.complete==0 && !isTaskLate(task), 'danger':isTaskLate(task)}">
-                                <a class="taskA" ng-class="{'farsi':!$parent.isASCII(task.title)}" style="font-size: 13px;" data-task-title="{{toTitleCase(task.title)}}" 
-                                    ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" id="task_{{task.id}}" >{{toTitleCase(task.title).slice(0,30)}}</a>
-                            <div class="progress" style="height:3px;">
-                              <div class="progress-bar" role="progressbar" aria-valuenow="{{task.complete}}" aria-valuemin="0" aria-valuemax="100" style="width: {{task.complete}}%;">
-                                  <span class="sr-only">{{task.complete}}% Complete</span>
-                              </div>
-                            </div>
-                            <small style="color:grey" ng-repeat="person in task.resources track by $index">
-                                <a style="color:grey" href="#/user/{{person.id}}">{{person.lastname}}</a><small ng-if="$index!=task.resources.length-1">, <small>
-
-                            </small>
-
-                            </td>
-                        
-                        </tr>
-                        </table>
-
-                    </div>
-				</div>
+    <div class="panel-body" style="background: #FAFAFA;"  ng-show="tasks.length>0">
+        <div id="taskList" class="col-md-3 column" ng-include="'pages/pms/tasksListTemplate.html'"></div>
 				<div class="col-md-9 column">
                     <div id="projectDetailContainer">
                         <div id="projectDetailDiv"></div>

@@ -256,12 +256,11 @@ function updateImageSize(img, maxWidth, maxHeight){
             if ($scope.userInfo.userid && $scope.newComment.content){
                 req = $http.put('/api/db/comment', $scope.newComment);
                 req.success(function(resp){
-                            //$scope.newComment.modified_on = moment().unix();
-                            if (!$scope.comments[$scope.comment_id])
-                                $scope.comments[$scope.comment_id] = [];
-                            $scope.comments[$scope.comment_id].splice(0, 0, $scope.newComment);
-                            $scope.newComment = {};
-                        })
+                        if (!$scope.comments[$scope.comment_id])
+                            $scope.comments[$scope.comment_id] = [];
+                        $scope.comments[$scope.comment_id].splice(0, 0, $scope.newComment);
+                        $scope.newComment = {};
+                    })
 
             }
 
@@ -1177,7 +1176,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 key = keys[2];
                 if (key != 'Date'){
                     value = data[key][i];
-                    chartData.push({date:new Date(label).getTime(), value:parseInt(value)})
+                    chartData.push({date:moment(label).toDate().getTime(), value:parseInt(value)})
                     }
                 //$scope.burndownLineChart.addData(values, label);
 

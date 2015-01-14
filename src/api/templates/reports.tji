@@ -1,4 +1,4 @@
-taskreport breakdown_${subproject.id} "csv_${subproject.id}"{
+taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
     formats csv
     #start ${subproject.start.strftime('%Y-%m-%d')}
     #end ${subproject.end.strftime('%Y-%m-%d')}
@@ -8,7 +8,7 @@ taskreport breakdown_${subproject.id} "csv_${subproject.id}"{
     taskroot fearless.__${subproject.id}
 }
 
-taskreport breakdown1_${subproject.id} "plan_${subproject.id}"{
+taskreport breakdown1_${subproject.id} "plan_${subproject.uuid}"{
     formats html
     start ${subproject.start.strftime('%Y-%m-%d')}
     end ${subproject.end.strftime('%Y-%m-%d')}
@@ -17,7 +17,7 @@ taskreport breakdown1_${subproject.id} "plan_${subproject.id}"{
     sorttasks actual.start.up
     taskroot fearless.__${subproject.id}
 }
-taskreport breakdown2_${subproject.id} "guntt_${subproject.id}"{
+taskreport breakdown2_${subproject.id} "guntt_${subproject.uuid}"{
     formats html
     start ${subproject.start.strftime('%Y-%m-%d')}
     end ${subproject.end.strftime('%Y-%m-%d')}
@@ -27,7 +27,7 @@ taskreport breakdown2_${subproject.id} "guntt_${subproject.id}"{
     taskroot fearless.__${subproject.id}
 }
 
-resourcereport resourceGraph_${subproject.id} "resource_${subproject.id}" {
+resourcereport resourceGraph_${subproject.id} "resource_${subproject.uuid}" {
   scenarios actual
   start ${subproject.start.strftime('%Y-%m-%d')}
   end ${subproject.end.strftime('%Y-%m-%d')}
@@ -41,7 +41,7 @@ resourcereport resourceGraph_${subproject.id} "resource_${subproject.id}" {
   taskroot fearless.__${subproject.id}
 }
 
-export "MS-project_${subproject.id}" {
+export "MS-project_${subproject.uuid}" {
   formats mspxml
   start ${subproject.start.strftime('%Y-%m-%d')}
   end ${subproject.end.strftime('%Y-%m-%d')}
@@ -49,7 +49,7 @@ export "MS-project_${subproject.id}" {
   taskroot fearless.__${subproject.id}
 }
 
-accountreport "ProfiAndLoss_${subproject.id}" {
+accountreport "ProfiAndLoss_${subproject.uuid}" {
   formats html
   start ${subproject.start.strftime('%Y-%m-%d')}
   end ${"${now}"}
@@ -58,7 +58,7 @@ accountreport "ProfiAndLoss_${subproject.id}" {
   accountroot resourceCost
 }
 
-accountreport "ProfiAndLossCsv_${subproject.id}" {
+accountreport "ProfiAndLossCsv_${subproject.uuid}" {
   formats csv
   start ${subproject.start.strftime('%Y-%m-%d')}
   end ${"${now}"}
@@ -67,7 +67,7 @@ accountreport "ProfiAndLossCsv_${subproject.id}" {
   accountroot resourceCost
 }
 
-tracereport burn_${subproject.id} "TraceReport_${subproject.id}" {
+tracereport burn_${subproject.id} "TraceReport_${subproject.uuid}" {
   formats html
   start ${subproject.start.strftime('%Y-%m-%d')}
   end ${subproject.end.strftime('%Y-%m-%d')}

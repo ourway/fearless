@@ -50,6 +50,7 @@ def getTemplate(name):
     t = os.path.join(templates_folder, name)
     return Template(filename=t)
 
+
 def dailyTasksReportForClients():
     '''generate an email report of all tasks and send it to users and managers'''
     message =  getTemplate('email_daily_tasks_for_clients.html')\

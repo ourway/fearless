@@ -67,8 +67,9 @@ class Task(IDMixin, Base):
     id = Column(
         Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     project_id = Column(Integer, ForeignKey("project.id"), nullable=False)
-    title = Column(Unicode(64), nullable=False)
-    note = Column(String(256))  ## task note
+    title = Column(Unicode(128), nullable=False)
+    note = Column(String(512))  ## task note
+    description = Column(String(512))  ## task note
     gauge = Column(String(64))  ## task note
     start = Column(DateTime, nullable=False, default=now)
     computed_start = Column(DateTime)
@@ -81,11 +82,14 @@ class Task(IDMixin, Base):
     length = Column(Float(precision=3), default=0)
     criticalness = Column(Float(precision=3), default=0)
     onstart_charge = Column(Float(precision=3), default=0)
+    active = Column(Boolean, default=True)
     onend_charge = Column(Float(precision=3), default=0)
     milestone = Column(Boolean, default=False) # is task a milestone?
     parent_id = Column(Integer, ForeignKey("task.id"))
+    report_id = Column(Integer, ForeignKey("report.id"))
 
     parent = relationship('Task', backref='children', remote_side=[id], uselist=True)
+    reports = relationship('Report', backref='task')
     resources = relationship('User', backref='tasks', secondary='task_users')
     alternative_resources = relationship(
         'User', backref='alternative_for', secondary='task_alternative')

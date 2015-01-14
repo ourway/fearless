@@ -59,6 +59,7 @@ class Project(IDMixin, Base):
 
     '''Studio Projects
     '''
+    id = Column( Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     active = Column(Boolean, default=True)
     # 0-active, 1-pending, 2-stopped, 3-finished
     status = Column(Integer, default=0)
@@ -88,9 +89,11 @@ class Project(IDMixin, Base):
     tk = relationship('Ticket', backref='project', cascade="all, delete, delete-orphan")
     sequences = relationship('Sequence', backref='project', cascade="all, delete, delete-orphan")
     tickets = association_proxy('tk', 'Ticket')
-    #project_id = Column(Integer, ForeignKey('project.id'))
+    project_id = Column(Integer, ForeignKey('project.id'))
     rep = relationship("Report",backref='project', cascade="all, delete, delete-orphan")
     reports = association_proxy('rep', 'id') # when we refer to reports, id will be returned.
+
+    subproject = relationship("Project", backref='parent', remote_side=[id])
 
 
 
@@ -195,7 +198,7 @@ class Project(IDMixin, Base):
                        )
 
         #plan_path = '/tmp/Fearless_project.tjp'
-        plan_path = '/home/farsheed/Desktop/Fearless_project.tjp'
+        plan_path = '/home/farsheed/Desktop/Fearless_project_%s.tjp' % self.uuid
         with open(plan_path, 'wb') as f:
             f.write(finalplan.encode('utf-8'))
 
@@ -216,14 +219,14 @@ class Project(IDMixin, Base):
             return
         #if not tj.stderr:
         plan, guntt, resource, msproject, profit, csvfile, trace, burndown = None, None, None, None, None, None, None, None
-        plan_path = '/tmp/plan_%s.html' % (self.id)
-        guntt_path = '/tmp/guntt_%s.html' % (self.id)
-        resource_path = '/tmp/resource_%s.html' % (self.id)
-        msproject_path = '/tmp/MS-project_%s.xml' % (self.id)
-        profit_path = '/tmp/ProfiAndLoss_%s.html' % (self.id)
-        csv_path = '/tmp/csv_%s.csv' % (self.id)
-        trace_path = '/tmp/TraceReport_%s.csv' % (self.id)
-        traceSvg_path = '/tmp/TraceReport_%s.html' % (self.id)
+        plan_path = '/tmp/plan_%s.html' % (self.uuid)
+        guntt_path = '/tmp/guntt_%s.html' % (self.uuid)
+        resource_path = '/tmp/resource_%s.html' % (self.uuid)
+        msproject_path = '/tmp/MS-project_%s.xml' % (self.uuid)
+        profit_path = '/tmp/ProfiAndLoss_%s.html' % (self.uuid)
+        csv_path = '/tmp/csv_%s.csv' % (self.uuid)
+        trace_path = '/tmp/TraceReport_%s.csv' % (self.uuid)
+        traceSvg_path = '/tmp/TraceReport_%s.html' % (self.uuid)
 
         def saveTable(path):
             '''Read main table from these files'''

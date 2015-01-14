@@ -1,0 +1,89 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h4 class="modal-title" id="myModalLabel">
+                Create a new task
+            </h4>
+        </div>
+        <div class="modal-body">
+
+<form class="form-horizontal" role="form">
+<div class="form-group">
+     <label for="inputEmail3" class="col-sm-4 control-label">Task title</label>
+    <div class="col-sm-6">
+        <input type="text" class="form-control" ng-class="{'farsi':!$parent.isASCII(newtask.title)}"  placeholder="New task name" ng-model="newtask.title" />
+    </div>
+</div>
+<div class="form-group">
+     <label for="inputEmail3" class="col-sm-4 control-label">Make task a milestone</label>
+    <div class="col-sm-6">
+        <input type="checkbox" class="form-control" placeholder="New task name" ng-model="newtask.isMilestone" />
+    </div>
+</div>
+<div class="form-group" ng-show="!newtask.isMilestone" >
+     <label for="inputEmail3" class="col-sm-4 control-label">Start</label>
+    <div class="col-sm-6">
+        <input type="date" class="form-control" placeholder="Task start date" ng-model="newtask.start" />
+    </div>
+</div>
+<div class="form-group" ng-show="newtask.isMilestone">
+     <label for="inputEmail3" class="col-sm-4 control-label">Delivery</label>
+    <div class="col-sm-6">
+        <input type="date" class="form-control" placeholder="Task End date" ng-model="newtask.end" />
+    </div>
+</div>
+<div class="form-group" ng-show="!newtask.isMilestone">
+     <label for="inputEmail3" class="col-sm-4 control-label">Effort</label>
+    <div class="col-sm-6">
+        <input type="number" min="0" max="96" class="form-control" placeholder="How many hours?" ng-model="newtask.effort" required/>
+    </div>
+</div>
+
+<div class="form-group">
+     <label for="inputPassword3" class="col-sm-4 control-label">Task Manager</label>
+    <div class="col-sm-6">
+        <select class="form-control" ng-model="newtask.manager" 
+            ng-options="resource.fullname for resource in resources track by resource.id">
+        </select>
+    </div>
+        <div class="form-group" ng-show="!newtask.isMilestone">
+             <label for="inputPassword3" class="col-sm-4 control-label">Resources</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" placeholder="Type person name here" ng-model="newtask.filterResources" />
+                <select class="form-control" ng-model="newtask.resources" multiple 
+                    ng-options="resource.fullname for resource in resources | filter:newtask.filterResources track by resource.id">
+                </select>
+             </div>
+        </div>
+
+        <div class="form-group">
+             <label for="inputEmail3" class="col-sm-4 control-label">Task Priority</label>
+            <div class="col-sm-6">
+                <input type="number" min="1" max="1000" class="form-control" placeholder="How many hours?" ng-init="newTaskEffort=0" ng-model="newtask.priority" required/>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+             <label for="inputPassword3" class="col-sm-4 control-label">Depends On</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" placeholder="Type task name here" ng-model="newtask.dependencyFilter" />
+                <select class="form-control" ng-model="newtask.depends" multiple 
+                    ng-options="task.title for task in tasks | filter:newtask.dependencyFilter track by task.id">
+                </select>
+             </div>
+        </div>
+
+    </form>
+                </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="resetNewtask()" data-dismiss="modal">Close</button>
+                    <button type="button" ng-disabled="!newtask.title || !newtask.manager || (newtask.effort && !newtask.resources)"
+                        ng-click="createNewTask()" class="btn btn-success">Create new task</button>
+                </div>
+            </div>
+
+        </div>
+

@@ -1,0 +1,83 @@
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h4 class="modal-title" id="myModalLabel">
+								Task edit area
+                                <a target="_new" href="#/pms/t/{{editTaskInfo.id}}"><button type="button" 
+                                    class="btn btn-default btn-sm pull-right">Go to Task Page</button></a>
+							</h4>
+						</div>
+                        <div class="modal-body">
+
+			<form class="form-horizontal" role="form">
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Task title</label>
+					<div class="col-sm-6">
+                        <input type="text" class="form-control" ng-class="{'farsi':!$parent.isASCII(editTaskInfo.title)}"  placeholder="Task name" 
+                        ng-model="editTaskInfo.title" />
+					</div>
+				</div>
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Start</label>
+					<div class="col-sm-6">
+                        <input type="date" class="form-control" placeholder="Task start date" ng-model="editTaskInfo.start"/>
+					</div>
+				</div>
+				<div class="form-group" ng-show="editTaskInfo.effort==0">
+					 <label for="inputEmail3"  class="col-sm-4 control-label">end</label>
+					<div class="col-sm-6">
+                        <input type="date" class="form-control" placeholder="Task end date" ng-model="editTaskInfo.end" />
+					</div>
+                </div>
+
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Effort</label>
+					<div class="col-sm-6">
+                        <input type="number" min="0" max="96" class="form-control" placeholder="Task effort" ng-model="editTaskInfo.effort" />
+					</div>
+                </div>
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Priority</label>
+					<div class="col-sm-6">
+                        <input type="number" min="1" max="1000" class="form-control" placeholder="Task effort" ng-model="editTaskInfo.priority" />
+					</div>
+                </div>
+
+				<div class="form-group" >
+					 <label for="inputPassword3" class="col-sm-4 control-label">Resources</label>
+					<div class="col-sm-6">
+
+                        <input type="text" class="form-control" placeholder="Type person name here" ng-model="editTaskInfo.resourceFilter" />
+                        <select class="form-control" ng-model="editTaskInfo.resources" multiple 
+                            ng-options="resource.fullname for resource in resources  | filter:editTaskInfo.resourceFilter track by resource.id">
+                        </select>
+                     </div>
+                </div>
+				<div class="form-group" ng-if="can_depend">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Depends On</label>
+					<div class="col-sm-6">
+                        <input type="text" class="form-control" placeholder="Type task name here" ng-model="editTaskInfo.dependencyFilter" />
+                        <select class="form-control" ng-model="editTaskInfo.depends" multiple 
+                            ng-options="task.title for task in can_depend | filter:editTaskInfo.dependencyFilter track by task.id">
+                        </select>
+                     </div>
+                </div>
+
+            	<div ng-show="editTaskInfo.effort" class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Complete</label>
+					<div class="col-sm-6">
+                        <div class="input-group-addon">{{editTaskInfo.complete}}</div>
+                        <input type="range" class="form-control" min="0" max="100" placeholder="Task effort" ng-model="editTaskInfo.complete" />
+					</div>
+                </div>
+			</form>
+						</div>
+						<div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" ng-click="deleteTask(editTaskInfo.id)" class="btn btn-danger" >Delete Task</button>
+                            <button type="button" ng-show="editTaskInfo.resources || editTaskInfo.effort==0"
+                                ng-click="updateTask(editTaskInfo.id)" class="btn btn-primary">Update task</button>
+						</div>
+					</div>
+
+				</div>

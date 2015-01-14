@@ -33,6 +33,14 @@ class Report(IDMixin, Base):
     data = deferred(Column(Text, nullable=False))  # load on access
     user_id = Column(Integer, ForeignKey('user.id'))
     project_id = Column(Integer, ForeignKey('project.id'))
+    asset_id = Column(Integer, ForeignKey('asset.id'))
+    asset = relationship('Asset', backref='reports')
+    client_id = Column(Integer, ForeignKey('client.id'))
+    client = relationship("Client", backref='reports')
+    shot_id = Column(Integer, ForeignKey('shot.id'))
+    shot = relationship("Shot", backref='reports')
+    sequence_id = Column(Integer, ForeignKey('sequence.id'))
+    sequence = relationship("Sequence", backref='reports')
 
     def __init__(self, data):
         self.data = data

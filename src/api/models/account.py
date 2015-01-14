@@ -32,6 +32,8 @@ class Account(IDMixin, Base):
     '''
 
     id = Column( Integer, primary_key=True)  # over-ride mixin version. because of remote_side
+    active = Column(Boolean, default=True)
+    description = Column(Text())
     name = Column(String(32), nullable=False, unique=True)
     max_credit = Column(Float(precision=3), default=0)
     credit = Column(Float(precision=3), default=0)
