@@ -18,7 +18,7 @@ Clean code is much better than Cleaner comments!
 
 from models import User, Group, Role, r, now  # r is redis
 from helpers import commit, get_ip, get_params
-import json as json
+import ujson as json
 import hmac
 import uuid
 import hashlib

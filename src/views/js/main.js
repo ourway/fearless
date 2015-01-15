@@ -839,7 +839,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
               element: 'burndown_chart_div',
               xkey: 'date',
               events:[timeConverter()],
-              data:[{'date':new Date().toDateString(), 'value':0}],
+              data:[{'date':new Date().toDateString(), 'value':0, 'expected':0, 'difference':0}],
               ykeys: ['value', 'expected', 'difference'],
               lineColors: ['#5bc0de', 'green', '#c2aeae'],
               lineWidth: ['5', '1', '1'],
@@ -853,7 +853,10 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
             progressPyChart = Morris.Donut({
               element: 'progress_chart_div',
-              data: [{}],
+              data: [
+                {label: "Completed", value: 0},
+                {label: "Remaining", value: 100},
+              ],
               colors:['#5bc0de','lightgrey'],
               postUnits:'%',
               resize:true
@@ -1134,7 +1137,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     {label: "Completed", value: complete},
                     {label: "Remaining", value: 100-complete},
                   ]
-            progressPyChart.setData(data);
+                progressPyChart.setData(data);
             
         }
 
@@ -1148,9 +1151,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             complete = 0;
             lables = data.Date;
             keys = Object.keys(data);
-
-
-            //$scope.burndownLineChart.addData([100,0], 'Project Start');
             chartData = [];
             for (i in lables){
                 label = lables[i];
@@ -1192,7 +1192,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         })
 
             }
-            burndownChart.setData(chartData)
+            if (chartData.length>2)
+            {
+                console.log(chartData)
+                burndownChart.setData(chartData);
+            }
 
         }
 
@@ -1306,12 +1310,15 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
     
     $scope.deleteTask = function(taskId){
         if (confirm('Are you sure you want to delete the task?'))
+        {
             $http.delete('/api/task/delete/'+taskId).success(function(resp){
                 $scope.replan = true;
-                $scope.generateReport();
                 $scope.getTasksList();
+                //$scope.generateReport();
                 $('#taskDetailModal').modal('hide');
                     });
+
+        }
 
 
     };

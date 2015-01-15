@@ -82,8 +82,7 @@ class DB:
 
     #@Authorize('see_db')
     def on_get(self, req, resp, **kw):
-        banned = ['password', 'token',  'session_id', 
-                  'latest_session_id', 'lastLogIn', 'password2']
+
         args = req.path.split('/')
         table = args[3]
         u = getUserInfoFromSession(req, resp)
@@ -119,6 +118,7 @@ class DB:
                 #data = eval(query).slice(start, end).all()
 
             data = eval(query).all()
+            resp.body = data
 
         else:
             if not show:
@@ -136,6 +136,7 @@ class DB:
                             query += '.filter({t}.{k}=="{v}")'.format(t=table, 
                                         k=filter.keys()[0], v=filter[filter.keys()[0]])
                 data = eval(query).all()
+                resp.body = data
             except (AttributeError):
                 data = None
         get_count = req.get_param('count')
@@ -144,10 +145,6 @@ class DB:
             return
         field = req.get_param('field')
         if field:
-            if field in banned:
-                resp.status = falcon.HTTP_403
-                resp.body = {'message':'Not Authorized'}
-                return
             try:
                 if len(args) != 5:
                     data = [eval('i.%s'%field) for i in data]
@@ -182,34 +179,15 @@ class DB:
                 print e
                 raise falcon.HTTPBadRequest('Bad Request', 'The requested field is not available for database')
 
-
             resp.body = data
             return
 
-
-        try:
-            _data = repr(data)
-            d = json.loads(_data)
-            if d and isinstance(d, dict):
-                for i in banned:
-                    if d.get(i):
-                        del(d[i])
-
-            if d and isinstance(d, list):
-                for each in d:
-                    if isinstance(each, dict):
-                        for i in banned:
-                            if each.get(i):
-                                del(each[i])
-            resp.body = d
-        except (TypeError, ValueError):
-            resp.body = data
 
         if len(args)==5 and len(data)==1 and not listMe:
             data = data[0]
             _d = {}
             for i in dir(data):
-                if not i.startswith('_') and i not in banned:
+                if not i.startswith('_'):
                     value=getattr(data, i)
                     if isinstance(value, (str, unicode, long, int, float, bool, datetime)):
                         _d[i] = value

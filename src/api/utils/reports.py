@@ -16,7 +16,7 @@ Clean code is much better than Cleaner comments!
 import falcon
 import json as json
 import hashlib
-from helpers import commit, get_ip, get_params
+from helpers import commit, get_ip, get_params, dumps
 from validators import email_validator
 from tasks import send_envelope
 import os

@@ -15,7 +15,8 @@ Clean code is much better than Cleaner comments!
 import falcon
 import os
 from sqlalchemy.exc import IntegrityError  # for exception handeling
-import json as json
+import json
+import ujson
 import commands
 import cStringIO
 from sqlalchemy.ext import associationproxy
@@ -52,11 +53,19 @@ def dumps(obj):
 
 def jsonify(self, resp):
     '''Everything is json here'''
-    import ujson
-    if isinstance(resp.body, str):
-        data = resp.body
-    elif isinstance(resp.body, (dict, list)):
-        data = ujson.dumps(resp.body)
+    if not resp.body:
+        data = {}
+    elif isinstance(resp.body, (dict)):
+        data = ujson.encode(resp.body)
+    elif isinstance(resp.body, (str)):
+        data = ujson.encode(resp.body)
+    elif isinstance(resp.body, (list)):
+        try:
+            data = json.loads(repr(resp.body))
+        except:
+            data = resp.body
+        finally:
+            data = ujson.encode(data)
     else:
         data = repr(resp.body)
 

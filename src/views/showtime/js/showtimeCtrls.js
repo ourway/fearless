@@ -132,7 +132,7 @@ $scope.$watch(function(){return $location.$$path},
                     project.projectName = $scope.name;
                     req = $http.post('/api/asset/'+$scope.name+'.zip?name=true');
                     req.error(function(resp){
-                        if (resp.title=='Authentication required')
+                        if (resp && resp.title=='Authentication required')
                             window.location = '/app/#/auth/login/' + btoa('showtime');
                             })
                     req.success(function(assetInfo){
