@@ -24,7 +24,7 @@ __all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
            'Repository', 'Project', 'now', 'Ticket', 'session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
            'Document', 'Account', 'Date' ,'Collection', 'r', 'es', 'Departement',
-           'Comment', 'fdb', 'vdb', 'adb', 'rdb']
+           'Comment', 'fdb', 'vdb', 'adb', 'rdb', 'ddb']
 
 import os
 
@@ -46,6 +46,11 @@ fdb = riakClient.bucket('fearless_file_database')
 vdb = riakClient.bucket('fearless_video_database')
 adb = riakClient.bucket('fearless_asset_database')
 rdb = riakClient.bucket('fearless_reports_database')
+
+ddb = riakClient.bucket('fearless_documents_database')
+riakClient.create_search_index('fearless_documents_database')
+ddb.set_properties({'search_index': 'fearless_documents_database'})
+ddb.enable_search()
 #r.flushdb()
 
 from db import session, engine, Base

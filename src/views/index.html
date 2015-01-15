@@ -93,7 +93,7 @@
               </li>
 
             </ul>
-            <ul class="nav navbar-nav navbar-right" ng-if="!check_auth_area()" ng-init="is_logged_in()">
+            <ul class="nav navbar-nav navbar-right" style="padding-left: 15px;margin-right: 0px;" ng-if="!check_auth_area()" ng-init="is_logged_in()">
         <form ng-if="userInfo.logged_in" class="navbar-form" name="profile_form">
         <button class="btn btn-info" ng-click=";go('profile/')">{{userInfo.username}}</button>
         <button class="btn btn-danger" ng-click="loginInfo.action='signout';doLogout();go('auth/login/'+$location.$$path)">Sign Out</button>

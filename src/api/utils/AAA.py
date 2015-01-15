@@ -75,7 +75,7 @@ def Authenticate(req, resp, params):
 
     sid = req.cookie('session-id')
     ''' Now we need to check if session is available and it's sha1 is in redis'''
-    if req.path in free_services or (sid and r.get(hashlib.sha1(sid).hexdigest())):
+    if req.path in free_services or '/api/note' in req.path or (sid and r.get(hashlib.sha1(sid).hexdigest())):
         ''' Now we need to authorize user!
             NOT IMPLEMENTED YET
         '''

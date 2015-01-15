@@ -81,10 +81,12 @@ class Project(IDMixin, Base):
     users = relationship('User', backref='projects', secondary='project_users')
     watchers = relationship('User', backref='watches_projects', secondary='project_watchers')
     lead_id = Column(Integer, ForeignKey("user.id"), nullable=False)
+    creator_id = Column(Integer, ForeignKey("user.id"))
+    director_id = Column(Integer, ForeignKey("user.id"))
+    lead = relationship('User', backref='leads', foreign_keys=[lead_id])
+    director = relationship('User', backref='directs', foreign_keys=[director_id])
+    creater = relationship('User', backref='projects_created', foreign_keys=[creator_id])
     working_days = Column(String(128), default='sat 09:00 - 18:00,')
-    lead = relationship('User', backref='leads')
-    director = relationship('User', backref='directs')
-    creator = relationship('User', backref='projects_created')
     is_stereoscopic = Column(Boolean, default=False)
     fps = Column(Float(precision=3), default=24.000)
     tk = relationship('Ticket', backref='project', cascade="all, delete, delete-orphan")
@@ -93,11 +95,7 @@ class Project(IDMixin, Base):
     project_id = Column(Integer, ForeignKey('project.id'))
     rep = relationship("Report",backref='project', cascade="all, delete, delete-orphan")
     reports = association_proxy('rep', 'id') # when we refer to reports, id will be returned.
-
     subproject = relationship("Project", backref='parent', remote_side=[id])
-
-
-
 
 
     @aggregated('tasks', Column(Integer))

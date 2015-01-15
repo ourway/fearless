@@ -149,8 +149,6 @@ var TITLE = 'TITLE';
                 templateUrl: 'pages/crew/report.html',
                 controller: 'reportCtrl',
                  reloadOnSearch: false // dont reload the page on $location.search
-
-
             })
              .when('/ua', {
 
@@ -934,14 +932,17 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 data = '<div id="canvasloader-container" style="display:none;padding:20%;padding-top:5%" class="col-md-12"><h1 align="center">Calculating ...</h1></div>'
                 $('#projectDetailDiv').html(data);
 
-                var cl = new CanvasLoader('canvasloader-container');
-                cl.setColor('#2aabd2'); // default is '#000000'
-                cl.setShape('spiral'); // default is 'oval'
-                cl.setDiameter($('#projectDetailDiv').width()*0.4); // default is 40
-                cl.setDensity(20); // default is 40
-                cl.setRange(2); // default is 1.3
-                cl.setFPS(24); // default is 24
-                cl.show(); // Hidden by default
+                el = document.getElementById('canvasloader-container');
+                if (el){
+                    var cl = new CanvasLoader('canvasloader-container');
+                    cl.setColor('#2aabd2'); // default is '#000000'
+                    cl.setShape('spiral'); // default is 'oval'
+                    cl.setDiameter($('#projectDetailDiv').width()*0.4); // default is 40
+                    cl.setDensity(20); // default is 40
+                    cl.setRange(2); // default is 1.3
+                    cl.setFPS(24); // default is 24
+                    cl.show(); // Hidden by default
+                }
             }
             $('#canvasloader-container').fadeIn();
             $scope.mode=mode;
@@ -967,7 +968,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         }
 
                     }
-                else
+                else if($scope.tasks)
                     {
                     data = '<div id="planerrordiv" style="padding:20%;padding-top:5%" class="col-md-12"><h1>Something is not right! Trying to use backup data. Please reload.</h1></div>';
                     $('#projectDetailDiv').html(data);
@@ -1670,7 +1671,9 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 fearlessApp.controller('errorsCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
         
         })
-
+fearlessApp.controller('tasksCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
+        
+        })
 
 fearlessApp.controller('taskDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
         taskId = $routeParams.taskId;

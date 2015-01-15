@@ -16,20 +16,20 @@
                         ng-model="project.name" />
 					</div>
 				</div>
-				<div class="form-group" ng-init="newProject.start=timeConverter()">
+				<div class="form-group" ng-init="newProject.start=timeConverter()" ng-show="$parent.isAdmin || $parent.userInfo.userid==project.creater.id">
 					 <label for="inputEmail3" class="col-sm-4 control-label">Start Date</label>
 					<div class="col-sm-6">
                         <input type="date" class="form-control" ng-model="project.start" required/>
 					</div>
 				</div>
-				<div class="form-group">
+				<div class="form-group" ng-show="$parent.isAdmin || $parent.userInfo.userid==project.creater.id">
 					 <label for="inputPassword3" class="col-sm-4 control-label">End Date</label>
 					<div class="col-sm-6">
 						<input type="date" class="form-control" ng-model="project.end" required />
 					</div>
 				</div>
 
-				<div class="form-group">
+				<div class="form-group" ng-show="$parent.isAdmin || $parent.userInfo.userid==project.creater.id">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Leader</label>
 					<div class="col-sm-6">
                         <select class="form-control" ng-model="project.leader" placeholder="Who's running the project?" 
@@ -38,7 +38,7 @@
                 </div>
                 </div>
 
-				<div class="form-group">
+				<div class="form-group" ng-show="$parent.isAdmin || $parent.userInfo.userid==project.creater.id">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Watchers</label>
 					<div class="col-sm-6">
                         <select class="form-control" ng-model="project.watchers" multiple 

@@ -59,12 +59,12 @@ class Document(IDMixin, Base):
     @validates('data')
     def save_data_in_riak(self, key, data):
         self.uuid = getUUID()
-        newReportObject = rdb.new(self.uuid, base64.encodestring(data.encode('utf-8')))
+        newReportObject = rdb.new(self.uuid, data.encode('utf-8'))
         newReportObject.store()
         return self.uuid
 
     @property
     def body(self):
         dataObject = rdb.get(self.uuid)
-        return base64.decodestring(dataObject.data)
+        return dataObject.data
 

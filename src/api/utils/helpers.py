@@ -53,9 +53,12 @@ def dumps(obj):
 
 def jsonify(self, resp):
     '''Everything is json here'''
+    resp.content_type = 'application/json'
     if not resp.body:
-        data = {}
-    elif isinstance(resp.body, (dict)):
+        data = '[]'
+        resp.body = data
+        return
+    if isinstance(resp.body, (dict)):
         data = ujson.encode(resp.body)
     elif isinstance(resp.body, (str)):
         data = ujson.encode(resp.body)
@@ -154,6 +157,8 @@ def csv2json(csvfile):
             obj[key].append(value)
     return dict(obj)
 
+
+        
 
 
 

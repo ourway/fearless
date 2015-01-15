@@ -18,6 +18,7 @@ import cgi
 #cgi.maxlen = 10 * 1024 * 1024 # 8Gb
 import importlib
 from utils.helpers import commit, jsonify, get_params
+from utils.documents import SetNote, GetNote, SearchNote
 import urlparse
 from urllib import unquote
 from string import ascii_uppercase
@@ -321,6 +322,9 @@ app.add_route('/api/taskcard/{date}', UserTasksCard())
 app.add_route('/api/sequence/add/{projId}', AddSequence())
 app.add_route('/api/sendmail', Mailer())
 app.add_route('/api/report', AddReport())
+app.add_route('/api/note/get/{key}', GetNote())
+app.add_route('/api/note/set/{key}/{value}', SetNote())
+app.add_route('/api/note/search/{query}', SearchNote())
 app.add_route('/api/user/{userId}/groups', UpdateGroups())
 
 

@@ -22,6 +22,7 @@ from sqlalchemy import desc, asc
 from helpers import commit, jsonify, parse_tjcsv, csv2json
 from defaults import home
 import datetime
+from sqlalchemy import or_, and_
 import os
 from cStringIO import StringIO
 
@@ -53,10 +54,12 @@ class GetProjectDetails:
                 'collections':[{'name':i.name.title(), 'id':i.id, 'path':i.path, 
                                 'repository':i.repository.name.title(),
                                 'repository_path':i.repository.path} for i in collections if not i.parent]}
-            if project.lead_id:
+            if project.lead:
                 data['leader'] = {'fullname':project.lead.fullname, 'id':project.lead.id}
             if project.director:
                 data['director'] = {'fullname':project.director.fullname, 'id':project.director.id}
+            if project.creater:
+                data['creater'] = {'fullname':project.creater.fullname, 'id':project.creater.id}
 
 
             resp.body = data
@@ -70,11 +73,10 @@ class ListProjects:
     def on_get(self, req, resp):
         user = getUserInfoFromSession(req, resp)
         uid = user.get('id')
-        userdb = req.session.query(User).filter_by(id=user.get('id')).first()
-        projects = req.session.query(Project).join(User).filter_by(id=uid)\
-            .order_by(asc(Project.complete)).all()
-        watchings = userdb.watches_projects
-        resp.body = list(set(projects + watchings))
+        projects = req.session.query(Project).filter(or_(Project.lead_id==uid, 
+                Project.director_id==uid, Project.creator_id==uid)).all()
+        resp.body = projects
+
 
 
 class AddProject:
@@ -95,8 +97,8 @@ class AddProject:
 
         if start and end and name and lead_id:
             leader = req.session.query(User).filter_by(id=lead_id).first()
-            creator = req.session.query(User).filter_by(id=user.get('id')).first()
-            new = Project(start=start, name=name, end=end, lead=leader, creator=creator)
+            creater = req.session.query(User).filter_by(id=user.get('id')).first()
+            new = Project(start=start, name=name, end=end, lead=leader, creater=creater)
             if description:
                 new.description = description
             repoName = name
@@ -226,7 +228,8 @@ class UpdateProject:
             project.name = data.get('name')
             project.end = data.get('end')
             project.description= data.get('description')
-            project.lead_id = int(data.get('leader').get('id'))
+            if data.get('leader'):
+                project.lead_id = data.get('leader').get('id')
             project.watchers = []
             if data.get('watchers'):
                 for eachWatcherId in data.get('watchers'):
@@ -286,7 +289,7 @@ class ListTasks:
         user = getUserInfoFromSession(req, resp)
         project = req.session.query(Project).filter(Project.id==projId).first()
         if project:
-            resp.body = [{
+            data = [{
                     'start':i.start,
                     'end':i.end,
                     'title':i.title,
@@ -298,6 +301,7 @@ class ListTasks:
                     'resources':[{'id':k.id, 'lastname':k.lastname} for k in i.resources]
             
             } for i in project.tasks]
+            resp.body = data
 
 
 class GetTask:
@@ -371,9 +375,11 @@ class DeleteTask:
         if target:
             req.session.delete(target)
             resp.status = falcon.HTTP_202
+            resp.body = {'message':'ok', 'info':'task deleted'}
 
         else:
             resp.status = falcon.HTTP_404
+            resp.body = {'message':'error', 'info':'task not found'}
 
 class UserTasksCard:
     def on_get(self, req, resp, date):

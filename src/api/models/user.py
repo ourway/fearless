@@ -129,7 +129,6 @@ class User(IDMixin, Base):
     grps = relationship('Group', backref='users', secondary='users_groups')
     groups = association_proxy('grps', 'name')
 
-
     @validates('email')
     def _validate_email(self, key, data):
         if re.match(r'[^@]+@[^@]+\.[^@]+', data):
