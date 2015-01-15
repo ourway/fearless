@@ -21,7 +21,7 @@ from utils.helpers import commit, jsonify, get_params
 import urlparse
 from urllib import unquote
 from string import ascii_uppercase
-import json as json
+import ujson as json
 from utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection
 from utils.reports import Mailer, AddReport
 from gevent import wsgi
@@ -31,7 +31,6 @@ from sqlalchemy import desc, asc
 from datetime import datetime
 import riak
 client = riak.RiakClient()
-
 
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
@@ -297,7 +296,7 @@ class RSET:
         obj.store()
         value = obj.data
 
-        resp.body = json.encode({key:value})
+        resp.body = {key:value}
 
 class RLIST:
     # NOTE
@@ -311,7 +310,7 @@ class RLIST:
             except (TypeError, ValueError):
                 value = json.loads(b.get(key).encoded_data)
             data.append({key:value})
-        resp.body = json.encode(data)
+        resp.body = data
 
 
 
@@ -319,7 +318,8 @@ class RLIST:
 
 # falcon.API instances are callable WSGI apps
 #app = falcon.API()
-app = falcon.API(before=[getSession, Authenticate], after=[jsonify, closeSession])
+#app = falcon.API(before=[getSession, Authenticate], after=[jsonify, closeSession])
+app = falcon.API(before=[getSession], after=[jsonify])
 things = ThingsResource()
 
 ########################################################
@@ -366,9 +366,9 @@ app.add_route('/api/report', AddReport())
 app.add_route('/api/user/{userId}/groups', UpdateGroups())
 
 
-app.add_route('/db/get/{bucket}/{key}', RGET())
-app.add_route('/db/set/{bucket}/{key}/{value}', RSET())
-app.add_route('/db/list/{bucket}', RLIST())
+app.add_route('/api/db/get/{bucket}/{key}', RGET())
+app.add_route('/api/db/set/{bucket}/{key}/{value}', RSET())
+app.add_route('/api/db/list/{bucket}', RLIST())
 
 
 if __name__ == '__main__':

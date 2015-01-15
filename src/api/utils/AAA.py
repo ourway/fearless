@@ -140,7 +140,8 @@ class Login:
         email = form.get('email')
         if email:
             email = email.lower()
-        target = userdb.get(email).data
+        _target = userdb.get(email)
+        target = _target.data
         if not sid:
             sid = getANewSessionId()
 
@@ -153,7 +154,7 @@ class Login:
         resp.append_header('set-cookie', 'session-id=%s; path=/; max-age=5; HttpOnly' %
                         sid)  # this session is not yet saved
         # don't tell what's wrong!
-        if not target or not target['password'] == form.get('password'):
+        if not target or not target.get('password') == hashlib.sha512(form.get('password')).hexdigest():
             r.incr('fail_' + sid, 1)
             r.expire('fail_' + sid, 60)
             logger.warning('{ip}|Wrong information provided'.format(ip=ip))
@@ -166,29 +167,32 @@ class Login:
                 # this session is not yet saved
 
                 
-                resp.append_header('set-cookie', 'userid=%s; path=/; max-age=%s' % (str(target.get('email')), rem_time) )
-                resp.append_header('set-cookie', 'groups=%s; path=/; max-age=%s' % (','.join(target.get('groups')), rem_time) )
-                resp.append_header('set-cookie', 'username=%s; path=/; max-age=%s' % (str(target.get('firstname') or target.get('alias')), rem_time) )
-                resp.append_header(
-                    'set-cookie', 'session-id=%s; path=/; max-age=%s; HttpOnly' % (sid, rem_time))
-
-                target.latest_session_id = hashed_sid
+                resp.append_header('set-cookie', 'userid=%s; path=/; max-age=%s' % (_target.key, rem_time) )
+                resp.append_header('set-cookie', 'username=%s; path=/; max-age=%s' % (str(target.get('firstname')), rem_time))
+                resp.append_header('set-cookie', 'groups=%s; path=/; max-age=%s' % (str(','.join(target.get('groups'))), rem_time))
+                resp.append_header('set-cookie', 'session-id=%s; path=/; max-age=%s; HttpOnly' % (sid, rem_time))
+                r.set(hashed_sid+'_email', target['email'])
                 r.incr(hashed_sid, 1)  # add it to redis
                 r.expire(hashed_sid, rem_time)
+                userdb.new(email, target).store() ## save to database
 
                 logger.info(
-                    '{ip}|"{u}" loggin in from web"'.format(u=target.email, ip=ip))
-                resp.body = {
+                    '{ip}|"{u}" loggin in from web"'.format(u=target['email'], ip=ip))
+
+                data = {
                             'message': 'success',
-                            'firstname': target.firstname,
-                            'id': target.id,
-                            'avatar':target.avatar,
-                            'groups':[i.name for i in target.grps]
+                            'firstname': target['firstname'],
+                            'id': _target.key,
+                            'avatar':target.get('avatar'),
+                            'groups': target['groups']
                             }
+                resp.status = falcon.HTTP_202
+                resp.body = data
+
             else:
 
                 logger.warning('{ip}|{u} tried to login from web without activation"'.format(
-                    u=target.email, ip=ip))
+                    u=target.get('email'), ip=ip))
                 resp.body = {'message': 'warning',
                              'info': 'Please check your email and activate your account',
                              'not_active': True}
@@ -218,9 +222,13 @@ class Signup:
         if not olduser.data:
             newuser = {
                 "email": email,
-                "password": form.get('password'),
+                "email_s": email,
+                "password": hashlib.sha512(form.get('password')).hexdigest(),
                 "firstname": form.get('firstname'),
+                "firstname_s": form.get('firstname'),
+                'active':True,
                 "lastname": form.get('lastname'),
+                "lastname_s": form.get('lastname'),
                 "token": str(uuid.uuid4()),
                 "groups":["users"]
                     }
@@ -436,17 +444,20 @@ def getUserInfoFromSession(req, resp):
         sid = req.cookie('session-id')
         if sid:
             hashed_sid = hashlib.sha1(sid).hexdigest()
-            target = req.session.query(User).filter(User.latest_session_id==hashed_sid).first()
-            if target:
-                return {'email':target.email, 'alias':target.alias, 'firstname':target.firstname,
-                            'lastname':target.lastname, 'id':target.id, 'server':{'name':'Fearless API', 'ip':get_ip()}}
-
+            email = r.get(hashed_sid+'_email')
+            if email:
+                _target = userdb.get(email)
+                target = _target.data
+                if target:
+                    return {'email':target.get('email'), 'alias':target.get('alias'),
+                            'firstname':target.get('firstname'),
+                            'lastname':target.get('lastname'), 'id':_target.key, 
+                            'server':{'name':'Fearless API', 'ip':get_ip()}}
             else:
 
                 resp.append_header('set-cookie', 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
                 resp.append_header('set-cookie', 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
                 r.delete(hashed_sid)
-            
         return {'message':'ERROR'}
 
 
@@ -459,9 +470,6 @@ class GetPermissions:
     def on_get(self, req, resp, userId):
         target = req.session.query(User).filter(User.id==int(userId)).first()
         resp.body =  [i.rls for i in target.grps]
-
-
-
 
 
 
@@ -484,9 +492,19 @@ def isAuthorizedTo(req, userId, actionName):
 class Users:
     def on_get(self, req, resp, **kw):
 
-        target = req.session.query(User).all()
-        data = [{'firstname':user.lastname, 'lastname':user.firstname, 
-                 'fullname':user.fullname, 'id':user.id} for user in target]
+        users = userdb.get_keys()
+        data = []
+        for user in users:
+            obj = userdb.get(user)
+            data.append(
+                {
+                    'firstname':obj.data.get('firstname'),
+                    'lastname':obj.data.get('lastname'),
+                    'fullname':obj.data.get('fullname'),
+                    'email':obj.data.get('email'),
+                    'id':obj.key,
+                }
+            )
         resp.body = data
 
 class UpdateGroups:

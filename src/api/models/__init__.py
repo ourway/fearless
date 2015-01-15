@@ -24,7 +24,8 @@ __all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
            'Repository', 'Project', 'now', 'Ticket', 'session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
            'Document', 'Account', 'Date' ,'Collection', 'r', 'es', 'Departement',
-           'Comment', 'fdb', 'vdb', 'adb', 'rdb', 'userdb', 'groupdb', 'roledb']
+           'Comment', 'fdb', 'vdb', 'rdb', 'assetsdb', 
+           'userdb', 'groupdb', 'roledb', 'projectsdb', 'tasksdb', 'collectionsdb']
 
 import os
 
@@ -42,16 +43,38 @@ r = redis.StrictRedis(host='localhost', port=6379, db=3)
 
 import riak
 riakClient = riak.RiakClient(pb_port=8087)
+
 fdb = riakClient.bucket('fearless_file_database')
 vdb = riakClient.bucket('fearless_video_database')
-adb = riakClient.bucket('fearless_asset_database')
 rdb = riakClient.bucket('fearless_reports_database')
+ddb = riakClient.bucket('fearless_documents_database')
 
 ## users
 userdb = riakClient.bucket('fearless_users')
 riakClient.create_search_index('fearless_users')
 userdb.set_properties({'search_index': 'fearless_users'})
 userdb.enable_search()
+
+projectsdb = riakClient.bucket('fearless_projects')
+riakClient.create_search_index('fearless_projects')
+projectsdb.set_properties({'search_index': 'fearless_projects'})
+projectsdb.enable_search()
+
+tasksdb = riakClient.bucket('fearless_tasks')
+riakClient.create_search_index('fearless_tasks')
+tasksdb.set_properties({'search_index': 'fearless_tasks'})
+tasksdb.enable_search()
+
+assetsdb = riakClient.bucket('fearless_assets')
+riakClient.create_search_index('fearless_assets')
+assetsdb.set_properties({'search_index': 'fearless_assets'})
+assetsdb.enable_search()
+
+collectionsdb = riakClient.bucket('fearless_collections')
+riakClient.create_search_index('fearless_collections')
+collectionsdb.set_properties({'search_index': 'fearless_collections'})
+collectionsdb.enable_search()
+
 
 groupdb = riakClient.bucket('fearless_groups')
 roledb = riakClient.bucket('fearless_roles')

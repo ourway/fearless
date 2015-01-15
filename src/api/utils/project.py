@@ -13,8 +13,7 @@ Clean code is much better than Cleaner comments!
 '''
 
 import json as json
-from models import Project, User, Report, Departement, Task, \
-    Sequence, Repository, Collection
+from models import *
 from AAA import Authorize, getUserInfoFromSession
 import falcon
 from helpers import get_params
@@ -70,11 +69,8 @@ class ListProjects:
     def on_get(self, req, resp):
         user = getUserInfoFromSession(req, resp)
         uid = user.get('id')
-        userdb = req.session.query(User).filter_by(id=user.get('id')).first()
-        projects = req.session.query(Project).join(User).filter_by(id=uid)\
-            .order_by(asc(Project.complete)).all()
-        watchings = userdb.watches_projects
-        resp.body = list(set(projects + watchings))
+        for key in projectsdb.get_keys():
+
 
 
 class AddProject:
