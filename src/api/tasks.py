@@ -20,7 +20,7 @@ Clean code is much better than Cleaner comments!
 '''
 
 #from gevent import monkey; monkey.patch_all()
-import ujson
+import json as json
 import hashlib
 import base64
 import shutil
@@ -96,7 +96,7 @@ def download(url):
                 'basename': basename}
     else:
         data = {'message': 'ERROR'}
-    return ujson.dumps(data)
+    return json.dumps(data)
 
 
 class mydatatype(object):
@@ -135,7 +135,7 @@ def add_asset(dataMD5, uploadedFilePath):
             'asset': targetAsset.id,
             'repository': targetAsset.repository.id,
             'datetime': datetime.utcnow()}
-    obj.data = ujson.dumps(data)
+    obj.data = json.dumps(data)
     try:
         es.create(
             index='assets2', doc_type='info', body=obj.data)
@@ -168,7 +168,7 @@ def send_envelope(to, cc, bcc, subject, message, attach=None):
     M = ET.render(message=message, subject=subject)
     envelope = Envelope(
         from_addr=(u'farsheed.ashouri@gmail.com',
-                   u'Pooyamehr Fearless Notification'),
+                   u'Fearless Notifications'),
         to_addr=to,
         cc_addr=cc,
         bcc_addr=bcc,

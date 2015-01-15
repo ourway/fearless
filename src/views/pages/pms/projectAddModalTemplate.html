@@ -1,0 +1,70 @@
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							<h4 class="modal-title" id="myModalLabel">
+                                Add a new project
+							</h4>
+						</div>
+                        <div class="modal-body">
+
+			<form class="form-horizontal" role="form">
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Project Name</label>
+					<div class="col-sm-6">
+                        <input type="text" class="form-control" ng-class="{'farsi':!$parent.isASCII(newProject.name)}"  placeholder="New project name. Must be unique" 
+                        ng-model="newProject.name" />
+					</div>
+				</div>
+				<div class="form-group">
+					 <label for="inputEmail3" class="col-sm-4 control-label">Start Date</label>
+					<div class="col-sm-6">
+                        <input type="date" class="form-control" ng-model="newProject.start" required/>
+					</div>
+				</div>
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">End Date</label>
+					<div class="col-sm-6">
+						<input type="date" class="form-control" ng-model="newProject.end" required />
+					</div>
+				</div>
+
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Leader</label>
+					<div class="col-sm-6">
+                        <select class="form-control" ng-model="newProject.leader" placeholder="Who's running the project?" 
+                            ng-options="resource.fullname for resource in resources track by resource.id">
+                        </select>
+                </div>
+                </div>
+
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Watchers</label>
+					<div class="col-sm-6">
+                        <select class="form-control" ng-model="newProject.watchers" multiple 
+                            ng-options="resource.fullname for resource in resources track by resource.id">
+                            <option value="0"></option>
+                        </select>
+                </div>
+
+            </div>
+				<div class="form-group">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Description</label>
+					<div class="col-sm-6">
+                        <textarea placeholder="Write a brief description about project goal here ..." class="form-control"
+                            ng-model="newProject.description" ></textarea>
+					</div>
+				</div>
+
+			</form>
+						</div>
+						<div class="modal-footer">
+                            <button type="button" ng-click="getProjectDetails()" class="btn btn-default" data-dismiss="modal">Close</button> 
+                            <button type="button" ng-show="newProject.name && newProject.start && newProject.end && newProject.leader.id" 
+                                ng-click="createNewProject()" class="btn btn-primary">Update project information</button>
+						</div>
+					</div>
+					
+				</div>
+				
+

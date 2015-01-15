@@ -18,7 +18,7 @@ import datetime
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event, Unicode
 
-import ujson as json
+import json as json
 from db import session
 from mako.template import Template
 from sqlalchemy_utils import PasswordType, aggregated

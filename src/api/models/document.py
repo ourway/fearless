@@ -16,7 +16,7 @@ Clean code is much better than Cleaner comments!
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
 import bz2
-import ujson as json
+import json as json
 import base64
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships

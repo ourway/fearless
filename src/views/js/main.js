@@ -77,7 +77,11 @@ var TITLE = 'TITLE';
 			// route for the home page
 			.when('/', {
 				templateUrl : 'pages/home.html',
-				controller  : 'mainController'
+				controller  : 'homeCtrl'
+			})
+			.when('/welcome', {
+				templateUrl : 'pages/welcome.html',
+				controller  : 'welcomeCtrl'
 			})
 			// route for the about page
 			.when('/about/', {
@@ -310,21 +314,6 @@ function updateImageSize(img, maxWidth, maxHeight){
 
 		$scope.appName = 'fearless';
         $scope.$parent.showLogin = false;
-		messages = [
-                    "Life is what happens to you while you're busy making other plans.",
-                    'A goal without a plan is just a wish!',
-                    'By failing to prepare, you are preparing to fail.',
-                    "You can't plow a field simply by turning it over in your mind.",
-                    "If you don't know where you are going, you'll end up someplace else.",
-                    "Plans are useless, but planning is indispensable.",
-                    "Someone's sitting in the shade today because someone planted a tree a long time ago.",
-                    "Always, Always have a plan",
-                    "You need to stop getting into situations where all your options are potentially bad.",
-                    "The time to repair the roof is when the sun is shining.",
-                    "Do not let the universe surprise you!",
-                    "Fearless is worrying, only in a productive, proactive form"
-                 ];
-		$scope.message = choose(messages);
         $scope.userInfo = {'logged_in':false};
 
 
@@ -478,23 +467,8 @@ function updateImageSize(img, maxWidth, maxHeight){
           $location.path( path );
         };
 
-    $scope.getUserTasks = function(){
-        if (!$scope.user.logged_in)
-            return null;
-        uid = $scope.user.userid;
-        $http.get('/api/taskcard/today').success(function(resp){
-                $scope.user.tasksForToday = resp;
-                })
-    }
 
-    $scope.getUnfinishedTasks = function(){
-        if (!$scope.user.logged_in)
-            return null;
-        uid = $scope.user.userid;
-        $http.get('/api/taskcard/before').success(function(resp){
-                $scope.user.unfinishedTasks = resp;
-                })
-    }
+
 
 	});
 
@@ -503,6 +477,59 @@ function updateImageSize(img, maxWidth, maxHeight){
 		$scope.message = $scope.appName + '! I am an about page.';
 	});
 
+
+	fearlessApp.controller('welcomeCtrl', function($scope) {
+		$scope.message = 'A heroestic project management solution';
+	});
+
+
+
+fearlessApp.controller('homeCtrl', function ($scope, $http, $location) {
+
+		messages = [
+                    "Life is what happens to you while you're busy making other plans.",
+                    'A goal without a plan is just a wish!',
+                    'By failing to prepare, you are preparing to fail.',
+                    "You can't plow a field simply by turning it over in your mind.",
+                    "If you don't know where you are going, you'll end up someplace else.",
+                    "Plans are useless, but planning is indispensable.",
+                    "Someone's sitting in the shade today because someone planted a tree a long time ago.",
+                    "Always, Always have a plan",
+                    "You need to stop getting into situations where all your options are potentially bad.",
+                    "The time to repair the roof is when the sun is shining.",
+                    "Do not let the universe surprise you!",
+                    "Fearless is worrying, only in a productive, proactive form"
+                 ];
+		$scope.message = choose(messages);
+
+
+    $http.get('/api/db/project?count=true').success(function(resp){
+            if (resp.count==0){
+                $location.path('/welcome')
+            }
+            
+        });
+
+
+    $scope.getUserTasks = function(){
+        if (!$scope.$parent.user.logged_in)
+            return null;
+        uid = $scope.$parent.user.userid;
+        $http.get('/api/taskcard/today').success(function(resp){
+                $scope.user.tasksForToday = resp;
+                })
+    }
+
+    $scope.getUnfinishedTasks = function(){
+        if (!$scope.$parent.user.logged_in)
+            return null;
+        uid = $scope.$parent.user.userid;
+        $http.get('/api/taskcard/before').success(function(resp){
+                $scope.user.unfinishedTasks = resp;
+                })
+    }
+
+});
 
 
 
@@ -691,72 +718,20 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
     $scope.newProject.start = new Date();
     $rootScope.title = "Projects - Fearless";
     $scope.timeConverter = timeConverter;
-    $scope.gridOptions = {
-        data: 'myData',
-        enableFiltering: true,
-        enableSorting:true,
-        enablePinning: true,
-        columnDefs: [
-                    { field: "id", enableFiltering: false, enableSorting:false, width:45 },
-                    { field: "name", displayName : 'Project', width: 270,
-cellTemplate: '<div>  <a style="position:absolute;margin:5px" href="#pms/{{row.entity.id}}"><span class="glyphicon glyphicon-folder-close"></span> {{row.entity.name}}</a></div>'
-                    },
-                    { field: "calculate_number_of_tasks", displayName : 'Tasks', enableFiltering: true, enableSorting:true, width:70,
-                    
-                    cellTemplate: '<div style="padding:5px"><span style="opacity:0.5" class="glyphicon glyphicon-tag"></span><Span> {{row.entity.calculate_number_of_tasks}}</span></div>'
-                    },
-                    { field: "duration", enableFiltering: true, enableSorting:true, width:100,
-                    cellTemplate: '<div style="padding:5px"><span style="opacity:0.5" class="glyphicon glyphicon-road"></span><Span> {{row.entity.duration}}</span></div>'
-                    },
-                    { field: "start", enableFiltering: false, enableSorting:true, width:110,
-                    cellTemplate: '<div style="padding:5px"><span style="opacity:0.5" class="glyphicon glyphicon-calendar"></span><Span> {{row.entity.start}}</span></div>'
-                    },
-                    { field: "end", enableFiltering: false, enableSorting:true, width:110,
-                    cellTemplate: '<div style="padding:5px"><span style="opacity:0.5" class="glyphicon glyphicon-calendar"></span><Span> {{row.entity.end}}</span></div>'
-                    },
-                    { field: "description", enableFiltering: true, enableSorting:false, width:190 },
 
-                ] 
-        };
-
-         $scope.myData = [ ];
-
-        $scope.getLeader = function(id){
-            console.log(id)
-            $http.get('/api/db/user/'+id+'?field=alias').success(function(r){
-                    console.log(r)}
-                );
-        }
-
-        $scope.getProjData = function(){
-            _pR = $http.get('/api/db/project');
-
-            _pR.error(function(resp){
-                   if (resp.title == 'Not Authorized')
-                        $location.path('401')
-                    } )
-            _pR.success(function(resp){
-                // Lets fix some problems:
-                for (i=0;i<resp.length;i++){
-                    resp[i].duration = Math.round((resp[i].end - resp[i].start)/(3600*24)) + ' days';
-                        
-                    resp[i].start = new Date(resp[i].start*1000);
-                    resp[i].end = new Date(resp[i].end*1000);
-                    resp[i].created_on = new Date(resp[i].start*1000);
-                    resp[i].modified_on = new Date(resp[i].start*1000);
-                }
-                $scope.myData = resp;
-                });
-        }
+    $scope.getProjsData = function(){
+        $http.get('/api/project').success(function(resp){
+            $scope.involving_projects = resp;
+            });
+    }
 
 
         $scope.createNewProject = function(){
+        $scope.newProject.lead_id = $scope.newProject.leader.id;
            $http.put('/api/project/add', $scope.newProject).success(function(resp){
-                   console.log(resp);
-                   $scope.getProjData();
+                   $scope.getProjsData();
                     $scope.newProject = {};
                    $('#projectAddModal').modal('hide');
-                   
                    });
         }
 

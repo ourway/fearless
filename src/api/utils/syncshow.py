@@ -13,8 +13,9 @@ Clean code is much better than Cleaner comments!
 '''
 
 
-import ujson as json
+import json as json
 from models import r
+from helpers import dumps
 from geventwebsocket import WebSocketError
 
 
@@ -80,7 +81,7 @@ class SyncShow:
                         #if master == str(client): ## dont send command to its issuer
                             #    command = None
                             #    frames = None
-                        wsock.send(json.dumps({"master" : r.get('show_%s_master'%assetId),
+                        wsock.send(dumps({"master" : r.get('show_%s_master'%assetId),
                                         "frame":frame, "command":command, "note":note,
                                         "slide":slide, 'watchers':watchers}))
 

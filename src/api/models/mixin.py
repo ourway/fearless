@@ -15,12 +15,12 @@ Clean code is much better than Cleaner comments!
 
 import os
 import datetime
-import ujson as json
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
 
 from utils.general import setup_logger
+from utils.helpers import dumps
 from uuid import uuid4  # for random guid generation
 import base64
 
@@ -96,15 +96,14 @@ class IDMixin(object):
     @property
     def columnitems(self):
         try:
-            data =  dict([(c, getattr(self, c)) for c in self.columns])
-            #for i in data:
-                ## convert datetime to unix time
-                #if isinstance(data[i], datetime.datetime):
-                #    data[i] = data[i].strftime('%s')
-            return data
+            data =  [(c, getattr(self, c)) for c in self.columns]
+            return dict([i for i in data \
+                 if isinstance(i[1], (str, unicode, datetime.datetime, long, int, float, bool)) ])
         except AttributeError, e:
             print e
             return self.title
 
     def __repr__(self):
-        return json.dumps(self.columnitems)
+        return dumps(self.columnitems)
+
+

@@ -12,13 +12,13 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
-import ujson as json
+import json as json
 from models import Project, User, Report, Departement, Task, \
     Sequence, Repository, Collection
 from AAA import Authorize, getUserInfoFromSession
 import falcon
 from helpers import get_params
-from sqlalchemy import desc
+from sqlalchemy import desc, asc
 from helpers import commit, jsonify, parse_tjcsv, csv2json
 from defaults import home
 import datetime
@@ -69,13 +69,12 @@ class GetProjectDetails:
 class ListProjects:
     def on_get(self, req, resp):
         user = getUserInfoFromSession(req, resp)
-
-        if user.get('id') != 1:
-            project = req.session.query(Project).order_by(desc(Project.modified_on)).all()
-        else:
-            project = req.session.query(Project).order_by(desc(Project.modified_on)).all()
-
-        resp.body = project
+        uid = user.get('id')
+        userdb = req.session.query(User).filter_by(id=user.get('id')).first()
+        projects = req.session.query(Project).join(User).filter_by(id=uid)\
+            .order_by(asc(Project.complete)).all()
+        watchings = userdb.watches_projects
+        resp.body = list(set(projects + watchings))
 
 
 class AddProject:
@@ -94,8 +93,10 @@ class AddProject:
         if projectData.get('lead_id'):
             lead_id = int(projectData.get('lead_id'))
 
-        if start and end and name and lead_id: 
-            new = Project(start=start, name=name, end=end, lead_id=lead_id)
+        if start and end and name and lead_id:
+            leader = req.session.query(User).filter_by(id=lead_id).first()
+            creator = req.session.query(User).filter_by(id=user.get('id')).first()
+            new = Project(start=start, name=name, end=end, lead=leader, creator=creator)
             if description:
                 new.description = description
             repoName = name
@@ -251,7 +252,7 @@ class AddTask:
         start = taskData.get('start')
         end = taskData.get('end')
         priority = taskData.get('priority')
-        project = req.session.query(Project).filter(Project.id==int(projId)).first()
+        project = req.session.query(Project).filter_by(id=int(projId)).first()
         if not start:
            start = project.start
         else:

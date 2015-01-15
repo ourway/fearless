@@ -14,7 +14,7 @@ Clean code is much better than Cleaner comments!
 
 
 import falcon
-import ujson
+import json as json
 import hashlib
 from helpers import commit, get_ip, get_params
 from validators import email_validator
@@ -31,7 +31,7 @@ class Mailer(object):
 
         data = {'message': 'Error'}
         stream = req.stream.read()
-        stream = ujson.loads(stream)
+        stream = json.loads(stream)
         to = stream.get('to')
         cc = stream.get('cc') or []
         bcc = stream.get('bcc') or []
@@ -44,7 +44,7 @@ class Mailer(object):
             data = {'message': 'ok', 'task_id': mail.task_id}
         else:
             resp.status = falcon.HTTP_400
-        resp.body = ujson.dumps(data)
+        resp.body = dumps(data)
 
 
 

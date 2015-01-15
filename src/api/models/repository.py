@@ -24,7 +24,7 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from mixin import IDMixin, Base
 from collections import defaultdict
-import ujson as json  # for collection data validation and parsing
+import json as json  # for collection data validation and parsing
 
 
 class Repository(IDMixin, Base):

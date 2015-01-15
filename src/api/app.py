@@ -21,13 +21,13 @@ from utils.helpers import commit, jsonify, get_params
 import urlparse
 from urllib import unquote
 from string import ascii_uppercase
-import ujson as json
+import json as json
 from utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection
 from utils.reports import Mailer, AddReport
 from gevent import wsgi
 from models import __all__ as av
 from models import *
-from sqlalchemy import desc
+from sqlalchemy import desc, asc
 from datetime import datetime
 
 
@@ -95,6 +95,12 @@ class DB:
         show = req.get_param('show')
         start = req.get_param('s')
         end = req.get_param('e')
+        filters = req.get_param('filters')
+        if filters:
+            filters = [{i.split('=')[0]:i.split('=')[1]} for i in filters.split(',') if '=' in i]
+        sort = req.get_param('sort')
+        if not sort:
+            sort = 'desc'
         order_by = req.get_param('order_by')
         if not order_by:
             order_by = 'modified_on'
@@ -105,27 +111,37 @@ class DB:
             end = start+10
         if len(args) == 5:
             id = args[4]
-            query = 'req.session.query({t}).filter({t}.{key}=="{id}").order_by(desc({t}.{order}))'.format(
-                t=table, id=id, key=key, order=order_by)
+            query = 'req.session.query({t}).filter({t}.{key}=="{id}").order_by({sort}({t}.{order}))'.format(
+                t=table, id=id, key=key, order=order_by, sort=sort)
             if start and end:
-                data = eval(query).slice(start, end).all()
-            else:
-                data = eval(query).all()
+                query += '.slice(start, end)'
+
+                #data = eval(query).slice(start, end).all()
+
+            data = eval(query).all()
 
         else:
             if not show:
-                query = 'req.session.query({t}).order_by(desc({t}.{order}))'.format(t=table, order=order_by)
+                query = 'req.session.query({t}).order_by({sort}({t}.{order}))'.format(t=table, sort=sort, order=order_by)
             else:
-                query = 'req.session.query({t}.{f}).order_by(desc({t}.{order}))'.format(t=table, f=show, order=order_by)
+                query = 'req.session.query({t}.{f}).order_by({sort}({t}.{order}))'.format(t=table, sort=sort, f=show, order=order_by)
             
             try:
                 if start and end:
-                    data = eval(query).slice(start, end).all()
-                else:
-                    data = eval(query).all()
+                    query += '.slice(start, end)'
+
+                if filters and isinstance(filters, list):
+                    for filter in filters:
+                        if isinstance(filter, dict):
+                            query += '.filter({t}.{k}=="{v}")'.format(t=table, 
+                                        k=filter.keys()[0], v=filter[filter.keys()[0]])
+                data = eval(query).all()
             except (AttributeError):
                 data = None
-
+        get_count = req.get_param('count')
+        if get_count:
+            resp.body = {'count':eval(query).count()}
+            return
         field = req.get_param('field')
         if field:
             if field in banned:
@@ -140,7 +156,6 @@ class DB:
                 elif len(args) == 5:
                     '''/api/db/user/1?field=tasks'''
                     for i in data:
-                        #_d = eval('i.%s'%field)
                         _d = getattr(i, field)
                         if isinstance(_d, list):
                             finalResult = []
@@ -158,7 +173,6 @@ class DB:
                                 value = getattr(_d, key)
                                 if isinstance(value, (str, type(None), unicode, int, float, long, datetime)):
                                     newDataDict[key] = value
-
                             data = newDataDict
 
 
@@ -220,7 +234,7 @@ class DB:
         resp.status = falcon.HTTP_201
         req.session.add(new)
         data = repr(new)
-        resp.body = json.dumps(json.loads(data))
+        resp.body = data
         # commit()
 
 

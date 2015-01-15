@@ -14,7 +14,6 @@ Clean code is much better than Cleaner comments!
 
 import os
 import sh
-import ujson as json
 import lxml
 from lxml import etree
 import datetime
@@ -31,6 +30,7 @@ from sqlalchemy import desc, asc
 from .task import Task
 from .user import User
 from . import r
+from utils.helpers import dumps
 
 project_users = Table('project_users', Base.metadata,
                       Column('id', Integer, primary_key=True),
@@ -84,6 +84,7 @@ class Project(IDMixin, Base):
     working_days = Column(String(128), default='sat 09:00 - 18:00,')
     lead = relationship('User', backref='leads')
     director = relationship('User', backref='directs')
+    creator = relationship('User', backref='projects_created')
     is_stereoscopic = Column(Boolean, default=False)
     fps = Column(Float(precision=3), default=24.000)
     tk = relationship('Ticket', backref='project', cascade="all, delete, delete-orphan")
@@ -275,7 +276,7 @@ class Project(IDMixin, Base):
         if csvfile: data['csvfile'] = csvfile
         if trace: data['trace'] = trace
         if burndown: data['burndown'] = burndown
-        data = json.dumps(data)
+        data = dumps(data)
         self.reports.append(data)
         session.commit()
         return data 

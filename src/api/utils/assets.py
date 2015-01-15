@@ -12,7 +12,6 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
-import ujson
 import time
 import hashlib
 from cStringIO import StringIO

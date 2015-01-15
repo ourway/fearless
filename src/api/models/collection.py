@@ -22,7 +22,7 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from mixin import IDMixin, Base
-import ujson as json  # for schema validations
+import json as json  # for schema validations
 from mako.template import Template
 
 from utils.fagit import GIT

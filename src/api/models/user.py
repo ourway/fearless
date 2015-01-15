@@ -113,6 +113,7 @@ class User(IDMixin, Base):
     latest_session_id = Column(String(64))
     active = Column(Boolean, default=False)
     fulltime = Column(Boolean, default=True)
+    is_client = Column(Boolean, default=False)
     rate = Column(Float(precision=3), default=0)
     monthly_salary = Column(Float(precision=3), default=0)
     retention = Column(Float(precision=3), default=10)
