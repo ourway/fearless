@@ -16,7 +16,7 @@ Clean code is much better than Cleaner comments!
 #sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
 
 
-from models import User, Group, Role, r, now  # r is redis
+from models import User, Group, Role, r, now, userdb, groupdb, roledb
 from helpers import commit, get_ip, get_params
 import ujson as json
 import hmac
@@ -31,7 +31,6 @@ from functools import wraps
 
 
 logger = setup_logger('auth', 'authentication.log')
-
 
 def getANewSessionId():
     return str(hmac.HMAC(key=str(uuid.uuid4()), digestmod=hashlib.sha1).hexdigest())
@@ -66,7 +65,7 @@ def Authenticate(req, resp, params):
             ...
 
     '''
-    #return
+    return
     ip = req.env.get('HTTP_X_FORWARDED_FOR')
     free_services = ['/api/auth/signup', '/api/auth/login',
                      '/api/things', '/api/auth/activate', '/api/auth/reactivate',
@@ -141,8 +140,7 @@ class Login:
         email = form.get('email')
         if email:
             email = email.lower()
-        target = req.session.query(User).filter(
-            User.email == email).first()
+        target = userdb.get(email).data
         if not sid:
             sid = getANewSessionId()
 
@@ -155,23 +153,22 @@ class Login:
         resp.append_header('set-cookie', 'session-id=%s; path=/; max-age=5; HttpOnly' %
                         sid)  # this session is not yet saved
         # don't tell what's wrong!
-        if not target or not target.password == form.get('password'):
+        if not target or not target['password'] == form.get('password'):
             r.incr('fail_' + sid, 1)
             r.expire('fail_' + sid, 60)
             logger.warning('{ip}|Wrong information provided'.format(ip=ip))
             resp.body = {
                 'message': 'error', 'info': 'login information is not correct', 'wait': 5}
         else:
-            if target.active:
-                target.lastLogIn = now()
+            if target['active']:
+                target['lastLogIn'] = int(now().strftime('%s'))
                 rem_time = 3600 * 24
                 # this session is not yet saved
 
                 
-                groups = ','.join([i.name for i in target.grps])
-                resp.append_header('set-cookie', 'userid=%s; path=/; max-age=%s' % (str(target.id), rem_time) )
-                resp.append_header('set-cookie', 'groups=%s; path=/; max-age=%s' % (str(groups), rem_time) )
-                resp.append_header('set-cookie', 'username=%s; path=/; max-age=%s' % (str(target.firstname or target.alias), rem_time) )
+                resp.append_header('set-cookie', 'userid=%s; path=/; max-age=%s' % (str(target.get('email')), rem_time) )
+                resp.append_header('set-cookie', 'groups=%s; path=/; max-age=%s' % (','.join(target.get('groups')), rem_time) )
+                resp.append_header('set-cookie', 'username=%s; path=/; max-age=%s' % (str(target.get('firstname') or target.get('alias')), rem_time) )
                 resp.append_header(
                     'set-cookie', 'session-id=%s; path=/; max-age=%s; HttpOnly' % (sid, rem_time))
 
@@ -217,31 +214,35 @@ class Signup:
         email=form.get('email')
         if email:
             email = email.lower()
-        olduser = req.session.query(User).filter(
-            User.email == email).first()
-        if not olduser:
-            newuser = User(email=email,
-                           password=form.get('password'),
-                           firstname=form.get('firstname'),
-                           lastname=form.get('lastname'),
-                           token=str(uuid.uuid4()))
+        olduser = userdb.get(email)
+        if not olduser.data:
+            newuser = {
+                "email": email,
+                "password": form.get('password'),
+                "firstname": form.get('firstname'),
+                "lastname": form.get('lastname'),
+                "token": str(uuid.uuid4()),
+                "groups":["users"]
+                    }
+            if not userdb.get_keys():  ## its first user so its admin
+                newuser['groups'].append("admin")
 
-
-            req.session.add(newuser)
+            obj = userdb.new(email, newuser)
+            obj.store()
 
             activation_link = host + \
-                '/api/auth/activate?token=' + newuser.token
+                '/api/auth/activate?token=' + newuser['token']
             send_envelope.delay(email, [], [], 'Account Activation',
-                                'Hi <strong>{u}</strong>! Please <a class="btn-primary" href="{l}">Activate your account</a>.'.format(u=newuser.firstname.title(),
-                                                                                                                  l=activation_link))
+                                'Hi <strong>{u}</strong>! Please <a class="btn-primary" href="{l}">Activate your account</a>.'\
+                                .format(u=newuser['firstname'].title(), l=activation_link))
 
             logger.info(
-                '{ip}|Signed up for {u}'.format(ip=ip, u=newuser.email))
+                '{ip}|Signed up for {u}'.format(ip=ip, u=newuser['email']))
             resp.body = {
                 'message': 'success', 'info': 'check your activation email'}
         else:
             logger.warning('{ip}|Tried to sign up for {u} which is already registered'.format(
-                ip=ip, u=olduser.email))
+                ip=ip, u=olduser.data['email']))
             resp.body = {
                 'message': 'error', 'info': 'email address is a registered one'}
 

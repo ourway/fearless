@@ -29,7 +29,8 @@ from models import __all__ as av
 from models import *
 from sqlalchemy import desc, asc
 from datetime import datetime
-
+import riak
+client = riak.RiakClient()
 
 
 from sqlalchemy.exc import IntegrityError  # for exception handeling
@@ -275,6 +276,47 @@ class DB:
         # print eval(query)
 
 
+class RGET:
+    def on_get(self, req, resp, bucket, key):
+        b = client.bucket(bucket)
+        obj = b.get(key)
+        if obj:
+            resp.body = obj.data
+
+
+class RSET:
+    # NOTE
+    def on_get(self, req, resp, bucket, key, value):
+        b = client.bucket(bucket)
+        try:
+            value = json.loads(value)
+        except (TypeError, ValueError):
+            pass
+
+        obj = b.new(key, value)
+        obj.store()
+        value = obj.data
+
+        resp.body = json.encode({key:value})
+
+class RLIST:
+    # NOTE
+    def on_get(self, req, resp, bucket):
+        b = client.bucket(bucket)
+        keys = b.get_keys()
+        data = []
+        for key in keys:
+            try:
+                value = json.loads(b.get(key).data)
+            except (TypeError, ValueError):
+                value = json.loads(b.get(key).encoded_data)
+            data.append({key:value})
+        resp.body = json.encode(data)
+
+
+
+
+
 # falcon.API instances are callable WSGI apps
 #app = falcon.API()
 app = falcon.API(before=[getSession, Authenticate], after=[jsonify, closeSession])
@@ -322,6 +364,11 @@ app.add_route('/api/sequence/add/{projId}', AddSequence())
 app.add_route('/api/sendmail', Mailer())
 app.add_route('/api/report', AddReport())
 app.add_route('/api/user/{userId}/groups', UpdateGroups())
+
+
+app.add_route('/db/get/{bucket}/{key}', RGET())
+app.add_route('/db/set/{bucket}/{key}/{value}', RSET())
+app.add_route('/db/list/{bucket}', RLIST())
 
 
 if __name__ == '__main__':
