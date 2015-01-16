@@ -46,8 +46,6 @@
 
 
 <div class="container collectionDiv">
-    <br/>
-    <div class="row clearfix" ng-cloak>
 		<div class="col-md-12 column">
 			<ul class="breadcrumb">
 				<li>
@@ -72,12 +70,9 @@
 				    {{collection.name}}
 				</li>
 			</ul>
-        </div>
 
         <div class="col-md-6 column">
-            
 			<div class="btn-group" ng-show="collection.container">
-
                 <button id="collectionAddButton" class="btn btn-success btn-sm" type="button">
                     <em class="glyphicon glyphicon-plus"></em>
                     <em class="glyphicon glyphicon-folder-open"></em>
@@ -96,16 +91,12 @@
 					</div>
                 </div>
 		</div>
-
         <div class="col-md-6 column" ng-show="collection.holdAssets">
             <form id="my-awesome-dropzone" style="min-height: 130px;" class="dropzone">
-            
             </form>
         </div>
-		</div>
 
-	<div class="row clearfix" bg-cloak>
-        <div ng-class="col-md-12">
+        <div class="col-md-12">
             <div ng-if="collection.holdAssets">
             <hr/>
             <h3 ng-show="collection.assets.length>0">Assets <small>({{(collection.page-1)*10+1}}-{{ (collection.page-1)*10+collection.assets.length}} of {{collection.assets_count}})</small></h3>
@@ -124,11 +115,7 @@
 
                     </ul>
                 </div>
-
-
-
                 </div>
-
 
 
             </form>

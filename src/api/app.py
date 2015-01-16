@@ -22,6 +22,7 @@ from utils.documents import SetNote, GetNote, SearchNote
 import urlparse
 from urllib import unquote
 from string import ascii_uppercase
+from sqlalchemy.ext.serializer import loads, dumps
 import json as json
 from utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection
 from utils.reports import Mailer, AddReport

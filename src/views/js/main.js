@@ -482,7 +482,7 @@ function updateImageSize(img, maxWidth, maxHeight){
 
 
 
-fearlessApp.controller('homeCtrl', function ($scope, $http, $location) {
+fearlessApp.controller('homeCtrl', function ($scope, $http, $location, $interval) {
 
 		messages = [
                     "Life is what happens to you while you're busy making other plans.",
@@ -498,7 +498,12 @@ fearlessApp.controller('homeCtrl', function ($scope, $http, $location) {
                     "Do not let the universe surprise you!",
                     "Fearless is worrying, only in a productive, proactive form"
                  ];
-		$scope.message = choose(messages);
+
+        $scope.message = choose(messages);
+        $interval(function(){
+            // every 30 secs
+		    $scope.message = choose(messages);
+            }, 30000);
 
 
     $http.get('/api/db/project?count=true').success(function(resp){
@@ -1193,9 +1198,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         })
 
             }
-            if (chartData.length>2)
+            if (chartData.length>0)
             {
-                console.log(chartData)
                 burndownChart.setData(chartData);
             }
 

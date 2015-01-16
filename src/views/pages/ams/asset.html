@@ -2,9 +2,6 @@
 
 
 <div class="container assetDiv" >
-    <br/>
-    <div class="row clearfix" ng-cloak>
-
 
 		<div class="col-md-12 column">
 			<ul class="breadcrumb"  style="height: 48px;">
@@ -21,7 +18,7 @@
 				    {{asset.fullname}}
                     </li>
                     <span class="pull-right">
-                        <button id="collectionAddButton" class="btn btn-danger btn-sm" ng-click="deleteAsset()" type="button"> 
+                        <button id="collectionAddButton" class="btn btn-default btn-sm" ng-click="deleteAsset()" type="button"> 
                             <em class="glyphicon glyphicon-trash"></em>
                         </button>
                     </span>
@@ -31,9 +28,7 @@
 
 
 		<div class="col-md-12 column">
-        </div>
-		<div class="col-md-12 column">
-                <div class="col-sm-3" ng-if="asset">
+                <div class="col-md-3" ng-if="asset">
 					<div class="thumbnail asm_thumb_solo">
                         <div class="col-md-12 asm_upper">
                             <div ng-if="asset.thumbnail"> 
@@ -66,49 +61,38 @@
                     </ul>
                 </div>
             </div>
-                <div class="col-md-12" ng-if="asset">
+            <div style="background:#f8f8f8;padding:10px" class="thumbnail">
                     <h4>Asset Versions</h4>
+                    
+                <div style="margin:10px;background:#fff;padding:10px">
                     <button ng-click="checkout(version)" class="btn btn-sm btn-default"
                         ng-class="{'btn-success':asset.version==version.split('v_')[1],
                         'btn-warning':checkout_load==version, 'btn-primary':checkouted==version}"
                         ng-repeat="version in assetVersions | orderBy:name">{{version.split('v_')[1]}}</button>
-                    
-                <div style="opacity:0.75;">
-                    <br/>
-                    <button class="btn btn-sm btn-default"></button> <small>Available versions</small> </br>
-                    <button class="btn btn-sm btn-primary"></button> <small>Retrived version</small></br>
-                    <button class="btn btn-sm btn-warning"></button> <small>Version is loading</small></br>
-                    <button class="btn btn-sm btn-danger"></button> <small>Error in version</small></br>
-                    <button class="btn btn-sm btn-success"></button> <small>Current version</small></br>
                 </div>
+                    <a><button ng-click="checkout(checkouted, true)" 
+                            class="btn btn-primary">Download Version {{checkouted.split('v_')[1]}}</button></a>
 
-                <br/>
-                <a>
-                    <button ng-click="checkout(checkouted, true)" class="btn btn-primary">Download Version {{checkouted.split('v_')[1]}}</button><a>
 
-                <hr/>
-
-                </div>
+            </div>
             </div>
 
 
             <div class="col-md-9" ng-if="asset">
-                <h5><a href="/static/{{asset.url}}">{{asset.fullname}}</a> <Small>version {{asset.version}}</small></h5>
-            <small style="color:grey">{{asset.fileinfo}}</small>
+                <h4><a href="/static/{{asset.url}}">{{asset.fullname}}</a> <Small>version {{asset.version}}</small></h4>
                 <div ng-if="asset.preview && asset.content_type.split('/')[0]=='video'">
                     <video id="video_{{asset.id}}" class="video-js vjs-default-skin thumbnail" controls 
-                    preload="metadata" ng-attr-poster="{{'/static/'+asset.poster}}" width="720" height="480" >
+                    preload="metadata" ng-attr-poster="{{'/static/'+asset.poster}}" width="600" height="400" >
                     <source 
                    data-setup='{"techOrder": ["flash", "html5", "links"]}'
-                    ng-src="{{'/static/'+asset.preview}}" type="video/mp4" /></video>
+                    ng-src="{{'/static/'+asset.preview}}" type="video/ogg" /></video>
                 </div>
 
 
                 <div ng-if="asset.content_type.split('/')[0]=='image' || asset.content_type.split('/')[1]=='pdf'">
-                    <img ng-src="{{'/static/'+asset.poster}}" style="margin:auto" class="thumbnail"/>
+                    <img ng-src="{{'/static/'+asset.poster}}" style="margin:auto;width:100%" class="thumbnail"/>
                 </div>
-                <hr/>
-                <div class="col-md-12" ng-if="asset.thumbnail && assetVersions.length>1">
+                <div style="padding:15px;" class="col-md-12" ng-if="asset.thumbnail && assetVersions.length>1">
                     <div class="col-sm-2" ng-repeat="v in range(0, assetVersions.length)">
                         <img class="thumbnail" ng-click="checkout('v_'+v)" ng-class="{'iconized':checkouted=='v_'+v}"
                         style="cursor:pointer;width:130px;opacity:0.75" ng-src="{{'/static/uploads/'+asset.uuid+'_thmb_'+v+'.png'}}" />
