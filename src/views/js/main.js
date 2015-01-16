@@ -1042,7 +1042,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     return null;
                 $scope.tasks = resp;
                 //$scope.tasksBackup = [];
-                $scope.resources = $scope.$parent.resources;
+                if($scope.$parent)
+                    $scope.resources = $scope.$parent.resources;
                 //$scope.project.tasks = resp;
                 $scope.calTasks = [];
                 for (x in $scope.tasks){

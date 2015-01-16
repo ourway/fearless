@@ -76,6 +76,7 @@ class Task(IDMixin, Base):
     computed_end = Column(DateTime)
     end = Column(DateTime, nullable=False)
     duration = Column(Float(precision=3), default=0)
+    period = relationship("Date", uselist=False)
     effort = Column(Float(precision=3), nullable=False, default=0)
     effort_left = Column(Float(precision=3), default=0)
     effort_done = Column(Float(precision=3), default=0)
@@ -86,8 +87,6 @@ class Task(IDMixin, Base):
     onend_charge = Column(Float(precision=3), default=0)
     milestone = Column(Boolean, default=False) # is task a milestone?
     parent_id = Column(Integer, ForeignKey("task.id"))
-    report_id = Column(Integer, ForeignKey("report.id"))
-
     parent = relationship('Task', backref='children', remote_side=[id], uselist=True)
     reports = relationship('Report', backref='task')
     resources = relationship('User', backref='tasks', secondary='task_users')
@@ -108,6 +107,8 @@ class Task(IDMixin, Base):
                            primaryjoin=id == task_relations.c.task_a_id,
                            secondaryjoin=id == task_relations.c.task_b_id,
                            backref='dependent_of')
+    account = relationship("Account", backref='tasks')
+
     ##########################################################################
 
     #def __repr__(self):

@@ -55,6 +55,7 @@ class Document(IDMixin, Base):
     shot = relationship("Shot", backref='documents')
     sequence_id = Column(Integer, ForeignKey('sequence.id'))
     sequence = relationship("Sequence", backref='documents')
+    period = relationship("Date", uselist=False)
  
     @validates('data')
     def save_data_in_riak(self, key, data):

@@ -32,6 +32,8 @@ users_groups = Table('users_groups', Base.metadata,
                      )
 
 
+
+
 user_vacations = Table('user_vacations', Base.metadata,
     Column('user_id', Integer, ForeignKey("user.id"),
            primary_key=True),
@@ -122,9 +124,8 @@ class User(IDMixin, Base):
     reps = relationship("Report", secondary=lambda: user_reports, backref='user')
     agreements = relationship("Document", backref='agreement_of')
     payment_invoices = relationship("Document", backref='invoice_of')
-    chargeset = relationship("Account", backref='account_of', secondary="user_accounts")
-    agreement_start = Column(DateTime, nullable=False, default=now)
-    agreement_end = Column(DateTime, nullable=False, default=now)
+    chargeset = relationship("Account", backref='users', secondary="user_accounts")
+    agreement_period = relationship("Date", uselist=False)
     reports = association_proxy('reps', 'id') # when we refer to reports, id will be returned.
     grps = relationship('Group', backref='users', secondary='users_groups')
     groups = association_proxy('grps', 'name')

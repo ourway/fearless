@@ -38,7 +38,16 @@ class Account(IDMixin, Base):
     max_credit = Column(Float(precision=3), default=0)
     credit = Column(Float(precision=3), default=0)
     parent_id = Column(Integer, ForeignKey('account.id'))
+    departement_id = Column(Integer, ForeignKey('departement.id'))
+    user_id = Column(Integer, ForeignKey('user.id'))
+    project_id = Column(Integer, ForeignKey('project.id'))
+    sequence_id = Column(Integer, ForeignKey('sequence.id'))
+    shot_id = Column(Integer, ForeignKey('shot.id'))
+    client_id = Column(Integer, ForeignKey('client.id'))
+    asset_id = Column(Integer, ForeignKey('asset.id'))
+    task_id = Column(Integer, ForeignKey('task.id'))
     parent = relationship("Account", backref="children" ,remote_side=[id])
+    period = relationship("Date", uselist=False)
     #start = Column(DateTime, nullable=False, default=now)
 
 

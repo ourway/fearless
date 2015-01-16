@@ -29,6 +29,7 @@ class Ticket(IDMixin, Base):
     project_id = Column(Integer, ForeignKey("project.id"))
     name = Column(String(64), nullable=False)
     body = deferred(Column(Text))
+    period = relationship("Date", uselist=False)
 
     def __init__(self, name):
         self.name = name

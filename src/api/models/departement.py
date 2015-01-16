@@ -39,6 +39,16 @@ sequences_departements = Table('sequences_departements', Base.metadata,
                                )
 
 
+shots_departements = Table('shots_departements', Base.metadata,
+                               Column('id', Integer, primary_key=True),
+                               Column(
+                                   'shot_id', Integer, ForeignKey('shot.id')),
+                               Column(
+                                   'departement_id', Integer, ForeignKey('departement.id'))
+                               )
+
+
+
 class Departement(IDMixin, Base):
 
     '''Groups for membership management
@@ -48,3 +58,7 @@ class Departement(IDMixin, Base):
         'User', backref='departements', secondary='users_departements')
     sequences = relationship(
         'Sequence', backref='departements', secondary='sequences_departements')
+    sequences = relationship(
+        'Shot', backref='departements', secondary='shots_departements')
+    period = relationship("Date", uselist=False)
+    account = relationship("Account", backref='departements')

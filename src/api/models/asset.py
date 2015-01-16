@@ -61,6 +61,7 @@ class Asset(IDMixin, Base):
     version = Column(Integer, default=1)  ## asset versioning
     task_id = Column(String(64))  # celery post processing task id
     ready = Column(Boolean, default=False)  # post processing
+    period = relationship("Date", uselist=False)
     users = relationship('User', backref='assets', secondary='users_assets')
     owner = relationship('User', backref='owning_assets')
     modifiers = relationship('User', viewonly=True,  backref='modifying_assets', secondary='users_assets')
@@ -76,6 +77,7 @@ class Asset(IDMixin, Base):
                            backref='attached_to')
 
     collection_id = Column( Integer, ForeignKey('collection.id'), nullable=False)
+    account = relationship("Account", backref='assets')
 
 
     @validates('name')

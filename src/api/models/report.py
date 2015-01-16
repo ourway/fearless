@@ -41,6 +41,8 @@ class Report(IDMixin, Base):
     shot = relationship("Shot", backref='reports')
     sequence_id = Column(Integer, ForeignKey('sequence.id'))
     sequence = relationship("Sequence", backref='reports')
+    task_id = Column(Integer, ForeignKey("task.id"))
+    due = relationship("Date")
 
     def __init__(self, data):
         self.data = data
@@ -49,7 +51,7 @@ class Report(IDMixin, Base):
     def save_data_in_riak(self, key, data):
         self.uuid = getUUID()
         #c = bz2.compress(data)
-        newReportObject = rdb.new(self.uuid, base64.encodestring(data.encode('utf-8')))
+        newReportObject = rdb.new(self.uuid, data.encode('utf-8'))
         #result = base64.encodestring(c)
         #with open(os.path.join(db_files_path, self.uuid), 'wb') as f:
         #    f.write(c)
@@ -61,5 +63,5 @@ class Report(IDMixin, Base):
         #with open(os.path.join(db_files_path, self.uuid), 'rb') as f:
         #    data = bz2.decompress(f.read())
         dataObject = rdb.get(self.uuid)
-        return base64.decodestring(dataObject.data)
+        return dataObject.data
 

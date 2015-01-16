@@ -42,6 +42,8 @@ class Sequence(IDMixin, Base):
     preview = relationship("Asset", backref='sequence')
     shots = relationship( 'Shot', backref='sequences', 
                 secondary='shots_sequences')
+    period = relationship("Date", uselist=False)
+    account = relationship("Account", backref='sequences')
 
 
     @validates('number')

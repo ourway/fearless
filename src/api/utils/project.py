@@ -75,7 +75,10 @@ class ListProjects:
         uid = user.get('id')
         projects = req.session.query(Project).filter(or_(Project.lead_id==uid, 
                 Project.director_id==uid, Project.creator_id==uid)).all()
-        resp.body = projects
+        involving = req.session.query(Project).join(Task)\
+            .join(Task.resources).filter(Task.resources.any(User.id==uid)).all()
+        data = list(set(projects + involving))
+        resp.body = data
 
 
 

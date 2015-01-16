@@ -44,6 +44,7 @@ class Repository(IDMixin, Base):
     project = relationship('Project', backref='repositories')
     owner_id = Column(Integer, ForeignKey('user.id'))
     owner = relationship("User", backref="ownes_repositories")
+    period = relationship("Date", uselist=False)
 
     @validates('path')
     def create_folders(self, key, path):

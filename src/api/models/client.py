@@ -35,3 +35,5 @@ class Client(IDMixin, Base):
     '''
     name = Column(String(64), unique=True, nullable=False)
     users = relationship('User', backref='companies', secondary='client_users')
+    period = relationship("Date", uselist=False)
+    account = relationship("Account", backref='client')

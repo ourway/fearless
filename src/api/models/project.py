@@ -96,6 +96,8 @@ class Project(IDMixin, Base):
     rep = relationship("Report",backref='project', cascade="all, delete, delete-orphan")
     reports = association_proxy('rep', 'id') # when we refer to reports, id will be returned.
     subproject = relationship("Project", backref='parent', remote_side=[id])
+    period = relationship("Date", uselist=False)
+    account = relationship("Account", backref='projects')
 
 
     @aggregated('tasks', Column(Integer))

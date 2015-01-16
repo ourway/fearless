@@ -51,6 +51,9 @@ class Shot(IDMixin, Base):
     collection = relationship("Collection", backref='shots')
     preview = relationship("Asset", backref='shots')
     scenes = relationship("Scene", backref='shots', secondary="shots_scenes")
+    period = relationship("Date", uselist=False)
+    account = relationship("Account", backref='shots')
+
 
     @validates('number')
     def _assign_name_code(self, key, data):
