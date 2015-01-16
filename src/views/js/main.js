@@ -836,6 +836,7 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
 fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
         $scope.$parent.page = 'pms';
         $scope.replan = true;
+        $scope.timeConverter = timeConverter;
 
 
             burndownChart = new Morris.Line({
@@ -968,7 +969,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     data = resp[mode];
                     if ($scope.project)
                         {
-                            $scope.getTasksList();
                             $scope.getProjectDetails();
                         }
 
@@ -988,7 +988,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                                 $scope.updateTask(_task.id, _task);
                             }
 
-                            $scope.getTasksList();
                         }
                             
 
@@ -1258,8 +1257,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     })
                 $scope.tasksBackup = newBackup;
                 resp.start = new Date(resp.start*1000);
+                resp.end = new Date(resp.end*1000);
                 //resp.start = timeConverter(Math.max(resp.start, resp.project_start));
-                resp.end = new Date(Math.min(resp.end, resp.project_end)*1000);
+                //resp.end = new Date(Math.min(resp.end, resp.project_end)*1000);
                 $scope.editTaskInfo = resp;
                 $scope.editTaskInfo.updatedResources = [];
                 $scope.editTaskInfo.updatedDepends = [];
@@ -1303,10 +1303,15 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         
     $scope.updateTask = function(taskId, data){
         if (!data)
-            data = $scope.editTaskInfo
+            data = $scope.editTaskInfo;
         $http.post('/api/task/update/'+taskId, data).success(function(resp){
             $scope.replan = true;
             $scope.getTasksList();
+            for (i in $scope.tasks){
+                _t = $scope.tasks[i];
+                if (_t.id == data.id)
+                    $scope.tasks[i] = data;
+            }
             $scope.editTaskInfo = {};
             $('#taskDetailModal').modal('hide');
 
@@ -1339,7 +1344,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
     $scope.isTaskLate = function(task){
         if (task.complete != 100)
-            return new Date() > new Date(task.end*1000);
+            result = new Date() > new Date(task.end*1000);
+        return result;
     };
 
         });
