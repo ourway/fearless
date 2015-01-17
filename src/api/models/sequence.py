@@ -19,6 +19,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
+from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 
 shots_sequences = Table("shots_sequences", Base.metadata,
@@ -44,6 +45,8 @@ class Sequence(IDMixin, Base):
                 secondary='shots_sequences')
     period = relationship("Date", uselist=False)
     account = relationship("Account", backref='sequences')
+    tgs = relationship("Tag", backref='sequences')
+    tags = association_proxy('tgs', 'name')
 
 
     @validates('number')

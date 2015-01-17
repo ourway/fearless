@@ -23,6 +23,7 @@ from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from mixin import IDMixin, Base, db_files_path, getUUID
+from sqlalchemy.ext.associationproxy import association_proxy
 import os
 from . import rdb
 
@@ -43,6 +44,8 @@ class Report(IDMixin, Base):
     sequence = relationship("Sequence", backref='reports')
     task_id = Column(Integer, ForeignKey("task.id"))
     due = relationship("Date")
+    tgs = relationship("Tag", backref='reports')
+    tags = association_proxy('tgs', 'name')
 
     def __init__(self, data):
         self.data = data

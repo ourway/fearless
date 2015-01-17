@@ -108,6 +108,8 @@ class Task(IDMixin, Base):
                            secondaryjoin=id == task_relations.c.task_b_id,
                            backref='dependent_of')
     account = relationship("Account", backref='tasks')
+    tgs = relationship("Tag", backref='tasks')
+    tags = association_proxy('tgs', 'name')
 
     ##########################################################################
 

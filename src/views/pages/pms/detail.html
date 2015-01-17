@@ -20,8 +20,8 @@ table {
 
 .tj_table_frame {
     line-height: 1;
-    /* margin-left: 0px; */
-    /* margin-right: 0px; */
+    margin-left: 0px;
+    margin-right: 0px;
     text-align: center;
     background-color: rgba(56, 129, 192, 0.28);
     /* margin-top: 15px; */
@@ -112,7 +112,6 @@ background-color: #FFEDA5;
 }
 .tj_table_cell_label{
     color:#333;
-    text-shadow: 0px 1px 1px #FFF;
     font-family:arial;
 }
 .tabhead .tj_table_cell_label{
@@ -264,7 +263,14 @@ background-color: #FFEDA5;
     <div class="panel-heading">
 			<div class="btn-group">
                 <button ng-show="$parent.isAdmin || $parent.userInfo.userid==project.leader.id || $parent.userInfo.userid==project.creater.id" 
-                    id="taskAddButton" class="btn btn-info" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
+                    id="taskAddButton" class="btn btn-success" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
+                <button ng-show="$parent.isAdmin || $parent.userInfo.userid==project.leader.id || $parent.userInfo.userid==project.creater.id" 
+                    id="taskTemplatePlanButton" class="btn btn-success" type="button"><em class="glyphicon glyphicon-plus"></em> Template Planing</button>
+            </div>
+            &nbsp;
+            &nbsp;
+            &nbsp;
+			<div class="btn-group">
                 <button ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='cal', 'btn-success':mode=='cal'}" 
                         ng-class="{'active':mode=='cal'}" ng-click="showCal();prepareCal();" type="button"><em class="glyphicon glyphicon-calendar"></em> Calendar</button>
                 <button ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
@@ -282,10 +288,10 @@ background-color: #FFEDA5;
 
     <div class="panel-body" style="background: #FAFAFA;"  ng-show="tasks.length>0">
         <div id="taskList" class="col-md-3 column" ng-include="'pages/pms/tasksListTemplate.html'"></div>
-				<div class="col-md-9 column">
-                    <div id="projectDetailContainer">
-                        <div id="projectDetailDiv"></div>
-                    </div>
+        <div class="col-md-9 column">
+            <div id="projectDetailContainer">
+                <div id="projectDetailDiv"></div>
+            </div>
             </div>
             </div>
 

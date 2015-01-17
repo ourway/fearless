@@ -19,6 +19,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
+from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 
 
@@ -37,3 +38,5 @@ class Client(IDMixin, Base):
     users = relationship('User', backref='companies', secondary='client_users')
     period = relationship("Date", uselist=False)
     account = relationship("Account", backref='client')
+    tgs = relationship("Tag", backref='clients')
+    tags = association_proxy('tgs', 'name')

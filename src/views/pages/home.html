@@ -7,7 +7,20 @@
     </div>
 
     <div class="container">
-      <!-- Example row of columns -->
+        <!-- Example row of columns -->
+        <div class="col-md-2 column">
+            
+			<ul class="nav nav-pills">
+				<li class="active" style="margin:5px;width:100%">
+					 <a href="#/messages"><span class="badge pull-right">42</span>Inbox</a>
+                     </li>
+				<li class="active" style="margin:5px;width:100%">
+					 <a href="#/notebook"><span class="badge pull-right">2</span>Notes</a>
+				</li>
+			</ul>
+
+            <hr/>
+		</div>
 		<div class="col-md-5 column" ng-init="getUserTasks()">
 			<div class="panel panel-success">
 				<div class="panel-heading">
@@ -36,7 +49,7 @@
                 </div>
                 <div class="panel-body" ng-if="user.tasksForToday.length<1 && user.unfinishedTasks.length>0">
                     <em class="glyphicon glyphicon-exclamation-sign btn btn-sm btn-warning"></em>
-                    You have Unfinished tasks! You are behind schedule!
+                    You have unfinished tasks!
                 </div>
 				<div class="panel-footer">
                     <small ng-if="user.tasksForToday.length>0 && user.unfinishedTasks.length<1" 
@@ -83,6 +96,7 @@
 				</div>
 			</div>
 		</div>
+
 
 
       <div class="class="col-md-12 column">

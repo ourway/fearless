@@ -19,6 +19,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
+from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 
 
@@ -30,4 +31,6 @@ class Version(IDMixin, Base):
     number = Column(Integer, default=1)
     is_published = Column(Boolean, default=False)
     task_id = Column(Integer, ForeignKey('task.id'))
+    tgs = relationship("Tag", backref='versions')
+    tags = association_proxy('tgs', 'name')
     #asset_id = Column(Integer, ForeignKey('task.id'))

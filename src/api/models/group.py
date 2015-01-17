@@ -20,6 +20,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
+from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 
 
@@ -39,6 +40,8 @@ class Group(IDMixin, Base):
     rls = relationship("Role",
                           secondary=groups_roles, backref='groups')
     roles = association_proxy('rls', 'name')
+    tgs = relationship("Tag", backref='groups')
+    tags = association_proxy('tgs', 'name')
 
 
     def __init__(self, name, role=None, typ='private'):

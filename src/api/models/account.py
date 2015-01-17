@@ -20,6 +20,7 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from mixin import IDMixin, Base, getUUID
 from sqlalchemy_utils import PasswordType, aggregated
+from sqlalchemy.ext.associationproxy import association_proxy
 from db import session, Session
 
 
@@ -48,6 +49,8 @@ class Account(IDMixin, Base):
     task_id = Column(Integer, ForeignKey('task.id'))
     parent = relationship("Account", backref="children" ,remote_side=[id])
     period = relationship("Date", uselist=False)
+    tgs = relationship("Tag", backref='accounts')
+    tags = association_proxy('tgs', 'name')
     #start = Column(DateTime, nullable=False, default=now)
 
 

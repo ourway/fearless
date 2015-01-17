@@ -983,6 +983,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         {
                             $scope.getProjectDetails();
                             $scope.getTasksList();
+                            $('#canvasloader-container').fadeOut();
+                            $('#projectDetailDiv').html(data);
+                            $('.tj_table_frame').fadeIn();
+                            if ($scope.replan)
+                                $scope.replan = false;
                         }
 
                     }
@@ -1010,27 +1015,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
                 //$scope.projectTjData = data;
                 //
-                $('#canvasloader-container').fadeOut();
-                $('#projectDetailDiv').html(data);
-                $('.tj_table_frame').fadeIn();
-                $scope.generateProgressChart();
-                $scope.generateBurndownChart();
+
                 })
-                if ($scope.replan)
-                    $scope.replan = false;
-            }
-            else{
-                data = localStorage.getItem(getprefix + mode);
-                if (data != 'undefined')
-                {
-                    $scope.printable = data;
-                    $('#projectDetailDiv').html(data);
-                    $('.tj_table_frame').fadeIn();
-                    $scope.getTasksList();
-                    //$scope.generateProgressChart();
-                    //$scope.generateBurndownChart();
-                    //$scope.getProjectDetails();
-                }
+
             }
 
            
@@ -1069,6 +1056,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                             };
                         $scope.calTasks.push(n);
                     }
+
+                $scope.generateBurndownChart();
+                $scope.generateProgressChart();
                 //if ($scope.mode == 'cal')
                 //    $scope.prepareCal();
             });

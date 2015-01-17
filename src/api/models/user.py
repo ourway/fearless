@@ -129,6 +129,8 @@ class User(IDMixin, Base):
     reports = association_proxy('reps', 'id') # when we refer to reports, id will be returned.
     grps = relationship('Group', backref='users', secondary='users_groups')
     groups = association_proxy('grps', 'name')
+    tgs = relationship("Tag", backref='users')
+    tags = association_proxy('tgs', 'name')
 
     @validates('email')
     def _validate_email(self, key, data):

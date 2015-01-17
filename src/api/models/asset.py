@@ -20,6 +20,7 @@ from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 from utils.fagit import GIT
 from db import Session
@@ -78,6 +79,9 @@ class Asset(IDMixin, Base):
 
     collection_id = Column( Integer, ForeignKey('collection.id'), nullable=False)
     account = relationship("Account", backref='assets')
+    tgs = relationship("Tag", backref='assets')
+    tags = association_proxy('tgs', 'name')
+
 
 
     @validates('name')

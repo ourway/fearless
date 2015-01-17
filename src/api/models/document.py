@@ -21,6 +21,7 @@ import base64
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
+from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 from . import rdb
 
@@ -56,6 +57,8 @@ class Document(IDMixin, Base):
     sequence_id = Column(Integer, ForeignKey('sequence.id'))
     sequence = relationship("Sequence", backref='documents')
     period = relationship("Date", uselist=False)
+    tgs = relationship("Tag", backref='documents')
+    tags = association_proxy('tgs', 'name')
  
     @validates('data')
     def save_data_in_riak(self, key, data):

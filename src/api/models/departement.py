@@ -19,6 +19,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
+from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 
 
@@ -62,3 +63,5 @@ class Departement(IDMixin, Base):
         'Shot', backref='departements', secondary='shots_departements')
     period = relationship("Date", uselist=False)
     account = relationship("Account", backref='departements')
+    tgs = relationship("Tag", backref='departements')
+    tags = association_proxy('tgs', 'name')

@@ -19,6 +19,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
+from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, getUUID
 
 
@@ -31,7 +32,8 @@ class Role(IDMixin, Base):
     '''
 
     name = Column(String(32), nullable=False, unique=True)
-
+    tgs = relationship("Tag", backref='roles')
+    tags = association_proxy('tgs', 'name')
 
 
     def __init__(self, name):

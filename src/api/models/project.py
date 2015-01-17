@@ -98,6 +98,8 @@ class Project(IDMixin, Base):
     subproject = relationship("Project", backref='parent', remote_side=[id])
     period = relationship("Date", uselist=False)
     account = relationship("Account", backref='projects')
+    tgs = relationship("Tag", backref='projects')
+    tags = association_proxy('tgs', 'name')
 
 
     @aggregated('tasks', Column(Integer))

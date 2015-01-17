@@ -53,6 +53,8 @@ class Shot(IDMixin, Base):
     scenes = relationship("Scene", backref='shots', secondary="shots_scenes")
     period = relationship("Date", uselist=False)
     account = relationship("Account", backref='shots')
+    tgs = relationship("Tag", backref='shots')
+    tags = association_proxy('tgs', 'name')
 
 
     @validates('number')

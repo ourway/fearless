@@ -21,6 +21,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 import ujson as json  # for schema validations
 from mako.template import Template
@@ -52,6 +53,8 @@ class Collection(IDMixin, Base):
     repository_id = Column(
         Integer, ForeignKey('repository.id'), nullable=False)
     assets = relationship('Asset', backref='collection')
+    tgs = relationship("Tag", backref='collections')
+    tags = association_proxy('tgs', 'name')
 
 
 

@@ -22,6 +22,7 @@ from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 from collections import defaultdict
 import json as json  # for collection data validation and parsing
@@ -45,6 +46,8 @@ class Repository(IDMixin, Base):
     owner_id = Column(Integer, ForeignKey('user.id'))
     owner = relationship("User", backref="ownes_repositories")
     period = relationship("Date", uselist=False)
+    tgs = relationship("Tag", backref='repositories')
+    tags = association_proxy('tgs', 'name')
 
     @validates('path')
     def create_folders(self, key, path):
