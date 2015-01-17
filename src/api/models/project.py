@@ -178,7 +178,7 @@ class Project(IDMixin, Base):
         # lets select just one task
         if not r.get('fearless_tj3_lock'):
             r.set('fearless_tj3_lock', 'OK')
-            r.expire('fearless_tj3_lock', 30)
+            r.expire('fearless_tj3_lock', 60)
         else:
             return
         templateFile = os.path.join(

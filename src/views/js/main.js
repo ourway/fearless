@@ -975,6 +975,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     if ($scope.project)
                         {
                             $scope.getProjectDetails();
+                            $scope.getTasksList();
                         }
 
                     }
@@ -1018,7 +1019,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     $scope.printable = data;
                     $('#projectDetailDiv').html(data);
                     $('.tj_table_frame').fadeIn();
-                    //$scope.getTasksList();
+                    $scope.getTasksList();
                     //$scope.generateProgressChart();
                     //$scope.generateBurndownChart();
                     //$scope.getProjectDetails();
@@ -1183,7 +1184,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         {
                             duration = (moment.unix(_tasks[_t].end)-moment.unix(_tasks[_t].start))/3600000;
                             tillnow = (moment(pointDate)-moment.unix(_tasks[_t].start))/3600000;
-                            console.log(duration, tillnow, pointDate, taskEndDate)
                             if (tillnow>0){
                                 expected_progress = (tillnow/duration);
                                 _behind_list.push(_tasks[_t].effort*expected_progress);

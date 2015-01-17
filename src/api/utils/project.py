@@ -143,7 +143,9 @@ class GetProjectLatestReport:
             resp.status = falcon.HTTP_404
             return
         data = project.plan()  ## first let it plan
+        update = True
         if not data:
+            update = False
             reports = project.reports
             if reports:
                 repid = reports[-1]
@@ -181,7 +183,7 @@ class GetProjectLatestReport:
                 elif typ == 'project':
                     projectid = int(d.get('projectid'))
                     target = req.session.query(Project).filter(Project.id==projectid).first()
-                if target: ## donble check
+                if target and update: ## donble check
                     start = d.get('start')
                     end = d.get('end')
                     duration = d.get('duration')
