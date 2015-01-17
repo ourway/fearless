@@ -214,7 +214,7 @@ class GetProjectLatestReport:
             resp.body = data
 
         else:
-            resp.status = falcon.HTTP_201
+            resp.status = falcon.HTTP_404
             message = None
             data = {'guntt':message, 'plan':message, 'resource':message, 
                     'profitAndLoss':message, 'msproject':message, 'csv':message }

@@ -838,33 +838,34 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         $scope.replan = true;
         $scope.timeConverter = timeConverter;
 
+        $scope.burndownChart = new Morris.Line({
+          element: 'burndown_chart_div',
+          xkey: 'date',
+          events:[timeConverter()],
+          data:[{'date':new Date().toDateString(), 'value':0, 'expected':0, 'difference':0}],
+          ykeys: ['value', 'expected', 'difference'],
+          lineColors: ['#5bc0de', 'green', '#c2aeae'],
+          lineWidth: ['5', '1', '1'],
+          labels: ['Completed', 'Expected', 'difference'],
+          fillOpacity:1,
+          goals: [0, 100],
+          parseTime:true,
+          hideHover:'auto',
+          resize:true,
+        });
 
-            burndownChart = new Morris.Line({
-              element: 'burndown_chart_div',
-              xkey: 'date',
-              events:[timeConverter()],
-              data:[{'date':new Date().toDateString(), 'value':0, 'expected':0, 'difference':0}],
-              ykeys: ['value', 'expected', 'difference'],
-              lineColors: ['#5bc0de', 'green', '#c2aeae'],
-              lineWidth: ['5', '1', '1'],
-              labels: ['Completed', 'Expected', 'difference'],
-              fillOpacity:1,
-              goals: [0, 100],
-              parseTime:true,
-              hideHover:'auto',
-              resize:true,
-            });
+        $scope.progressPyChart = Morris.Donut({
+          element: 'progress_chart_div',
+          data: [
+            {label: "Completed", value: 0},
+            {label: "Remaining", value: 100},
+          ],
+          colors:['#5bc0de','lightgrey'],
+          postUnits:'%',
+          hideHover:'auto',
+          resize:true
+        });
 
-            progressPyChart = Morris.Donut({
-              element: 'progress_chart_div',
-              data: [
-                {label: "Completed", value: 0},
-                {label: "Remaining", value: 100},
-              ],
-              colors:['#5bc0de','lightgrey'],
-              postUnits:'%',
-              resize:true
-            });
 
             $scope.projId = $routeParams.projId;
             newTask = {};
@@ -908,6 +909,10 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                                 $scope.$parent.comment_id = resp.uuid;
                                 $scope.$parent.getComments();
                                 }
+
+
+
+
                             //$scope.generateReport('guntt');
                         }
                     else
@@ -982,12 +987,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                             console.log('Something went wrong.  Sending backup information;')
                             _projectData = $scope.projectBackup;
                             $scope.updateProject(_projectData);
-                        if ($scope.tasksBackup){
-                            for (i in $scope.tasksBackup){
-                                _task = $scope.tasksBackup[i];
-                                $scope.updateTask(_task.id, _task);
-                            }
-
+                            if ($scope.tasksBackup){
+                                for (i in $scope.tasksBackup){
+                                    _task = $scope.tasksBackup[i];
+                                    $scope.updateTask(_task.id, _task);
+                                }
                         }
                             
 
@@ -1143,7 +1147,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     {label: "Completed", value: complete},
                     {label: "Remaining", value: 100-complete},
                   ]
-                progressPyChart.setData(data);
+                $scope.progressPyChart.setData(data);
             
         }
 
@@ -1177,8 +1181,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         _behind_list.push(_tasks[_t].effort);
                     else
                         {
-                            duration = (moment(taskEndDate)-moment.unix(_tasks[_t].start))/3600000;
+                            duration = (moment.unix(_tasks[_t].end)-moment.unix(_tasks[_t].start))/3600000;
                             tillnow = (moment(pointDate)-moment.unix(_tasks[_t].start))/3600000;
+                            console.log(duration, tillnow, pointDate, taskEndDate)
                             if (tillnow>0){
                                 expected_progress = (tillnow/duration);
                                 _behind_list.push(_tasks[_t].effort*expected_progress);
@@ -1200,7 +1205,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             }
             if (chartData.length>0)
             {
-                burndownChart.setData(chartData);
+                $scope.burndownChart.setData(chartData);
             }
 
         }
