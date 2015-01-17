@@ -751,6 +751,13 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
         $scope.getUsers = function(){
             $http.get('/api/db/user').success(function(resp){
                     $scope.users = resp;
+                    $scope.paylist = [];
+                    for (i in resp){
+                        _user = resp[i];
+                        if (_user.monthly_present_hours)
+                            $scope.paylist.push(_user);
+                    }
+
                     }).error(function(resp, status){
                         if (status == 401)
                             $location.path('auth/login');

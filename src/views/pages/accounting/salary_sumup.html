@@ -1,4 +1,8 @@
-            <div class="col-md-11" id="salary_sumup">
+<div class="col-md-12">
+<h3>Payment Bills</h3>
+<hr/>
+<div class="col-md-11" id="salary_sumup">
+
                 <table class="table table-responsive table-bordered farsi" style="direction:rtl;text-align:right">
 
                     <tr class="info">
@@ -10,9 +14,10 @@
                         <td>حسن انجام</td>
                         <td>کسر کار</td>
                         <td>کد هزینه</td>
+                        <td>شماره حساب</td>
                         <td>مبلغ قابل پرداخت (تومان)</td>
                     </tr>
-                    <tr ng-if="user.monthly_salary || showAll" class="active" ng-repeat="user in users | orderBy:user.firstname | filter:filterUA track by $index" >
+                    <tr ng-if="user.monthly_salary || showAll" class="active" ng-repeat="user in paylist | orderBy:'firstname' | filter:filterUA track by $index" >
                         <td>{{$index+1}}</td>
                         <td><a href="#user/{{user.id}}">{{user.persian_firstname || user.firstname}} {{user.persian_lastname || user.lastname}}</a></td>
                         <td ng-if="user.monthly_salary">{{accounting.formatNumber(user.monthly_salary)}}</td>
@@ -21,6 +26,7 @@
                         <td ng-if="user.monthly_salary">{{accounting.formatNumber(user.monthly_salary*user.retention/100)}}</td>
                         <td ng-if="user.monthly_salary">{{accounting.formatNumber(roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours))))}}</td>
                         <td ng-if="user.monthly_salary">{{user.budget_account}}</td>
+                        <td ng-if="user.monthly_salary">{{user.bank_account_number || 'صدور چک'}}</td>
                         <td ng-if="user.monthly_salary" class="success"><strong>{{calculate_salery(user)}}</strong></td>
                         
                     </tr>
@@ -33,6 +39,7 @@
                         <td></td>
                         <td></td>
                         <td></td>
+                        <td><h3 align="center">جمع کل</h3></td>
                         <td><h4><code>{{final_payment()}}</code></h4></td>
                     
                     </tr>
@@ -42,16 +49,16 @@
 
             </div>
         <div class="col-sm-1 column">
-			<div class="btn-group" >
+				<div class="form-group" >
                 <button id="collectionaddbutton" ng-click="print()" class="btn btn-primary btn-sm" type="button">
                     <em class="glyphicon glyphicon-print"></em>
                 </button>
+                <br/>
+                <br/>
                 <button id="collectionaddbutton" ng-click="mailSumpup()" class="btn btn-primary btn-sm" type="button">
                     <em class="glyphicon glyphicon-send"></em>
                 </button>
-				<div class="form-group" >
-				    <label class="col-sm-12 control-label">Show All</label>
-                <input type="checkbox" class="form-control" ng-model="showAll" />
-                </div>
+
             </div>
         </div>
+</div>

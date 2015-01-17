@@ -1,22 +1,25 @@
-
-
-    <div class="container">
-            <br/>
-                <div class="col-md-12 usersUA">
+<div class="container">
+        <div class="col-md-12 column">
+            <h1>Members <small>[{{users.length}}]</small></h1>
             <input placeholder="Filter users. Example: type yahoo for filtering users with yahoo! email" class="form-control" type="text" ng-model="filterUA" />
-            <div ng-repeat="user in users | orderBy:'firstname'| filter:filterUA" class="useracessDiv" >
-                <img ng-show="user.avatar" ng-src="{{user.avatar}}" width="100" class="pull-left img-responsive img-rounded center-block img-thumbnail"/>
-                <img ng-show="!user.avatar" ng-src="images/user_man-512.png" width="100" class="pull-left img-responsive img-rounded "/>
-                <div style="margin-left:110px;margin-top:10px;">
-                    <a href="#/user/{{user.id}}">{{user.firstname}} {{user.lastname}}</a><br/>
-                    <span class="glyphicon glyphicon-envelope"></span>  <a href="mailto:{{user.email}}"><span style="color:grey">{{user.email}}</span></a>
+            <br/>
+            <div class="col-md-5 column thumbnail" style="background:#f2f2f2;margin:5px" ng-repeat="user in users | orderBy:'firstname'| filter:filterUA" >
+                <div class="col-md-3">
+                    <img ng-show="user.avatar" ng-src="{{user.avatar}}" width="100" class="img-responsive img-rounded img-thumbnail"/>
+                    <img ng-show="!user.avatar" ng-src="images/user_man-512.png" width="100" class="img-responsive img-rounded img-thumbnail"/>
+                </div>
+                <div class="col-md-9">
+                    <br/>
+                    <a href="#/user/{{user.id}}"><h4>{{user.firstname}} {{user.lastname}}</h4></a>
+                    <span class="glyphicon glyphicon-envelope"></span> 
+                    <a href="mailto:{{user.email}}"><span style="color:grey">{{user.email}}</span></a>
                 </div>
             </div>
 
+        </div>
 
-    </div>
-        <hr/>
         <div ng-include="'pages/accounting/salary_sumup.html'"></div>
+</div>
 
 
 
