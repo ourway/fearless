@@ -309,7 +309,6 @@ function updateImageSize(img, maxWidth, maxHeight){
             }
         }
 
-
 		$scope.appName = 'fearless';
         $scope.$parent.showLogin = false;
         $scope.userInfo = {'logged_in':false};
@@ -318,8 +317,8 @@ function updateImageSize(img, maxWidth, maxHeight){
     $scope.doLogin = function() {
         
         if (validateEmail($scope.loginInfo.email) == false && $scope.loginInfo.action != 'changepassword')
-                return null;
-                $scope.AuthRespInfo = null;
+            return null;
+        $scope.AuthRespInfo = null;
         url = '/api/auth/'+$scope.loginInfo.action;
         if ($routeParams.token)
             url = url + '?token=' + $routeParams.token
@@ -999,7 +998,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         {
                             console.log('Something went wrong.  Sending backup information;')
                             _projectData = $scope.projectBackup;
-                            $scope.updateProject(_projectData);
                             if ($scope.tasksBackup){
                                 for (i in $scope.tasksBackup){
                                     _task = $scope.tasksBackup[i];

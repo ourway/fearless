@@ -31,6 +31,7 @@ class Date(IDMixin, Base):
     '''
     start = Column(DateTime, nullable=False)
     end = Column(DateTime, nullable=False)
+    accpeted = Column(Boolean(), default=True)
     client_id = Column(Integer, ForeignKey('client.id'))
     user_id = Column(Integer, ForeignKey('user.id'))
     task_id = Column(Integer, ForeignKey('task.id'))

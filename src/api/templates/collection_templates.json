@@ -116,6 +116,7 @@
             "art/colorkey": [""],
             "art/modelsheet": [""],
             "art/design": [""],
+            "research": [""],
         },
         "copy": {
             "thumb.png": "icons/props.png"
@@ -254,6 +255,7 @@
             "maya/scenes/dynamics": ["ma", "mb"],
             "maya/scenes/render": ["ma", "mb"],
             "maya/scenes/light": ["ma", "mb"],
+            "maya/scenes/camera": ["ma", "mb"],
             "maya/data": ["ma", "mb"],
             "maya/cache": ["ma", "mb"],
             "maya/sound": ["ma", "mb"],
@@ -285,6 +287,22 @@
             "output": [],
             "review": [],
             "script": [],
+            },
+        "copy": {
+            "thumb.png": "icons/props.png"
+        },
+        "files": {
+            "README.txt": "readme.txt",
+            "Characters.txt": "characters_guideline.txt"
+        },
+        "ignore": []
+    },
+    "resources": {
+        "folders": {
+            "programs": [],
+            "docs": [],
+            "scripts": [],
+            "learnings": [],
             },
         "copy": {
             "thumb.png": "icons/props.png"

@@ -118,6 +118,7 @@ class User(IDMixin, Base):
     is_client = Column(Boolean, default=False)
     rate = Column(Float(precision=3), default=0)
     monthly_salary = Column(Float(precision=3), default=0)
+    extra_payment = Column(Float(precision=3), default=0)
     retention = Column(Float(precision=3), default=10)
     payroll_tax = Column(Float(precision=3), default=3)
     insurance_deductions = Column(Float(precision=3), default=7.8)

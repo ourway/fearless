@@ -96,9 +96,14 @@ class DB:
         show = req.get_param('show')
         start = req.get_param('s')
         end = req.get_param('e')
-        filters = req.get_param('filters')
-        if filters:
-            filters = [{i.split('=')[0]:i.split('=')[1]} for i in filters.split(',') if '=' in i]
+        filters_raw = req.get_param('filters')
+        filters = []
+        if filters_raw:
+
+            filters += [{i.split('=')[0]:i.split('=')[1], '_':'=='} for i in filters_raw.split(',') if '=' in i]
+            filters += [{i.split('>')[0]:i.split('>')[1], '_':'>'} for i in filters_raw.split(',') if '>' in i]
+            filters += [{i.split('<')[0]:i.split('<')[1], '_':'<'} for i in filters_raw.split(',') if '<' in i]
+
         sort = req.get_param('sort')
         if not sort:
             sort = 'desc'
@@ -135,7 +140,8 @@ class DB:
                 if filters and isinstance(filters, list):
                     for filter in filters:
                         if isinstance(filter, dict):
-                            query += '.filter({t}.{k}=="{v}")'.format(t=table, 
+                            eq = filter.pop('_')
+                            query += '.filter({t}.{k}{eq}"{v}")'.format(t=table,eq=eq,
                                         k=filter.keys()[0], v=filter[filter.keys()[0]])
                 data = eval(query).all()
                 resp.body = data

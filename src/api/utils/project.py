@@ -117,12 +117,14 @@ class AddProject:
             sets_section = Collection(name='Sets', path='sets')
             sequences_section = Collection(name='Sequences', path='sequences')
             editorial_section = Collection(name='Editorial', path='editorial')
+            resources_section = Collection(name='Resources', path='resources')
 
             new_repository.collections.append(chars_section)
             new_repository.collections.append(props_section)
             new_repository.collections.append(sets_section)
             new_repository.collections.append(sequences_section)
             new_repository.collections.append(editorial_section)
+            new_repository.collections.append(resources_section)
 
 
             new.repositories.append(new_repository)

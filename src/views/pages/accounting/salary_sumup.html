@@ -1,8 +1,13 @@
 <div class="col-md-12">
 <h3>Payment Bills</h3>
 <hr/>
-<div class="col-md-11" id="salary_sumup">
+		<div class="form-group" >
+            <input type="text" class="form-control farsi" placeholder="توضیحات" ng-model="desc"/>
+        </div>
 
+        <br/>
+<div class="col-md-11" id="salary_sumup">
+        <h3 ng-if="desc" class="farsi">{{desc}}</h3>
                 <table class="table table-responsive table-bordered farsi" style="direction:rtl;text-align:right">
 
                     <tr class="info">
