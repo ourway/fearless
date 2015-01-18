@@ -23,7 +23,7 @@ project FEARLESS_MAIN_PROJECT "Fearless Main Project" 2014-10-01 - 2018-01-01 {
 
 % for vy in xrange(2015,2019):
     vacation "Martyrdom of Imam Reza" ${vy}-1-2
-    vacation "Birthday of Muhammad and Imam Sadeq" ${vy}-1-19
+    vacation "Birthday of Muhammad and Imam Sadeq" ${vy}-1-09
     vacation "Revolution Day" ${vy}-2-11
     vacation "Nourooz" ${vy}-3-20 - ${vy}-3-25
     vacation "Islamic Republic Day" ${vy}-4-1
