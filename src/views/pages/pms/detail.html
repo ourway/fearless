@@ -239,14 +239,14 @@ background-color: #FFEDA5;
 
      <div class="panel-body" style="background: #F9F5FF;">
         <div class="col-md-12 column">
-                <div class="col-md-2 column" style="border-right: 1px solid #ccc;">
+                <div class="col-md-3 column" style="border-right: 1px solid #ccc;">
                      <h3 style="color:grey">Collections</h3>
                         <div id="CollectionsDiv" >
                             <a class="projectCollectionsA" href="#/ams/c/{{collection.id}}?page=1" ng-repeat="collection in project.collections track by $index" 
                                 title="{{collection.name}}">{{collection.name}}</a>
                         </div>
                 </div>
-                <div class="col-md-6 column" style="border-right: 1px solid #ccc;">
+                <div class="col-md-7 column" style="border-right: 1px solid #ccc;">
                     <h3 style="color:grey">Sequences</h3>
                     <a class="projectSeqA" href="#pms/{{project.id}}/seq/{{seq.number}}" ng-repeat="seq in project.sequences track by $index" title="{{req.code}}">{{seq.number}}</a>
                     </div>

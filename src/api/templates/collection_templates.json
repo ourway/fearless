@@ -34,9 +34,9 @@
         "folders": {
             "maya/scenes/model": ["ma", "mb"],
             "maya/scenes/rig": ["ma", "mb"],
-            "maya/scenes/dynamics": ["ma", "mb"],
+            "maya/scenes/dynamics/hair": ["ma", "mb"],
+            "maya/scenes/dynamics/cloth": ["ma", "mb"],
             "maya/scenes/shader": ["ma", "mb"],
-            "maya/scenes/light": ["ma", "mb"],
             "zbrush": ["ztl", "zbr", "obj"],
             "textures/128": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
             "textures/256": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
@@ -55,6 +55,7 @@
             "art/modelsheet": [""],
             "art/design": [""],
             "art/motion": [""],
+            "research": [""],
         },
         "files": {
             "README.txt": "readme.txt",
@@ -71,7 +72,6 @@
             "maya/scenes/rig": ["ma", "mb"],
             "maya/scenes/dynamics": ["ma", "mb"],
             "maya/scenes/shader": ["ma", "mb"],
-            "maya/scenes/light": ["ma", "mb"],
             "textures/128": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
             "textures/256": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
             "textures/512": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
@@ -98,7 +98,6 @@
             "maya/scenes/rig": ["ma", "mb"],
             "maya/scenes/dynamics": ["ma", "mb"],
             "maya/scenes/shader": ["ma", "mb"],
-            "maya/scenes/light": ["ma", "mb"],
             "zbrush": ["ztl", "zbr", "obj"],
             "textures/128": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
             "textures/256": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
@@ -134,7 +133,6 @@
             "maya/scenes/rig": ["ma", "mb"],
             "maya/scenes/dynamics": ["ma", "mb"],
             "maya/scenes/shader": ["ma", "mb"],
-            "maya/scenes/light": ["ma", "mb"],
             "textures/128": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
             "textures/256": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
             "textures/512": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
@@ -159,8 +157,6 @@
     "sets": {
         "folders": {
             "maya/scenes/model": ["ma", "mb"],
-            "maya/scenes/rig": ["ma", "mb"],
-            "maya/scenes/dynamics": ["ma", "mb"],
             "maya/scenes/shader": ["ma", "mb"],
             "maya/scenes/light": ["ma", "mb"],
             "zbrush": ["ztl", "zbr", "obj"],
@@ -185,6 +181,7 @@
             "art/colorkey": [""],
             "art/modelsheet": [""],
             "art/design": [""],
+            "research": [""],
         },
         "copy": {
             "thumb.png": "icons/sets.png"

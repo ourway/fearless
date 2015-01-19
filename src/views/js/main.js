@@ -206,6 +206,16 @@ var TITLE = 'TITLE';
                 controller: 'errorsCtrl',
                  reloadOnSearch: false // dont reload the page on $location.search
             })
+             .when('/messages/:folder/:mid', {
+                templateUrl: 'pages/messages/index.html',
+                controller: 'messagesCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
+            })
+             .when('/messages/:folder', {
+                templateUrl: 'pages/messages/index.html',
+                controller: 'messagesCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
+            })
              .when('/messages', {
                 templateUrl: 'pages/messages/index.html',
                 controller: 'messagesCtrl',
@@ -512,8 +522,9 @@ function updateImageSize(img, maxWidth, maxHeight){
 
 
 
-fearlessApp.controller('homeCtrl', function ($scope, $http, $location, $interval) {
+fearlessApp.controller('homeCtrl', function ($scope, $http, $location, $interval, $rootScope) {
 
+        $rootScope.title = 'Home';
 		messages = [
                     "Life is what happens to you while you're busy making other plans.",
                     'A goal without a plan is just a wish!',
@@ -1731,9 +1742,10 @@ fearlessApp.controller('taskDetailCtrl', function($scope, $rootScope, $routePara
 
 
     
-fearlessApp.controller('inboxCtrl', function ($scope, $filter, $interval, messageService) {
+fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $interval, $rootScope, messageService, $http, $routeParams) {
 
     $scope.messages = {};
+    $scope.messages.folder = $routeParams.folder;
     $scope.getUnreadCount  = messageService.getUnreadCount;
     mailes = [
     {"id":1,"from":"Hamid Lak","fromAddress":"test@test.com","subject":"Posting on board","dtSent":"Today, 9:18AM","read":false,"body":"Hey ,<br><br>I saw your post on the message board and I was wondering if you still had that item available. Can you call me if you still do?<br><br>Thanks,<br><b>Hamid Lak</b>"},
@@ -1741,6 +1753,40 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $interval, messag
     {"id":3,"from":"Morteza Ghamari","fromAddress":"test@test.com","subject":"New Cat!","dtSent":"Yesterday, 4:48PM","read":true,"body":"The message body goes here..."},
     {"id":4,"from":"Negar Ahmadi","fromAddress":"test@test.com","subject":"RE: New developer","dtSent":"Yesterday, 4:40PM","read":false,"body":"The message body goes here...","priority":1},
 ];
+    
+    $scope.init = function(process){
+        req = $http.get('/api/messages/list');
+        req.success(function(resp){
+            if (!process)
+                messageService.messages = resp;
+            else{
+                messageService.messages = [];
+                $rootScope.title = 'Messages';
+                for (i in resp){
+                    key = resp[i];
+                    message = $http.get('/api/messages/get/'+key);
+                    message.success(function(m){
+                            newm = m;
+                            newm.body = m.body_s;
+                            newm.key=key;
+                            newm.from = m.from_s;
+                            newm.to = m.to_s;
+                            newm.dtSent = $scope.$parent.prettyDate(m.dtSent);
+                            newm.subject = m.subject_s;
+                            messageService.messages.push(newm);
+                            $scope.messages.items = messageService.messages;
+                            $scope.search($scope.messages.folder);
+                        })
+                }
+
+
+            }
+
+
+            $scope.newMessage = {};            
+       })
+
+    }
    	
  	$scope.date = new Date;
     $scope.sortingOrder = 'id';
@@ -1754,16 +1800,19 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $interval, messag
     
     /* inbox functions -------------------------------------- */
     
-    // get data and init the filtered items
-    $scope.init = function () {
-       messageService.messages = JSON.parse(JSON.stringify(mailes));
-       $scope.messages.items = messageService.messages;
-       $scope.search();
-       
+
+
+
+    $scope.sendMessage = function(draft){
+        if (draft)
+            $scope.newMessage.draft = true;
+        req = $http.post('/api/messages/set', $scope.newMessage);
+        req.success(function(resp){
+                    console.log(resp);
+                })
+
+        
     }
-
-
-
 
     var searchMatch = function (haystack, needle) {
         if (!needle) {
@@ -1772,8 +1821,12 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $interval, messag
         return haystack.toLowerCase().indexOf(needle.toLowerCase()) !== -1;
     };
     
+    $scope.$watch($scope.messages.folder, function(){
+            
+                console.log('woow')
+            })
     // filter the items
-    $scope.search = function () {
+    $scope.search = function (folder) {
         $scope.filteredItems = $filter('filter')($scope.messages.items, function (item) {
           for(var attr in item) {
             if (searchMatch(item[attr], $scope.query))
@@ -1838,10 +1891,13 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $interval, messag
         return false;
     };
 
+
     
     $scope.isMessageSelected = function () {
         if (typeof $scope.selected!=="undefined" && $scope.selected!==null) {
+
             return true;
+
         }
         else {
             return false;
@@ -1874,7 +1930,7 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $interval, messag
 
 
     // initialize
-    $scope.init();
+    //$scope.init();
 
 
     

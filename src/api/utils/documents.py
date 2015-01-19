@@ -30,6 +30,7 @@ class SetNote:
         obj = ddb.new(key, data).store()
         resp.body = {'note':obj.data.get('note_s')}
 
+
 class SearchNote:
     def on_get(self, req, resp, query):
         res = ddb.search('note_s:*%s*'%query)['docs']

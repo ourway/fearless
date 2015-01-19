@@ -53,6 +53,8 @@ def dumps(obj):
 
 def jsonify(self, resp):
     '''Everything is json here'''
+    if resp.stream:
+        return
     resp.content_type = 'application/json'
     if not resp.body:
         data = '[]'

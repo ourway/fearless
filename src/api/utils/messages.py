@@ -16,6 +16,7 @@ Clean code is much better than Cleaner comments!
 import falcon
 from models import ddb, riakClient, User
 from AAA import Authorize, getUserInfoFromSession
+from helpers import get_params
 import base64
 from uuid import uuid4
 
@@ -42,7 +43,6 @@ def getUserMessageBox(uuid):
 
 
 class GetMessagesList:
-
     def on_get(self, req, resp):
         user = getUserInfoFromSession(req, resp)
         mdb = getUserMessageBox(user.get('uuid'))
@@ -53,22 +53,19 @@ class GetMessage:
         user = getUserInfoFromSession(req, resp)
         mdb = getUserMessageBox(user.get('uuid'))
         data = mdb.get(key)
-        resp.body = data.data
+        result = data.data
+        result['dtSent'] = data.last_modified
+        resp.body = result
 
 class SetMessage:
-    def on_get(self, req, resp):
+    def on_post(self, req, resp):
         user = getUserInfoFromSession(req, resp)
-        body = req.get_param('body')
-        subject = req.get_param('subject')
-        to = req.get_param('to')
-        TO = req.session.query(User).filter_by(email=to).first()
+        message = get_params(req.stream, False)
+        TO = req.session.query(User).filter_by(email=message.get('to')).first()
         FROM = req.session.query(User).filter_by(email=user.get('email')).first()
-        attach = req.get_param('attach')
         _from = user.get('email')
         _from_fn = user.get('firstname')
         _from_ln = user.get('lastname')
-        from_mdb = getUserMessageBox(FROM.uuid)
-        to_mdb = getUserMessageBox(TO.uuid)
 
         data = {
                 'to_s':
@@ -76,30 +73,45 @@ class SetMessage:
                         'firstname_s':TO.firstname,
                         'lastname_s':TO.lastname,
                         'email_s':TO.email,
+                        'id':TO.id,
                     },
                 'from_s':
                     {
                         'firstname_s':FROM.firstname,
                         'lastname_s':FROM.lastname,
                         'email_s':FROM.email,
+                        'id':FROM.id
                     },
                 'target_readed':False,
                 'sender_readed':False,
                 'attachments':[],
-                'body_s':body,
-                'subject_s':subject,
-                'folder':'sent'
+                'body_s':message.get('body'),
+                'subject_s':message.get('subject'),
+                'folder':'sent',
+                'stared': bool(message.get('started')),
+                'archived': bool(message.get('archived')),
+                'flagged': bool(message.get('flagged'))
         }
 
         target_data = data.copy()
         target_data['folder'] = 'inbox'
-        if TO and FROM and subject and body:
+        if not TO or not message.get('subject') or message.get('draft'):
+            data['folder'] = 'draft'
+            target_data = {}
+        if FROM and message.get('body'):
             key = getUUID()
-            obj = from_mdb.new(key, data)
-            obj.store()
-            tobj = to_mdb.new(key, target_data)
-            tobj.store()
-            resp.body = {'message':data, 'key':key}
+            if data:
+                from_mdb = getUserMessageBox(FROM.uuid)
+                obj = from_mdb.new(key, data)
+                obj.store()
+            if target_data:
+                to_mdb = getUserMessageBox(TO.uuid)
+                tobj = to_mdb.new(key, target_data)
+                tobj.store()
+            if data:
+                resp.body = {'message':data, 'key':key}
+            else:
+                resp.status = falcon.HTTP_201
         else:
             resp.status = falcon.HTTP_400
             resp.body = {'message':'error', 'info':'subject, to and body needed.'}

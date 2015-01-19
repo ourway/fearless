@@ -12,7 +12,7 @@
             
 			<ul class="nav nav-pills nav-stacked">
                 <li class="active" style="margin:5px;width:100%" ng-controller="inboxCtrl">
-                        <a href="#/messages"><span class="badge pull-right">{{messages.items.length}}</span>Inbox</a>
+                        <a href="#/messages"><span class="badge pull-right">{{getUnreadCount()}}</span>Inbox</a>
                 </li>
 				<li class="active" style="margin:5px;width:100%">
 					 <a href="#/notebook"><span class="badge pull-right">2</span>Notes</a>
