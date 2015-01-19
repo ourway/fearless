@@ -437,7 +437,7 @@ def getUserInfoFromSession(req, resp):
             hashed_sid = hashlib.sha1(sid).hexdigest()
             target = req.session.query(User).filter(User.latest_session_id==hashed_sid).first()
             if target:
-                return {'email':target.email, 'alias':target.alias, 'firstname':target.firstname,
+                return {'email':target.email, 'alias':target.alias, 'firstname':target.firstname, 'uuid':target.uuid,
                             'lastname':target.lastname, 'id':target.id, 'server':{'name':'Fearless API', 'ip':get_ip()}}
 
             else:

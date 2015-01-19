@@ -1,5 +1,30 @@
-var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular', 'ui.grid', 
+var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular', 'ui.grid', 'ngSanitize', 
                         'ui.bootstrap', 'checklist-model']);
+
+
+fearlessApp.config(function($sceDelegateProvider) {
+  $sceDelegateProvider.resourceUrlWhitelist([
+    'self',
+  ]);
+  // The blacklist overrides the whitelist so the open redirect here is blocked.
+  $sceDelegateProvider.resourceUrlBlacklist([
+  ]);
+});
+
+
+fearlessApp.factory('messageService', function() {
+    itemsService = {};
+    itemsService.messages = [];
+    itemsService.getUnreadCount = function(){
+        unread = 0;
+        itemsService.messages.forEach(function(item){
+                if (!item.read)
+                    unread+=1;
+                });
+        return unread;
+    };    
+    return itemsService;
+});
 
 fearlessApp.factory('authFactory', function($resource) {
   return $resource('/api/auth/:what',
@@ -510,13 +535,15 @@ fearlessApp.controller('homeCtrl', function ($scope, $http, $location, $interval
 		    $scope.message = choose(messages);
             }, 30000);
 
+    if (!localStorage.getItem('WelcomePageVisited')){
 
-    $http.get('/api/db/project?count=true').success(function(resp){
-            if (resp.count==0){
-                $location.path('/welcome')
-            }
-            
-        });
+        $http.get('/api/db/project?count=true').success(function(resp){
+                if (resp.count==0){
+                    localStorage.setItem('WelcomePageVisited', 1);
+                    $location.path('/welcome');
+                }
+            });
+    }
 
 
     $scope.getUserTasks = function(){
@@ -1699,35 +1726,21 @@ fearlessApp.controller('taskDetailCtrl', function($scope, $rootScope, $routePara
                     $scope.task = resp;
                 
                 })
-
         }
-
-
         })
 
-var messages = [
-    {"id":1,"from":"Gary Lewis","fromAddress":"test@testdomain.com","subject":"Posting on board","dtSent":"Today, 9:18AM","read":false,"body":"Hey Mark,<br><br>I saw your post on the message board and I was wondering if you still had that item available. Can you call me if you still do?<br><br>Thanks,<br><b>Gary Lewis</b>"},
-    {"id":2,"from":"Bob Sutton","fromAddress":"test@testdomain.com","subject":"In Late Today","dtSent":"Today, 8:54AM","read":false,"body":"Mark,<br>I will be in late today due to an appt.<br>v/r Bob","attachment":true},
-    {"id":3,"from":"Will Adivo","fromAddress":"test@testdomain.com","subject":"New developer","dtSent":"Yesterday, 4:48PM","read":true,"body":"The message body goes here..."},
-    {"id":4,"from":"Al Kowalski","fromAddress":"test@testdomain.com","subject":"RE: New developer","dtSent":"Yesterday, 4:40PM","read":false,"body":"The message body goes here...","priority":1},
-    {"id":4,"from":"Beth Maloney","fromAddress":"test@testdomain.com","subject":"July Reports","dtSent":"3 Days Ago","read":true,"body":"PYC Staff-<br> Our weekly meeting is canceled due to the holiday. Please review and submit your PID report before next week's meeting.<br>Thanks,<br>Beth"},
-    {"id":6,"from":"Jason Furgano","fromAddress":"test@testdomain.com","subject":"New developer","dtSent":"3 Days Ago","read":true,"body":"All,<br>I'd like to introduce Joe Canfigliata our new S/W developer. If you see him in the office introduce yourself and make him feel welcome."},
-    {"id":7,"from":"Bob Sutton","fromAddress":"test@testdomain.com","subject":"Tasking request","dtSent":"3 Days Ago","read":true,"body":"Ovi lipsu doir. The message body goes here..."},
-    {"id":8,"from":"Will Adivo","fromAddress":"test@testdomain.com","subject":"Proposal for Avid Consulting","dtSent":"3 Days Ago","read":true,"body":"Mark, I reviewed your proposal with Beth and we have a few questions. Let me know when you time to meet."},
-    {"id":9,"from":"Philip Corrigan","fromAddress":"test@testdomain.com","subject":"Follow-up Appt.","dtSent":"4 Days Ago","read":true,"body":"Hi,<br>Can you please confirm the expense report I submitted for my last trip to SD?<br>Thanks,<br>Tom Grey"},
-    {"id":10,"from":"Will Adivo","fromAddress":"test@testdomain.com","subject":"FWD: Subject","dtSent":"4 Days Ago","read":true,"body":"The message body goes here dapibus nec velit egdiet tempu...","priority":1},
-    {"id":11,"from":"Will Adivo","fromAddress":"test@testdomain.com","subject":"Subject","dtSent":"Last Week","read":true,"body":"The message body goes here... <br>Regards,Fagan"},
-    {"id":12,"from":"Parker Dunlap","fromAddress":"test@testdomain.com","subject":"Subject","dtSent":"Aug 14 5:09PM","read":true,"body":"Hello,<br>The message body goes here...","attachment":true},
-    {"id":13,"from":"Hannah Marks","fromAddress":"test@testdomain.com","subject":"Subject","dtSent":"Aug 14 4:18PM","read":true,"body":"Dear Mark,<br>We've missed you at the shop. How are you and the fam? Let's get together soon.<br> - James"},
-    {"id":14,"from":"Parker Dunlap","fromAddress":"test@testdomain.com","subject":"Subject","dtSent":"Aug 14 5:09PM","read":true,"body":"The message body goes here...","attachment":true},
-    {"id":15,"from":"Hannah Marks","fromAddress":"hmarks@testdomain.com","subject":"Subject","dtSent":"Aug 14 4:18PM","read":true,"body":"The message body goes here..."},
-    {"id":16,"from":"Parker Dunlap","fromAddress":"parker@testdomain.com","subject":"Subject","dtSent":"Aug 14 5:09PM","read":true,"body":"The message body goes here...","attachment":true},
-    {"id":17,"from":"Amy Davis","fromAddress":"amy@testdomain.com","subject":"Subject","dtSent":"Aug 14 4:18PM","read":true,"body":"The message body goes here..."}
-];
 
     
-fearlessApp.controller('inboxCtrl', ['$scope', '$filter', function ($scope, $filter) {
-  
+fearlessApp.controller('inboxCtrl', function ($scope, $filter, $interval, messageService) {
+
+    $scope.messages = {};
+    $scope.getUnreadCount  = messageService.getUnreadCount;
+    mailes = [
+    {"id":1,"from":"Hamid Lak","fromAddress":"test@test.com","subject":"Posting on board","dtSent":"Today, 9:18AM","read":false,"body":"Hey ,<br><br>I saw your post on the message board and I was wondering if you still had that item available. Can you call me if you still do?<br><br>Thanks,<br><b>Hamid Lak</b>"},
+    {"id":2,"from":"Farsheed Ashouri","fromAddress":"test@test.com","subject":"In Late Today","dtSent":"Today, 8:54AM","read":false,"body":"Mark,<br>I will be in late today due to an appt.<br>v/r Bob","attachment":true},
+    {"id":3,"from":"Morteza Ghamari","fromAddress":"test@test.com","subject":"New Cat!","dtSent":"Yesterday, 4:48PM","read":true,"body":"The message body goes here..."},
+    {"id":4,"from":"Negar Ahmadi","fromAddress":"test@test.com","subject":"RE: New developer","dtSent":"Yesterday, 4:40PM","read":false,"body":"The message body goes here...","priority":1},
+];
    	
  	$scope.date = new Date;
     $scope.sortingOrder = 'id';
@@ -1743,11 +1756,14 @@ fearlessApp.controller('inboxCtrl', ['$scope', '$filter', function ($scope, $fil
     
     // get data and init the filtered items
     $scope.init = function () {
-      
-       $scope.items = messages;
+       messageService.messages = JSON.parse(JSON.stringify(mailes));
+       $scope.messages.items = messageService.messages;
        $scope.search();
        
     }
+
+
+
 
     var searchMatch = function (haystack, needle) {
         if (!needle) {
@@ -1758,7 +1774,7 @@ fearlessApp.controller('inboxCtrl', ['$scope', '$filter', function ($scope, $fil
     
     // filter the items
     $scope.search = function () {
-        $scope.filteredItems = $filter('filter')($scope.items, function (item) {
+        $scope.filteredItems = $filter('filter')($scope.messages.items, function (item) {
           for(var attr in item) {
             if (searchMatch(item[attr], $scope.query))
               return true;
@@ -1816,12 +1832,12 @@ fearlessApp.controller('inboxCtrl', ['$scope', '$filter', function ($scope, $fil
     
     $scope.deleteItem = function (idx) {
         var itemToDelete = $scope.pagedItems[$scope.currentPage][idx];
-        var idxInItems = $scope.items.indexOf(itemToDelete);
-        $scope.items.splice(idxInItems,1);
+        var idxInItems = $scope.messages.items.indexOf(itemToDelete);
+        $scope.messages.items.splice(idxInItems,1);
         $scope.search();
-        
         return false;
     };
+
     
     $scope.isMessageSelected = function () {
         if (typeof $scope.selected!=="undefined" && $scope.selected!==null) {
@@ -1833,13 +1849,14 @@ fearlessApp.controller('inboxCtrl', ['$scope', '$filter', function ($scope, $fil
     };
     
     $scope.readMessage = function (idx) {
-        $scope.items[idx].read = true;
-        $scope.selected = $scope.items[idx];
+        $scope.messages.items[idx].read = true;
+        $scope.selected = $scope.messages.items[idx];
     };
+
     
     $scope.readAll = function () {
-        for (var i in $scope.items) {
-            $scope.items[i].read = true;
+        for (var i in $scope.messages.items) {
+            $scope.messages.items[i].read = true;
         }
     };
     
@@ -1854,18 +1871,21 @@ fearlessApp.controller('inboxCtrl', ['$scope', '$filter', function ($scope, $fil
     
     /* end inbox functions ---------------------------------- */
     
-    
+
+
     // initialize
     $scope.init();
+
+
     
-}])// end inboxCtrl
-fearlessApp.controller('messagesCtrl', ['$scope', function ($scope) {
+})// end inboxCtrl
+fearlessApp.controller('messagesCtrl',  function ($scope) {
     
     $scope.message = function(idx) {
         return messages(idx);
     };
     
-}]);// end messageCtrl
+});// end messageCtrl
 
 //////////////////////////////////////////////////////
 
