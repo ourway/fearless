@@ -53,6 +53,21 @@ install:
 	@supervisorctl restart fearless-celery
 	#@riak-admin bucket-type create siblings_allowed '{"props":{"allow_mult":true}}'
 	#@riak-admin bucket-type activate siblings_allowed
+	@riak-admin bucket-type create mail_inbox
+	@riak-admin bucket-type create mail_draft
+	@riak-admin bucket-type create mail_sent
+	@riak-admin bucket-type create mail_star
+	@riak-admin bucket-type create mail_trash
+	@riak-admin bucket-type create mail_spam
+	@riak-admin bucket-type create mail_archive
+
+	@riak-admin bucket-type activate mail_inbox
+	@riak-admin bucket-type activate mail_draft
+	@riak-admin bucket-type activate mail_sent
+	@riak-admin bucket-type activate mail_star
+	@riak-admin bucket-type activate mail_trash
+	@riak-admin bucket-type activate mail_spam
+	@riak-admin bucket-type activate mail_archive
 	#@riak-admin bucket-type status siblings_allowed
 	#@sudo -u postgres createuser -PE vserver
 	#@sudo -u postgres createdb -O vserver -E UTF8 vserver

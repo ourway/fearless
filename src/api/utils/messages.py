@@ -18,6 +18,7 @@ from models import ddb, riakClient, User
 from AAA import Authorize, getUserInfoFromSession
 from helpers import get_params
 import base64
+import riak
 from uuid import uuid4
 
 
@@ -27,17 +28,19 @@ def getUUID():
 
 
 
-def getUserMessageBox(uuid):
+def getUserMessageBox(uuid, btype):
     '''Create/get a riak bucket for user messages'''
     bname = 'messages_database_%s' % uuid
+    tname = 'mail_%s' % btype
     bname = str(bname)
-    mdb = riakClient.bucket(bname)
+    tname = str(tname)
+    mdb = riakClient.bucket_type(tname).bucket(bname)
     riakClient.create_search_index(bname)
     try:
         mdb.set_properties({'search_index': bname})
+        mdb.enable_search()
     except Exception, e:
         pass
-    mdb.enable_search()
     return mdb
 
 
@@ -45,17 +48,58 @@ def getUserMessageBox(uuid):
 class GetMessagesList:
     def on_get(self, req, resp):
         user = getUserInfoFromSession(req, resp)
-        mdb = getUserMessageBox(user.get('uuid'))
+        bfolder = req.get_param('folder') or 'inbox'
+        if not bfolder in ['inbox', 'sent', 'draft', 'start', 'archive', 'spam', 'trash']:
+            return
+        mdb = getUserMessageBox(user.get('uuid'), bfolder)
         resp.body = mdb.get_keys()
+
+
+class GetMessages:
+    def on_get(self, req, resp):
+        user = getUserInfoFromSession(req, resp)
+        bfolder = req.get_param('folder') or 'inbox'
+        if not bfolder in ['inbox', 'sent', 'draft', 'start', 'archive', 'spam', 'trash']:
+            return
+        mdb = getUserMessageBox(user.get('uuid'), bfolder)
+        objects = mdb.get_keys()
+        result = []
+        for key in objects:
+            message = mdb.get(key)
+            try:
+                mdata = message.data
+                mdata['key'] = key
+                mdata['dtSent'] = message.last_modified
+                result.append(mdata)
+            except riak.ConflictError:
+                message = message.siblings[-1]
+                mdata = message.data
+                mdata['key'] = key
+                mdata['dtSent'] = message.last_modified
+                result.append(mdata)
+            except TypeError:
+                pass
+        resp.body = result
+
 
 class GetMessage:
     def on_get(self, req, resp, key):
         user = getUserInfoFromSession(req, resp)
-        mdb = getUserMessageBox(user.get('uuid'))
+        bfolder = req.get_param('folder') or 'inbox'
+        mdb = getUserMessageBox(user.get('uuid'), bfolder)
+        if not bfolder in ['inbox', 'sent', 'draft', 'start', 'archive', 'spam', 'trash']:
+            return
         data = mdb.get(key)
-        result = data.data
-        result['dtSent'] = data.last_modified
-        resp.body = result
+        messages = []
+        for message in data.siblings:
+            result = message.data
+            try:
+                result['key'] = key
+                result['dtSent'] = message.last_modified
+            except TypeError:
+                pass
+            messages.append(result)
+        resp.body = messages
 
 class SetMessage:
     def on_post(self, req, resp):
@@ -94,18 +138,22 @@ class SetMessage:
         }
 
         target_data = data.copy()
-        target_data['folder'] = 'inbox'
+        bfolder = message.get('folder') or 'sent'
+        if not bfolder in ['inbox', 'sent', 'draft', 'start', 'archive', 'spam', 'trash']:
+            return
         if not TO or not message.get('subject') or message.get('draft'):
-            data['folder'] = 'draft'
+            bfolder = 'draft'
             target_data = {}
+            data['folder'] = 'draft'
         if FROM and message.get('body'):
             key = getUUID()
             if data:
-                from_mdb = getUserMessageBox(FROM.uuid)
+                from_mdb = getUserMessageBox(FROM.uuid,  bfolder)
                 obj = from_mdb.new(key, data)
                 obj.store()
             if target_data:
-                to_mdb = getUserMessageBox(TO.uuid)
+                to_mdb = getUserMessageBox(TO.uuid, 'inbox')
+                target_data['folder'] = 'inbox'
                 tobj = to_mdb.new(key, target_data)
                 tobj.store()
             if data:

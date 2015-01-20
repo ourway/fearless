@@ -2,7 +2,7 @@
     <input ng-if="tasks" type="text" class="form-control" placeholder="Filter Tasks" 
     ng-model="project.filterTaskName" />
     <div id="tasksDiv">
-        <table class="table table-responsive table-bordered">
+        <table class="table table-responsive table table-bordered table-striped table-hover refresh-container pull-down">
         <tr title="{{task.name}}" class="active" 
             ng-repeat="task in tasks | orderBy:'start' | filter:project.filterTaskName ">
             <td class="info">

@@ -206,20 +206,11 @@ var TITLE = 'TITLE';
                 controller: 'errorsCtrl',
                  reloadOnSearch: false // dont reload the page on $location.search
             })
-             .when('/messages/:folder/:mid', {
-                templateUrl: 'pages/messages/index.html',
-                controller: 'messagesCtrl',
-                 reloadOnSearch: false // dont reload the page on $location.search
-            })
-             .when('/messages/:folder', {
-                templateUrl: 'pages/messages/index.html',
-                controller: 'messagesCtrl',
-                 reloadOnSearch: false // dont reload the page on $location.search
-            })
              .when('/messages', {
                 templateUrl: 'pages/messages/index.html',
                 controller: 'messagesCtrl',
-                 reloadOnSearch: false // dont reload the page on $location.search
+                 reloadOnSearch: true // dont reload the page on $location.search
+
             })
 
     })
@@ -1745,8 +1736,10 @@ fearlessApp.controller('taskDetailCtrl', function($scope, $rootScope, $routePara
 fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $interval, $rootScope, messageService, $http, $routeParams) {
 
     $scope.messages = {};
-    $scope.messages.folder = $routeParams.folder;
+    messageService.messages = [];
     $scope.getUnreadCount  = messageService.getUnreadCount;
+    $scope.messages.folder = $routeParams.folder || 'inbox';
+
     mailes = [
     {"id":1,"from":"Hamid Lak","fromAddress":"test@test.com","subject":"Posting on board","dtSent":"Today, 9:18AM","read":false,"body":"Hey ,<br><br>I saw your post on the message board and I was wondering if you still had that item available. Can you call me if you still do?<br><br>Thanks,<br><b>Hamid Lak</b>"},
     {"id":2,"from":"Farsheed Ashouri","fromAddress":"test@test.com","subject":"In Late Today","dtSent":"Today, 8:54AM","read":false,"body":"Mark,<br>I will be in late today due to an appt.<br>v/r Bob","attachment":true},
@@ -1757,30 +1750,30 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
     $scope.init = function(process){
         req = $http.get('/api/messages/list');
         req.success(function(resp){
-            if (!process)
-                messageService.messages = resp;
-            else{
-                messageService.messages = [];
-                $rootScope.title = 'Messages';
-                for (i in resp){
-                    key = resp[i];
-                    message = $http.get('/api/messages/get/'+key);
-                    message.success(function(m){
-                            newm = m;
-                            newm.body = m.body_s;
-                            newm.key=key;
-                            newm.from = m.from_s;
-                            newm.to = m.to_s;
-                            newm.dtSent = $scope.$parent.prettyDate(m.dtSent);
-                            newm.subject = m.subject_s;
-                            messageService.messages.push(newm);
-                            $scope.messages.items = messageService.messages;
-                            $scope.search($scope.messages.folder);
-                        })
-                }
-
-
+        messageService.messages = resp;
+        $scope.messages.items = resp;
+        if (process){
+            $scope.messages.items = [];
+            $rootScope.title = 'Messages';
+            all = $http.get('/api/messages/all?folder='+($routeParams.folder || 'inbox'));
+            all.success(function(results){
+            for (i in results){
+                m = results[i];
+                newm = m;
+                datetime = m.dtSent*-1;
+                newm.body = m.body_s;
+                newm.from = m.from_s;
+                newm.to = m.to_s;
+                newm.dtSent = $scope.$parent.prettyDate(m.dtSent);
+                newm.datetime = datetime;
+                newm.subject = m.subject_s;
+                $scope.messages.items.push(newm);
+                $scope.search($scope.messages.folder);
             }
+            });
+
+
+        }
 
 
             $scope.newMessage = {};            
@@ -1808,7 +1801,7 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
             $scope.newMessage.draft = true;
         req = $http.post('/api/messages/set', $scope.newMessage);
         req.success(function(resp){
-                    console.log(resp);
+                $('#modalCompose').modal('hide');
                 })
 
         
@@ -1821,12 +1814,12 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         return haystack.toLowerCase().indexOf(needle.toLowerCase()) !== -1;
     };
     
-    $scope.$watch($scope.messages.folder, function(){
-            
-                console.log('woow')
+    $scope.$watch($routeParams.folder, function(){
+                console.log($routeParams.folder)
             })
     // filter the items
     $scope.search = function (folder) {
+        $scope.messages.items.sort(function(a, b){return a.datetime>b.datetime});
         $scope.filteredItems = $filter('filter')($scope.messages.items, function (item) {
           for(var attr in item) {
             if (searchMatch(item[attr], $scope.query))
@@ -1884,9 +1877,15 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
     };
     
     $scope.deleteItem = function (idx) {
-        var itemToDelete = $scope.pagedItems[$scope.currentPage][idx];
-        var idxInItems = $scope.messages.items.indexOf(itemToDelete);
-        $scope.messages.items.splice(idxInItems,1);
+        for (i in $scope.messages.items)
+        {
+            item = $scope.messages.items[i];
+            if (item.key==idx){
+                var itemToDelete = item;
+                var idxInItems = $scope.messages.items.indexOf(itemToDelete);
+                $scope.messages.items.splice(idxInItems,1);
+            }
+        }
         $scope.search();
         return false;
     };
@@ -1903,11 +1902,50 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
             return false;
         }
     };
-    
+
+    function replaceAll(find, replace, str) {
+      return str.replace(new RegExp(find, 'g'), replace);
+    }
+
+    var re = /(^|\s)((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi;
+    function uniq_fast(a) {
+        if (!a)
+            return []
+
+        var seen = {};
+        var out = [];
+        var len = a.length;
+        var j = 0;
+        for(var i = 0; i < len; i++) {
+             var item = a[i];
+             if(seen[item] !== 1) {
+                   seen[item] = 1;
+                   out[j++] = item;
+             }
+        }
+        return out;
+    }
+
     $scope.readMessage = function (idx) {
-        $scope.messages.items[idx].read = true;
-        $scope.selected = $scope.messages.items[idx];
+        for (i in $scope.messages.items)
+        {
+            item = $scope.messages.items[i];
+            if (item.key==idx){
+                $scope.messages.items[i].read = true;
+                $scope.selected = $scope.messages.items[i];
+                links = uniq_fast($scope.selected.body.match(re));
+                for (i in links){
+                    link = links[i].trim();
+                    console.log(link)
+                    $scope.selected.body = replaceAll(link, link.link(link), $scope.selected.body);
+
+                }
+                $scope.selected.body = replaceAll('\n', '  <br/>', $scope.selected.body);
+            }
+        }
     };
+
+
 
     
     $scope.readAll = function () {

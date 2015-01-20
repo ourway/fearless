@@ -1,10 +1,10 @@
   <div class="container" >
-      <h3 align="center">Fearless Message System</h3>
+      <h3 align="center"><small style="margin-top: -13px; position: absolute;">Fearless</small>Studio Mail&reg;</h3>
   
         <div class="row" ng-controller="inboxCtrl" ng-init="init(true)">
         <aside class="col-md-2 pad-right-0">
             <ul class="nav nav-pills nav-stacked">
-              <li class="active"><a href="#/messages/inbox" ng-click="groupToPages()"><span class="badge pull-right">{{messages.items.length}}</span> Inbox </a></li>
+              <li class="active"><a href="#/messages?folder=inbox" ng-click="groupToPages()"><span class="badge pull-right">{{messages.items.length}}</span> Inbox </a></li>
               <li><a href="#/messages?folder=archive"><span class="badge pull-right">{{messages.archiveCount}}</span>Archived</a></li>
               <li><a href="#/messages?folder=star"><span class="badge pull-right">{{messages.starCount}}</span>Important</a></li>
               <li><a href="#/messages?folder=sent"><span class="badge pull-right">{{messages.sentCount}}</span>Sent</a></li>
@@ -45,11 +45,11 @@
                     <div class="pull-right">
                         <span class="text-muted"><b>{{(itemsPerPage * currentPage) + 1}}</b>–<b>{{(itemsPerPage * currentPage) + pagedItems[currentPage].length}}</b> of <b>{{messages.items.length}}</b></span>
                         <div class="btn-group btn-group">
-                            <button type="button" class="btn btn-default" ng-class="{disabled: currentPage == 0}" ng-click="prevPage()">
-                                <span class="glyphicon glyphicon-chevron-left"></span>
+                            <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: currentPage == 0}" ng-click="prevPage()">
+                                <em class="glyphicon glyphicon-chevron-left"></em>
                             </button>
-                            <button type="button" class="btn btn-default" ng-class="{disabled: currentPage == pagedItems.length - 1}" ng-click="nextPage()">
-                                <span class="glyphicon glyphicon-chevron-right"></span>
+                            <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: currentPage == pagedItems.length - 1}" ng-click="nextPage()">
+                                <em class="glyphicon glyphicon-chevron-right"></em>
                             </button>
                         </div>
                     </div>
@@ -71,26 +71,35 @@
                             <td class="col-sm-1"></td>
                         </tr></thead>
                         
-                          <tbody><tr ng-repeat="item in pagedItems[currentPage] track by $index | orderBy:'dtSent' ">
-                            <td class="col-sm-1 col-xs-4"><input type="checkbox" title="Mark this item here"></td>
-                            <td class="col-sm-4 col-xs-6" ng-click="readMessage($index)"><a style="color:#333" ng-class="{'strong': !item.read}">{{item.subject}}</a></td>
-                            <td class="col-sm-2 col-xs-4" ng-click="readMessage($index)"><a style="color:#555" href="#/user/{{item.from.id}}" ng-class="{'strong': !item.read}">{{item.from.firstname_s}} {{item.from.lastname_s}}</a></td>
-                            <td class="col-sm-3 col-xs-4" ng-click="readMessage($index)"><span style="color:#555" ng-class="{'strong': !item.read}">{{item.dtSent}} ago</span></td>
-                            <td class="col-sm-1 col-sm-2" ng-click="readMessage($index)"><span ng-show="item.attachment" class="glyphicon glyphicon-paperclip pull-right"></span> <span ng-show="item.priority==1" class="pull-right glyphicon glyphicon-warning-sign text-danger"></span></td>
-                            <td class="col-sm-1 col-xs-4"><a ng-class="{strong: !item.read}" ng-click="deleteItem($index)" title="Delete item" href="javascript:;"><i class="fa fa-trash-o"></i></a> <a title="Mark item" href="javascript:;"><i class="fa fa-flag"></i></a></td>
+                          <tbody><tr ng-repeat="item in pagedItems[currentPage] | orderBy:'datetime' ">
+                            <td class="col-sm-1 col-xs-1"><input type="checkbox" title="Mark this item here"></td>
+                            <td class="col-sm-4 col-xs-4" ng-click="readMessage(item.key)">
+                                <a style="color:#333;cursor:pointer" ng-class="{'strong': !item.read}">{{item.subject.slice(0, 20)}}</a>
+                                <small style="color:grey">{{item.body_s.slice(0, 35-item.subject.length)}} ...</small>
+                            </td>
+                            <td class="col-sm-2 col-xs-2" ng-click="readMessage(item.key)"><a style="color:#555" href="#/user/{{item.from.id}}" ng-class="{'strong': !item.read}">{{item.from.firstname_s}} {{item.from.lastname_s}}</a></td>
+                            <td class="col-sm-1 col-xs-1" ng-click="readMessage(item.key)"><span style="color:#555" ng-class="{'strong': !item.read}">{{item.dtSent}} ago</span></td>
+                            <td class="col-sm-1 col-xs-1" ng-click="readMessage(item.key)"><span ng-show="item.attachment" class="glyphicon glyphicon-paperclip pull-right"></span> <span ng-show="item.priority==1" class="pull-right glyphicon glyphicon-warning-sign text-danger"></span></td>
+                            <td class="col-sm-1 col-xs-1"><a ng-class="{strong: !item.read}" ng-click="deleteItem(item.key)" title="Delete item" href="javascript:;"><i class="fa fa-trash-o"></i></a> <a title="Mark item" href="javascript:;"><i class="fa fa-flag"></i></a></td>
                           </tr>
                         </tbody>
                     </table>
+                    <div style="padding:50px" ng-if="!messages.items.length">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4" ><h4>Hoora! no messages left</h4></div>
+                    <div class="col-md-4"></div>
+                </div>
                 </div>
                 <!--message detail-->
                 <div class="container-fluid" ng-show="isMessageSelected()">
                     <div class="row" >
                         <div class="col-xs-12">
-                            <h3 title="subject"><button type="button" class="close pull-right" ng-click="closeMessage()" aria-hidden="true">×</button><a href="#/messages/{{messages.folder}}" ng-click="groupToPages()">{{messages.folder}}</a> &gt; {{selected.subject}}</h3>
+                            <h3 style="word-break: break-word;"  title="subject"><button type="button" class="close pull-right" ng-click="closeMessage()" aria-hidden="true">×</button>
+                                <a href="#/messages?folder={{messages.folder}}" ng-click="groupToPages()">{{messages.folder}}</a> &gt; {{selected.subject}}</h3>
                         </div>
                         <div class="col-md-8">
-                            <blockquote class="bg-info small">
-                            <strong>{{selected.from_s.firstname_s}} {{selected.from_s.lastname_s}}</strong> &lt;{{selected.from.email_s}}&gt; on 10:14AM, 22 May 2014
+                            <blockquote class="bg-info small">From: <strong>{{selected.from_s.firstname_s}} {{selected.from_s.lastname_s}}</strong> &lt;{{selected.from.email_s}}&gt; {{selected.dtSent}} ago <br/>
+                                To: <strong>{{selected.to_s.firstname_s}} {{selected.to_s.lastname_s}}</strong> &lt;{{selected.to.email_s}}&gt;
                             </blockquote>
                         </div>
                         <div class="col-md-4">
@@ -111,14 +120,14 @@
                 				</ul>
                 			</div>
                 			<div class="spacer5 pull-right"></div>
-                			<button class="btn btn btn-primary pull-right" ng-click="deleteItem(selected.$index)" title="Delete this message" data-toggle="tooltip">
+                			<button class="btn btn btn-primary pull-right" ng-click="deleteItem(selected.key)" title="Delete this message" data-toggle="tooltip">
             					<i class="fa fa-trash-o fa-1x"></i>
             				</button>
                 		</div>
                 		<div class="col-xs-12"><hr></div>
                         <div class="col-xs-12">
                             <!--message body-->
-                            <div ng-bind-html="renderMessageBody(selected.body)"></div>
+                            <div style="word-break: break-word" ng-bind-html="renderMessageBody(selected.body)"></div>
                             <!--/message body-->
                         </div>
                         <div class="col-xs-12 clearfix"><hr></div>
