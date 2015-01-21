@@ -1820,7 +1820,7 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
             })
     // filter the items
     $scope.search = function (folder) {
-        $scope.messages.items.sort(function(a, b){return a.datetime<b.datetime});
+        //$scope.messages.items.sort(function(a, b){return a.datetime<b.datetime});
         $scope.filteredItems = $filter('filter')($scope.messages.items, function (item) {
           for(var attr in item) {
             if (searchMatch(item[attr], $scope.query))

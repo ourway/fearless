@@ -87,7 +87,7 @@
                             <td class="col-sm-1"></td>
                         </tr></thead>
                         
-                          <tbody><tr ng-repeat="item in pagedItems[currentPage] | orderBy:'datetime':true track by $index ">
+                          <tbody><tr ng-repeat="item in pagedItems[currentPage] track by $index ">
                             <td class="col-sm-1 col-xs-1"><input type="checkbox" title="Mark this item here"></td>
                             <td class="col-sm-4 col-xs-4" ng-click="readMessage(item)">
                                 <a style="color:#333;cursor:pointer" ng-class="{'strong': !item.read}">{{item.subject_s.slice(0, 20) || 'DRAFT'}}</a>

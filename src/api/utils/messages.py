@@ -31,13 +31,14 @@ def getUUID():
 
 
 
-def getUserMessageBox(uuid, btype):
+def getUserMessageBox(uuid, name=False):
     '''Create/get a riak bucket for user messages'''
-    bname = 'messages_database_%s' % uuid
-    tname = 'mail_%s' % btype
+    bname = 'messages_database_%s_1' % uuid
     bname = str(bname)
-    tname = str(tname)
-    mdb = riakClient.bucket_type(tname).bucket(bname)
+    if name:
+        return bname
+    #mdb = riakClient.bucket_type(tname).bucket(bname)
+    mdb = riakClient.bucket(bname)
     riakClient.create_search_index(bname)
     try:
         mdb.set_properties({'search_index': bname})
@@ -48,6 +49,9 @@ def getUserMessageBox(uuid, btype):
 
 
 
+
+
+
 class GetMessagesList:
     def on_get(self, req, resp):
         user = getUserInfoFromSession(req, resp)
@@ -55,8 +59,11 @@ class GetMessagesList:
         if not bfolder in ['inbox', 'sent', 'draft', 'star', 'archive', 'spam', 'trash']:
             resp.body = falcon.HTTP_400
             return
-        mdb = getUserMessageBox(user.get('uuid'), bfolder)
+        mdb = getUserMessageBox(user.get('uuid'))
         resp.body = mdb.get_keys()
+
+
+
 
 
 class GetMessages:
@@ -66,35 +73,27 @@ class GetMessages:
         if not bfolder in ['inbox', 'sent', 'draft', 'star', 'archive', 'spam', 'trash']:
             resp.body = falcon.HTTP_400
             return
-        mdb = getUserMessageBox(user.get('uuid'), bfolder)
-        objects = mdb.get_keys()
-        result = []
-        for key in objects:
-            message = mdb.get(key)
-            try:
-                mdata = message.data
-                mdata['key'] = key
-                result.append(mdata)
-            except riak.ConflictError:
-                message = message.siblings[-1]
-                mdata = message.data
-                mdata['key'] = key
-                result.append(mdata)
-                #mdb.delete(key)
-            except ValueError:
-                mdb.delete(key)
-            except TypeError:
-                ## message is in wrong format, delete it!!!
-                mdb.delete(key)
+        bname = getUserMessageBox(user.get('uuid'), name=True)
+        query = riak.RiakMapReduce(riakClient).add(bname)
+        query.map("function(v) { var data = JSON.parse(v.values[0].data); if(data.folder == '%s') { return [[v.key, data]]; } return []; }" % bfolder)
+        query.reduce("function(values) { return values.sort(function(a, b){return a[1].datetime<b[1].datetime}) }")
+        results = query.run()
+        output = []
+        if results:
+            for result in results:
+                data = result [1]
+                data['key'] = result[0]
+                output.append(data)
 
-        resp.body = result
+        resp.body = output
+
 
 
 class GetMessage:
     def on_get(self, req, resp, key):
         user = getUserInfoFromSession(req, resp)
         bfolder = req.get_param('folder') or 'inbox'
-        mdb = getUserMessageBox(user.get('uuid'), bfolder)
+        mdb = getUserMessageBox(user.get('uuid'))
         if not bfolder in ['inbox', 'sent', 'draft', 'star', 'archive', 'spam', 'trash']:
             resp.body = falcon.HTTP_400
             return
@@ -158,17 +157,17 @@ class SetMessage:
         if FROM and message.get('body'):
             key = getUUID()
             if data:
-                from_mdb = getUserMessageBox(FROM.uuid,  bfolder)
+                from_mdb = getUserMessageBox(FROM.uuid)
                 obj = from_mdb.new(key, data)
                 obj.store()
             if target_data:
-                to_mdb = getUserMessageBox(TO.uuid, 'inbox')
+                to_mdb = getUserMessageBox(TO.uuid)
                 target_data['folder'] = 'inbox'
                 tobj = to_mdb.new(key, target_data)
                 tobj.store()
                 mail_body = misaka.html('_____\n %s \n_____' % message.get('body'))
                 mail_subject = ('New message from %s: ' % FROM.firstname) + message.get('subject')
-                sent = send_envelope.delay([TO.email], [], [], mail_subject, mail_body)
+                #sent = send_envelope.delay([TO.email], [], [], mail_subject, mail_body)
             if data:
                 resp.body = {'message':data, 'key':key}
             else:
@@ -192,7 +191,7 @@ class UpdateMessage:
         folder = options.get('folder')
         message = options.get('message')
         user = getUserInfoFromSession(req, resp)
-        mdb = getUserMessageBox(user.get('uuid'),  folder)
+        mdb = getUserMessageBox(user.get('uuid'))
         mdb.delete(key)
         obj = mdb.new(key, message)
         obj.store()
@@ -213,22 +212,32 @@ class MoveMessage:
             resp.body = falcon.HTTP_201
             return
         user = getUserInfoFromSession(req, resp)
-        mdb = getUserMessageBox(user.get('uuid'),  from_folder)
+        mdb = getUserMessageBox(user.get('uuid'))
         message =  mdb.get(key)
-        try:
-            data = message.data
-        except riak.ConflictError:
-            data = message.siblings[-1].data
+        data = message.data
         # lets move
+#        if data:
+#            target_mdb = getUserMessageBox(user.get('uuid'),  to_folder)
+#            tobj = target_mdb.new(key, data)
+#            tobj.store()
+#            mdb.delete(key)
+#            resp.body = falcon.HTTP_201
+#            resp.body = {'message':'MOVED'}
+#        else:
+#            resp.status = falcon.HTTP_404
+#            resp.body = {'message':'Not Found'}
         if data:
-            target_mdb = getUserMessageBox(user.get('uuid'),  to_folder)
-            tobj = target_mdb.new(key, data)
-            tobj.store()
+            data['folder'] = to_folder
             mdb.delete(key)
+            obj = mdb.new(key, data)
+            obj.store()
             resp.body = falcon.HTTP_201
             resp.body = {'message':'MOVED'}
         else:
+            mdb.delete(key)
             resp.status = falcon.HTTP_404
             resp.body = {'message':'Not Found'}
+
+
     
 
