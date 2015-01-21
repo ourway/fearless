@@ -75,11 +75,11 @@ install:
 prepare:
 	@yum groupinstall "development Tools"
 	@yum install gcc php-devel ccze php-pear graphviz libsndfile libsndfile-devel mencoder mplayer ImageMagick ImageMagick-devel nginx mysql-server mysql-devel libxslt-devel libxml2-devel libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel python27 python27-devel -y
-	@yum install http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.2/rhel/6/riak-2.0.2-1.el6.x86_64.rpm -y
-	@ gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+	@yum install http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.4/rhel/6/riak-2.0.4-1.el6.x86_64.rpm -y
+	@gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
 	@curl -sSL https://get.rvm.io | bash -s stable --ruby
 	@gem install taskjuggler
-	@yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u55-linux-x64.rpm -y
+	@yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u25-linux-x64.rpm -y
 	@ln -s -f '/usr/java/default/bin/java' /usr/bin/java
 	@yum install https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.4.noarch.rpm -y
 	@service riak start
