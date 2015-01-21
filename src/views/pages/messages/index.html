@@ -53,7 +53,7 @@
                         <ul class="dropdown-menu" role="menu" >
                             <li><a href="javascript:;" ng-click="readAll()">Mark all as read</a></li>
                             <li class="divider"></li>
-                            <li><a href="" data-toggle="modal" data-target="#modalCompose">Compose new</a></li>
+                            <li><a href="" data-toggle="modal" ng-click="replyMode=false;newMessage={};" data-target="#modalCompose">Compose new</a></li>
                             <li><a href="javascript:;" class="text-muted">Settings</a></li>
                         </ul>
                     </div>
@@ -95,15 +95,15 @@
                             </td>
                             <td class="col-sm-2 col-xs-2" ng-click="readMessage(item)">
                                 <a style="color:#555" href="#/user/{{item.from_s.id}}" ng-class="{'strong': !item.read}">{{item.from_s.firstname_s}} {{item.from_s.lastname_s}}</a></td>
-                            <td class="col-sm-2 col-xs-2" ng-click="readMessage(item)"><span style="color:#555" ng-class="{'strong': !item.read}">{{$parent.prettyDate(item.datetime)}} ago</span></td>
-                            <td class="col-sm-1 col-xs-1" ng-click="readMessage(item)"><span ng-show="item.attachment" class="glyphicon glyphicon-paperclip pull-right"></span> <span ng-show="item.priority==1" class="pull-right glyphicon glyphicon-warning-sign text-danger"></span></td>
-                            <td class="col-sm-2 col-xs-2">
-                                <a ng-class="{strong: !item.read, 'fa fa-trash-o':messages.folder!='trash', 'fa fa-inbox':messages.folder=='trash'}" 
-                                    ng-click="moveItem(item)" title="Delete item" href="javascript:;"><i ></i></a>
+                            <td class="col-sm-1 col-xs-1" ng-click="readMessage(item)"><span style="color:#555" ng-class="{'strong': !item.read}">{{$parent.prettyDate(item.datetime)}} ago</span></td>
+                            <td class="col-sm-4 col-xs-4">
+                                <a ng-show="messages.folder!='archive'" ng-click="moveItem(item, 'archive')" title="unStar item" href="javascript:;"><i class="fa fa-archive"></i></a>
                                 <a ng-show="!item.flagged" title="Mark item" href="javascript:;" ng-click="item.flagged=true;updateMessage(item);"><i class="fa fa-flag-o"></i></a>
                                 <a ng-show="item.flagged" title="Mark item" href="javascript:;" ng-click="item.flagged=flase;updateMessage(item);"><i class="fa fa-flag"></i></a>
                                 <a ng-show="messages.folder!='star'" ng-click="moveItem(item, 'star')" title="Star item" href="javascript:;"><i class="fa fa-star-o"></i></a>
                                 <a ng-show="messages.folder=='star'" ng-click="moveItem(item, 'archive')" title="unStar item" href="javascript:;"><i class="fa fa-star"></i></a>
+                                <a ng-class="{strong: !item.read, 'fa fa-trash-o':messages.folder!='trash', 'fa fa-inbox':messages.folder=='trash'}" 
+                                    ng-click="moveItem(item)" title="Delete item" href="javascript:;"><i ></i></a>
                             </td>
                           </tr>
                         </tbody>
@@ -205,13 +205,9 @@
                       <div class="col-sm-10"><input type="text" disabled="true" value="{{newMessage.subject}}" class="form-control" id="inputSubject"></div>
                     </div>
 
-                    <div class="form-group" ng-if="!replyMode">
+                    <div class="form-group">
                       <label class="col-sm-12" for="inputBody">Message</label>
-                      <div class="col-sm-12"><textarea class="form-control" id="inputBody" ng-model="newMessage.body" rows="12"></textarea></div>
-                    </div>
-                    <div class="form-group" ng-if="replyMode" ng-init="newMessage.body = '\n\n\n--\n' + selected.body_s + '\n--\n'">
-                      <label class="col-sm-12" for="inputBody">Message</label>
-                      <div class="col-sm-12"><textarea class="form-control" id="inputBody" ng-model="newMessage.body" rows="12"></textarea></div>
+                      <div class="col-sm-12"><textarea class="form-control" id="inputBody" ng-model="newMessage.body" rows="12" autofocus></textarea></div>
                     </div>
                 </form>
               </div>

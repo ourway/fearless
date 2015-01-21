@@ -2,6 +2,12 @@ var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'resta
                         'ui.bootstrap', 'checklist-model']);
 
 
+fearlessApp.factory('$exceptionHandler', function () {
+    return function (exception, cause) {
+        console.log(exception.message);
+    };
+});
+
 fearlessApp.config(function($sceDelegateProvider) {
   $sceDelegateProvider.resourceUrlWhitelist([
     'self',
@@ -1782,11 +1788,17 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
 
 
     $scope.sendMessage = function(draft){
+        $('#modalCompose').modal('hide');
         if (draft)
             $scope.newMessage.draft = true;
+        if ($scope.replyMode)
+            $scope.newMessage.body += ('\n _____ \n\n <sup> Authored on '
+                    + new Date($scope.selected.datetime * 1000).toString()
+                    + ' by '+$scope.selected.from_s.firstname_s 
+                    + ' ' + $scope.selected.from_s.lastname_s +'</sub> \n >'
+                    + $scope.selected.body_s);
         req = $http.post('/api/messages/set', $scope.newMessage);
         req.success(function(resp){
-                $('#modalCompose').modal('hide');
                 if ($scope.newMessage.to)
                     $location.search('folder', 'sent');
                 else
@@ -1808,7 +1820,7 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
             })
     // filter the items
     $scope.search = function (folder) {
-        $scope.messages.items.sort(function(a, b){return a.datetime>b.datetime});
+        $scope.messages.items.sort(function(a, b){return a.datetime<b.datetime});
         $scope.filteredItems = $filter('filter')($scope.messages.items, function (item) {
           for(var attr in item) {
             if (searchMatch(item[attr], $scope.query))
@@ -1877,8 +1889,8 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
                 req = $http.post('/api/messages/move/'+item.key, data);
                 $scope.messages.items.splice(idxInItems,1);
                 req.success(function(resp){
-                    if (target!='trash')
-                        $location.search('folder', target);
+                   // if (target!='trash' && target!='archive')
+                   //     $location.search('folder', target);
                         //deleted
                 })
         $scope.search();
@@ -1946,24 +1958,9 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
     
     $scope.renderMessageBody = function(body)
     {
-        if (!body)
-            return null;
-        data = body;
-        links = uniq_fast(body.match(re));
-        for (i in links){
-            link = links[i].trim();
-            data = replaceAll(link, link.link(link), data);
-        }
-        quotes = body.match(/--\n(.*)\n--/);
-        if (quotes){
-            for (i in quotes){
-                quote = quotes[i];
-                data = replaceAll(quote, "<code>"+quote+"</code>", data);
-            }
-        }
-        html = replaceAll('\n', '  <br/>', data);
-        return html;
-    };
+        if (body)
+            return marked(body);
+        };
     
     /* end inbox functions ---------------------------------- */
     

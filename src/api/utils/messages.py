@@ -20,7 +20,9 @@ from helpers import get_params
 import base64
 import riak
 from uuid import uuid4
+from tasks import send_envelope  ## send emails
 import time
+import misaka
 
 
 def getUUID():
@@ -164,6 +166,9 @@ class SetMessage:
                 target_data['folder'] = 'inbox'
                 tobj = to_mdb.new(key, target_data)
                 tobj.store()
+                mail_body = misaka.html('_____\n %s \n_____' % message.get('body'))
+                mail_subject = ('New message from %s: ' % FROM.firstname) + message.get('subject')
+                sent = send_envelope.delay([TO.email], [], [], mail_subject, mail_body)
             if data:
                 resp.body = {'message':data, 'key':key}
             else:

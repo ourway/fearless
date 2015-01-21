@@ -72,10 +72,11 @@
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <li ng-class="{'active':area=='project'}"><a href="#/pms"><em class="fa fa-building"></em> Projects</a></li>
-                <li ng-class="{'active':area=='message'}"><a href="#/messages"><em class="fa fa-inbox"></em> Messages</a></li>
-              <li ng-class="{'active':area=='tasks'}"><a href="#/tasks"><em class="fa fa-tasks"></em> Tasks</a></li>
+                <li ng-class="{'active':area=='message'}"><a href="#/messages"><em class="fa fa-inbox"></em> Inbox</a></li>
               <li class="dropdown">
-                <a ng-class="{'active':area=='tools'}" href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><em class="fa fa-plug"></em> Tools<span class="caret"></span></a>
+              <a ng-class="{'active':area=='tools'}" href="" 
+                  class="dropdown-toggle" data-toggle="dropdown" role="button" 
+                  aria-expanded="false"><em class="fa fa-plug"></em> Tools<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                   <li><a href="/app/showtime">Showtime</a></li>
                   <li><a href="#/report">Reports</a></li>
@@ -88,7 +89,8 @@
                 </ul>
                 </li>
               <li ng-if="isAdmin || isManager || isClient" class="dropdown">
-                <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><em class="fa fa-gears"></em> Administration<span class="caret"></span></a>
+              <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" 
+                  aria-expanded="false"><em class="fa fa-gears"></em> Admin<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                   <li ng-if="isAdmin"><a href="#/ua">User Management</a></li>
                 </ul>
@@ -113,16 +115,7 @@
              </ul>
 
 
-        <ul class="col-sm-3" ng-show="userInfo.logged_in">
-            <form class="navbar-form" role="search">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Search" name="q">
-                    <div class="input-group-btn">
-                        <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-                    </div>
-                </div>
-            </form>
-        </ul> 
+
 
           </div><!--/.nav-collapse -->
         </div><!--/.container-fluid -->
@@ -179,6 +172,7 @@
         <script src="js/vendor/angular-moment.min.js"></script>
         <script src="js/vendor/fullcalendar.min.js"></script>
         <script src='js/vendor/Chart.min.js'></script>
+        <script src='js/vendor/marked.js'></script>
         <script src="js/vendor/calendar.js"></script>
         <script src="js/vendor/ui-grid.min.js"></script>
         <script src="js/vendor/jquery.hotkeys.js"></script>
