@@ -58,7 +58,7 @@
         <![endif]-->
       <div class="container">
 
-      <nav class="navbar navbar-default" role="navigation">
+      <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container-fluid">
           <div class="navbar-header">
             <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -67,14 +67,15 @@
               <span class="icon-bar"></span>
               <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#/">HOME</a>
+            <a class="navbar-brand active" href="#/"><em class="fa fa-home"></em> HOME</a>
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-              <li><a href="#/pms">Projects</a></li>
-              <li><a href="#/tasks">Tasks</a></li>
+                <li ng-class="{'active':area=='project'}"><a href="#/pms"><em class="fa fa-building"></em> Projects</a></li>
+                <li ng-class="{'active':area=='message'}"><a href="#/messages"><em class="fa fa-inbox"></em> Messages</a></li>
+              <li ng-class="{'active':area=='tasks'}"><a href="#/tasks"><em class="fa fa-tasks"></em> Tasks</a></li>
               <li class="dropdown">
-                <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Tools<span class="caret"></span></a>
+                <a ng-class="{'active':area=='tools'}" href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><em class="fa fa-plug"></em> Tools<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                   <li><a href="/app/showtime">Showtime</a></li>
                   <li><a href="#/report">Reports</a></li>
@@ -87,18 +88,20 @@
                 </ul>
                 </li>
               <li ng-if="isAdmin || isManager || isClient" class="dropdown">
-                <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Administration<span class="caret"></span></a>
+                <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><em class="fa fa-gears"></em> Administration<span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                   <li ng-if="isAdmin"><a href="#/ua">User Management</a></li>
                 </ul>
               </li>
 
+            <!-- 
               <li ng-controller="inboxCtrl" ng-init="init()" ng-show="getUnreadCount()>0">
                   <a href="#/messages" 
                      data-placement="bottom"
                      data-toggle="popover"
                      data-original-title="Notifications"><span class="badge badge-success" style="background-color:#c12e2a">{{getUnreadCount()}}</span></a>
-                </li>
+                 </li>
+            --!>
           </ul>
 
             <ul class="nav navbar-nav navbar-right" style="padding-left: 15px;margin-right: 0px;" ng-if="!check_auth_area()" ng-init="is_logged_in()">
@@ -110,7 +113,7 @@
              </ul>
 
 
-        <ul class="col-md-4" ng-if="userInfo.logged_in">
+        <ul class="col-sm-3" ng-show="userInfo.logged_in">
             <form class="navbar-form" role="search">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Search" name="q">
@@ -126,7 +129,7 @@
       </nav>
 
     </div>
-	<div id="container" style="min-height:500px">
+	<div id="container" style="min-height:500px;padding-left:20px;padding-right:20px;padding-top:70px;padding-bottom:5px;background:rgba(248, 248, 248, 0.5);">
         <div class="row clearfix">
             <div ng-view></div>
         </div>

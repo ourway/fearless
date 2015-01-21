@@ -25,7 +25,8 @@ from string import ascii_uppercase
 from sqlalchemy.ext.serializer import loads, dumps
 import json as json
 from utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection
-from utils.messages import GetMessagesList, GetMessages, GetMessage, SetMessage, SearchMessages
+from utils.messages import GetMessagesList, GetMessages, GetMessage, SetMessage, \
+    SearchMessages, MoveMessage, DeleteMessage, UpdateMessage
 from utils.reports import Mailer, AddReport
 from gevent import wsgi
 from models import __all__ as av
@@ -338,7 +339,9 @@ app.add_route('/api/messages/all', GetMessages())
 app.add_route('/api/messages/get/{key}', GetMessage())
 app.add_route('/api/messages/set', SetMessage())
 app.add_route('/api/messages/search/{query}', SearchMessages())
-
+app.add_route('/api/messages/move/{key}', MoveMessage())
+app.add_route('/api/messages/delete/{key}', DeleteMessage())
+app.add_route('/api/messages/update/{key}', UpdateMessage())
 
 
 if __name__ == '__main__':

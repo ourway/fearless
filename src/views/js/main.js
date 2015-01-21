@@ -876,6 +876,7 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
 
 fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
         $scope.$parent.page = 'pms';
+
         $scope.replan = true;
         $scope.timeConverter = timeConverter;
 
@@ -883,11 +884,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
           element: 'burndown_chart_div',
           xkey: 'date',
           events:[timeConverter()],
-          data:[{'date':new Date().toDateString(), 'value':0, 'expected':0, 'difference':0}],
-          ykeys: ['value', 'expected', 'difference'],
+          data:[{'date':new Date().toDateString(), 'value':0, 'expected':0, 'Offset':0}],
+          ykeys: ['value', 'expected', 'Offset'],
           lineColors: ['#5bc0de', 'green', '#c2aeae'],
           lineWidth: ['5', '1', '1'],
-          labels: ['Completed', 'Expected', 'difference'],
+          labels: ['Completed', 'Expected', 'Offset'],
           fillOpacity:1,
           goals: [0, 100],
           parseTime:true,
@@ -1229,7 +1230,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 chartData.push({
                         date:ldate, value:complete, 
                         expected:parseInt(expected),
-                        difference:parseInt(expected)-complete
+                        Offset:complete - parseInt(expected)
                         })
 
             }
@@ -1734,18 +1735,13 @@ fearlessApp.controller('taskDetailCtrl', function($scope, $rootScope, $routePara
 
     
 fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $interval, $rootScope, messageService, $http, $routeParams) {
-
     $scope.messages = {};
+    if($scope.$parent)
+        $scope.messages.resources = $scope.$parent.resources;
     messageService.messages = [];
     $scope.getUnreadCount  = messageService.getUnreadCount;
     $scope.messages.folder = $routeParams.folder || 'inbox';
 
-    mailes = [
-    {"id":1,"from":"Hamid Lak","fromAddress":"test@test.com","subject":"Posting on board","dtSent":"Today, 9:18AM","read":false,"body":"Hey ,<br><br>I saw your post on the message board and I was wondering if you still had that item available. Can you call me if you still do?<br><br>Thanks,<br><b>Hamid Lak</b>"},
-    {"id":2,"from":"Farsheed Ashouri","fromAddress":"test@test.com","subject":"In Late Today","dtSent":"Today, 8:54AM","read":false,"body":"Mark,<br>I will be in late today due to an appt.<br>v/r Bob","attachment":true},
-    {"id":3,"from":"Morteza Ghamari","fromAddress":"test@test.com","subject":"New Cat!","dtSent":"Yesterday, 4:48PM","read":true,"body":"The message body goes here..."},
-    {"id":4,"from":"Negar Ahmadi","fromAddress":"test@test.com","subject":"RE: New developer","dtSent":"Yesterday, 4:40PM","read":false,"body":"The message body goes here...","priority":1},
-];
     
     $scope.init = function(process){
         req = $http.get('/api/messages/list');
@@ -1760,25 +1756,14 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
             for (i in results){
                 m = results[i];
                 newm = m;
-                datetime = m.dtSent*-1;
-                newm.body = m.body_s;
-                newm.from = m.from_s;
-                newm.to = m.to_s;
-                newm.dtSent = $scope.$parent.prettyDate(m.dtSent);
-                newm.datetime = datetime;
-                newm.subject = m.subject_s;
+                newm.prettyDate = $scope.$parent.prettyDate(m.datetime);
                 $scope.messages.items.push(newm);
                 $scope.search($scope.messages.folder);
             }
             });
-
-
         }
-
-
             $scope.newMessage = {};            
        })
-
     }
    	
  	$scope.date = new Date;
@@ -1802,6 +1787,11 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         req = $http.post('/api/messages/set', $scope.newMessage);
         req.success(function(resp){
                 $('#modalCompose').modal('hide');
+                if ($scope.newMessage.to)
+                    $location.search('folder', 'sent');
+                else
+                    $location.search('folder', 'draft');
+                $scope.newMessage = {};
                 })
 
         
@@ -1815,7 +1805,6 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
     };
     
     $scope.$watch($routeParams.folder, function(){
-                console.log($routeParams.folder)
             })
     // filter the items
     $scope.search = function (folder) {
@@ -1876,16 +1865,22 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         $scope.currentPage = this.n;
     };
     
-    $scope.deleteItem = function (idx) {
-        for (i in $scope.messages.items)
-        {
-            item = $scope.messages.items[i];
-            if (item.key==idx){
-                var itemToDelete = item;
-                var idxInItems = $scope.messages.items.indexOf(itemToDelete);
-                $scope.messages.items.splice(idxInItems,1);
+    $scope.moveItem = function (item, target) {
+            if (!target){
+                if ($scope.messages.folder != 'trash')
+                    target = 'trash';
+                else
+                    target = 'inbox';
             }
-        }
+                var idxInItems = $scope.messages.items.indexOf(item);
+                data = {to_folder:target, from_folder:$scope.messages.folder};
+                req = $http.post('/api/messages/move/'+item.key, data);
+                $scope.messages.items.splice(idxInItems,1);
+                req.success(function(resp){
+                    if (target!='trash')
+                        $location.search('folder', target);
+                        //deleted
+                })
         $scope.search();
         return false;
     };
@@ -1926,31 +1921,22 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         return out;
     }
 
-    $scope.readMessage = function (idx) {
-        for (i in $scope.messages.items)
-        {
-            item = $scope.messages.items[i];
-            if (item.key==idx){
-                $scope.messages.items[i].read = true;
-                $scope.selected = $scope.messages.items[i];
-                links = uniq_fast($scope.selected.body.match(re));
-                for (i in links){
-                    link = links[i].trim();
-                    console.log(link)
-                    $scope.selected.body = replaceAll(link, link.link(link), $scope.selected.body);
-
-                }
-                $scope.selected.body = replaceAll('\n', '  <br/>', $scope.selected.body);
-            }
-        }
+    $scope.readMessage = function (item) {
+        item.read = true;
+        $scope.selected = item;
+        $scope.updateMessage(item);
     };
 
-
+    $scope.updateMessage = function(message){
+        data = {message:message, folder:$scope.messages.folder}
+        $http.post('/api/messages/update/'+message.key, data);
+    }
 
     
     $scope.readAll = function () {
         for (var i in $scope.messages.items) {
             $scope.messages.items[i].read = true;
+            $scope.updateMessage($scope.messages.items[i]);
         }
     };
     
@@ -1958,8 +1944,24 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         $scope.selected = null;
     };
     
-    $scope.renderMessageBody = function(html)
+    $scope.renderMessageBody = function(body)
     {
+        if (!body)
+            return null;
+        data = body;
+        links = uniq_fast(body.match(re));
+        for (i in links){
+            link = links[i].trim();
+            data = replaceAll(link, link.link(link), data);
+        }
+        quotes = body.match(/--\n(.*)\n--/);
+        if (quotes){
+            for (i in quotes){
+                quote = quotes[i];
+                data = replaceAll(quote, "<code>"+quote+"</code>", data);
+            }
+        }
+        html = replaceAll('\n', '  <br/>', data);
         return html;
     };
     

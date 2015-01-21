@@ -20,6 +20,7 @@ from helpers import get_params
 import base64
 import riak
 from uuid import uuid4
+import time
 
 
 def getUUID():
@@ -49,7 +50,8 @@ class GetMessagesList:
     def on_get(self, req, resp):
         user = getUserInfoFromSession(req, resp)
         bfolder = req.get_param('folder') or 'inbox'
-        if not bfolder in ['inbox', 'sent', 'draft', 'start', 'archive', 'spam', 'trash']:
+        if not bfolder in ['inbox', 'sent', 'draft', 'star', 'archive', 'spam', 'trash']:
+            resp.body = falcon.HTTP_400
             return
         mdb = getUserMessageBox(user.get('uuid'), bfolder)
         resp.body = mdb.get_keys()
@@ -59,7 +61,8 @@ class GetMessages:
     def on_get(self, req, resp):
         user = getUserInfoFromSession(req, resp)
         bfolder = req.get_param('folder') or 'inbox'
-        if not bfolder in ['inbox', 'sent', 'draft', 'start', 'archive', 'spam', 'trash']:
+        if not bfolder in ['inbox', 'sent', 'draft', 'star', 'archive', 'spam', 'trash']:
+            resp.body = falcon.HTTP_400
             return
         mdb = getUserMessageBox(user.get('uuid'), bfolder)
         objects = mdb.get_keys()
@@ -69,16 +72,19 @@ class GetMessages:
             try:
                 mdata = message.data
                 mdata['key'] = key
-                mdata['dtSent'] = message.last_modified
                 result.append(mdata)
             except riak.ConflictError:
                 message = message.siblings[-1]
                 mdata = message.data
                 mdata['key'] = key
-                mdata['dtSent'] = message.last_modified
                 result.append(mdata)
+                #mdb.delete(key)
+            except ValueError:
+                mdb.delete(key)
             except TypeError:
-                pass
+                ## message is in wrong format, delete it!!!
+                mdb.delete(key)
+
         resp.body = result
 
 
@@ -87,7 +93,8 @@ class GetMessage:
         user = getUserInfoFromSession(req, resp)
         bfolder = req.get_param('folder') or 'inbox'
         mdb = getUserMessageBox(user.get('uuid'), bfolder)
-        if not bfolder in ['inbox', 'sent', 'draft', 'start', 'archive', 'spam', 'trash']:
+        if not bfolder in ['inbox', 'sent', 'draft', 'star', 'archive', 'spam', 'trash']:
+            resp.body = falcon.HTTP_400
             return
         data = mdb.get(key)
         messages = []
@@ -95,7 +102,6 @@ class GetMessage:
             result = message.data
             try:
                 result['key'] = key
-                result['dtSent'] = message.last_modified
             except TypeError:
                 pass
             messages.append(result)
@@ -105,7 +111,9 @@ class SetMessage:
     def on_post(self, req, resp):
         user = getUserInfoFromSession(req, resp)
         message = get_params(req.stream, False)
-        TO = req.session.query(User).filter_by(email=message.get('to')).first()
+        TO = None
+        if message.get('to'):
+            TO = req.session.query(User).filter_by(id=message.get('to').get('id')).first()
         FROM = req.session.query(User).filter_by(email=user.get('email')).first()
         _from = user.get('email')
         _from_fn = user.get('firstname')
@@ -114,10 +122,10 @@ class SetMessage:
         data = {
                 'to_s':
                     {
-                        'firstname_s':TO.firstname,
-                        'lastname_s':TO.lastname,
-                        'email_s':TO.email,
-                        'id':TO.id,
+                        'firstname_s':TO.firstname if TO else None,
+                        'lastname_s':TO.lastname if TO else None,
+                        'email_s':TO.email if TO else None,
+                        'id':TO.id if TO else None,
                     },
                 'from_s':
                     {
@@ -126,20 +134,20 @@ class SetMessage:
                         'email_s':FROM.email,
                         'id':FROM.id
                     },
-                'target_readed':False,
-                'sender_readed':False,
+                'read':False,
                 'attachments':[],
                 'body_s':message.get('body'),
                 'subject_s':message.get('subject'),
                 'folder':'sent',
-                'stared': bool(message.get('started')),
-                'archived': bool(message.get('archived')),
-                'flagged': bool(message.get('flagged'))
+                'stared': False,
+                'flagged': False,
+                'datetime': time.time()
         }
 
         target_data = data.copy()
         bfolder = message.get('folder') or 'sent'
-        if not bfolder in ['inbox', 'sent', 'draft', 'start', 'archive', 'spam', 'trash']:
+        if not bfolder in ['inbox', 'sent', 'draft', 'star', 'archive', 'spam', 'trash']:
+            resp.body = falcon.HTTP_400
             return
         if not TO or not message.get('subject') or message.get('draft'):
             bfolder = 'draft'
@@ -167,3 +175,55 @@ class SetMessage:
 class SearchMessages:
     def on_get(self, req, resp, query):
         resp.body = 'not implemented'
+
+class DeleteMessage:
+    def on_get(self, req, resp, query):
+        resp.body = 'not implemented'
+
+
+class UpdateMessage:
+    def on_post(self, req, resp, key):
+        options = get_params(req.stream, False)
+        folder = options.get('folder')
+        message = options.get('message')
+        user = getUserInfoFromSession(req, resp)
+        mdb = getUserMessageBox(user.get('uuid'),  folder)
+        mdb.delete(key)
+        obj = mdb.new(key, message)
+        obj.store()
+        resp.body = {'message':'updated'}
+
+class MoveMessage:
+    def on_post(self, req, resp, key):
+        options = get_params(req.stream, False)
+        from_folder = options.get('from_folder') or req.get_param('from_folder')
+        to_folder = options.get('to_folder') or req.get_param('to_folder')
+        if not from_folder in ['inbox', 'sent', 'draft', 'star', 'archive', 'spam', 'trash']:
+            resp.body = falcon.HTTP_400
+            return
+        if not to_folder in ['inbox', 'sent', 'draft', 'star', 'archive', 'spam', 'trash']:
+            resp.body = falcon.HTTP_400
+            return
+        if to_folder == from_folder:
+            resp.body = falcon.HTTP_201
+            return
+        user = getUserInfoFromSession(req, resp)
+        mdb = getUserMessageBox(user.get('uuid'),  from_folder)
+        message =  mdb.get(key)
+        try:
+            data = message.data
+        except riak.ConflictError:
+            data = message.siblings[-1].data
+        # lets move
+        if data:
+            target_mdb = getUserMessageBox(user.get('uuid'),  to_folder)
+            tobj = target_mdb.new(key, data)
+            tobj.store()
+            mdb.delete(key)
+            resp.body = falcon.HTTP_201
+            resp.body = {'message':'MOVED'}
+        else:
+            resp.status = falcon.HTTP_404
+            resp.body = {'message':'Not Found'}
+    
+
