@@ -21,7 +21,6 @@
 # ``invoke generate.installer``.
 
 import os.path
-import mehdi
 import pkgutil
 import shutil
 import sys

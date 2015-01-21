@@ -12,7 +12,7 @@
 
 
 server {
-    listen 5003;
+    listen 80;
     server_name _;
     server_tokens off;
     access_log  /var/log/nginx/fearless_acess.log;

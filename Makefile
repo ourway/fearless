@@ -51,41 +51,25 @@ install:
 	@supervisorctl update
 	@supervisorctl restart fearless-api
 	@supervisorctl restart fearless-celery
-	#@riak-admin bucket-type create siblings_allowed '{"props":{"allow_mult":true}}'
-	#@riak-admin bucket-type activate siblings_allowed
-	@riak-admin bucket-type create mail_inbox
-	@riak-admin bucket-type create mail_draft
-	@riak-admin bucket-type create mail_sent
-	@riak-admin bucket-type create mail_star
-	@riak-admin bucket-type create mail_trash
-	@riak-admin bucket-type create mail_spam
-	@riak-admin bucket-type create mail_archive
 
-	@riak-admin bucket-type activate mail_inbox
-	@riak-admin bucket-type activate mail_draft
-	@riak-admin bucket-type activate mail_sent
-	@riak-admin bucket-type activate mail_star
-	@riak-admin bucket-type activate mail_trash
-	@riak-admin bucket-type activate mail_spam
-	@riak-admin bucket-type activate mail_archive
 	#@riak-admin bucket-type status siblings_allowed
 	#@sudo -u postgres createuser -PE vserver
 	#@sudo -u postgres createdb -O vserver -E UTF8 vserver
 
 prepare:
 	@yum groupinstall "development Tools"
-	@yum install gcc php-devel ccze php-pear graphviz libsndfile libsndfile-devel mencoder mplayer ImageMagick ImageMagick-devel nginx mysql-server mysql-devel libxslt-devel libxml2-devel libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel python27 python27-devel -y
+	@yum install gcc php-devel ccze php-pear graphviz redis libsndfile libsndfile-devel mencoder mplayer ImageMagick ImageMagick-devel nginx mysql-server mysql-devel libxslt-devel libxml2-devel libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel python27 python27-devel -y
 	@yum install http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.4/rhel/6/riak-2.0.4-1.el6.x86_64.rpm -y
 	@gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
 	@curl -sSL https://get.rvm.io | bash -s stable --ruby
 	@gem install taskjuggler
 	@yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u25-linux-x64.rpm -y
 	@ln -s -f '/usr/java/default/bin/java' /usr/bin/java
-	@yum install https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.4.noarch.rpm -y
+	#@yum install https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.3.4.noarch.rpm -y
 	@service riak start
-	@service elasticsearch start
-	@service supervisord start
-	@service redis start
+	#@service elasticsearch start
+	#@service supervisord start
+	#@service redis start
 	@python2.7 config/get-pip.py
 	@python2.7 -m pip install -U pip virtualenv
 	@python2.7 -m pip install supervisor
