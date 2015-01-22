@@ -1791,7 +1791,12 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         $('#modalCompose').modal('hide');
         if (draft)
             $scope.newMessage.draft = true;
-        if ($scope.replyMode)
+        if ($scope.forwardMode){
+            $scope.newMessage.subject = 'FWD: ' + $scope.selected.subject_s;
+            $scope.newMessage.body = 'Forwarded message:'
+        }
+
+        if ($scope.replyMode || $scope.forwardMode)
             $scope.newMessage.body += ('\n _____ \n\n <sup> Authored on '
                     + new Date($scope.selected.datetime * 1000).toString()
                     + ' by '+$scope.selected.from_s.firstname_s 
@@ -1804,9 +1809,9 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
                 else
                     $location.search('folder', 'draft');
                 $scope.newMessage = {};
+                replyMode=false;
+                forwardMode=false;
                 })
-
-        
     }
 
     var searchMatch = function (haystack, needle) {

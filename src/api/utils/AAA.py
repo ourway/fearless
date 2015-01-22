@@ -450,6 +450,7 @@ def getUserInfoFromSession(req, resp):
             resp.append_header(
                 'set-cookie', 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
             r.delete(hashed_sid)
+            raise falcon.HTTPUnauthorized('Not Authorized', 'You need to login before using Fearless API')
 
     return {'message': 'ERROR'}
 
