@@ -28,11 +28,9 @@ now = datetime.datetime.utcnow
 
 Base = declarative_base()
 logger = setup_logger('model', 'model.log')
-db_files_path = os.path.join( os.path.dirname(__file__), '../database/files')
+db_files_path = os.path.join(os.path.dirname(__file__), '../database/files')
 if not os.path.isdir(db_files_path):
     os.makedirs(db_files_path)
-
-
 
 
 def getUUID():
@@ -45,7 +43,7 @@ def convert_to_datetime(inp):
     if inp == 'None':
         return
     try:
-        unixtime = int(inp);
+        unixtime = int(inp)
         return datetime.datetime.fromtimestamp(unixtime)
     except (ValueError, TypeError):
         pass
@@ -53,7 +51,7 @@ def convert_to_datetime(inp):
     if isinstance(inp, datetime.datetime):
         return inp
 
-    elif isinstance(inp, (float, int)):  ## unix timestamp
+    elif isinstance(inp, (float, int)):  # unix timestamp
         return datetime.datetime.fromtimestamp(inp)
 
     elif isinstance(inp, (str, unicode)):
@@ -70,7 +68,7 @@ def convert_to_datetime(inp):
             inp = inp.split('T')[0]
             fmt = '%Y-%m-%d'
         #inp = '-'.join(map(str, map( int, inp.split(';')[0].split('-'))) )
-        #print inp, fmt
+        # print inp, fmt
         return datetime.datetime.strptime(inp, fmt)
 
 
@@ -89,21 +87,18 @@ class IDMixin(object):
 
     @property
     def columns(self):
-        data =  [c.name for c in self.__table__.columns]
+        data = [c.name for c in self.__table__.columns]
         return data
-            
 
     @property
     def columnitems(self):
         try:
-            data =  [(c, getattr(self, c)) for c in self.columns]
-            return dict([i for i in data \
-                 if isinstance(i[1], (str, unicode, datetime.datetime, long, int, float, bool)) ])
+            data = [(c, getattr(self, c)) for c in self.columns]
+            return dict([i for i in data
+                         if isinstance(i[1], (str, unicode, datetime.datetime, long, int, float, bool))])
         except AttributeError, e:
             print e
             return self.title
 
     def __repr__(self):
         return dumps(self.columnitems)
-
-

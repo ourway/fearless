@@ -16,25 +16,29 @@ Clean code is much better than Cleaner comments!
 import falcon
 from models import ddb
 
+
 class GetNote:
+
     def on_get(self, req, resp, key):
         obj = ddb.get(key)
         if obj.data:
 
-            resp.body = {'note':obj.data.get('note_s')}
+            resp.body = {'note': obj.data.get('note_s')}
 
 
 class SetNote:
+
     def on_get(self, req, resp, key, value):
-        data = {'note_s':value}
+        data = {'note_s': value}
         obj = ddb.new(key, data).store()
-        resp.body = {'note':obj.data.get('note_s')}
+        resp.body = {'note': obj.data.get('note_s')}
 
 
 class SearchNote:
+
     def on_get(self, req, resp, query):
-        res = ddb.search('note_s:*%s*'%query)['docs']
+        res = ddb.search('note_s:*%s*' % query)['docs']
         data = []
         for result in res:
-            data.append({result.get('_yz_rk'):result.get('note_s')})
+            data.append({result.get('_yz_rk'): result.get('note_s')})
         resp.body = data

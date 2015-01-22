@@ -43,50 +43,49 @@ class SyncShow:
                     note = data.get('note')
                     slide = data.get('slide')
                     want_to_be_master = data.get('i_want_to_be_master')
-                    client = json.loads(showInfo).get('client') or req.env.get('HTTP_X_FORWARDED_FOR')
+                    client = json.loads(showInfo).get(
+                        'client') or req.env.get('HTTP_X_FORWARDED_FOR')
                     if assetId:
-                        if not str(client) in r.lrange('show_%s_watchers'%assetId, 0, -1):
-                            r.rpush('show_%s_watchers'%assetId, client)
-                            r.expire('show_%s_watchers'%assetId, 1)
-                        master = r.get('show_%s_master'%assetId)
-                        if want_to_be_master: # Asset is unlocked
-                            if master and str(client) != master:  ## check if not other master
-                               pass
+                        if not str(client) in r.lrange('show_%s_watchers' % assetId, 0, -1):
+                            r.rpush('show_%s_watchers' % assetId, client)
+                            r.expire('show_%s_watchers' % assetId, 1)
+                        master = r.get('show_%s_master' % assetId)
+                        if want_to_be_master:  # Asset is unlocked
+                            # check if not other master
+                            if master and str(client) != master:
+                                pass
                             else:
-                                r.set('show_%s_master'%assetId, str(client))
-                                r.set('show_%s_command'%assetId, command)
-                                r.set('show_%s_frame'%assetId, frame)
-                                r.set('show_%s_note'%assetId, note)
-                                r.set('show_%s_slide'%assetId, slide)
-                                r.expire('show_%s_master'%assetId, 1)
-                                r.expire('show_%s_command'%assetId, 1)
-                                r.expire('show_%s_frame'%assetId, 1)
-                                r.expire('show_%s_note'%assetId, 1)
-                                r.expire('show_%s_slide'%assetId, 1)
+                                r.set('show_%s_master' % assetId, str(client))
+                                r.set('show_%s_command' % assetId, command)
+                                r.set('show_%s_frame' % assetId, frame)
+                                r.set('show_%s_note' % assetId, note)
+                                r.set('show_%s_slide' % assetId, slide)
+                                r.expire('show_%s_master' % assetId, 1)
+                                r.expire('show_%s_command' % assetId, 1)
+                                r.expire('show_%s_frame' % assetId, 1)
+                                r.expire('show_%s_note' % assetId, 1)
+                                r.expire('show_%s_slide' % assetId, 1)
 
-
-                        command = r.get('show_%s_command'%assetId)
-                        frame = r.get('show_%s_frame'%assetId)
-                        note = r.get('show_%s_note'%assetId)
-                        slide = r.get('show_%s_slide'%assetId)
-                        watchers = r.lrange('show_%s_watchers'%assetId, 0, -1)
-                            #note = json.loads(note)
-                        if r.getset('show_%s_%s_latest_command'% (assetId, client), command) == command:
+                        command = r.get('show_%s_command' % assetId)
+                        frame = r.get('show_%s_frame' % assetId)
+                        note = r.get('show_%s_note' % assetId)
+                        slide = r.get('show_%s_slide' % assetId)
+                        watchers = r.lrange(
+                            'show_%s_watchers' % assetId, 0, -1)
+                        #note = json.loads(note)
+                        if r.getset('show_%s_%s_latest_command' % (assetId, client), command) == command:
                             command = None
-                        if r.getset('show_%s_%s_latest_frame'% (assetId, client), frame) == frame:
+                        if r.getset('show_%s_%s_latest_frame' % (assetId, client), frame) == frame:
                             frame = 'KEEP'
-                        if r.getset('show_%s_%s_latest_note'% (assetId, client), note) == note:
+                        if r.getset('show_%s_%s_latest_note' % (assetId, client), note) == note:
                             note = 'KEEP'
 
-                        #if master == str(client): ## dont send command to its issuer
+                        # if master == str(client): ## dont send command to its issuer
                             #    command = None
                             #    frames = None
-                        wsock.send(dumps({"master" : r.get('show_%s_master'%assetId),
-                                        "frame":frame, "command":command, "note":note,
-                                        "slide":slide, 'watchers':watchers}))
-
-
+                        wsock.send(dumps({"master": r.get('show_%s_master' % assetId),
+                                          "frame": frame, "command": command, "note": note,
+                                          "slide": slide, 'watchers': watchers}))
 
                 except (WebSocketError, KeyboardInterrupt):
                     break
-

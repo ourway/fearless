@@ -29,6 +29,5 @@ class Item(IDMixin, Base):
 
     '''Main users group
     '''
-    path = Column(String(128), unique=True, nullable=False)  # showtime/#/DmWdMXXw
-    
-
+    path = Column(
+        String(128), unique=True, nullable=False)  # showtime/#/DmWdMXXw

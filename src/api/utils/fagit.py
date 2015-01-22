@@ -20,6 +20,7 @@ from string import ascii_letters
 from cStringIO import StringIO
 import zlib
 
+
 def fix_name(name):
     for i in '()[]{} ":,./':
         name = name.replace(i, '_')
@@ -27,6 +28,7 @@ def fix_name(name):
         if i not in ascii_letters:
             name.replace(i, encodestring(i))
     return name
+
 
 class GIT(object):
 
@@ -70,7 +72,6 @@ class GIT(object):
     def tag(self, tag):
         tag = fix_name(tag)
         t = self.git.tag(tag)
-
 
     def archive(self, commit='HEAD'):
         '''returns a file object containing zip version of files'''

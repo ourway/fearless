@@ -14,7 +14,9 @@ Clean code is much better than Cleaner comments!
 
 from geventwebsocket import WebSocketError
 
+
 class Chat:
+
     def on_get(self, req, resp):
         wsock = req.env.get('wsgi.websocket')
         if wsock:
@@ -25,7 +27,3 @@ class Chat:
 
                 except (WebSocketError, KeyboardInterrupt):
                     break
-                    
-
-                
- 

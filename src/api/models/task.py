@@ -35,23 +35,22 @@ task_users = Table('task_users', Base.metadata,
                    )
 
 task_watchers = Table('task_watchers', Base.metadata,
-                   Column('id', Integer, primary_key=True),
-                   Column('task_id', Integer, ForeignKey('task.id')),
-                   Column('user_id', Integer, ForeignKey('user.id'))
-                   )
+                      Column('id', Integer, primary_key=True),
+                      Column('task_id', Integer, ForeignKey('task.id')),
+                      Column('user_id', Integer, ForeignKey('user.id'))
+                      )
 
 task_responsible = Table('task_responsible', Base.metadata,
-                   Column('id', Integer, primary_key=True),
-                   Column('task_id', Integer, ForeignKey('task.id')),
-                   Column('user_id', Integer, ForeignKey('user.id'))
-                   )
+                         Column('id', Integer, primary_key=True),
+                         Column('task_id', Integer, ForeignKey('task.id')),
+                         Column('user_id', Integer, ForeignKey('user.id'))
+                         )
 
 task_alternative = Table('task_alternative', Base.metadata,
-                   Column('id', Integer, primary_key=True),
-                   Column('task_id', Integer, ForeignKey('task.id')),
-                   Column('user_id', Integer, ForeignKey('user.id'))
-                   )
-
+                         Column('id', Integer, primary_key=True),
+                         Column('task_id', Integer, ForeignKey('task.id')),
+                         Column('user_id', Integer, ForeignKey('user.id'))
+                         )
 
 
 task_relations = Table(
@@ -68,9 +67,9 @@ class Task(IDMixin, Base):
         Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     project_id = Column(Integer, ForeignKey("project.id"), nullable=False)
     title = Column(Unicode(128), nullable=False)
-    note = Column(String(512))  ## task note
-    description = Column(String(512))  ## task note
-    gauge = Column(String(64))  ## task note
+    note = Column(String(512))  # task note
+    description = Column(String(512))  # task note
+    gauge = Column(String(64))  # task note
     start = Column(DateTime, nullable=False, default=now)
     computed_start = Column(DateTime)
     computed_end = Column(DateTime)
@@ -85,9 +84,10 @@ class Task(IDMixin, Base):
     onstart_charge = Column(Float(precision=3), default=0)
     active = Column(Boolean, default=True)
     onend_charge = Column(Float(precision=3), default=0)
-    milestone = Column(Boolean, default=False) # is task a milestone?
+    milestone = Column(Boolean, default=False)  # is task a milestone?
     parent_id = Column(Integer, ForeignKey("task.id"))
-    parent = relationship('Task', backref='children', remote_side=[id], uselist=True)
+    parent = relationship(
+        'Task', backref='children', remote_side=[id], uselist=True)
     reports = relationship('Report', backref='task')
     resources = relationship('User', backref='tasks', secondary='task_users')
     alternative_resources = relationship(
@@ -113,7 +113,7 @@ class Task(IDMixin, Base):
 
     ##########################################################################
 
-    #def __repr__(self):
+    # def __repr__(self):
     #    return self.title
 
     #@property
@@ -132,13 +132,11 @@ class Task(IDMixin, Base):
         # print key, task
         return fix_text(data)
 
-
     @validates('responsibles')
     def update_resources(self, key, data):
-        #if not data in self.resources:
+        # if not data in self.resources:
         #    self.resources.append(data)
         return data
-
 
     @property
     def go(self):
@@ -149,7 +147,7 @@ class Task(IDMixin, Base):
         if data == 'now':
             data = datetime.datetime.utcnow()
         else:
-            data =  convert_to_datetime(data)
+            data = convert_to_datetime(data)
 
         if data and self.project and self.project.end:
             try:
@@ -159,21 +157,20 @@ class Task(IDMixin, Base):
 
         if self.project:
             if data == self.project.end and self.effort:
-                data = data - datetime.timedelta(hours=self.effort*4) ## approximate fix
+                # approximate fix
+                data = data - datetime.timedelta(hours=self.effort * 4)
 
         if isinstance(data, datetime.datetime):
             return data
         else:
             return now()
 
-
-
     @validates('end')
     def _check_end(self, key, data):
         end = convert_to_datetime(data)
         start = convert_to_datetime(self.start)
         if start and end:
-            data = max(start, end)  ## if any errors in end
+            data = max(start, end)  # if any errors in end
         if data and self.project and self.project.end:
             try:
                 data = min(data, self.project.end)
@@ -182,13 +179,13 @@ class Task(IDMixin, Base):
 
         #delta = data - start
         self.end_set = True
-        #if not hasattr(self, 'effort_set'):
+        # if not hasattr(self, 'effort_set'):
         #    self.duration = delta.days * 24 + delta.seconds / 3600.0
         if isinstance(data, datetime.datetime):
             return data
         else:
             return now()
-    
+
     @validates('computed_start')
     def _update_computed_start(self, key, data):
         return convert_to_datetime(data)
@@ -199,7 +196,8 @@ class Task(IDMixin, Base):
 
     @validates('effort')
     def _update_end(self, key, data):
-        if data: data = float(data)
+        if data:
+            data = float(data)
         if not self.start:
             self.start = now()
         delta = datetime.timedelta(hours=data)
@@ -210,7 +208,8 @@ class Task(IDMixin, Base):
 
     @validates('complete')
     def _check_complete(self, key, data):
-        if data: data = int(float(data))
+        if data:
+            data = int(float(data))
         return data
 
 
@@ -224,13 +223,13 @@ def receive_before_insert(mapper, connection, target):
 @event.listens_for(Task, 'after_insert')
 def receive_before_insert(mapper, connection, target):
     pass
-    #print target.title
+    # print target.title
     # ... (update task confighandling logic) ...
 
 
-#def schedule(mapper, connection, target):
+# def schedule(mapper, connection, target):
 
-    #target.project.plan()
+    # target.project.plan()
 
 
 #event.listen(Task, 'after_insert', schedule)

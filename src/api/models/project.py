@@ -39,27 +39,30 @@ project_users = Table('project_users', Base.metadata,
                       )
 
 project_watchers = Table('project_watchers', Base.metadata,
-                      Column('id', Integer, primary_key=True),
-                      Column('project_id', Integer, ForeignKey('project.id')),
-                      Column('user_id', Integer, ForeignKey('user.id'))
-                      )
+                         Column('id', Integer, primary_key=True),
+                         Column(
+                             'project_id', Integer, ForeignKey('project.id')),
+                         Column('user_id', Integer, ForeignKey('user.id'))
+                         )
 
 from db import session
 from mako.template import Template
 
 
 project_reports = Table('project_reports', Base.metadata,
-    Column('project_id', Integer, ForeignKey("project.id"),
-           primary_key=True),
-    Column('report_id', Integer, ForeignKey("report.id"),
-           primary_key=True)
-)
+                        Column('project_id', Integer, ForeignKey("project.id"),
+                               primary_key=True),
+                        Column('report_id', Integer, ForeignKey("report.id"),
+                               primary_key=True)
+                        )
+
 
 class Project(IDMixin, Base):
 
     '''Studio Projects
     '''
-    id = Column( Integer, primary_key=True)  # over-ride mixin version. because of remote_side
+    id = Column(
+        Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     active = Column(Boolean, default=True)
     # 0-active, 1-pending, 2-stopped, 3-finished
     status = Column(Integer, default=0)
@@ -79,28 +82,34 @@ class Project(IDMixin, Base):
         'Task', backref='project',
         cascade="all, delete, delete-orphan")
     users = relationship('User', backref='projects', secondary='project_users')
-    watchers = relationship('User', backref='watches_projects', secondary='project_watchers')
+    watchers = relationship(
+        'User', backref='watches_projects', secondary='project_watchers')
     lead_id = Column(Integer, ForeignKey("user.id"), nullable=False)
     creator_id = Column(Integer, ForeignKey("user.id"))
     director_id = Column(Integer, ForeignKey("user.id"))
     lead = relationship('User', backref='leads', foreign_keys=[lead_id])
-    director = relationship('User', backref='directs', foreign_keys=[director_id])
-    creater = relationship('User', backref='projects_created', foreign_keys=[creator_id])
+    director = relationship(
+        'User', backref='directs', foreign_keys=[director_id])
+    creater = relationship(
+        'User', backref='projects_created', foreign_keys=[creator_id])
     working_days = Column(String(128), default='sat 09:00 - 18:00,')
     is_stereoscopic = Column(Boolean, default=False)
     fps = Column(Float(precision=3), default=24.000)
-    tk = relationship('Ticket', backref='project', cascade="all, delete, delete-orphan")
-    sequences = relationship('Sequence', backref='project', cascade="all, delete, delete-orphan")
+    tk = relationship(
+        'Ticket', backref='project', cascade="all, delete, delete-orphan")
+    sequences = relationship(
+        'Sequence', backref='project', cascade="all, delete, delete-orphan")
     tickets = association_proxy('tk', 'Ticket')
     project_id = Column(Integer, ForeignKey('project.id'))
-    rep = relationship("Report",backref='project', cascade="all, delete, delete-orphan")
-    reports = association_proxy('rep', 'id') # when we refer to reports, id will be returned.
+    rep = relationship(
+        "Report", backref='project', cascade="all, delete, delete-orphan")
+    # when we refer to reports, id will be returned.
+    reports = association_proxy('rep', 'id')
     subproject = relationship("Project", backref='parent', remote_side=[id])
     period = relationship("Date", uselist=False)
     account = relationship("Account", backref='projects')
     tgs = relationship("Tag", backref='projects')
     tags = association_proxy('tgs', 'name')
-
 
     @aggregated('tasks', Column(Integer))
     def calculate_number_of_tasks(self):
@@ -117,13 +126,12 @@ class Project(IDMixin, Base):
 
         return result
 
-
     @validates('tasks')
     def recalculate_end(self, key, data):
         if not self.start and self.end:
             return data
 
-        if self.end<self.start:
+        if self.end < self.start:
             self.end = self.start + datetime.timedelta(days=31 * 3)
 
         if not data.start:
@@ -142,12 +150,10 @@ class Project(IDMixin, Base):
                 self.end = data.end
         return data
 
-
-
     @validates('end')
     def _check_end(self, key, data):
         result = convert_to_datetime(data)
-        #if self.start and data<=self.start:
+        # if self.start and data<=self.start:
         ##    result = self.start + datetime.timedelta(days=31*3)
         return result
 
@@ -167,13 +173,10 @@ class Project(IDMixin, Base):
         for task in self.tasks:
             _tasks.append(task.tjp_task())
             #_resources.extend(task.resources)
-        subProjectTasks = sp.render(tasks=_tasks, subproject=self)  ## send tasks in reverse order
+        # send tasks in reverse order
+        subProjectTasks = sp.render(tasks=_tasks, subproject=self)
         report = sr.render(subproject=self)
-        return {'report':report, 'subProjectTasks':subProjectTasks}
-
-
-
-
+        return {'report': report, 'subProjectTasks': subProjectTasks}
 
     #@property
     def plan(self):
@@ -196,9 +199,9 @@ class Project(IDMixin, Base):
                 subProjectTasks.append(planData.get('subProjectTasks'))
                 reports.append(planData.get('report'))
 
-        finalplan = t.render(reports=reports, subProjectTasks=subProjectTasks, 
-                       now=now(), subprojects = projects, resources=resources
-                       )
+        finalplan = t.render(reports=reports, subProjectTasks=subProjectTasks,
+                             now=now(), subprojects=projects, resources=resources
+                             )
 
         #plan_path = '/tmp/Fearless_project.tjp'
         plan_path = '/home/farsheed/Desktop/Fearless_project_%s.tjp' % self.uuid
@@ -210,17 +213,19 @@ class Project(IDMixin, Base):
             print 'Start Calculating project %s' % self.id
             import time
             s = time.time()
-            tj = tj3(plan_path, '--silent', '--no-color', '--add-trace', o='/tmp', c='1')
-            print 'Finished in %s seconds' % round(time.time()-s, 3)
-        except Exception,e:
-            #print type(repr(e))
+            tj = tj3(
+                plan_path, '--silent', '--no-color', '--add-trace', o='/tmp', c='1')
+            print 'Finished in %s seconds' % round(time.time() - s, 3)
+        except Exception, e:
+            # print type(repr(e))
             for i in xrange(3):
-                _d = '<br/>'.join(repr(e).split('\\n')[17:]).replace('\\x1b[31m', '<b>').replace('\\x1b[0m','</b>').split('\\x1b[35m')
-                if len(_d)>1:
+                _d = '<br/>'.join(repr(e).split('\\n')[17:]).replace(
+                    '\\x1b[31m', '<b>').replace('\\x1b[0m', '</b>').split('\\x1b[35m')
+                if len(_d) > 1:
                     self.reports.append(_d[1])
             session.commit()
             return
-        #if not tj.stderr:
+        # if not tj.stderr:
         plan, guntt, resource, msproject, profit, csvfile, trace, burndown = None, None, None, None, None, None, None, None
         plan_path = '/tmp/plan_%s.html' % (self.uuid)
         guntt_path = '/tmp/guntt_%s.html' % (self.uuid)
@@ -243,7 +248,8 @@ class Project(IDMixin, Base):
 
                 tosave = etree.tostring(main_table)
                 return tosave
-                #self.reports.append(tosave)
+                # self.reports.append(tosave)
+
         def getSvg(path):
             '''extract svg element of report'''
             if os.path.isfile(path):
@@ -270,22 +276,30 @@ class Project(IDMixin, Base):
         burndown = getSvg(traceSvg_path)
 
         data = {}
-        if plan: data['plan'] = plan
-        if guntt: data['guntt'] = guntt
-        if resource: data['resource'] = resource
-        if profit: data['profit'] = profit
-        if msproject: data['msproject'] = msproject
-        if csvfile: data['csvfile'] = csvfile
-        if trace: data['trace'] = trace
-        if burndown: data['burndown'] = burndown
+        if plan:
+            data['plan'] = plan
+        if guntt:
+            data['guntt'] = guntt
+        if resource:
+            data['resource'] = resource
+        if profit:
+            data['profit'] = profit
+        if msproject:
+            data['msproject'] = msproject
+        if csvfile:
+            data['csvfile'] = csvfile
+        if trace:
+            data['trace'] = trace
+        if burndown:
+            data['burndown'] = burndown
         data = dumps(data)
         self.reports.append(data)
         session.commit()
-        return data 
-        #else:
-        #return tj.stderr
+        return data
+        # else:
+        # return tj.stderr
 
-#def plan_project(mapper, connection, target):
+# def plan_project(mapper, connection, target):
 #    target.plan
 
 

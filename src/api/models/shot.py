@@ -23,15 +23,13 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 
 
-
-
 shots_scenes = Table("shots_scenes", Base.metadata,
-                   Column('id', Integer, primary_key=True),
-                   Column(
-                       "shot_id", Integer, ForeignKey("shot.id"), primary_key=True),
-                   Column(
-                       "scene_id", Integer, ForeignKey("scene.id"), primary_key=True)
-                   )
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "shot_id", Integer, ForeignKey("shot.id"), primary_key=True),
+                     Column(
+                         "scene_id", Integer, ForeignKey("scene.id"), primary_key=True)
+                     )
 
 
 class Shot(IDMixin, Base):
@@ -55,7 +53,6 @@ class Shot(IDMixin, Base):
     account = relationship("Account", backref='shots')
     tgs = relationship("Tag", backref='shots')
     tags = association_proxy('tgs', 'name')
-
 
     @validates('number')
     def _assign_name_code(self, key, data):

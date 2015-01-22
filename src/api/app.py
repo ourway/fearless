@@ -15,7 +15,7 @@ Clean code is much better than Cleaner comments!
 #from gevent import monkey; monkey.patch_all()
 from falcon_patch import falcon
 import cgi
-#cgi.maxlen = 10 * 1024 * 1024 # 8Gb
+# cgi.maxlen = 10 * 1024 * 1024 # 8Gb
 import importlib
 from utils.helpers import commit, jsonify, get_params
 from utils.documents import SetNote, GetNote, SearchNote
@@ -34,7 +34,6 @@ from models import *
 from sqlalchemy import desc, asc
 from datetime import datetime
 
-
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
     Verify, Reactivate, Reset, Logout, GetUserInfo, Authorize, \
@@ -42,11 +41,10 @@ from utils.AAA import Login, Signup, Authenticate,\
     ChangePassword, Users, UpdateGroups
 from utils.showtime import GetUserShows
 from utils.project import GetProjectDetails, GetProjectLatestReport, \
-        ListProjects, AddProject, AddTask, ListTasks, GetTask, UpdateTask, \
-        DeleteTask, UpdateProject, UserTasksCard
+    ListProjects, AddProject, AddTask, ListTasks, GetTask, UpdateTask, \
+    DeleteTask, UpdateProject, UserTasksCard
 
 from utils.sequence import AddSequence
-
 
 
 tables = [i for i in av if i[0] in ascii_uppercase]
@@ -54,15 +52,16 @@ tables = [i for i in av if i[0] in ascii_uppercase]
 
 def getSession(req, resp, params):
     from models.db import Session
-    req.session=Session()
+    req.session = Session()
+
 
 def closeSession(req, resp):
     try:
         req.session.commit()
     except Exception, e:
-        print '*'*80
+        print '*' * 80
         print e
-        print '*'*80
+        print '*' * 80
         req.session.rollback()
     finally:
         req.session.close()
@@ -70,6 +69,7 @@ def closeSession(req, resp):
 
 class ThingsResource:
     #@Authorize('create_collection')
+
     def on_get(self, req, resp):
         """Handles GET requests"""
         req.env['hooooooo'] = 'gooooooooo'
@@ -89,7 +89,7 @@ class DB:
         args = req.path.split('/')
         table = args[3]
         u = getUserInfoFromSession(req, resp)
-        #if not isAuthorizedTo(u.get('id'), 'see_%s'%table):
+        # if not isAuthorizedTo(u.get('id'), 'see_%s'%table):
         #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         key = req.get_param('key') or 'id'
         listMe = req.get_param('list')
@@ -101,9 +101,12 @@ class DB:
         filters = []
         if filters_raw:
 
-            filters += [{i.split('=')[0]:i.split('=')[1], '_':'=='} for i in filters_raw.split(',') if '=' in i]
-            filters += [{i.split('>')[0]:i.split('>')[1], '_':'>'} for i in filters_raw.split(',') if '>' in i]
-            filters += [{i.split('<')[0]:i.split('<')[1], '_':'<'} for i in filters_raw.split(',') if '<' in i]
+            filters += [{i.split('=')[0]:i.split('=')[1], '_':'=='}
+                        for i in filters_raw.split(',') if '=' in i]
+            filters += [{i.split('>')[0]:i.split('>')[1], '_':'>'}
+                        for i in filters_raw.split(',') if '>' in i]
+            filters += [{i.split('<')[0]:i.split('<')[1], '_':'<'}
+                        for i in filters_raw.split(',') if '<' in i]
 
         sort = req.get_param('sort')
         if not sort:
@@ -112,10 +115,12 @@ class DB:
         if not order_by:
             order_by = 'modified_on'
 
-        if start: start = int(start)
-        if end: end = int(end)
+        if start:
+            start = int(start)
+        if end:
+            end = int(end)
         if start and not end:
-            end = start+10
+            end = start + 10
         if len(args) == 5:
             id = args[4]
             query = 'req.session.query({t}).filter({t}.{key}=="{id}").order_by({sort}({t}.{order}))'.format(
@@ -130,10 +135,12 @@ class DB:
 
         else:
             if not show:
-                query = 'req.session.query({t}).order_by({sort}({t}.{order}))'.format(t=table, sort=sort, order=order_by)
+                query = 'req.session.query({t}).order_by({sort}({t}.{order}))'.format(
+                    t=table, sort=sort, order=order_by)
             else:
-                query = 'req.session.query({t}.{f}).order_by({sort}({t}.{order}))'.format(t=table, sort=sort, f=show, order=order_by)
-            
+                query = 'req.session.query({t}.{f}).order_by({sort}({t}.{order}))'.format(
+                    t=table, sort=sort, f=show, order=order_by)
+
             try:
                 if start and end:
                     query += '.slice(start, end)'
@@ -142,22 +149,21 @@ class DB:
                     for filter in filters:
                         if isinstance(filter, dict):
                             eq = filter.pop('_')
-                            query += '.filter({t}.{k}{eq}"{v}")'.format(t=table,eq=eq,
-                                        k=filter.keys()[0], v=filter[filter.keys()[0]])
+                            query += '.filter({t}.{k}{eq}"{v}")'.format(t=table, eq=eq,
+                                                                        k=filter.keys()[0], v=filter[filter.keys()[0]])
                 data = eval(query).all()
                 resp.body = data
             except (AttributeError):
                 data = None
         get_count = req.get_param('count')
         if get_count:
-            resp.body = {'count':eval(query).count()}
+            resp.body = {'count': eval(query).count()}
             return
         field = req.get_param('field')
         if field:
             try:
                 if len(args) != 5:
-                    data = [eval('i.%s'%field) for i in data]
-
+                    data = [eval('i.%s' % field) for i in data]
 
                 elif len(args) == 5:
                     '''/api/db/user/1?field=tasks'''
@@ -181,28 +187,24 @@ class DB:
                                     newDataDict[key] = value
                             data = newDataDict
 
-
-                            
-
             except AttributeError, e:
                 print e
-                raise falcon.HTTPBadRequest('Bad Request', 'The requested field is not available for database')
+                raise falcon.HTTPBadRequest(
+                    'Bad Request', 'The requested field is not available for database')
 
             resp.body = data
             return
 
-
-        if len(args)==5 and len(data)==1 and not listMe:
+        if len(args) == 5 and len(data) == 1 and not listMe:
             data = data[0]
             _d = {}
             for i in dir(data):
                 if not i.startswith('_'):
-                    value=getattr(data, i)
+                    value = getattr(data, i)
                     if isinstance(value, (str, unicode, long, int, float, bool, datetime)):
                         _d[i] = value
-                    #if isinstance(value, long) and i.endswith('_id'):
+                    # if isinstance(value, long) and i.endswith('_id'):
                     #    table = i.split('_')[0]
-
 
             resp.body = _d
         # Ok, We have an id
@@ -211,7 +213,7 @@ class DB:
         args = req.path.split('/')
         table = args[3].title()
         u = getUserInfoFromSession(req, resp)
-        #if not isAuthorizedTo(u.get('id'), 'create_%s'%table):
+        # if not isAuthorizedTo(u.get('id'), 'create_%s'%table):
         #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         query_params = get_params(req.stream, flat=False)
         insert_cmd = '{t}()'.format(t=table)
@@ -224,14 +226,13 @@ class DB:
         resp.body = data
         # commit()
 
-
     def on_post(self, req, resp, **kw):
         args = req.path.split('/')
         table = args[3].title()
         #u = getUserInfoFromSession(req)
-        #if not isAuthorizedTo(u.get('id'), 'update_%s'%table):
+        # if not isAuthorizedTo(u.get('id'), 'update_%s'%table):
         #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
-        if len(args)<5:
+        if len(args) < 5:
             resp.status = falcon.HTTP_400
             return
         id = args[4]
@@ -241,7 +242,7 @@ class DB:
         result = eval(query).first()
         ##
         query_params = get_params(req.stream, flat=False)
-        updated_values = [];
+        updated_values = []
         for key in query_params:
             if key in ['created_on', 'modified_on', 'id']:
                 continue
@@ -254,9 +255,9 @@ class DB:
                 except AttributeError:
                     continue
 
-        #if result.update(query_params):
+        # if result.update(query_params):
         resp.status = falcon.HTTP_202
-        resp.body = {'message':'updated', 'info':updated_values}
+        resp.body = {'message': 'updated', 'info': updated_values}
         #query = 'result({q})'.format(q=query_params)
         # print eval(query)
 
@@ -264,9 +265,9 @@ class DB:
         args = req.path.split('/')
         table = args[3].title()
         #u = getUserInfoFromSession(req)
-        #if not isAuthorizedTo(u.get('id'), 'delete_%s'%table):
+        # if not isAuthorizedTo(u.get('id'), 'delete_%s'%table):
         #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
-        if len(args)<5:
+        if len(args) < 5:
             resp.status = falcon.HTTP_400
             return
         id = args[4]
@@ -279,14 +280,15 @@ class DB:
             req.session.delete(each)
             deleted.append(each.id)
         resp.status = falcon.HTTP_202
-        resp.body = {'message':'deleted', 'info':deleted}
+        resp.body = {'message': 'deleted', 'info': deleted}
         #query = 'result({q})'.format(q=query_params)
         # print eval(query)
 
 
 # falcon.API instances are callable WSGI apps
 #app = falcon.API()
-app = falcon.API(before=[getSession, Authenticate], after=[jsonify, closeSession])
+app = falcon.API(
+    before=[getSession, Authenticate], after=[jsonify, closeSession])
 things = ThingsResource()
 
 ########################################################

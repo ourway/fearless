@@ -26,7 +26,8 @@ class Tag(IDMixin, Base):
 
     """Used for any tag in orm
     """
-    id = Column( Integer, primary_key=True)  # over-ride mixin version. because of remote_side
+    id = Column(
+        Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     name = Column(String(64), unique=True, nullable=False)
     description = Column(String(512))
     asset_id = Column(Integer, ForeignKey("asset.id"))
@@ -50,8 +51,7 @@ class Tag(IDMixin, Base):
     account_id = Column(Integer, ForeignKey('account.id'))
     comment_id = Column(Integer, ForeignKey('comment.id'))
     date_id = Column(Integer, ForeignKey('date.id'))
-    parent = relationship("Tag", backref="children" ,remote_side=[id])
+    parent = relationship("Tag", backref="children", remote_side=[id])
 
     def __init__(self, data):
         self.name = data
-    

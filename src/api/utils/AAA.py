@@ -44,7 +44,8 @@ def Authorize(action):
             if isAuthorizedTo(req, u.get('id'), action):
                 return func(self, req, resp, *args, **kw)
             else:
-                raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
+                raise falcon.HTTPUnauthorized(
+                    'Not Authorized', 'Permission Denied')
         return _f
     return request_checked
 
@@ -66,7 +67,7 @@ def Authenticate(req, resp, params):
             ...
 
     '''
-    #return
+    # return
     ip = req.env.get('HTTP_X_FORWARDED_FOR')
     free_services = ['/api/auth/signup', '/api/auth/login',
                      '/api/things', '/api/auth/activate', '/api/auth/reactivate',
@@ -129,6 +130,7 @@ class Login:
 
     '''Main login class
     '''
+
     def on_post(self, req, resp):
         '''Add a user to database'''
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
@@ -153,7 +155,7 @@ class Login:
             cookie will be used
         '''
         resp.append_header('set-cookie', 'session-id=%s; path=/; max-age=5; HttpOnly' %
-                        sid)  # this session is not yet saved
+                           sid)  # this session is not yet saved
         # don't tell what's wrong!
         if not target or not target.password == form.get('password'):
             r.incr('fail_' + sid, 1)
@@ -167,11 +169,13 @@ class Login:
                 rem_time = 3600 * 24
                 # this session is not yet saved
 
-                
                 groups = ','.join([i.name for i in target.grps])
-                resp.append_header('set-cookie', 'userid=%s; path=/; max-age=%s' % (str(target.id), rem_time) )
-                resp.append_header('set-cookie', 'groups=%s; path=/; max-age=%s' % (str(groups), rem_time) )
-                resp.append_header('set-cookie', 'username=%s; path=/; max-age=%s' % (str(target.firstname or target.alias), rem_time) )
+                resp.append_header(
+                    'set-cookie', 'userid=%s; path=/; max-age=%s' % (str(target.id), rem_time))
+                resp.append_header(
+                    'set-cookie', 'groups=%s; path=/; max-age=%s' % (str(groups), rem_time))
+                resp.append_header('set-cookie', 'username=%s; path=/; max-age=%s' %
+                                   (str(target.firstname or target.alias), rem_time))
                 resp.append_header(
                     'set-cookie', 'session-id=%s; path=/; max-age=%s; HttpOnly' % (sid, rem_time))
 
@@ -182,12 +186,12 @@ class Login:
                 logger.info(
                     '{ip}|"{u}" loggin in from web"'.format(u=target.email, ip=ip))
                 resp.body = {
-                            'message': 'success',
-                            'firstname': target.firstname,
-                            'id': target.id,
-                            'avatar':target.avatar,
-                            'groups':[i.name for i in target.grps]
-                            }
+                    'message': 'success',
+                    'firstname': target.firstname,
+                    'id': target.id,
+                    'avatar': target.avatar,
+                    'groups': [i.name for i in target.grps]
+                }
             else:
 
                 logger.warning('{ip}|{u} tried to login from web without activation"'.format(
@@ -204,6 +208,7 @@ class Signup:
 
     '''Main login class
     '''
+
     def on_post(self, req, resp):
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
         sid = req.cookie('session-id')
@@ -214,7 +219,7 @@ class Signup:
 
         host = req.protocol + '://' + req.headers.get('HOST')
         form = json.loads(req.stream.read())
-        email=form.get('email')
+        email = form.get('email')
         if email:
             email = email.lower()
         olduser = req.session.query(User).filter(
@@ -226,14 +231,13 @@ class Signup:
                            lastname=form.get('lastname'),
                            token=str(uuid.uuid4()))
 
-
             req.session.add(newuser)
 
             activation_link = host + \
                 '/api/auth/activate?token=' + newuser.token
             send_envelope.delay(email, [], [], 'Account Activation',
                                 'Hi <strong>{u}</strong>! Please <a class="btn-primary" href="{l}">Activate your account</a>.'.format(u=newuser.firstname.title(),
-                                                                                                                  l=activation_link))
+                                                                                                                                      l=activation_link))
 
             logger.info(
                 '{ip}|Signed up for {u}'.format(ip=ip, u=newuser.email))
@@ -344,8 +348,10 @@ class ChangePasswordVerify:
             target.token = new_token
             logger.info('{ip}|Verified a reset key'.format(ip=ip))
             resp.status = falcon.HTTP_302
-            m = encodestring('hey %s! You can reset your password here' % target.firstname)
-            resp.location = '/app/#auth/changepassword/%s'%new_token
+            m = encodestring(
+                'hey %s! You can reset your password here' % target.firstname)
+            resp.location = '/app/#auth/changepassword/%s' % new_token
+
 
 class ChangePassword:
 
@@ -359,20 +365,13 @@ class ChangePassword:
         pass1 = form.get('password')
         pass2 = form.get('password2')
         target = req.session.query(User).filter(User.token == token).first()
-        if target and pass1 and pass2 and len(pass1)>5 and pass1==pass2:
+        if target and pass1 and pass2 and len(pass1) > 5 and pass1 == pass2:
             new_token = str(uuid.uuid4())
             target.token = new_token
             target.password = pass1
-            resp.body = {'message':'password changed'}
+            resp.body = {'message': 'password changed'}
         else:
-            resp.body = {'message':'error in password change'}
-
-
-
-
-
-
-
+            resp.body = {'message': 'error in password change'}
 
 
 class Reset:
@@ -400,11 +399,12 @@ class Reset:
             User.email == form.get('email')).first()
         if target:
             host = req.protocol + '://' + req.headers.get('HOST')
-            reset_link = host + '/api/auth/changepasswordverify?token=' + target.token
+            reset_link = host + \
+                '/api/auth/changepasswordverify?token=' + target.token
             send_envelope.delay(form.get('email'), [], [],  'Account Password Reset',
                                 'Hi <strong>{u}</strong>! <a href="{l}">reset</a> your account password.'.format(u=target.firstname,
-                                                                                                                    l=reset_link))
-            resp.body = {'message':'reset key sent'}
+                                                                                                                 l=reset_link))
+            resp.body = {'message': 'reset key sent'}
 
 
 class Logout:
@@ -417,7 +417,8 @@ class Logout:
         sid = req.cookie('session-id')
         if sid:
             hashed_sid = hashlib.sha1(sid).hexdigest()
-            target = req.session.query(User).filter(User.latest_session_id == hashed_sid).first()
+            target = req.session.query(User).filter(
+                User.latest_session_id == hashed_sid).first()
             if not target:
                 logger.warning(
                     '{ip}|tried to logout of an invalid session'.format(ip=ip))
@@ -425,44 +426,46 @@ class Logout:
                 logger.info('{ip}|logged out'.format(ip=ip))
                 target.latest_session_id = None
 
-            resp.append_header('set-cookie', 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
-            resp.append_header('set-cookie', 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
+            resp.append_header(
+                'set-cookie', 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
+            resp.append_header(
+                'set-cookie', 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
             resp.body = r.delete(hashed_sid)
 
 
-
 def getUserInfoFromSession(req, resp):
-        sid = req.cookie('session-id')
-        if sid:
-            hashed_sid = hashlib.sha1(sid).hexdigest()
-            target = req.session.query(User).filter(User.latest_session_id==hashed_sid).first()
-            if target:
-                return {'email':target.email, 'alias':target.alias, 'firstname':target.firstname, 'uuid':target.uuid,
-                            'lastname':target.lastname, 'id':target.id, 'server':{'name':'Fearless API', 'ip':get_ip()}}
+    sid = req.cookie('session-id')
+    if sid:
+        hashed_sid = hashlib.sha1(sid).hexdigest()
+        target = req.session.query(User).filter(
+            User.latest_session_id == hashed_sid).first()
+        if target:
+            return {'email': target.email, 'alias': target.alias, 'firstname': target.firstname, 'uuid': target.uuid,
+                    'lastname': target.lastname, 'id': target.id, 'server': {'name': 'Fearless API', 'ip': get_ip()}}
 
-            else:
+        else:
 
-                resp.append_header('set-cookie', 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
-                resp.append_header('set-cookie', 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
-                r.delete(hashed_sid)
-            
-        return {'message':'ERROR'}
+            resp.append_header(
+                'set-cookie', 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
+            resp.append_header(
+                'set-cookie', 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
+            r.delete(hashed_sid)
+
+    return {'message': 'ERROR'}
 
 
 class GetUserInfo:
     #@falcon.after(commit)
+
     def on_post(self, req, resp):
         resp.body = getUserInfoFromSession(req, resp)
 
+
 class GetPermissions:
+
     def on_get(self, req, resp, userId):
-        target = req.session.query(User).filter(User.id==int(userId)).first()
-        resp.body =  [i.rls for i in target.grps]
-
-
-
-
-
+        target = req.session.query(User).filter(User.id == int(userId)).first()
+        resp.body = [i.rls for i in target.grps]
 
 
 def isAuthorizedTo(req, userId, actionName):
@@ -471,24 +474,27 @@ def isAuthorizedTo(req, userId, actionName):
     if not target:
         return
 
-    if target.id == 1: # first user has access to everything
+    if target.id == 1:  # first user has access to everything
         return True
 
-    for userGroup in target.grps: # grps is access to gourp objects
-        for role in userGroup.rls: # rls is access to role object 
+    for userGroup in target.grps:  # grps is access to gourp objects
+        for role in userGroup.rls:  # rls is access to role object
             if actionName.lower() == role.name.lower():
                 return True
 
 
 class Users:
+
     def on_get(self, req, resp, **kw):
 
         target = req.session.query(User).all()
-        data = [{'firstname':user.lastname, 'lastname':user.firstname, 
-                 'fullname':user.fullname, 'id':user.id} for user in target]
+        data = [{'firstname': user.lastname, 'lastname': user.firstname,
+                 'fullname': user.fullname, 'id': user.id} for user in target]
         resp.body = data
 
+
 class UpdateGroups:
+
     def on_get(self, req, resp, userId, **kw):
         pass
 
@@ -504,28 +510,14 @@ class UpdateGroups:
             for grpinfo in data.get('groups'):
                 if grpinfo.get('name') != 'guests' and user_group and not user_group in target.grps:
                     target.grps.append(user_group)
-                group = req.session.query(Group).filter_by(id=grpinfo.get('id')).first()
+                group = req.session.query(Group).filter_by(
+                    id=grpinfo.get('id')).first()
                 if group:
                     target.grps.append(group)
                     added.append(group.name)
 
             if target.id == 1 and not admin_group in target.grps:
-                    target.grps.append(admin_group)
-
+                target.grps.append(admin_group)
 
             resp.status = falcon.HTTP_202
-            resp.body = {'message':'OK', 'info':added}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            resp.body = {'message': 'OK', 'info': added}

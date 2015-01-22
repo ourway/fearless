@@ -36,17 +36,18 @@ class Collection(IDMixin, Base):
 
     '''All reports will be saved here
     '''
-    id = Column( Integer, primary_key=True)  # over-ride mixin version. because of remote_side
+    id = Column(
+        Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     schema = deferred(Column(Text))  # load on access
     name = Column(String(128))
     description = Column(String(512))
-    container = Column(Boolean(), default=True)  ## can contain assets
-    holdAssets = Column(Boolean(), default=True)  ## can contain assets
-    version = Column(Integer, default=1)  ## asset versioning
+    container = Column(Boolean(), default=True)  # can contain assets
+    holdAssets = Column(Boolean(), default=True)  # can contain assets
+    version = Column(Integer, default=1)  # asset versioning
     template = Column(String(64))
     owner_id = Column(Integer, ForeignKey('user.id'))
     parent_id = Column(Integer, ForeignKey('collection.id'))
-    parent = relationship("Collection", backref="children" ,remote_side=[id])
+    parent = relationship("Collection", backref="children", remote_side=[id])
     owner = relationship("User", backref="ownes_collections")
     path = Column(String(512), nullable=False)  # relative to repo path path
     url = Column(String(512))  # relative to repo path path
@@ -55,8 +56,6 @@ class Collection(IDMixin, Base):
     assets = relationship('Asset', backref='collection')
     tgs = relationship("Tag", backref='collections')
     tags = association_proxy('tgs', 'name')
-
-
 
     @validates('schema')
     def load_json(self, key, schema):
@@ -77,7 +76,8 @@ class Collection(IDMixin, Base):
     @validates('repository_id')
     def update_url(self, key, data):
         if self.path:
-            repository = session.query(Repository).filter(Repository.id == data).first()
+            repository = session.query(Repository).filter(
+                Repository.id == data).first()
             self.url = os.path.join(repository.path, self.path)
         return data
 
@@ -85,37 +85,36 @@ class Collection(IDMixin, Base):
     def check_path(self, key, data):
         self.name = os.path.basename(data).title()
         if self.repository_id:
-            repository = session.query(Repository).filter(Repository.id == self.repository_id).first()
+            repository = session.query(Repository).filter(
+                Repository.id == self.repository_id).first()
             self.url = os.path.join(repository.path, data)
         return data
 
     @hybrid_property
     def archive(self):
         pass
-        #collection_path = os.path.join(
+        # collection_path = os.path.join(
         #    self.repository.path, self.path or '')
         #git = GIT('.', wt=collection_path)
-        #return git.archive()
-
-
+        # return git.archive()
 
 
 def BeforeUserCreationFuncs(mapper, connection, target):
     pass
 
 
-
-
 def AfterUserCreationFuncs(mapper, connection, target):
     '''Some operations after getting ID'''
     session = Session()
-    repository = session.query(Repository).filter_by(id=target.repository_id).first()
+    repository = session.query(Repository).filter_by(
+        id=target.repository_id).first()
     Target = session.query(Collection).filter_by(id=target.id).first()
     if target.path:
         collection_path = os.path.join(repository.path, target.path)
         if not os.path.isdir(collection_path):
             os.makedirs(collection_path)
-        thmb =  os.path.join( os.path.dirname(__file__), '../templates/icons/asset_thumb.png')
+        thmb = os.path.join(
+            os.path.dirname(__file__), '../templates/icons/asset_thumb.png')
         dest = os.path.join(collection_path, 'thumb.png')
         if not os.path.isfile(dest):
             shutil.copyfile(thmb, dest)
@@ -129,8 +128,6 @@ def AfterUserCreationFuncs(mapper, connection, target):
         collection = json.loads(
             open(templateFile).read()).get(target.template)
     if collection:
-
-
 
         # print collection.get('folders')
         if collection.get('folders'):
@@ -157,13 +154,14 @@ def AfterUserCreationFuncs(mapper, connection, target):
 
                     part = part.strip()
                     tn = folder.split('/').index(part)
-                    tc = '@@'.join(folder.split('/')[:tn+1])
-                    partPath = os.path.join(repository.path, target.path,  tc.replace('@@', '/'))
+                    tc = '@@'.join(folder.split('/')[:tn + 1])
+                    partPath = os.path.join(
+                        repository.path, target.path,  tc.replace('@@', '/'))
 
                     if not generated.get(tc):
-                        newCollection = Collection(name=newCollectionName, path=part, 
-                                            repository_id=repository.id, 
-                                            container=container, holdAssets=holdAssets)
+                        newCollection = Collection(name=newCollectionName, path=part,
+                                                   repository_id=repository.id,
+                                                   container=container, holdAssets=holdAssets)
                         if tn:
                             tcm = '@@'.join(folder.split('/')[:tn])
                             newCollection.parent = generated.get(tcm)
@@ -173,20 +171,18 @@ def AfterUserCreationFuncs(mapper, connection, target):
                         if 'seq_' in part.lower():
                             part = 'sequence'
                         tdest = os.path.join(partPath, 'thumb.png')
-                        tsrc = os.path.join(os.path.dirname(__file__), '../templates/icons/%s.png' % part.lower())
+                        tsrc = os.path.join(
+                            os.path.dirname(__file__), '../templates/icons/%s.png' % part.lower())
                         if os.path.isfile(tsrc):
                             shutil.copyfile(tsrc, tdest)
                         session.add(newCollection)
 
-
-
         if collection.get('copy'):
             for c in collection.get('copy'):
                 src = os.path.join(
-                            os.path.dirname(__file__), '../templates/%s' % collection.get('copy')[c])
+                    os.path.dirname(__file__), '../templates/%s' % collection.get('copy')[c])
                 dest = os.path.join(
                     repository.path, target.path or repository.path, c)
-
 
                 if os.path.isfile(src):
                     shutil.copyfile(src, dest)
@@ -204,9 +200,9 @@ def AfterUserCreationFuncs(mapper, connection, target):
 #                        if os.path.isfile(templateFile):
 #                            template = Template(filename=templateFile)
 #                            f.write(template.render(reponame=repository.name, project=repository.project.name,
-#                                                    id=target.id, collection=target.name.decode('utf-8')))
+# id=target.id, collection=target.name.decode('utf-8')))
 
-    
+
 #        message = 'Added: files to collection:*%s* of repo:*%s*' % (
 #            target.name, repository.name)
 #
@@ -231,8 +227,6 @@ def AfterUserCreationFuncs(mapper, connection, target):
 
     session.commit()
     session.close()
-
-
 
 
 event.listen(Collection, 'after_insert', AfterUserCreationFuncs)

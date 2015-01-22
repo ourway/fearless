@@ -30,24 +30,24 @@ shots_sequences = Table("shots_sequences", Base.metadata,
                             "sequence.id"), primary_key=True)
                         )
 
+
 class Sequence(IDMixin, Base):
 
     number = Column(Integer, nullable=False)
     name = Column(String(64), nullable=False)  # sequence1
     code = Column(String(64), nullable=False)  # SEQ1
-    note = Column(String(512))  ## task note
+    note = Column(String(512))  # task note
     asset_id = Column(Integer, ForeignKey("asset.id"))
     project_id = Column(Integer, ForeignKey("project.id"))
     collection_id = Column(Integer, ForeignKey("collection.id"))
     collection = relationship("Collection", backref='sequence')
     preview = relationship("Asset", backref='sequence')
-    shots = relationship( 'Shot', backref='sequences', 
-                secondary='shots_sequences')
+    shots = relationship('Shot', backref='sequences',
+                         secondary='shots_sequences')
     period = relationship("Date", uselist=False)
     account = relationship("Account", backref='sequences')
     tgs = relationship("Tag", backref='sequences')
     tags = association_proxy('tgs', 'name')
-
 
     @validates('number')
     def _assign_name_code(self, key, data):

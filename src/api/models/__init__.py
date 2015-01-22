@@ -23,7 +23,7 @@ usage:
 __all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
            'Repository', 'Project', 'now', 'Ticket', 'session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
-           'Document', 'Account', 'Date' ,'Collection', 'r', 'es', 'Departement',
+           'Document', 'Account', 'Date', 'Collection', 'r', 'es', 'Departement',
            'Comment', 'fdb', 'vdb', 'adb', 'rdb', 'ddb', 'mdb', 'riakClient']
 
 import os
@@ -56,7 +56,7 @@ mdb = riakClient.bucket('fearless_messages_database')
 riakClient.create_search_index('fearless_messages_database')
 mdb.set_properties({'search_index': 'fearless_messages_database'})
 mdb.enable_search()
-#r.flushdb()
+# r.flushdb()
 
 from db import session, engine, Base
 
@@ -86,6 +86,7 @@ from models.date import Date
 from utils.defaults import public_repository_path
 Base.metadata.create_all(engine)
 
+
 def init():
     '''set some defaults values. Like admin role and group, managers, etc...
     '''
@@ -100,13 +101,15 @@ def init():
                 new.typ = 'departement'
             session.add(new)
 
-    manager_group = session.query(Group).filter(Group.name=='managers').first()
-    admin_group = session.query(Group).filter(Group.name=='admin').first()
-    user_group = session.query(Group).filter(Group.name=='users').first()
+    manager_group = session.query(Group).filter(
+        Group.name == 'managers').first()
+    admin_group = session.query(Group).filter(Group.name == 'admin').first()
+    user_group = session.query(Group).filter(Group.name == 'users').first()
 
     role_actions = ['create', 'see', 'delete', 'edit']
     role_areas_managers = ['project', 'collection', 'repository', 'database']
-    role_areas_users = ['tag', 'asset', 'ticket', 'shot', 'sequence', 'report', 'scene', 'document', 'task', 'user']
+    role_areas_users = ['tag', 'asset', 'ticket', 'shot',
+                        'sequence', 'report', 'scene', 'document', 'task', 'user']
     roles = session.query(Role).all()
     for act in role_actions:
         for area in role_areas_managers + role_areas_users:
@@ -120,22 +123,22 @@ def init():
                 admin_group.rls.append(new)
 
     read_roles = session.query(Role).filter(Role.name.like('see%')).all()
-    users_group = session.query(Group).filter(Group.name=='users').first()
+    users_group = session.query(Group).filter(Group.name == 'users').first()
     for role in read_roles:
         users_group.rls.append(role)
 
     for repo in ['profiles', 'reports', 'assets', 'showtime']:
-        new_repository = session.query(Repository).filter(Repository.name == repo).first()
+        new_repository = session.query(Repository).filter(
+            Repository.name == repo).first()
         if not new_repository:
-            new_repository = Repository(name=repo, path= os.path.join(public_repository_path, repo))
+            new_repository = Repository(
+                name=repo, path=os.path.join(public_repository_path, repo))
             session.add(new_repository)
 
     session.commit()
 
 
 init()
-
-
 
 
 if __name__ == '__main__':

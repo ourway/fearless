@@ -26,15 +26,15 @@ from mixin import IDMixin, Base
 from . import rdb
 
 user_documents = Table('user_documents', Base.metadata,
-    Column('user_id', Integer, ForeignKey("user.id"),
-           primary_key=True),
-    Column('document_id', Integer, ForeignKey("document.id"),
-           primary_key=True)
-)
-
+                       Column('user_id', Integer, ForeignKey("user.id"),
+                              primary_key=True),
+                       Column('document_id', Integer, ForeignKey("document.id"),
+                              primary_key=True)
+                       )
 
 
 class Document(IDMixin, Base):
+
     """Implements o simple Document for assets and other docs
     """
     title = Column(String(256), unique=True)
@@ -42,7 +42,8 @@ class Document(IDMixin, Base):
     user_id = Column('User', Integer, ForeignKey("user.id"))
     asset_id = Column('Asset', Integer, ForeignKey("asset.id"))
     author = relationship("User", backref='documents')
-    editors = relationship("User", backref='edited_documents', secondary=user_documents)
+    editors = relationship(
+        "User", backref='edited_documents', secondary=user_documents)
     asset = relationship("Asset", backref='documents')
     project_id = Column(Integer, ForeignKey('project.id'))
     project = relationship("Project", backref='documents')
@@ -59,7 +60,7 @@ class Document(IDMixin, Base):
     period = relationship("Date", uselist=False)
     tgs = relationship("Tag", backref='documents')
     tags = association_proxy('tgs', 'name')
- 
+
     @validates('data')
     def save_data_in_riak(self, key, data):
         self.uuid = getUUID()
@@ -71,4 +72,3 @@ class Document(IDMixin, Base):
     def body(self):
         dataObject = rdb.get(self.uuid)
         return dataObject.data
-

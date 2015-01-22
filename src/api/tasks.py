@@ -61,28 +61,19 @@ from utils.validators import checkPath, md5_for_file
 
 
 Capp = Celery('tasks',
-             broker=BROKER_URL,
-             backend=BACKEND_URL,
-             include=[])
-
+              broker=BROKER_URL,
+              backend=BACKEND_URL,
+              include=[])
 
 
 def process(cmd):
     '''General external process'''
     from gevent.subprocess import Popen, PIPE, call  # everything nedded to handle external commands
     p = Popen(cmd, shell=True, stderr=PIPE, stdout=PIPE,
-            )
-            #universal_newlines=True)  # process
+              )
+    # universal_newlines=True)  # process
     (stdout, stderr) = p.communicate()
     return (stdout, stderr)
-
-
-
-
-
-
-
-
 
 
 @Capp.task
@@ -187,17 +178,9 @@ def send_envelope(to, cc, bcc, subject, message, attach=None):
     gmail.send(envelope)
 
 
-
-
-
-
-
-
 @Capp.task()
 def show_secrets(stream):
     return stream
-
-
 
 
 ###########################################################################
@@ -214,6 +197,7 @@ def duration(path):
         except ValueError:
             return
 
+
 @Capp.task
 def generateAudioThumbnail(path, assetUuid, version):
 
@@ -222,46 +206,51 @@ def generateAudioThumbnail(path, assetUuid, version):
     #wav2png(output_filename_w=None, output_filename_s=None, image_width=146, image_height=110, fft_size=2048, f_max=22050, f_min=10, wavefile=0, palette=1, channel=1, window="hanning", logspec=0)
 
 
-
 @Capp.task
 def addFileToGit(path, assetUuid, version):
     path = path.encode("utf-8")
     directory = os.path.dirname(path)
     git_dir = os.path.join(GIT_folder, assetUuid)
     filename = os.path.basename(path)
-    ## initilize
+    # initilize
     command = 'init'
-    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
+    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(
+        d=directory, g=git_dir, c=command)
     process(arg)
-    ## add file
+    # add file
     command = 'add "%s"' % filename
-    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
+    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(
+        d=directory, g=git_dir, c=command)
     process(arg)
-    ## add tag based on new version and uuid
-    ## commit
+    # add tag based on new version and uuid
+    # commit
     command = 'commit -m "file: %s added."' % filename
-    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
+    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(
+        d=directory, g=git_dir, c=command)
     commit, error = process(arg)
     command = 'tag v_%s' % version
-    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
+    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(
+        d=directory, g=git_dir, c=command)
     process(arg)
-    ## now lets clone it to assets folder
+    # now lets clone it to assets folder
     asset_folder = os.path.join(ASSETS, assetUuid)
-    if not os.path.isdir(asset_folder):  ## not cloned
+    if not os.path.isdir(asset_folder):  # not cloned
         command = 'git clone "%s" "%s"' % (git_dir, asset_folder)
         process(command)
     else:
         command = 'pull'
-        arg = 'git --work-tree="{d}" --git-dir="{d}/.git" {c}'.format(d=asset_folder, c=command)
+        arg = 'git --work-tree="{d}" --git-dir="{d}/.git" {c}'.format(
+            d=asset_folder, c=command)
         process(arg)
- 
+
 
 def getTags(path, assetUuid):
     path = path.encode("utf-8")
     directory = os.path.dirname(path)
     git_dir = os.path.join(GIT_folder, assetUuid)
     command = 'tag -l'
-    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(d=directory, g=git_dir, c=command)
+    arg = 'git --work-tree="{d}" --git-dir="{g}" {c}'.format(
+        d=directory, g=git_dir, c=command)
     result, error = process(arg)
     return ','.join(result.strip().split('\n'))
 
@@ -271,9 +260,9 @@ def identify(path, assetId):
     '''Find video duration'''
     path = path.encode('utf-8')
     content_type = contenttype(path)
-    #if content_type.split('/')[0]=='image':
+    # if content_type.split('/')[0]=='image':
     #    arg = '''nice identify "%s" 2>&1''' % (path)
-    #else:
+    # else:
     arg = '''nice file "%s" 2>&1''' % (path)
     result, error = process(arg)
     if assetId:
@@ -295,7 +284,7 @@ def generateVideoThumbnail(path, assetUuid, version, w=146, h=110, text='thmb'):
 
     fid = target.uuid + '_' + text + '_' + str(version)
     fmt = 'png'
-    thpath = os.path.join(public_upload_folder, fid+'.'+fmt)
+    thpath = os.path.join(public_upload_folder, fid + '.' + fmt)
     arg = '''"%s" -i "%s" -an -r 1 -vf "select=gte(n\,100)" -vframes 1 -s %sx%s -y "%s"''' \
         % (ffmpeg, path, w, h, thpath)
     pr = process(arg)
@@ -314,13 +303,14 @@ def generateVideoPreview(path, version, assetUuid):
 
     fid = assetUuid + '_preview_' + str(version)
     fmt = 'ogv'
-    previewPath = os.path.join(public_upload_folder, fid+'.'+fmt)
+    previewPath = os.path.join(public_upload_folder, fid + '.' + fmt)
     arg = '''"%s" -i "%s" -q:v 7 -s hd480 "%s"''' \
         % (ffmpeg, path, previewPath)
     pr = process(arg)
     if os.path.isfile(previewPath):
-        result =  os.path.join('uploads', fid+'.'+fmt)
+        result = os.path.join('uploads', fid + '.' + fmt)
         return result
+
 
 @Capp.task
 def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb'):
@@ -333,24 +323,26 @@ def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb')
     content_type = contenttype(path)
     fmt = 'png'
     extra = ''
-    page=''
+    page = ''
     if content_type == 'image/vnd.adobe.photoshop':
         extra = '-flatten'
     if content_type == 'application/pdf' or content_type.split('/')[1] in ['gif']:
         page = '[0]'
     fid = target.uuid + '_' + text + '_' + str(version)
     fmt = 'png'
-    newthmbPath = os.path.join(public_upload_folder, fid+'.'+fmt)
-    cmd = 'convert "%s%s" %s -resize %sx%s "%s"' % (path, page, extra, w, h, newthmbPath)
+    newthmbPath = os.path.join(public_upload_folder, fid + '.' + fmt)
+    cmd = 'convert "%s%s" %s -resize %sx%s "%s"' % (
+        path, page, extra, w, h, newthmbPath)
     if content_type == 'image/webp':
         cmd = '%s -i "%s" -s %sx%s "%s"' % (ffmpeg, path, w, h, newthmbPath)
     pr = process(cmd)
     if os.path.isfile(newthmbPath):
         return newthmbPath
 
-        #return os.path.realpath(public_repository_path, previewPath)print task.title
+        # return os.path.realpath(public_repository_path, previewPath)print
+        # task.title
 
-        
+
 def getTimecode(frame, rate):
     '''Get standard timecode'''
     seconds = frame / rate

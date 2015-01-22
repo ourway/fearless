@@ -23,9 +23,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, getUUID
 
 
-
-
-
 class Role(IDMixin, Base):
 
     '''Rules for permissions and authorizations
@@ -34,7 +31,6 @@ class Role(IDMixin, Base):
     name = Column(String(32), nullable=False, unique=True)
     tgs = relationship("Tag", backref='roles')
     tags = association_proxy('tgs', 'name')
-
 
     def __init__(self, name):
         self.name = name

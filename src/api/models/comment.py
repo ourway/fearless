@@ -24,6 +24,7 @@ from mixin import IDMixin, Base
 
 
 class Comment(IDMixin, Base):
+
     """Implements o simple Document structure for wikis and structures
     """
     item = Column(String(256), nullable=False)

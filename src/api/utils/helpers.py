@@ -28,27 +28,26 @@ import base64
 import uuid
 from opensource.contenttype import contenttype
 
+
 def get_ip():
     '''Simple method'''
     ip = commands.getoutput("/sbin/ifconfig").split("\n")[1].split()[1][5:]
     return ip
+
 
 def Commit():
     return True
 
 
 def commit(req, resp):
-        if not Commit():
-            resp.status = falcon.HTTP_500
-            resp.body = {'message':'Database Error'}
-
+    if not Commit():
+        resp.status = falcon.HTTP_500
+        resp.body = {'message': 'Database Error'}
 
 
 def dumps(obj):
     import ujson
     return ujson.encode(obj)
-
-
 
 
 def jsonify(self, resp):
@@ -77,7 +76,6 @@ def jsonify(self, resp):
     resp.body = data
 
 
-
 def punish(self, req, resp):
     '''Add a user to database'''
     sid = req.cookie('session-id')
@@ -85,7 +83,6 @@ def punish(self, req, resp):
         resp.body = {
             'message': 'error', 'info': 'You need to wait!', 'wait': 5}
         return
-
 
 
 def get_params(stream, flat=True):
@@ -104,7 +101,7 @@ def get_params(stream, flat=True):
 
 
 def parse_tjcsv(csvfile):
-    csvfile.seek(0);
+    csvfile.seek(0)
     spamreader = csv.reader(csvfile, delimiter=';', quotechar='"')
     try:
         keys = spamreader.next()
@@ -122,11 +119,11 @@ def parse_tjcsv(csvfile):
         typ = 'root'
         if len(_id) == 2:
             pid = _id[1][2:]
-            obj[count] = {'type':'project', 'projectid':pid}
-        elif len(_id)>2:
+            obj[count] = {'type': 'project', 'projectid': pid}
+        elif len(_id) > 2:
             tid = _id[-1][1:]
-            obj[count] = {'type':'task', 'taskid':tid}
-        
+            obj[count] = {'type': 'task', 'taskid': tid}
+
         for key in keys:
             index = keys.index(key)
             value = s[index].strip()
@@ -134,7 +131,7 @@ def parse_tjcsv(csvfile):
                 value = s[index]
                 format = '%y-%m-%d %H-%M'
                 dt = datetime.datetime.strptime(value, format)
-                value =  time.mktime(dt.timetuple())
+                value = time.mktime(dt.timetuple())
             if tid or pid:
                 obj[count][key.strip().lower()] = value
         count += 1
@@ -143,7 +140,7 @@ def parse_tjcsv(csvfile):
 
 def csv2json(csvfile):
     '''A general function'''
-    csvfile.seek(0);
+    csvfile.seek(0)
     spamreader = csv.reader(csvfile, delimiter=';', quotechar='"')
     try:
         keys = spamreader.next()
@@ -158,13 +155,3 @@ def csv2json(csvfile):
             value = s[index].strip()
             obj[key].append(value)
     return dict(obj)
-
-
-        
-
-
-
-
-
-    
-

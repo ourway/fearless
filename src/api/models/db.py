@@ -8,7 +8,7 @@ from mixin import Base
 
 #db_path = ':memory:'
 #db_path = 'database/studio.db'
-db_path = os.path.join( os.path.dirname(__file__), '../database/studio.db')
+db_path = os.path.join(os.path.dirname(__file__), '../database/studio.db')
 
 try:
     db_dir = os.path.dirname(db_path)
@@ -27,11 +27,8 @@ postgres = 'postgresql+psycopg2://user:password@/dbname'
 DB = msql
 
 
-
 #engine = create_engine(DB, echo=False, convert_unicode=True)
 engine = create_engine(DB, echo=False, convert_unicode=True, pool_recycle=3600)
-
-
 
 
 #engine = create_engine("postgresql+psycopg2://farsheed:rrferl@localhost:5432/fearless2")

@@ -9,13 +9,6 @@ GIT_folder = os.path.join(home, '.fearlessrepo/GIT')
 ASSETS = os.path.join(home, '.fearlessrepo/ASSETS')
 
 
-
-
-
-
-
-
-
 #####################################
 for i in [public_repository_path, public_upload_folder, GIT_folder, ASSETS]:
     if not os.path.isdir(i):

@@ -39,12 +39,6 @@ Have a nice day!
 data['to'] = ['Farsheed Ashouri <farsheed.ashouri@gmail.com>']
 data['subject'] = 'A letter to Pooyamehr managers'
 
-r = requests.post(url, data=json.dumps(data), auth=HTTPBasicAuth('rodmena@me.com', 'rrferl'))
+r = requests.post(
+    url, data=json.dumps(data), auth=HTTPBasicAuth('rodmena@me.com', 'rrferl'))
 print r.reason
-
-
-
-
-
-
-

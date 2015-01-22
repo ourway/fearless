@@ -32,58 +32,58 @@ users_groups = Table('users_groups', Base.metadata,
                      )
 
 
-
-
 user_vacations = Table('user_vacations', Base.metadata,
-    Column('user_id', Integer, ForeignKey("user.id"),
-           primary_key=True),
-    Column('date_id', Integer, ForeignKey("date.id"),
-           primary_key=True)
-)
+                       Column('user_id', Integer, ForeignKey("user.id"),
+                              primary_key=True),
+                       Column('date_id', Integer, ForeignKey("date.id"),
+                              primary_key=True)
+                       )
 
 user_leaves = Table('user_leaves', Base.metadata,
-    Column('user_id', Integer, ForeignKey("user.id"),
-           primary_key=True),
-    Column('date_id', Integer, ForeignKey("date.id"),
-           primary_key=True)
-)
+                    Column('user_id', Integer, ForeignKey("user.id"),
+                           primary_key=True),
+                    Column('date_id', Integer, ForeignKey("date.id"),
+                           primary_key=True)
+                    )
 
 user_shifts = Table('user_shifts', Base.metadata,
-    Column('user_id', Integer, ForeignKey("user.id"),
-           primary_key=True),
-    Column('date_id', Integer, ForeignKey("date.id"),
-           primary_key=True)
-)
+                    Column('user_id', Integer, ForeignKey("user.id"),
+                           primary_key=True),
+                    Column('date_id', Integer, ForeignKey("date.id"),
+                           primary_key=True)
+                    )
 
 
 user_offdays = Table('user_offdays', Base.metadata,
-    Column('user_id', Integer, ForeignKey("user.id"),
-           primary_key=True),
-    Column('date_id', Integer, ForeignKey("date.id"),
-           primary_key=True)
-)
+                     Column('user_id', Integer, ForeignKey("user.id"),
+                            primary_key=True),
+                     Column('date_id', Integer, ForeignKey("date.id"),
+                            primary_key=True)
+                     )
 
 
 user_reports = Table('user_reports', Base.metadata,
-    Column('user_id', Integer, ForeignKey("user.id"),
-           primary_key=True),
-    Column('report_id', Integer, ForeignKey("report.id"),
-           primary_key=True)
-)
+                     Column('user_id', Integer, ForeignKey("user.id"),
+                            primary_key=True),
+                     Column('report_id', Integer, ForeignKey("report.id"),
+                            primary_key=True)
+                     )
 
 
 user_accounts = Table('user_accounts', Base.metadata,
-    Column('user_id', Integer, ForeignKey("user.id"),
-           primary_key=True),
-    Column('account_id', Integer, ForeignKey("account.id"),
-           primary_key=True)
-)
+                      Column('user_id', Integer, ForeignKey("user.id"),
+                             primary_key=True),
+                      Column('account_id', Integer, ForeignKey("account.id"),
+                             primary_key=True)
+                      )
+
 
 class User(IDMixin, Base):
 
     '''Main users group
     '''
-    id = Column( Integer, primary_key=True)  # over-ride mixin version. because of remote_side
+    id = Column(
+        Integer, primary_key=True)  # over-ride mixin version. because of remote_side
     email = Column(String(64), unique=True, nullable=False)
     paypal = Column(String(64), unique=True)
     password = Column(PasswordType(schemes=['pbkdf2_sha512']), nullable=False)
@@ -96,14 +96,15 @@ class User(IDMixin, Base):
     lastname = Column(String(64), nullable=True)
     persian_lastname = Column(String(64))
     hasFrequentPayment = Column(Boolean(), default=True)
-    payment_type = Column(String(64), nullable=True, default='monthly') ## , manually. ..
+    # , manually. ..
+    payment_type = Column(String(64), nullable=True, default='monthly')
     lastLogIn = Column(DateTime)
     age = Column(Integer)
     efficiency = Column(Float(precision=3), default=1.0)
     effectiveness = Column(Float(precision=3), default=1.0)
     cell = Column(String(16))
     address = Column(String(512))
-    budget_account = Column(Integer, default=0) 
+    budget_account = Column(Integer, default=0)
     bank = Column(String(64), default='Paarsian')
     bank_account_number = Column(String(64))
     debit_card_number = Column(String(64), default='0000-0000-0000-0000')
@@ -122,12 +123,15 @@ class User(IDMixin, Base):
     retention = Column(Float(precision=3), default=10)
     payroll_tax = Column(Float(precision=3), default=3)
     insurance_deductions = Column(Float(precision=3), default=7.8)
-    reps = relationship("Report", secondary=lambda: user_reports, backref='user')
+    reps = relationship(
+        "Report", secondary=lambda: user_reports, backref='user')
     agreements = relationship("Document", backref='agreement_of')
     payment_invoices = relationship("Document", backref='invoice_of')
-    chargeset = relationship("Account", backref='users', secondary="user_accounts")
+    chargeset = relationship(
+        "Account", backref='users', secondary="user_accounts")
     agreement_period = relationship("Date", uselist=False)
-    reports = association_proxy('reps', 'id') # when we refer to reports, id will be returned.
+    # when we refer to reports, id will be returned.
+    reports = association_proxy('reps', 'id')
     grps = relationship('Group', backref='users', secondary='users_groups')
     groups = association_proxy('grps', 'name')
     tgs = relationship("Tag", backref='users')
@@ -138,7 +142,7 @@ class User(IDMixin, Base):
         if re.match(r'[^@]+@[^@]+\.[^@]+', data):
             if not self.alias:
                 self.alias = data.split('@')[0].replace('.', '_')
-            #self.groups.append(self.alias)
+            # self.groups.append(self.alias)
             return data
 
     @validates('firstname')
@@ -163,7 +167,6 @@ class User(IDMixin, Base):
             data = now()
         return data
 
-
     @hybrid_property
     def fullname(self):
         return (self.firstname or '<>') + " " + (self.lastname or '<>')
@@ -181,16 +184,17 @@ class User(IDMixin, Base):
     #reports = Set("Report")
     #groups = Set("Group")
 
+
 def AfterUserCreationFuncs(mapper, connection, target):
     '''Some operations after getting ID'''
     logger.info('New user added|{t.id}|{t.email}'.format(t=target))
-    session=Session()  ## old session is closed...
-    user = session.query(User).filter(User.id==target.id).first()
-    if target.id == 1: ## first user is admin!
-        adminGroup = session.query(Group).filter(Group.name=='admin').first()
+    session = Session()  # old session is closed...
+    user = session.query(User).filter(User.id == target.id).first()
+    if target.id == 1:  # first user is admin!
+        adminGroup = session.query(Group).filter(Group.name == 'admin').first()
         user.grps.append(adminGroup)
     else:
-        usersGroup = session.query(Group).filter(Group.name=='users').first()
+        usersGroup = session.query(Group).filter(Group.name == 'users').first()
         if not usersGroup in user.grps:
             user.grps.append(usersGroup)
     session.commit()

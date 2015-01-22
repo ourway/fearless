@@ -41,13 +41,12 @@ sequences_departements = Table('sequences_departements', Base.metadata,
 
 
 shots_departements = Table('shots_departements', Base.metadata,
-                               Column('id', Integer, primary_key=True),
-                               Column(
-                                   'shot_id', Integer, ForeignKey('shot.id')),
-                               Column(
-                                   'departement_id', Integer, ForeignKey('departement.id'))
-                               )
-
+                           Column('id', Integer, primary_key=True),
+                           Column(
+                               'shot_id', Integer, ForeignKey('shot.id')),
+                           Column(
+                               'departement_id', Integer, ForeignKey('departement.id'))
+                           )
 
 
 class Departement(IDMixin, Base):

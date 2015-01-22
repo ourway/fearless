@@ -23,8 +23,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, now
 
 
-
-
 class Date(IDMixin, Base):
 
     '''The Client (e.g. a company) which users may be part of.

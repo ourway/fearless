@@ -14,7 +14,7 @@ Clean code is much better than Cleaner comments!
 
 from models import session, Task, User, Report, r, fdb
 import arrow
-from tasks import send_envelope  ## send emails
+from tasks import send_envelope  # send emails
 from mako.template import Template
 import os
 from collections import defaultdict
@@ -32,18 +32,17 @@ bcc = []
 '''Dates'''
 now = arrow.utcnow()
 year, month, day = now.year, now.month, now.day
-jd = cal.gregorian_to_jd(year,month,day)
+jd = cal.gregorian_to_jd(year, month, day)
 jtoday = '/'.join(map(str, cal.jd_to_jalali(jd)))
 today = now.format('YYYY-MM-DD')
 
 
-
 '''On going tasks:  Tasks that started and are not finished'''
-ongoing_tasks = session.query(Task).filter(Task.start<now.date())\
-            .filter(Task.end>now.date()).order_by(desc(Task.complete)).all()
+ongoing_tasks = session.query(Task).filter(Task.start < now.date())\
+    .filter(Task.end > now.date()).order_by(desc(Task.complete)).all()
 '''Behind schedule tasks:  Tasks that are not finished on time and are not completed yet'''
-behind_tasks = session.query(Task).filter(Task.end<now.date())\
-            .filter(Task.complete<100).order_by(asc(Task.end)).all()
+behind_tasks = session.query(Task).filter(Task.end < now.date())\
+    .filter(Task.complete < 100).order_by(asc(Task.end)).all()
 
 
 def getTemplate(name):
@@ -54,12 +53,12 @@ def getTemplate(name):
 def dailyTasksReportForClients():
     '''generate an email report of all tasks and send it to users and managers'''
     message =  getTemplate('email_daily_tasks_for_clients.html')\
-        .render(ongoing_tasks=ongoing_tasks, behind_tasks=behind_tasks, today=today, 
+        .render(ongoing_tasks=ongoing_tasks, behind_tasks=behind_tasks, today=today,
                 jtoday=jtoday, arrow=arrow, recipient='product owner', responsibility='managing')
     to = ['hamid2177@gmail.com']
     #to = ['farsheed.ashouri@gmail.com']
     subject = 'Studio Reports - Daily Tasks - %s' % jtoday
-    #intro = "Good morning, Here is a basic simple (alpha version) report about studio's daily tasks for %s<br/>." % today 
+    #intro = "Good morning, Here is a basic simple (alpha version) report about studio's daily tasks for %s<br/>." % today
     #message = '<hr/>'.join(tasks)
     sent = send_envelope.delay(to, cc, bcc, subject, message)
     return sent
@@ -73,7 +72,8 @@ def dailyTasksReportForProjectLeads():
         managerOngoingTasks[task.project.lead].append(task)
     for task in behind_tasks:
         managerBehindTasks[task.project.lead].append(task)
-    target_users = list(set(managerBehindTasks.keys() + managerOngoingTasks.keys()))
+    target_users = list(
+        set(managerBehindTasks.keys() + managerOngoingTasks.keys()))
     for target in target_users:
         target_behind_tasks = managerBehindTasks[target]
         target_ongoing_tasks = managerOngoingTasks[target]
@@ -82,9 +82,9 @@ def dailyTasksReportForProjectLeads():
         #to = [target.email]
         subject = 'Studio Reports - Daily Tasks for your projects - %s' % jtoday
         message =  getTemplate('email_daily_tasks_for_clients.html')\
-        .render(ongoing_tasks=target_ongoing_tasks, behind_tasks=target_behind_tasks,
-                today=today, jtoday=jtoday, arrow=arrow, recipient=target.firstname,
-                responsibility='leading')
+            .render(ongoing_tasks=target_ongoing_tasks, behind_tasks=target_behind_tasks,
+                    today=today, jtoday=jtoday, arrow=arrow, recipient=target.firstname,
+                    responsibility='leading')
 
         sent = send_envelope.delay(to, cc, bcc, subject, message)
         print 'Report sent to %s' % target.email
@@ -101,7 +101,8 @@ def dailyTaskCardForResources():
     for task in behind_tasks:
         for resource in task.resources:
             resourceBehindTasks[resource].append(task)
-    target_users = list(set(resourceBehindTasks.keys() + resourceOngoingTasks.keys()))
+    target_users = list(
+        set(resourceBehindTasks.keys() + resourceOngoingTasks.keys()))
     for target in target_users:
         target_behind_tasks = resourceBehindTasks[target]
         target_ongoing_tasks = resourceOngoingTasks[target]
@@ -111,23 +112,13 @@ def dailyTaskCardForResources():
         to = [target.email]
         subject = 'Studio Reports - Task card - %s' % jtoday
         message =  getTemplate('email_daily_tasks_for_clients.html')\
-        .render(ongoing_tasks=target_ongoing_tasks, behind_tasks=target_behind_tasks,
-                today=today, jtoday=jtoday, arrow=arrow, recipient=target.firstname,
-                responsibility='contributing to')
+            .render(ongoing_tasks=target_ongoing_tasks, behind_tasks=target_behind_tasks,
+                    today=today, jtoday=jtoday, arrow=arrow, recipient=target.firstname,
+                    responsibility='contributing to')
 
         sent = send_envelope.delay(to, cc, bcc, subject, message)
         print 'Report sent to %s' % target.email
     return True
-
-
-
-
-        
-
-
-        
-
-
 
 
 if __name__ == '__main__':
@@ -142,7 +133,6 @@ if __name__ == '__main__':
         print '\t\t dailyTaskCardForResources'
         print '\t------------------'
         sys.exit()
-    command = sys.argv[1]+'()'
+    command = sys.argv[1] + '()'
     print eval(command)
     sys.exit()
-

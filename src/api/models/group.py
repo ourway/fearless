@@ -36,16 +36,15 @@ class Group(IDMixin, Base):
     '''Groups for membership management
     '''
     name = Column(String(32), nullable=False, unique=True)
-    typ = Column(String(32), nullable=False, default = 'private')
+    typ = Column(String(32), nullable=False, default='private')
     rls = relationship("Role",
-                          secondary=groups_roles, backref='groups')
+                       secondary=groups_roles, backref='groups')
     roles = association_proxy('rls', 'name')
     tgs = relationship("Tag", backref='groups')
     tags = association_proxy('tgs', 'name')
 
-
     def __init__(self, name, role=None, typ='private'):
-        self.name=name
+        self.name = name
         self.typ = typ
         if role:
             self.roles.append(role)

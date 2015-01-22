@@ -40,7 +40,8 @@ class Repository(IDMixin, Base):
     ftp_path = Column(String(256))
     sftp_path = Column(String(256))
     webdav_path = Column(String(256))
-    collections = relationship('Collection', backref='repository', cascade="all, delete, delete-orphan")
+    collections = relationship(
+        'Collection', backref='repository', cascade="all, delete, delete-orphan")
     project_id = Column(Integer, ForeignKey("project.id"))
     project = relationship('Project', backref='repositories')
     owner_id = Column(Integer, ForeignKey('user.id'))
@@ -58,4 +59,3 @@ class Repository(IDMixin, Base):
             f.write('welcome to Fearless repository.')
         #GIT(readme).add('repo *%s* created successfully' % self.name)
         return path
-

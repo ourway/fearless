@@ -47,14 +47,14 @@ class Mailer(object):
         resp.body = dumps(data)
 
 
-
 class AddReport:
+
     def on_put(self, req, resp, **kw):
         u = getUserInfoFromSession(req, resp)
-        targetUser = req.session.query(User).filter(User.id==u.get('id')).first()
+        targetUser = req.session.query(User).filter(
+            User.id == u.get('id')).first()
         data = get_params(req.stream, flat=False)
         if data and data.get('body'):
             targetUser.reports.append(data.get('body'))
             resp.status = falcon.HTTP_202
-            resp.body = {'message':'OK'}
-
+            resp.body = {'message': 'OK'}

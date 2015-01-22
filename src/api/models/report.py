@@ -27,6 +27,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 import os
 from . import rdb
 
+
 class Report(IDMixin, Base):
 
     '''All reports will be saved here
@@ -56,15 +57,14 @@ class Report(IDMixin, Base):
         #c = bz2.compress(data)
         newReportObject = rdb.new(self.uuid, data.encode('utf-8'))
         #result = base64.encodestring(c)
-        #with open(os.path.join(db_files_path, self.uuid), 'wb') as f:
+        # with open(os.path.join(db_files_path, self.uuid), 'wb') as f:
         #    f.write(c)
         newReportObject.store()
         return self.uuid
 
     @property
     def body(self):
-        #with open(os.path.join(db_files_path, self.uuid), 'rb') as f:
+        # with open(os.path.join(db_files_path, self.uuid), 'rb') as f:
         #    data = bz2.decompress(f.read())
         dataObject = rdb.get(self.uuid)
         return dataObject.data
-

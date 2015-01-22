@@ -13,12 +13,13 @@ Clean code is much better than Cleaner comments!
 '''
 
 
-from gevent import monkey; monkey.patch_all()
+from gevent import monkey
+monkey.patch_all()
 from falcon_patch import falcon
 from utils.syncshow import SyncShow
 from utils.chat import Chat
 
-            
+
 app = falcon.API()
 app.add_route('/media/syncshow', SyncShow())
 app.add_route('/conn/chat', Chat())
