@@ -24,7 +24,7 @@ touch-reload=utils/helpers.py
 
 harakiri=180
 #cpu-affinity=2
-procceses=8
+procceses=2
 #threads=20
 disable-logging=True
 listen=128
