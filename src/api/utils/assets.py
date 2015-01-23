@@ -53,42 +53,30 @@ class AssetSave:
     def on_put(self, req, resp, repo):
         '''Get data based on a file object or b64 data, save and commit it'''
         userInfo = getUserInfoFromSession(req, resp)
-        uploader = userInfo.get('alias')
-        targetRepo = req.session.query(Repository).filter(
-            Repository.name == repo).first()
-
+        uploader = userInfo.get('uuid')
+        targetRepo = req.session.query(Repository).filter_by(name=repo).first()
         if not uploader:
             uploader = 'anonymous'
-            targetRepo = req.session.query(Repository).filter(
-                Repository.name == 'public').first()
-
-        targetUser = req.session.query(User).filter(
-            User.alias == uploader).first()
-
+            targetRepo = req.session.query(Repository).filter_by(name='public').first()
+        targetUser = req.session.query(User).filter_by(uuid=uploader).first()
         if not targetRepo:
-            pr = req.session.query(Repository).filter(
-                Repository.name == repo).first()
-            if not pr:
-                targetRepo = Repository(name=repo,
-                                        path=os.path.join(public_repository_path, repo))
+                targetRepo = Repository(name=repo, path=os.path.join(public_repository_path, repo))
                 req.session.add(targetRepo)
-            else:
-                targetRepo = pr
+
 
         _cid = req.get_param('collection_id')
+        _cname = req.get_param('collection')
         if _cid:
             collection = req.session.query(Collection).filter_by(repository=targetRepo)\
                             .filter_by(id=_cid).first()
-        _cname = req.get_param('collection')
-        if _cname:
+        elif _cname:
             collection = req.session.query(Collection).filter_by(repository=targetRepo)\
                             .filter_by(name=_cname).first()
-        if not collection:
+        elif not _cid and not _cname:
             collection = Collection(path='danger', repository=targetRepo)
-            req.session.add(collection)
-
+        
+        req.session.add(collection)
         body = req.stream
-
         b64 = req.get_param('b64')
         thumbnail = req.get_param('thmb')
         mt = req.get_param('multipart')
