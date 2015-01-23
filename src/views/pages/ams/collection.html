@@ -126,8 +126,8 @@
                 <table class="table table-striped table-hover refresh-container pull-down" >
                         <thead class="hidden-xs">
                             <td class="col-md-1"><a href="javascript:;"><strong>ID</strong></a></td>
-                            <td ng-if="thumbnails" class="col-md-1"><a href="javascript:;"><strong></strong></a></td>
-                            <td class="col-md-5"><a href="javascript:;"><strong>Name</strong></a></td>
+                            <td ng-if="thumbnails" class="col-md-2"><a href="javascript:;"><strong></strong></a></td>
+                            <td ng-class="{'col-md-5':thumbnails, 'col-md-7':!thumbnails}"><a href="javascript:;"><strong>Name</strong></a></td>
                             <td class="col-md-2"><a href="javascript:;"><strong>Date</strong></a></td>
                             <td class="col-md-2"><a href="javascript:;"><strong>Owner</strong></a></td>
                         </tr></thead>
