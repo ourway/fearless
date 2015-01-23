@@ -141,6 +141,10 @@ class Asset(IDMixin, Base):
             result = getTags(self.full_path, self.uuid)
         return result
 
+    @hybrid_property
+    def collection_name(self):
+        return self.collection.name
+
     @property
     def thumbnail(self):
         fmt = 'png'

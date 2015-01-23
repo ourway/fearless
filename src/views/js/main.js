@@ -1,5 +1,5 @@
 var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular', 'ui.grid', 'ngSanitize', 
-                        'ui.bootstrap', 'checklist-model']);
+                        'ui.bootstrap', 'checklist-model', 'siyfion.sfTypeahead']);
 
 
 fearlessApp.factory('$exceptionHandler', function () {
@@ -61,6 +61,33 @@ function pad(num, size) {
     while (s.length < size) s = "0" + s;
     return s;
 }
+
+var substringMatcher = function(strs) {
+  return function findMatches(q, cb) {
+    var matches, substrRegex;
+ 
+    // an array that will be populated with substring matches
+    matches = [];
+ 
+    // regex used to determine if a string contains the substring `q`
+    substrRegex = new RegExp(q, 'i');
+ 
+    // iterate through the pool of strings and for any string that
+    // contains the substring `q`, add it to the `matches` array
+    $.each(strs, function(i, str) {
+      if (substrRegex.test(str)) {
+        // the typeahead jQuery plugin expects suggestions to a
+        // JavaScript object, refer to typeahead docs for more info
+        matches.push({ value: str });
+      }
+    });
+ 
+    cb(matches);
+  };
+};
+
+
+
 
 var convertDataURL2binaryArray = function(dataURL){
 
@@ -195,6 +222,11 @@ var TITLE = 'TITLE';
              .when('/ams/a/:assetId', {
                 templateUrl: 'pages/ams/asset.html',
                 controller: 'assetCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
+            })
+             .when('/ams', {
+                templateUrl: 'pages/ams/index.html',
+                controller: 'assetsIndexCtrl',
                  reloadOnSearch: false // dont reload the page on $location.search
             })
              .when('/pms/t/:taskId', {
@@ -1994,6 +2026,73 @@ fearlessApp.controller('messagesCtrl',  function ($scope) {
     $scope.message = function(idx) {
         return messages(idx);
     };
+    
+});// end messageCtrl
+
+
+fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
+        // main assets index page
+var assets = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('fullname'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  limit: 5,
+  prefetch: {
+    // url points to a json file that contains an array of country names, see
+    // https://github.com/twitter/typeahead.js/blob/gh-pages/data/countries.json
+    url: '/api/db/asset?field=fullname&filters=owner_id='+$scope.$parent.userInfo.userid,
+    // the json file contains an array of strings, but the Bloodhound
+    // suggestion engine expects JavaScript objects so this converts all of
+    // those strings
+    filter: function(list) {
+      return $.map(list, function(asset) { return { fullname: asset }; });
+    }
+            
+  }
+});
+// kicks off the loading/processing of `local` and `prefetch`
+assets.initialize();
+
+$scope.typeheadOptions =  {
+    highlight: true
+  };
+// passing in `null` for the `options` arguments will result in the default
+// options being used
+$scope.completeData = {
+  name: 'assets',
+  displayKey: 'fullname',
+  // `ttAdapter` wraps the suggestion engine in an adapter that
+  // is compatible with the typeahead jQuery plugin
+  source: assets.ttAdapter(),
+//templates: {
+//    empty: [
+//      '<div style="padding:10px">',
+//      'unable to find any assets.',
+//      '</div>'
+//    ].join('\n'),
+//    suggestion: Handlebars.compile('<p><strong>{{fullname}}</strong> – {{content_type}}</p>')
+//  }
+};
+$scope.$watch($routeParams.page, function(){
+            $scope.page = $routeParams.page-1;
+            $scope.getUserAssets();
+        });
+
+$scope.gotoPage = function(page){
+    //here
+}
+
+
+$scope.getUserAssets = function(){
+    req = $http.get('/api/db/asset?sort=desc&order_by=created_on&filters=owner_id'+$scope.$parent.userInfo.userid+'');
+    req.success(function(resp){
+            $scope.userAssets = resp;
+            
+            })
+}
+
+
+ 
+
     
 });// end messageCtrl
 
