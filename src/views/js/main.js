@@ -1657,8 +1657,20 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             maxThumbnailFilesize: 10,
             uploadMultiple:false,
         });
+    
 
+        $scope.toggleThumbnail = function(){
+            if ($scope.thumbnails)
+                $scope.thumbnails=false;
+            else
+                $scope.thumbnails=true;
+        }
+        $scope.initToggle = function(){
+            $('#toggle-thmb').bootstrapToggle();
+            $scope.thumbnails=false;
+        }
         $scope.getCollectionDetails = function(page){
+            console.log(page)
             if (page==undefined)
             {
                 if ($routeParams.page>0)
