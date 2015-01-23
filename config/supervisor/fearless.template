@@ -3,7 +3,8 @@ command={dir}/pyenv/bin/uwsgi --emperor config/uwsgi
 autostart=true
 directory={dir}
 stopsignal=TERM
-user=farsheed
+user=fearless
+environment=PATH="/opt/rubystack-2.0.0-23/ruby/bin:%(ENV_PATH)s"
 stdout_logfile={dir}/logs/uwsgi_access.log
 stderr_logfile={dir}/logs/uwsgi_error.log
 
@@ -13,7 +14,7 @@ command={dir}/pyenv/bin/python -OO src/api/socket_api.py
 autostart=true
 directory={dir}
 stopsignal=TERM
-user=farsheed
+user=fearless
 stdout_logfile={dir}/logs/socket_access.log
 stderr_logfile={dir}/logs/socket_error.log
 
@@ -23,7 +24,7 @@ command={dir}/pyenv/bin/celery -A tasks worker -P gevent -c 10 -l info
 autostart=true
 directory={dir}/src/api
 stopsignal=TERM
-user=farsheed
+user=fearless
 stdout_logfile={dir}/logs/celery.log
 stderr_logfile={dir}/logs/celery_error.log
 

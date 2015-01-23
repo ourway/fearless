@@ -28,8 +28,6 @@ from cStringIO import StringIO
 
 
 class GetProjectDetails:
-    #@Authorize('see_project')
-
     def on_get(self, req, resp, id):
         project = req.session.query(Project).filter(Project.id == id).first()
         collections = list()
@@ -141,8 +139,6 @@ class AddProject:
 
 
 class GetProjectLatestReport:
-    #@Authorize('see_project')
-
     def on_get(self, req, resp, id):
         project = req.session.query(Project).filter(Project.id == id).first()
         if not project:
@@ -224,10 +220,8 @@ class GetProjectLatestReport:
             resp.body = data
 
         else:
-            resp.status = falcon.HTTP_404
-            message = None
-            data = {'guntt': message, 'plan': message, 'resource': message,
-                    'profitAndLoss': message, 'msproject': message, 'csv': message}
+            resp.status = falcon.HTTP_201
+            data = {}
             resp.body = data
 
 

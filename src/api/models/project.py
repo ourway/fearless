@@ -183,7 +183,7 @@ class Project(IDMixin, Base):
         # lets select just one task
         if not r.get('fearless_tj3_lock'):
             r.set('fearless_tj3_lock', 'OK')
-            r.expire('fearless_tj3_lock', 20)
+            r.expire('fearless_tj3_lock', 5)
         else:
             return
         templateFile = os.path.join(
@@ -204,19 +204,20 @@ class Project(IDMixin, Base):
                              )
 
         #plan_path = '/tmp/Fearless_project.tjp'
-        plan_path = '/home/farsheed/Desktop/Fearless_project_%s.tjp' % self.uuid
+        plan_path = '/tmp/Fearless_project_%s.tjp' % self.uuid
         with open(plan_path, 'wb') as f:
             f.write(finalplan.encode('utf-8'))
 
-        tj3 = sh.Command('/usr/local/bin/tj3')
+        tj3 = sh.Command('tj3')
+        #tj3 = sh.Command('/usr/local/bin/tj3')
         try:
             print 'Start Calculating project %s' % self.id
             import time
             s = time.time()
-            tj = tj3(
-                plan_path, '--silent', '--no-color', '--add-trace', o='/tmp', c='1')
+            tj = tj3( plan_path, '--silent', '--no-color', '--add-trace', o='/tmp', c='1')
             print 'Finished in %s seconds' % round(time.time() - s, 3)
         except Exception, e:
+            print e
             # print type(repr(e))
             for i in xrange(3):
                 _d = '<br/>'.join(repr(e).split('\\n')[17:]).replace(
