@@ -4,10 +4,10 @@
         </div>
         <div class="col-md-10">
             <div id="from-group">
-                <input type="text" id="assetsSearchInput" class="typeahead form-control" 
+                <input type="search" id="assetsSearchInput" class="typeahead form-control" 
                 options="typeheadOptions" datasets="completeData" placeholder="Search for your assets ..."
                 ng-model="assetOptions.userAssetsFilter" ng-change="search()" autofocus sf-typeahead>
-            <div class="btn-group btn-group">
+                <div class="btn-group btn-group" ng-show="assetsCount>50">
                 <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: page == 1}" 
                     ng-click="gotoPage(page-1)">
                     <em class="glyphicon glyphicon-chevron-left"></em>
@@ -30,7 +30,7 @@
                 </thead>
                 <tbody>
 
-                    <tr ng-repeat="asset in userAssets | filter:assetOptions.userAssetsFilter track by $index">
+                    <tr ng-repeat="asset in userAssets | filter:assetOptions.userAssetsFilter.fullname track by $index">
                             <td>{{asset.id}}</td>
                             <td><a href="#/ams/a/{{asset.id}}">{{asset.fullname}}</a></td>
                             <td>{{$parent.prettyDate(asset.created_on)}}</td>

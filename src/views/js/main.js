@@ -2076,20 +2076,22 @@ $scope.completeData = {
 };
 
 $scope.search = function(){
+    old = false;
     q = $scope.assetOptions.userAssetsFilter.fullname;
-    if (q)
+    if (q && old!=q)
     {
         $scope.getUserAssets(false, false, q);
         $location.search('q', q);
+        old = q;
+    }
+    else if (!q && !$scope.assetOptions.userAssetsFilter)
+    {
+        $scope.getUserAssets();
+        $location.search('q', null);
     }
 }
 
-$scope.$watch($routeParams.page, function(){
-            $scope.page = parseInt($routeParams.page);
-            $scope.assetOptions.userAssetsFilter = {};
-            $scope.assetOptions.userAssetsFilter.fullname = $routeParams.q;
-            $scope.getUserAssets();
-        });
+
 
 
 
@@ -2125,7 +2127,10 @@ $scope.getUserAssets = function(order_by, sort, search_for){
             $scope.userAssets = resp;
             
             })
-    creq = $http.get('/api/db/asset?filters=owner_id='+$scope.$parent.userInfo.userid+'&count=true');
+    query = '/api/db/asset?filters=owner_id='+$scope.$parent.userInfo.userid+'&count=true';
+    if (search_for)
+        query += '&filters=fullname=' + search_for;
+    creq = $http.get(query);
     creq.success(function(cresp){
             $scope.assetsCount = cresp.count;
             
@@ -2133,7 +2138,19 @@ $scope.getUserAssets = function(order_by, sort, search_for){
 }
 
 
- 
+ $scope.$watch($routeParams.page, function(){
+            $scope.page = parseInt($routeParams.page);
+            $scope.assetOptions.userAssetsFilter = {};
+            $scope.assetOptions.userAssetsFilter.fullname = $routeParams.q;
+            if ($routeParams.q)
+                {
+                $scope.search();
+                }
+            else
+                {
+                $scope.getUserAssets();
+                }
+        });
 
     
 });// end messageCtrl
