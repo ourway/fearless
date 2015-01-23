@@ -6,12 +6,14 @@
             <div id="from-group">
                 <input type="text" id="assetsSearchInput" class="typeahead form-control" 
                 options="typeheadOptions" datasets="completeData" placeholder="Search for your assets ..."
-                ng-model="userAssets.userAssetsFilter" autofocus sf-typeahead>
+                ng-model="assetOptions.userAssetsFilter" ng-change="search()" autofocus sf-typeahead>
             <div class="btn-group btn-group">
-                <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: page == 0}" ng-click="prevPage()">
+                <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: page == 1}" 
+                    ng-click="gotoPage(page-1)">
                     <em class="glyphicon glyphicon-chevron-left"></em>
                 </button>
-                <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: page == pagedItems.length - 1}" ng-click="nextPage()">
+                <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: page >= assetsCount/50}" 
+                    ng-click="gotoPage(page+1)">
                     <em class="glyphicon glyphicon-chevron-right"></em>
                 </button>
             </div>
@@ -22,13 +24,13 @@
             <table class="table table-striped table-hover refresh-container pull-down" 
                 ng-show="userAssets.length">
                 <thead>
-                    <td ><a href="javascript:;"><strong>ID</strong></a></td>
-                    <td ><a href="javascript:;"><strong>Name</strong></a></td>
-                    <td ><a href="javascript:;"><strong>Date</strong></a></td>
+                    <td ><a style="cursor:pointer" ng-click="orderMode='id';getUserAssets('id', 1)"><strong>ID</strong></a></td>
+                    <td ><a style="cursor:pointer" ng-click="orderMode='fullname';getUserAssets('fullname', 1)"><strong>Name</strong></a></td>
+                    <td ><a style="cursor:pointer" ng-click="orderMode='created_on';getUserAssets('created_on', 1)"><strong>Date</strong></a></td>
                 </thead>
                 <tbody>
 
-                    <tr ng-repeat="asset in userAssets | filter:userAssets.userAssetsFilter track by $index">
+                    <tr ng-repeat="asset in userAssets | filter:assetOptions.userAssetsFilter track by $index">
                             <td>{{asset.id}}</td>
                             <td><a href="#/ams/a/{{asset.id}}">{{asset.fullname}}</a></td>
                             <td>{{$parent.prettyDate(asset.created_on)}}</td>

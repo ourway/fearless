@@ -97,6 +97,7 @@ class DB:
         show = req.get_param('show')
         start = req.get_param('s')
         end = req.get_param('e')
+
         filters_raw = req.get_param('filters')
         filters = []
         if filters_raw:
@@ -108,6 +109,7 @@ class DB:
             filters += [{i.split('<')[0]:i.split('<')[1], '_':'<'}
                         for i in filters_raw.split(',') if '<' in i]
 
+        get_count = req.get_param('count')
         sort = req.get_param('sort')
         if not sort:
             sort = 'desc'
@@ -123,42 +125,40 @@ class DB:
             end = start + 10
         if len(args) == 5:
             id = args[4]
-            query = 'req.session.query({t}).filter({t}.{key}=="{id}").order_by({sort}({t}.{order}))'.format(
-                t=table, id=id, key=key, order=order_by, sort=sort)
-            if start and end:
+            query = 'req.session.query({t}).filter({t}.{key}=="{id}")'.format(t=table, id=id, key=key)
+            if get_count:
+                data = eval(query).count()
+                resp.body = {'count':data}
+                return
+            query += '.order_by({sort}({t}.{order}))'.format(sort=sort, t=table, order=order_by)
+            if start!=None and end!=None:
                 query += '.slice(start, end)'
-
-                #data = eval(query).slice(start, end).all()
-
             data = eval(query).all()
             resp.body = data
 
         else:
             if not show:
-                query = 'req.session.query({t}).order_by({sort}({t}.{order}))'.format(
-                    t=table, sort=sort, order=order_by)
+                query = 'req.session.query({t})'.format(t=table)
             else:
-                query = 'req.session.query({t}.{f}).order_by({sort}({t}.{order}))'.format(
-                    t=table, sort=sort, f=show, order=order_by)
-
+                query = 'req.session.query({t}.{f})'.format(t=table, f=show)
             try:
-                if start and end:
-                    query += '.slice(start, end)'
-
                 if filters and isinstance(filters, list):
                     for filter in filters:
                         if isinstance(filter, dict):
                             eq = filter.pop('_')
                             query += '.filter({t}.{k}{eq}"{v}")'.format(t=table, eq=eq,
-                                                                        k=filter.keys()[0], v=filter[filter.keys()[0]])
+                                                  k=filter.keys()[0], v=filter[filter.keys()[0]])
+                if get_count:
+                    data = eval(query).count()
+                    resp.body = {'count':data}
+                    return
+                query += '.order_by({sort}({t}.{order}))'.format(sort=sort, order=order_by, t=table)
+                if start!=None and end!=None:
+                    query += '.slice(start, end)'
                 data = eval(query).all()
                 resp.body = data
             except (AttributeError):
                 data = None
-        get_count = req.get_param('count')
-        if get_count:
-            resp.body = {'count': eval(query).count()}
-            return
         field = req.get_param('field')
         if field:
             try:

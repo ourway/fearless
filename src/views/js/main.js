@@ -2031,6 +2031,8 @@ fearlessApp.controller('messagesCtrl',  function ($scope) {
 
 
 fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
+
+        $scope.assetOptions = {};
         // main assets index page
 var assets = new Bloodhound({
   datumTokenizer: Bloodhound.tokenizers.obj.whitespace('fullname'),
@@ -2072,20 +2074,60 @@ $scope.completeData = {
 //    suggestion: Handlebars.compile('<p><strong>{{fullname}}</strong> – {{content_type}}</p>')
 //  }
 };
+
+$scope.search = function(){
+    q = $scope.assetOptions.userAssetsFilter.fullname;
+    if (q)
+    {
+        $scope.getUserAssets(false, false, q);
+        $location.search('q', q);
+    }
+}
+
 $scope.$watch($routeParams.page, function(){
-            $scope.page = $routeParams.page-1;
+            $scope.page = parseInt($routeParams.page);
+            $scope.assetOptions.userAssetsFilter = {};
+            $scope.assetOptions.userAssetsFilter.fullname = $routeParams.q;
             $scope.getUserAssets();
         });
 
+
+
 $scope.gotoPage = function(page){
+    if (page<1)
+        return null;
+
+    $scope.page = page;
+    $location.search('page', page);
+    $scope.getUserAssets();
     //here
 }
 
 
-$scope.getUserAssets = function(){
-    req = $http.get('/api/db/asset?sort=desc&order_by=created_on&filters=owner_id'+$scope.$parent.userInfo.userid+'');
+
+$scope.getUserAssets = function(order_by, sort, search_for){
+    if (!order_by)
+        order_by = $scope.orderMode || 'created_on';
+    if (!sort || sort==0)
+        sort = 'desc';
+    else
+        sort = 'asc';
+    s = ($scope.page-1)*50;
+    e = s+50;
+    query = '/api/db/asset?sort='+sort+'&s='+s+'&e='+e+'&order_by='+ order_by + '&filters=owner_id='+
+            $scope.$parent.userInfo.userid;
+
+    if (search_for)
+        query += ',fullname=' + search_for;
+
+    req = $http.get(query);
     req.success(function(resp){
             $scope.userAssets = resp;
+            
+            })
+    creq = $http.get('/api/db/asset?filters=owner_id='+$scope.$parent.userInfo.userid+'&count=true');
+    creq.success(function(cresp){
+            $scope.assetsCount = cresp.count;
             
             })
 }
