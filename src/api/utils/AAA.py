@@ -68,19 +68,35 @@ def Authenticate(req, resp, params):
 
     '''
     # return
-    ip = req.env.get('HTTP_X_FORWARDED_FOR')
+    ip = req.env.get('HTTP_X_FORWARDED_FOR') or req.env.get('REMOTE_ADDR')
     free_services = ['/api/auth/signup', '/api/auth/login',
                      '/api/things', '/api/auth/activate', '/api/auth/reactivate',
                      '/api/auth/reset', '/api/auth/logout', '/api/auth/getUserInfo',
                      '/api/auth/changepasswordverify', '/api/auth/changepassword']
 
     sid = req.cookie('session-id')
+    if sid:
+        sid_digest = hashlib.sha1(sid).hexdigest()
+    ip_digest =  hashlib.sha1(ip).hexdigest()
     ''' Now we need to check if session is available and it's sha1 is in redis'''
-    if req.path in free_services or '/api/note' in req.path or (sid and r.get(hashlib.sha1(sid).hexdigest())):
-        ''' Now we need to authorize user!
-            NOT IMPLEMENTED YET
-        '''
-        pass
+    if req.path in free_services or '/api/note' in req.path or (sid and r.get(sid_digest)):
+        ''' User can access 300 api calls per minute (for now! NOTE)'''
+        api_count_key = ip_digest + '_access_count'
+        access_count = r.get(api_count_key)
+        if not access_count:
+            '''probabaly acceess count expired, lets create one and let user in'''
+            r.set(api_count_key, 1)
+            r.expire(api_count_key, 60)
+            pass
+        elif int(access_count) <= 300:
+            print access_count, ip
+            r.incr(api_count_key, 1)
+            pass
+
+        else:
+            message = 'Too many api access in short amount of time'
+            raise falcon.HTTPUnauthorized('Authentication required', message)
+ 
     else:
         auth_header = req.headers.get('AUTHORIZATION')
         if auth_header:
