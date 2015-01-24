@@ -1,5 +1,5 @@
 var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular', 'ui.grid', 'ngSanitize', 
-                        'ui.bootstrap', 'checklist-model', 'siyfion.sfTypeahead']);
+                        'ui.bootstrap', 'checklist-model', 'siyfion.sfTypeahead', 'bootstrap-tagsinput']);
 
 
 fearlessApp.factory('$exceptionHandler', function () {
@@ -47,6 +47,26 @@ fearlessApp.filter('range', function() {
     return input;
   };
 });
+
+
+var tags = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  prefetch: {
+    url: '/api/db/tag',
+  }
+});
+tags.initialize();
+
+
+var resources = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('fullname'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  prefetch: {
+    url: '/api/users',
+  }
+});
+resources.initialize()
 
 
 function toTitleCase(str)
@@ -303,6 +323,24 @@ function updateImageSize(img, maxWidth, maxHeight){
         $scope.login_init = function() {
             //
         }
+
+        $scope.setResourceTags = function(obj){
+            $('.resourceSelect').tagsinput({
+            itemValue: 'id',
+            itemText: 'lastname',
+              typeaheadjs: {
+                name: 'resources',
+                displayKey: 'fullname',
+                source: resources.ttAdapter()
+              }
+            });
+            $('#newproj_watchers').on('itemAdded', function(event) {
+                    
+              // event.item: contains the item
+            });
+        }
+
+
         $scope.prettyDate = function(time){
             var _d = moment.unix(time); 
             return moment.duration(_d-moment()).humanize();
@@ -1455,6 +1493,22 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
         }
 
         }
+        
+        $scope.setTags = function(){
+            $('#assetTags').tagsinput({
+              typeaheadjs: {
+                name: 'tags',
+                displayKey: 'name',
+                valueKey: 'name',
+                source: tags.ttAdapter()
+              }
+            });
+            $('#assetTags').on('itemAdded', function(event) {
+
+                    
+              // event.item: contains the item
+            });
+        }
 
         $scope.isImage = function(asset){
             ct = asset.content_type;
@@ -1537,6 +1591,11 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                         }
                     //$location.search('version', Resp.version)
                     $scope.asset = Resp;
+
+                    getTags = $http.get('/api/db/asset/'+assetId+'?field=tags');
+                    getTags.success(function(tags){
+                        $scope.asset._tags = tags;
+                        })
 
                     $scope.checkout('v_'+Resp.version);
                     $scope.assetVersions = Resp.git_tags.split(',');
@@ -1635,6 +1694,19 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         $scope.collection.assets = [];
         $scope.newSubCollection = {};
         ci = $routeParams.collectionId;
+
+        $scope.deleteCollection = function(){
+            if (confirm('Are you sure you want to rmove this collection?'))
+                req= $http.delete('/api/db/collection/'+ci).success(function(resp){
+                            pid = $scope.collection.project.id;
+                            url = '/pms/' + pid;
+                            $location.path(url);
+                        });
+
+        }
+
+
+
         $scope.$watch(ci, function(){
                 $scope.getCollectionDetails();
                 })
@@ -1702,7 +1774,6 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             $scope.thumbnails=false;
         }
         $scope.getCollectionDetails = function(page){
-            console.log(page)
             if (page==undefined)
             {
                 if ($routeParams.page>0)
@@ -1738,6 +1809,9 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     //$scope.activateVideo();
 
                 })
+            req.error(function(er){
+                        $location.path('404')
+                    })
         }
         $scope.createNewSubCollection = function(){
             $scope.newSubCollection.parent_id = $scope.collection.id;
@@ -2080,6 +2154,8 @@ $scope.search = function(){
     q = $scope.assetOptions.userAssetsFilter.fullname;
     if (q && old!=q)
     {
+        $scope.page = 1;
+        $location.search('page', 1);
         $scope.getUserAssets(false, false, q);
         $location.search('q', q);
         old = q;
@@ -2108,6 +2184,8 @@ $scope.gotoPage = function(page){
 
 
 $scope.getUserAssets = function(order_by, sort, search_for){
+    if (!$scope.page)
+        $scope.page = 1;
     if (!order_by)
         order_by = $scope.orderMode || 'created_on';
     if (!sort || sort==0)

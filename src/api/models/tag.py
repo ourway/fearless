@@ -53,5 +53,5 @@ class Tag(IDMixin, Base):
     date_id = Column(Integer, ForeignKey('date.id'))
     parent = relationship("Tag", backref="children", remote_side=[id])
 
-    def __init__(self, data):
+    def __init__(self, data, *args, **kw):
         self.name = data

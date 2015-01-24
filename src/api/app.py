@@ -116,11 +116,16 @@ class DB:
         order_by = req.get_param('order_by')
         if not order_by:
             order_by = 'modified_on'
+        try:
+            if start:
+                start = int(start)
+            if end:
+                end = int(end)
+        except ValueError, e:
+            print e
+            start = 0
+            end = 10
 
-        if start:
-            start = int(start)
-        if end:
-            end = int(end)
         if start and not end:
             end = start + 10
         if len(args) == 5:
@@ -216,10 +221,10 @@ class DB:
         # if not isAuthorizedTo(u.get('id'), 'create_%s'%table):
         #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         query_params = get_params(req.stream, flat=False)
-        insert_cmd = '{t}()'.format(t=table)
+        insert_cmd = '{t}(*query_params)'.format(t=table)
         new = eval(insert_cmd)
-        for i in query_params:
-            setattr(new, i, query_params.get(i))
+        #for i in query_params:
+        #    setattr(new, i, query_params.get(i))
         resp.status = falcon.HTTP_201
         req.session.add(new)
         data = repr(new)
@@ -244,7 +249,7 @@ class DB:
         query_params = get_params(req.stream, flat=False)
         updated_values = []
         for key in query_params:
-            if key in ['created_on', 'modified_on', 'id']:
+            if key in ['created_on', 'modified_on', 'id', 'uuid']:
                 continue
             key = str(key)
             value = query_params[key]

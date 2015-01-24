@@ -187,18 +187,18 @@ background-color: #FFEDA5;
             <tr class="active">
                 <td >Name</td>
                 <td >Progress</td>
-                <td >Start</td>
-                <td >End</td>
+                <td class="hidden-sm hidden-xs">Start</td>
+                <td class="hidden-sm hidden-xs">End</td>
                 <td >Effort Left</td>
-                <td >Project Leader</td>
+                <td class="hidden-xs">Project Leader</td>
             </tr>
             <tr class="success">
                 <td class="active"><strong>{{project.name}}</strong></td>
                 <td ><strong>{{project.complete}}</strong>%</td>
-                <td class="farsi" >{{$parent.persianDate(project.start)}}</td>
-                <td class="farsi" >{{$parent.persianDate(project.end)}}</td>
-                <td >{{project.effort_left}}</td>
-                <td ><a href="#/user/{{project.leader.id}}">{{project.leader.fullname}}</a></td>
+                <td class="farsi hidden-sm hidden-xs" >{{$parent.persianDate(project.start)}}</td>
+                <td class="farsi hidden-sm hidden-xs" >{{$parent.persianDate(project.end)}}</td>
+                <td >{{project.effort_left}} hours</td>
+                <td class="hidden-xs" ><a href="#/user/{{project.leader.id}}">{{project.leader.fullname}}</a></td>
             </tr>
         </table>
 
@@ -270,7 +270,7 @@ background-color: #FFEDA5;
             &nbsp;
             &nbsp;
             &nbsp;
-			<div class="btn-group">
+			<div class="btn-group hidden-sm hidden-xs">
                 <button ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='cal', 'btn-success':mode=='cal'}" 
                         ng-class="{'active':mode=='cal'}" ng-click="showCal();prepareCal();" type="button"><em class="glyphicon glyphicon-calendar"></em> Calendar</button>
                 <button ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
@@ -290,7 +290,7 @@ background-color: #FFEDA5;
         <div id="taskList" class="col-md-3 column" ng-include="'pages/pms/tasksListTemplate.html'"></div>
         <div class="col-md-9 column">
             <div id="projectDetailContainer">
-                <div id="projectDetailDiv"></div>
+                <div class="hidden-sm hidden-xs" id="projectDetailDiv"></div>
             </div>
             </div>
             </div>

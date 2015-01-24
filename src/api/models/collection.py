@@ -53,7 +53,7 @@ class Collection(IDMixin, Base):
     url = Column(String(512))  # relative to repo path path
     repository_id = Column(
         Integer, ForeignKey('repository.id'), nullable=False)
-    assets = relationship('Asset', backref='collection')
+    assets = relationship('Asset', backref='collection', cascade="all, delete, delete-orphan")
     tgs = relationship("Tag", backref='collections')
     tags = association_proxy('tgs', 'name')
 

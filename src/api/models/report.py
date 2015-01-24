@@ -48,7 +48,7 @@ class Report(IDMixin, Base):
     tgs = relationship("Tag", backref='reports')
     tags = association_proxy('tgs', 'name')
 
-    def __init__(self, data):
+    def __init__(self, data, *args, **kw):
         self.data = data
 
     @validates('data')

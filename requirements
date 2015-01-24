@@ -15,12 +15,10 @@ weasyprint
 riak
 pyinotify
 pyCalverter
-jsonschema
 MySQL-Python
 oursql
 psycopg2
 lxml
-bottle
 ipython
 sh
 eventlet
@@ -31,7 +29,6 @@ pysendfile
 werkzeug
 elasticsearch
 sqlalchemy
-sqlalchemy_mptt
 sqlalchemy-utils
 passlib
 pillow

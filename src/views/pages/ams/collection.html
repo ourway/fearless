@@ -47,7 +47,7 @@
 
 <div class="container collectionDiv">
 		<div class="col-md-12 column">
-			<ul class="breadcrumb">
+			<ul class="breadcrumb" style="min-height: 45px">
 				<li>
 					<a href="#/pms">Projects</a> <span class="divider"></span>
 				</li>
@@ -68,7 +68,14 @@
 				</li>
 				<li class="active">
 				    {{collection.name}}
-				</li>
+                    </li>
+
+                    <span class="pull-right">
+                        <button id="collectionAddButton" class="btn btn-default btn-sm" ng-click="deleteCollection()" type="button"> 
+                            <em class="glyphicon glyphicon-trash"></em>
+                        </button>
+                    </span>
+
 			</ul>
 
         <div class="col-md-6 column">

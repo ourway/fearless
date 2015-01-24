@@ -467,6 +467,8 @@ class CollectionInfo:
                                      'children': [{'name': c1.name, 'id': c1.id, 'path': c1.path, } for c1 in i.children]
                                      } for i in target.children]
             resp.body = data
+        else:
+            resp.status = falcon.HTTP_404
 
 
 class AddCollection:

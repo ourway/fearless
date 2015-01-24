@@ -58,7 +58,7 @@ install:
 
 prepare:
 	@yum groupinstall "development Tools"
-	@yum install gcc php-devel ccze php-pear graphviz redis libsndfile libsndfile-devel mencoder mplayer ImageMagick ImageMagick-devel nginx mysql-server mysql-devel libxslt-devel libxml2-devel libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel python27 python27-devel -y
+	@yum install gcc php-devel ccze php-pear graphviz redis libsndfile libsndfile-devel openjpeg openjpeg-devel mencoder mplayer ImageMagick ImageMagick-devel nginx mysql-server mysql-devel libxslt-devel littlecms libxml2-devel libffi-devel python-devel openssl-devel postgresql-devel python-pip python-virtualenv pcre-devel python27 python27-devel -y
 	@yum install http://s3.amazonaws.com/downloads.basho.com/riak/2.0/2.0.4/rhel/6/riak-2.0.4-1.el6.x86_64.rpm -y
 	@gpg2 --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
 	@curl -sSL https://get.rvm.io | bash -s stable --ruby

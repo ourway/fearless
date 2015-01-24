@@ -41,9 +41,8 @@
 				<div class="form-group">
 					 <label for="inputPassword3" class="col-sm-4 control-label">Watchers</label>
 					<div class="col-sm-6">
-                        <select class="form-control" ng-model="newProject.watchers" multiple 
+                        <select class="form-control resourceSelect" ng-init="$parent.setResourceTags()" ng-model="newProject.watchers" multiple 
                             ng-options="resource.fullname for resource in resources track by resource.id">
-                            <option value="0"></option>
                         </select>
                 </div>
 
