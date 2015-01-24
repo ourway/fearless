@@ -4,7 +4,7 @@ autostart=true
 directory={dir}
 stopsignal=TERM
 user=fearless
-environment=PATH="/opt/rubystack-2.0.0-23/ruby/bin:%(ENV_PATH)s"
+environment=PATH="/opt/rubystack-2.0.0-23/ruby/bin:/usr/local/bin:%(ENV_PATH)s"
 stdout_logfile={dir}/logs/uwsgi_access.log
 stderr_logfile={dir}/logs/uwsgi_error.log
 

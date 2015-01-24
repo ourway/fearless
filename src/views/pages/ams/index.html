@@ -32,7 +32,7 @@
                     <td ><a style="cursor:pointer" ng-click="orderMode='id';getUserAssets('id', 1)"><strong>ID</strong></a></td>
                     <td ><a style="cursor:pointer" ng-click="orderMode='fullname';getUserAssets('fullname', 1)"><strong>Name</strong></a></td>
                     <td ><a style="cursor:pointer" ng-click="orderMode='created_on';getUserAssets('created_on', 1)"><strong>Date</strong></a></td>
-                    <td class="hidden-sm hidden-xs"><a style="cursor:pointer" ng-click="orderMode='owner_id';getUserAssets('owner_id', 1)"><strong>Owner</strong></a></td>
+                    <td class="hidden-sm hidden-xs"><a style="cursor:pointer" ng-click="orderMode='owner_id';getUserAssets('owner_id', 1)"><strong>Collection</strong></a></td>
                 </thead>
                 <tbody>
 
@@ -40,7 +40,7 @@
                             <td class="hidden-xs">{{asset.id}}</td>
                             <td><a href="#/ams/a/{{asset.id}}">{{asset.fullname}}</a></td>
                             <td class="hidden-xs">{{$parent.prettyDate(asset.created_on)}} ago</td>
-                            <td class="hidden-xs hidden-sm">{{$parent.prettyDate(asset.created_on)}} ago</td>
+                            <td class="hidden-sm hidden-xs">{{asset.collection_id}}</td>
                     </tr>
                     
                 </tbody>

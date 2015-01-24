@@ -34,6 +34,9 @@ from models import Asset, Repository, Collection, es, User, fdb
 from AAA import getUserInfoFromSession
 from defaults import public_upload_folder, public_repository_path, GIT_folder, ASSETS
 from models.mixin import getUUID
+from general import setup_logger
+
+logger = setup_logger('auth', 'assets.log')
 
 
 def _generate_id():
@@ -48,35 +51,47 @@ This is a funtion that lets api to get a big/small file from user.
 #@asset_api.post('/save/<user>/<repo>')
 
 
-class AssetSave:
 
+
+class AssetSave:
     def on_put(self, req, resp, repo):
         '''Get data based on a file object or b64 data, save and commit it'''
         userInfo = getUserInfoFromSession(req, resp)
-        uploader = userInfo.get('uuid')
-        targetRepo = req.session.query(Repository).filter_by(name=repo).first()
+        uploader = userInfo.get('alias')
+        targetRepo = req.session.query(Repository).filter(
+            Repository.name == repo).first()
+
         if not uploader:
             uploader = 'anonymous'
-            targetRepo = req.session.query(Repository).filter_by(name='public').first()
-        targetUser = req.session.query(User).filter_by(uuid=uploader).first()
-        if not targetRepo:
-                targetRepo = Repository(name=repo, path=os.path.join(public_repository_path, repo))
-                req.session.add(targetRepo)
+            targetRepo = req.session.query(Repository).filter(Repository.name == 'public').first()
 
+        targetUser = req.session.query(User).filter(User.alias == uploader).first()
+        
+        if not targetRepo:
+            pr = req.session.query(Repository).filter(Repository.name == repo).first()
+            if not pr:
+                targetRepo = Repository(name=repo,
+                                        path=os.path.join(public_repository_path, repo))
+                req.session.add(targetRepo)
+            else:
+                targetRepo = pr
 
         _cid = req.get_param('collection_id')
-        _cname = req.get_param('collection')
         if _cid:
             collection = req.session.query(Collection).filter_by(repository=targetRepo)\
                             .filter_by(id=_cid).first()
-        elif _cname:
+        _cname = req.get_param('collection')
+        if _cname:
             collection = req.session.query(Collection).filter_by(repository=targetRepo)\
                             .filter_by(name=_cname).first()
-        elif not _cid and not _cname:
+        if not collection:
             collection = Collection(path='danger', repository=targetRepo)
+            req.session.add(collection)
+
+
         
-        req.session.add(collection)
         body = req.stream
+
         b64 = req.get_param('b64')
         thumbnail = req.get_param('thmb')
         mt = req.get_param('multipart')
@@ -86,21 +101,20 @@ class AssetSave:
                 fs = cgi.FieldStorage(fp=req.stream, environ=req.env)
             except (ValueError, IOError):
                 resp.status = falcon.HTTP_400
-                resp.body = {'message': 'error'}
+                resp.body={'message':'error'}
                 return
 
             body = fs['file'].file
-            if fs.has_key('thumbnail'):  # thumbnails are dataURLs
-                # thumbs are mostly small
-                thumbnail = fs['thumbnail'].file.read()
+            if fs.has_key('thumbnail'): ## thumbnails are dataURLs
+                thumbnail = fs['thumbnail'].file.read()  ## thumbs are mostly small
 
             mtname = fs['file'].filename
+
 
         attach_to = req.get_param('attach_to')
         if targetRepo and body:
             if not mtname:
-                name = req.get_param(
-                    'name') or 'undefined.%s.raw' % _generate_id()
+                name = req.get_param('name') or 'undefined.%s.raw' % _generate_id()
             else:
                 name = mtname
 
@@ -114,17 +128,16 @@ class AssetSave:
             tempraryStoragePath = path.join(targetRepo.path, collection.path,
                                             name)
 
-            name, bodyMd5 = safeCopyAndMd5(
-                req, body, tempraryStoragePath, targetRepo.id, b64=b64)
+            name, bodyMd5 = safeCopyAndMd5(req, body, tempraryStoragePath, targetRepo.id, b64=b64)
             fullname = name
             name = (name[:10] + '..') if len(name) > 10 else name
             asset = req.session.query(Asset).filter(
                 Asset.repository == targetRepo).filter_by(collection=collection)\
-                .filter_by(fullname=fullname).first()
+                        .filter_by(fullname=fullname).first()
 
             if not asset:
                 _uid = getUUID()
-                asset = Asset(key=bodyMd5, version=1, repository=targetRepo, uuid=_uid,
+                asset = Asset(key=bodyMd5, version=1, repository=targetRepo,uuid=_uid,
                               collection=collection, name=name, fullname=fullname,
                               path=assetPath, ext=assetExt, owner_id=targetUser.id)
                 req.session.add(asset)
@@ -139,33 +152,37 @@ class AssetSave:
 
             if req.get_param('description'):
                 asset.description = req.get_param('description')
+            
+
 
             if targetUser:
                 asset.modifiers.append(targetUser)
                 asset.users.append(targetUser)
-            if thumbnail:  # thumbnail is base64 format
+            if thumbnail:  ## thumbnail is base64 format
                 fmt = 'png'
                 fid = asset.uuid + '_thmb_' + str(asset.version)
-                result = os.path.join('uploads', fid + '.' + fmt)
-                thmbpath = os.path.join(public_upload_folder, fid + '.' + fmt)
+                result = os.path.join('uploads', fid+'.'+fmt)
+                thmbpath = os.path.join(public_upload_folder, fid+'.'+fmt)
                 thmb_data = decodestring(unquote(thumbnail).split(',')[1])
                 with open(thmbpath, 'wb') as f:
                     f.write(thmb_data)
 
+
             if attach_to:
                 parent_id = int(attach_to)
-                parent = req.session.query(Asset).filter(
-                    Asset.id == parent_id).first()
+                parent = req.session.query(Asset).filter(Asset.id == parent_id).first()
                 asset.attached_to.append(parent)
 
+
+                
                 #newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
                 #asset.task_id = newAsset.task_id
             resp.body = {'message': 'Asset created|updated', 'key': asset.key,
-                         'url': asset.url, 'fullname': asset.fullname, 'id': asset.id,
-                         'name': asset.name, 'content_type': asset.content_type.split('/')[0],
-                         'datetime': time.time()}
-            #resp.body = "I am working"
-        else:  # lets consume the stream!
+                         'url': asset.url, 'fullname':asset.fullname, 'id':asset.id,
+                         'name':asset.name, 'content_type':asset.content_type.split('/')[0],
+                         'datetime':time.time()}
+                #resp.body = "I am working"
+        else:  ## lets consume the stream!
             while True:
                 chunk = req.stream.read(2 ** 20)
                 if not chunk:
@@ -180,15 +197,15 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, b64=False):
     destDir = path.dirname(destinationPath)
     extsp = destinationPath.split('.')
     basename = os.path.basename(destinationPath)
-    if len(extsp) > 1:
+    if len(extsp)>1:
         ext = extsp[1]
     else:
         ext = 'raw'
     checkPath(destDir)
-    # if path.isfile(destinationPath):
+    #if path.isfile(destinationPath):
     #    basename = _generate_id() + '@@' + basename
     #    destinationPath = os.path.join(destDir, basename)
-    # os.remove(destinationPath)
+        #os.remove(destinationPath)
     f = open(destinationPath, 'wb')
     md5 = hashlib.md5()
     if b64:
@@ -206,21 +223,21 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, b64=False):
 
     f.close()
     dataMd5 = md5.hexdigest()
-    # check if there is an asset with same key
+    ## check if there is an asset with same key
     if not repoId:
-        availableAsset = req.session.query(
-            Asset).filter_by(key=dataMd5).first()
+        availableAsset = req.session.query(Asset).filter_by(key=dataMd5).first()
     else:
-        availableAsset = req.session.query(Asset).filter_by(key=dataMd5).join(
-            Collection).filter_by(repository_id=repoId).first()
+        availableAsset = req.session.query(Asset).filter_by(key=dataMd5).join(Collection).filter_by(repository_id=repoId).first()
     if availableAsset and not os.path.isfile(availableAsset.full_path):
         req.session.delete(availableAsset)
     elif availableAsset:
-        if os.path.isfile(availableAsset.full_path) and availableAsset.full_path != destinationPath:
-            os.remove(destinationPath)  # we dont need it anymore
+        if os.path.isfile(availableAsset.full_path) and availableAsset.full_path!=destinationPath:
+            os.remove(destinationPath) ## we dont need it anymore
             os.symlink(availableAsset.full_path, destinationPath)
-            # print 'Symblink: %s generated' % destinationPath
+            #print 'Symblink: %s generated' % destinationPath
 
+
+    
     return (basename, dataMd5)
 
 
@@ -276,38 +293,35 @@ def getAssetInfo(key):
 
 
 class GetAsset:
-
     def on_post(self, req, resp, key):
         '''Serve asset based on a key (riak key for finding path'''
         name = req.get_param('name')
         if name == 'true':
-            target = req.session.query(Asset).filter(
-                Asset.fullname == key).first()
+            target = req.session.query(Asset).filter(Asset.fullname == key).first()
         else:
             target = req.session.query(Asset).filter(Asset.key == key).first()
         if target:
             sz = os.path.getsize(target.full_path)
             modifier = target.modifiers[-1]
             attachments = [
-                {
-                    'name': i.name,
-                    'url': i.url,
-                    'id': i.id,
-                    'description': i.description,
-                    'thumbnail': i.thumbnail,
-                    'content_type': i.content_type
-                }
-                for i in target.attachments]
-            resp.body = {'url': os.path.join('/static', target.url),
-                         'size': sz, 'key': target.key, 'id': target.id,
-                         'version': target.version, 'datetime': target.modified_on,
-                         'last_updated_by': modifier.alias, 'descripion': target.description,
-                         'owner': target.owner.alias, 'thumbnail': target.thumbnail,
-                         'attachments': attachments}
+                        {
+                            'name':i.name,
+                            'url':i.url, 
+                            'id':i.id,
+                            'description':i.description, 
+                            'thumbnail':i.thumbnail,
+                            'content_type':i.content_type
+                        }
+                        for i in target.attachments]
+            resp.body = {'url':os.path.join('/static', target.url),
+                         'size':sz, 'key':target.key, 'id':target.id,
+                         'version':target.version, 'datetime':target.modified_on,
+                         'last_updated_by':modifier.alias, 'descripion':target.description,
+                         'owner':target.owner.alias, 'thumbnail':target.thumbnail, 
+                         'attachments':attachments}
 
 
 class DeleteAsset:
-
     def on_delete(self, req, resp, id):
         target = req.session.query(Asset).filter(Asset.id == id).first()
         userInfo = getUserInfoFromSession(req, resp)
@@ -315,9 +329,11 @@ class DeleteAsset:
             req.session.delete(target)
             resp.status = falcon.HTTP_202
 
+        
 
+
+        
 class ListAssets:
-
     def on_get(self, req, resp):
         page = req.get_param('page') or 1
         userName = req.get_param('user') or '*'
@@ -396,50 +412,43 @@ class ListAssets:
 
 
 class CollectionInfo:
-
     def on_get(self, req, resp, collectionId):
-        target = req.session.query(Collection).filter(
-            Collection.id == int(collectionId)).first()
+        target = req.session.query(Collection).filter(Collection.id==int(collectionId)).first()
         start = req.get_param('s')
         end = req.get_param('e')
-        if start:
-            start = int(start)
-        else:
-            start = 0
-        if end:
-            end = int(end)
-        if start != None and not end:
-            end = start + 10
+        if start: start = int(start)
+        else: start = 0
+        if end: end = int(end)
+        if start!=None and not end:
+            end = start+10
 
         end = max(start, end)
 
         if target:
-            assets = req.session.query(Asset).filter_by(collection_id=target.id).order_by(
-                desc(Asset.modified_on)).slice(start, end)
-            assets_count = req.session.query(Asset).filter_by(
-                collection_id=target.id).count()
+            assets = req.session.query(Asset).filter_by(collection_id=target.id).order_by(desc(Asset.modified_on)).slice(start, end)
+            assets_count = req.session.query(Asset).filter_by(collection_id=target.id).count()
             data = dict()
             data['name'] = target.name
             data['name'] = target.name
             data['assets_count'] = assets_count
             if assets:
                 data['assets'] = [
-                    {'id': i.id,
-                     'name': i.name,
-                     'url': i.url,
-                     'fullname': i.fullname,
-                     'version': i.version,
-                     'thumbnail': i.thumbnail,
-                     'preview': i.preview,
-                     'poster': i.poster,
-                     'owner': {
-                         'id': i.owner.id if i.owner else 0,
-                         'name': i.owner.fullname if i.owner else None
-                     },
-                     'description': i.description,
-                     'content_type': i.content_type,
-                     'datetime': i.modified_on}
-                    for i in assets]
+                                    {'id':i.id, 
+                                   'name':i.name,
+                                   'url':i.url,
+                                   'fullname':i.fullname,
+                                   'version':i.version,
+                                   'thumbnail':i.thumbnail,
+                                   'preview':i.preview,
+                                   'poster':i.poster,
+                                   'owner':{
+                                            'id':i.owner.id if i.owner else 0,
+                                            'name':i.owner.fullname if i.owner else None
+                                            },
+                                   'description':i.description,
+                                   'content_type':i.content_type,
+                                   'datetime':i.modified_on}
+                                for i in assets]
 
             data['id'] = target.id
             data['container'] = target.container
@@ -447,32 +456,25 @@ class CollectionInfo:
             data['uuid'] = target.uuid
             data['path'] = target.path
             data['description'] = target.description
-            data['repository'] = {
-                'name': target.repository.name, 'id': target.repository.id}
+            data['repository'] = {'name':target.repository.name, 'id':target.repository.id}
             if target.repository and target.repository.project:
-                data['project'] = {
-                    'name': target.repository.project.name, 'id': target.repository.project.id}
+                data['project'] = {'name':target.repository.project.name, 'id':target.repository.project.id}
             _t = target.parent
             d = data
             while True:
                 if _t:
-                    d['parent'] = {
-                        'name': _t.name, 'id': _t.id, 'path': _t.path}
+                    d['parent'] = {'name':_t.name, 'id':_t.id, 'path':_t.path}
                     d = d['parent']
                     _t = _t.parent
                 else:
                     break
             if target.children:
-                data['children'] = [{'name': i.name, 'id': i.id, 'path': i.path,
-                                     'children': [{'name': c1.name, 'id': c1.id, 'path': c1.path, } for c1 in i.children]
+                data['children'] = [{'name':i.name, 'id':i.id, 'path':i.path,
+                                     'children':[{'name':c1.name, 'id':c1.id, 'path':c1.path, } for c1 in i.children]
                                      } for i in target.children]
             resp.body = data
-        else:
-            resp.status = falcon.HTTP_404
-
 
 class AddCollection:
-
     def on_put(self, req, resp):
         data = get_params(req.stream, flat=False)
         name = data.get('name')
@@ -481,27 +483,24 @@ class AddCollection:
 
         template = data.get('template').lower()
         if name and repository_id:
-            newC = Collection(
-                name=name, path=name, repository_id=repository_id)
+            newC = Collection(name=name, path=name, repository_id=repository_id)
             if parent_id:
                 newC.parent_id = parent_id
             if template:
                 newC.template = template
 
-            # if not os.path.isdir(newC.url):
+            #if not os.path.isdir(newC.url):
             req.session.add(newC)
-            resp.body = {'message': 'OK', 'info': 'Collection created'}
-            # else:
+            resp.body = {'message':'OK', 'info':'Collection created'}
+            #else:
             #    resp.body = {'message':'ERROR', 'info':'Collection is available on server'}
 
 
 class AssetCheckout:
-
     def on_post(self, req, resp, assetId):
         '''Get asset thumbnails from riak'''
         try:
-            target = req.session.query(Asset).filter_by(
-                id=int(assetId)).first()
+            target = req.session.query(Asset).filter_by(id=int(assetId)).first()
         except ValueError:
             resp.status = falcon.HTTP_404
             return
@@ -514,17 +513,23 @@ class AssetCheckout:
 
         version = req.get_param('version')
         command = 'checkout %s' % version
-        arg = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(
-            d=asset_folder, c=command)
+        arg = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(d=asset_folder, c=command)
         error, result = process(arg)
-        pstKey = '%s_poster_v%s' % (target.uuid, version.split('_')[1])
-        thmbKey = '%s_thmb_v%s' % (target.uuid, version.split('_')[1])
-        poster = os.path.join(
-            'uploads', target.uuid + '_poster_' + version.split('_')[1] + '.png')
-        thumbnail = os.path.join(
-            'uploads', target.uuid + '_thmb_' + version.split('_')[1] + '.png')
+        pstKey = '%s_poster_v%s'%(target.uuid, version.split('_')[1])
+        thmbKey = '%s_thmb_v%s'%(target.uuid, version.split('_')[1])
+        poster =  os.path.join('uploads', target.uuid + '_poster_' + version.split('_')[1] + '.png')
+        thumbnail =  os.path.join('uploads', target.uuid + '_thmb_' + version.split('_')[1] + '.png')
         fid = target.uuid + '_preview_' + version.split('_')[1]
         fmt = 'ogv'
-        preview = os.path.join('uploads', fid + '.' + fmt)
-        resp.body = {'poster': poster, 'thumbnail': thumbnail,
-                     'version': version, 'preview': preview}
+        preview =  os.path.join('uploads', fid+'.'+fmt)
+        resp.body = {'poster':poster, 'thumbnail':thumbnail, 'version':version, 'preview':preview}
+
+
+        
+
+ 
+        
+        
+
+
+        
