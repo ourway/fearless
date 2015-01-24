@@ -89,7 +89,6 @@ def Authenticate(req, resp, params):
             r.expire(api_count_key, 60)
             pass
         elif int(access_count) <= 300:
-            print access_count, ip
             r.incr(api_count_key, 1)
             pass
 
