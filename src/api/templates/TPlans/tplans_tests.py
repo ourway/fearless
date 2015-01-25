@@ -1,9 +1,11 @@
-
+#!../../../../pyenv/bin/python
 from mako.template import Template
 import json as json
 from uuid import uuid4  # for random guid generation
 import base64
 from collections import OrderedDict
+
+
 
 
 def getUUID():
@@ -27,7 +29,7 @@ def render_process(t):
         @desciption: string
     
     '''
-    templ = Template(filename=t+'.json')  ## create a mako template
+    templ = Template(filename='processes/'+t+'.json')  ## create a mako template
     raw_root =  templ.render()
     plan = json.loads(raw_root)
     outputs = []
@@ -37,37 +39,72 @@ def render_process(t):
 
     if plan.get('processes'):
         processes = OrderedDict(sorted(plan.get('processes').items(), key=sort_by_order))
+        list_of_order_numbers = [processes.get(i).get('order') for i in processes.keys()]
+        remainings = []
+        multies = []
         plan['processes'] = processes
         for process in processes:
+            depends = []
             _id = getUUID()
             plan['processes'][process]['id'] = _id
+
             po = int(plan['processes'][process]['order'])
-            if  po > last_order:
+            _this = {'name':process, 'id':_id, 'order':po}
+            if list_of_order_numbers.count(po)>1:
+                multies.append(_this)
+                remainings = outputs
+                if po > last_order:
+                    plan['processes'][process]['depends_on'] = outputs
+                elif po == last_order:
+                    plan['processes'][process]['depends_on'] = remainings
+
+            else:
+                if multies:
+                    outputs = multies
+                    multies = []
                 plan['processes'][process]['depends_on'] = outputs
-                outputs = [{'name':process, 'id':_id}]
-            elif po == last_order:
-                outputs.append({'name':process, 'id':_id})
-            if po > last_order:
-                last_order = po
+                outputs = [_this]
+            last_order = max(po, last_order)
+
 
             process_plan = render_process(plan['processes'][process]['template'])
             plan['processes'][process]['plan'] = process_plan
+
+
     if plan.get('tasks'):
         tasks = OrderedDict(sorted(plan.get('tasks').items(), key=sort_by_order))
+        list_of_order_numbers = [tasks.get(i).get('order') for i in tasks.keys()]
+        remainings = []
+        multies = []
         plan['tasks'] = tasks
         for task in tasks:
             _id = getUUID()
+            depends = outputs
             plan['tasks'][task]['id'] = _id
-            po = int(plan['tasks'][task]['order'])
-            if  po > last_order:
+
+            to = int(plan['tasks'][task]['order'])
+            _this = {'name':task, 'id':_id, 'order':to}
+            if list_of_order_numbers.count(to)>1:
+                multies.append(_this)
+                remainings = outputs
+                if to > last_order:
+                    plan['tasks'][task]['depends_on'] = outputs
+                elif to == last_order:
+                    plan['tasks'][task]['depends_on'] = remainings
+
+            else:
+                if multies:
+                    outputs = multies
+                    multies = []
                 plan['tasks'][task]['depends_on'] = outputs
-                outputs = [{'name':process, 'id':_id}]
-            elif po == last_order:
-                outputs.append({'name':process, 'id':_id})
-            if po > last_order:
-                last_order = po
-            process_task = render_task(plan['tasks'][task]['template'])
-            plan['tasks'][task]['plan'] = process_task
+                outputs = [_this]
+            last_order = max(to, last_order)
+
+            if plan['tasks'][task].get('template'):
+                process_task = render_task(plan['tasks'][task]['template'])
+                plan['tasks'][task]['plan'] = process_task
+
+
     with open('plan.json', 'wb') as f:
         f.write(json.dumps(plan, sort_keys=True, indent=4))
     return plan
@@ -76,7 +113,7 @@ def render_process(t):
 
 def render_task(t):
     '''lets see what will happen'''
-    templ = Template(filename=t+'.json')  ## create a mako template
+    templ = Template(filename='tasks/'+t+'.json')  ## create a mako template
     raw_process = templ.render()
     task = json.loads(raw_process)
     return task
