@@ -1,0 +1,48 @@
+{
+    "processes":
+        {
+            "Character Research":
+            {
+                "template":"character_research",
+                "description":"Research about character",
+                "order":1
+            },
+            "Free Illustration For Character":
+            {
+                "template":"character_free_illustration",
+                "description":"Free illustrations on character",
+                "order":1
+            },
+            "Character Concept":
+            {
+                "template":"character_concept",
+                "description":"Charcter concept process",
+                "order":2
+            },
+            "Character Design":
+            {
+                "template":"character_design",
+                "description":"Character Design Process",
+                "order":3
+            },
+            "Check Points, Finilize and Quality Control":
+            {
+                "template":"character_output_qc",
+                "description":"",
+                "order":4
+                }
+        },
+    "tasks":
+        {
+            "Asset Management":
+            {
+                "template":"asset_management",
+                "order":5
+            },
+            "Documentation":
+            {
+                "template":"documentation",
+                "order":6
+            }
+        }
+}

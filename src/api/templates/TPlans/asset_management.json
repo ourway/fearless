@@ -1,0 +1,25 @@
+{
+    "min_effort":1,
+    "max_effort":8,
+    "resource_expertize":
+        {
+            "layout artist":
+                {
+                    "minimum_rate":5
+                }
+        },
+    "outputs":
+        {
+            "Links of assets in asset management system":
+                {
+                    "type":"url",
+                    "checklist":"url_checklist"
+                },
+            "A zip file containing all assets":
+                {
+                    "type":"zip file",
+                    "checklist":"asset_zip_checklist"
+            
+                }
+        }
+}

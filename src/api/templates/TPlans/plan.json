@@ -1,0 +1,198 @@
+{
+    "processes": {
+        "Character Concept": {
+            "depends_on": [
+                {
+                    "id": "ZgqcrWN1SWyHcgbc5vzaYQ", 
+                    "name": "Character Research"
+                }, 
+                {
+                    "id": "lnI8nPaMTVGGqP-9OXgyvw", 
+                    "name": "Free Illustration For Character"
+                }
+            ], 
+            "description": "Charcter concept process", 
+            "id": "5jgIXaLWSMyMOPwtxFs+1w", 
+            "order": 2, 
+            "plan": {}, 
+            "template": "character_concept"
+        }, 
+        "Character Design": {
+            "depends_on": [
+                {
+                    "id": "5jgIXaLWSMyMOPwtxFs+1w", 
+                    "name": "Character Concept"
+                }
+            ], 
+            "description": "Character Design Process", 
+            "id": "HVe4arIjQM6V9OsrYbM9hA", 
+            "order": 3, 
+            "plan": {
+                "processes": {
+                    "Character Cloth Design": {
+                        "id": "wDZ0CBP6RJeB87lVUZ91Uw", 
+                        "order": 1, 
+                        "plan": {}, 
+                        "template": "character_cloth"
+                    }, 
+                    "Character Props Design": {
+                        "id": "WZOam2+EQy6edfPYTqQwWg", 
+                        "order": 1, 
+                        "plan": {}, 
+                        "template": "character_props"
+                    }, 
+                    "Character pose sheet": {
+                        "id": "vn0TnPiqRAyGDJt7v8x9OA", 
+                        "order": 1, 
+                        "plan": {}, 
+                        "template": "character_pose_sheet"
+                    }, 
+                    "Character side and front": {
+                        "id": "uIcIZmt9T6K4U4-mVeTcmQ", 
+                        "order": 1, 
+                        "plan": {}, 
+                        "template": "character_side_and_front"
+                    }, 
+                    "Color key": {
+                        "id": "tRRg3HMtRL2meIrHqoXkgQ", 
+                        "order": 1, 
+                        "plan": {}, 
+                        "template": "character_color_key"
+                    }, 
+                    "Scale Sheet": {
+                        "depends_on": [], 
+                        "id": "lYLL7L8YQziPhAo34tmXgw", 
+                        "order": 1, 
+                        "plan": {}, 
+                        "template": "scale_sheet"
+                    }, 
+                    "Shading references": {
+                        "id": "8931ayg5SwSlBNof84fyOQ", 
+                        "order": 1, 
+                        "plan": {}, 
+                        "template": "character_shading_ref"
+                    }, 
+                    "Sketch": {
+                        "depends_on": [
+                            {
+                                "id": "lYLL7L8YQziPhAo34tmXgw", 
+                                "name": "Scale Sheet"
+                            }, 
+                            {
+                                "id": "8931ayg5SwSlBNof84fyOQ", 
+                                "name": "Shading references"
+                            }, 
+                            {
+                                "id": "tRRg3HMtRL2meIrHqoXkgQ", 
+                                "name": "Color key"
+                            }, 
+                            {
+                                "id": "uIcIZmt9T6K4U4-mVeTcmQ", 
+                                "name": "Character side and front"
+                            }, 
+                            {
+                                "id": "WZOam2+EQy6edfPYTqQwWg", 
+                                "name": "Character Props Design"
+                            }, 
+                            {
+                                "id": "wDZ0CBP6RJeB87lVUZ91Uw", 
+                                "name": "Character Cloth Design"
+                            }, 
+                            {
+                                "id": "344ZueHAQlWcQopcmdIw5Q", 
+                                "name": "Texture refrerences"
+                            }, 
+                            {
+                                "id": "vn0TnPiqRAyGDJt7v8x9OA", 
+                                "name": "Character pose sheet"
+                            }
+                        ], 
+                        "id": "lmgbuRoITvmnZ+WJq8Alfg", 
+                        "order": 2, 
+                        "plan": {}, 
+                        "template": "character_sketch"
+                    }, 
+                    "Texture refrerences": {
+                        "id": "344ZueHAQlWcQopcmdIw5Q", 
+                        "order": 1, 
+                        "plan": {}, 
+                        "template": "character_texture_ref"
+                    }
+                }
+            }, 
+            "template": "character_design"
+        }, 
+        "Character Research": {
+            "depends_on": [], 
+            "description": "Research about character", 
+            "id": "ZgqcrWN1SWyHcgbc5vzaYQ", 
+            "order": 1, 
+            "plan": {}, 
+            "template": "character_research"
+        }, 
+        "Check Points, Finilize and Quality Control": {
+            "depends_on": [
+                {
+                    "id": "HVe4arIjQM6V9OsrYbM9hA", 
+                    "name": "Character Design"
+                }
+            ], 
+            "description": "", 
+            "id": "CCmgr7eTTtKgZtxKoBMrig", 
+            "order": 4, 
+            "plan": {}, 
+            "template": "character_output_qc"
+        }, 
+        "Free Illustration For Character": {
+            "description": "Free illustrations on character", 
+            "id": "lnI8nPaMTVGGqP-9OXgyvw", 
+            "order": 1, 
+            "plan": {}, 
+            "template": "character_free_illustration"
+        }
+    }, 
+    "tasks": {
+        "Asset Management": {
+            "depends_on": [
+                {
+                    "id": "CCmgr7eTTtKgZtxKoBMrig", 
+                    "name": "Check Points, Finilize and Quality Control"
+                }
+            ], 
+            "id": "Pt9qKVwDRf6yitw-+XKBVg", 
+            "order": 5, 
+            "plan": {
+                "max_effort": 8, 
+                "min_effort": 1, 
+                "outputs": {
+                    "A zip file containing all assets": {
+                        "checklist": "asset_zip_checklist", 
+                        "type": "zip file"
+                    }, 
+                    "Links of assets in asset management system": {
+                        "checklist": "url_checklist", 
+                        "type": "url"
+                    }
+                }, 
+                "resource_expertize": {
+                    "layout artist": {
+                        "minimum_rate": 5
+                    }
+                }
+            }, 
+            "template": "asset_management"
+        }, 
+        "Documentation": {
+            "depends_on": [
+                {
+                    "id": "Pt9qKVwDRf6yitw-+XKBVg", 
+                    "name": "Check Points, Finilize and Quality Control"
+                }
+            ], 
+            "id": "9faBPsyCR66TrLoCepxMgw", 
+            "order": 6, 
+            "plan": {}, 
+            "template": "documentation"
+        }
+    }
+}

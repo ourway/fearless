@@ -1,0 +1,60 @@
+{
+    "processes":
+        {
+            "Scale Sheet":
+                {
+                    "order":1,
+                    "template":"scale_sheet"
+                
+                },
+            "Sketch":
+                {
+                    "order":2,
+                    "template":"character_sketch"
+                
+                },
+            "Character side and front":
+                {
+                    "order":1,
+                    "template":"character_side_and_front"
+                
+                },
+            "Character pose sheet":
+                {
+                    "order":1,
+                    "template":"character_pose_sheet"
+                
+                },
+            "Shading references":
+                {
+                    "order":1,
+                    "template":"character_shading_ref"
+                
+                },
+            "Texture refrerences":
+                {
+                    "order":1,
+                    "template":"character_texture_ref"
+                
+                },
+            "Color key":
+                {
+                    "order":1,
+                    "template":"character_color_key"
+                
+                },
+            "Character Cloth Design":
+                {
+                    "order":1,
+                    "template":"character_cloth"
+                
+                },
+            "Character Props Design":
+                {
+                    "order":1,
+                    "template":"character_props"
+                
+                }
+
+        }
+}
