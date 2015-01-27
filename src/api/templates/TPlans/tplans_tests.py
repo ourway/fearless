@@ -68,7 +68,7 @@ def render_process(t):
 
 
             process_plan = render_process(plan['processes'][process]['template'])
-            plan['processes'][process]['plan'] = process_plan
+            plan['processes'][process]['processes'] = process_plan
 
 
     if plan.get('tasks'):
@@ -102,7 +102,7 @@ def render_process(t):
 
             if plan['tasks'][task].get('template'):
                 process_task = render_task(plan['tasks'][task]['template'])
-                plan['tasks'][task]['plan'] = process_task
+                plan['tasks'][task]['task'] = process_task
 
 
     with open('plan.json', 'wb') as f:

@@ -44,8 +44,7 @@
             "Documentation":
             {
                 "template":"documentation",
-                "order":6,
-                "asset_management_output"
+                "order":6
             }
         }
 }

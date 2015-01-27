@@ -1,2 +1,10 @@
 {
+    "tasks":
+        {
+            "Prepare character scale sheet":
+            {
+                "template":"character_scale_sheet",
+                "order":1
+            }
+        }
 }
