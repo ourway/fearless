@@ -12,7 +12,7 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
-from models import session, Task, User, Report, r, fdb
+from models import Session, Task, User, Report, r, fdb
 import arrow
 from tasks import send_envelope  # send emails
 from mako.template import Template
@@ -36,14 +36,21 @@ jd = cal.gregorian_to_jd(year, month, day)
 jtoday = '/'.join(map(str, cal.jd_to_jalali(jd)))
 today = now.format('YYYY-MM-DD')
 
+################################################################
+session = Session()
 
 '''On going tasks:  Tasks that started and are not finished'''
+
+
 ongoing_tasks = session.query(Task).filter(Task.start < now.date())\
     .filter(Task.end > now.date()).order_by(desc(Task.complete)).all()
 '''Behind schedule tasks:  Tasks that are not finished on time and are not completed yet'''
 behind_tasks = session.query(Task).filter(Task.end < now.date())\
     .filter(Task.complete < 100).order_by(asc(Task.end)).all()
 
+session.close()
+
+#################################################################
 
 def getTemplate(name):
     t = os.path.join(templates_folder, name)

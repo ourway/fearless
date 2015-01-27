@@ -28,7 +28,7 @@ from mako.template import Template
 
 from utils.fagit import GIT
 from . import Repository
-from db import session, Session
+from db import Session
 from collections import defaultdict
 
 
@@ -67,27 +67,33 @@ class Collection(IDMixin, Base):
 
     @validates('parent_id')
     def update_path(self, key, data):
+        session=Session()
         parent = session.query(Collection).filter_by(id=data).first()
         if parent and parent.path not in self.path:
             newpath = os.path.join(parent.path, self.path)
             self.path = newpath
+        session.close()
         return data
 
     @validates('repository_id')
     def update_url(self, key, data):
+        session=Session()
         if self.path:
             repository = session.query(Repository).filter(
                 Repository.id == data).first()
             self.url = os.path.join(repository.path, self.path)
+        session.close()
         return data
 
     @validates('path')
     def check_path(self, key, data):
+        session=Session()
         self.name = os.path.basename(data).title()
         if self.repository_id:
             repository = session.query(Repository).filter(
                 Repository.id == self.repository_id).first()
             self.url = os.path.join(repository.path, data)
+        session.close()
         return data
 
     @hybrid_property

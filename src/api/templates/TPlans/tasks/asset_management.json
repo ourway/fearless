@@ -1,4 +1,5 @@
 {
+    "tags":["asset"],
     "min_effort":1,
     "max_effort":8,
     "resource_expertize":

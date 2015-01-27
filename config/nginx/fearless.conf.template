@@ -15,6 +15,7 @@ server {
     listen 80;
     server_name _;
     server_tokens off;
+    large_client_header_buffers 40 1M;
     access_log  /var/log/nginx/fearless_acess.log;
     error_log  /var/log/nginx/fearless_error.log;
     #more_set_headers 'Server: Fearless Server';

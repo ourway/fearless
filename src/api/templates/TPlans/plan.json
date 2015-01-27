@@ -3,18 +3,18 @@
         "Character Concept": {
             "depends_on": [
                 {
-                    "id": "jfo4djbdSrefkA7ERydhPA", 
+                    "id": "XQQfUB2sSYCp0j1QH+co1Q", 
                     "name": "Character Research", 
                     "order": 1
                 }, 
                 {
-                    "id": "U1IuBvxhSD+voi94iqH3YQ", 
+                    "id": "Yqa9WC7UQPC1zDJnX3-coQ", 
                     "name": "Free Illustration For Character", 
                     "order": 1
                 }
             ], 
             "description": "Charcter concept process", 
-            "id": "qQBKH4S8SBKzv+vAoqYwbg", 
+            "id": "FjIMkOfMS9iRpaGBatZd3Q", 
             "order": 2, 
             "plan": {}, 
             "template": "character_concept"
@@ -22,25 +22,26 @@
         "Character Design": {
             "depends_on": [
                 {
-                    "id": "qQBKH4S8SBKzv+vAoqYwbg", 
+                    "id": "FjIMkOfMS9iRpaGBatZd3Q", 
                     "name": "Character Concept", 
                     "order": 2
                 }
             ], 
             "description": "Character Design Process", 
-            "id": "p-yqIDIISVynsDnSL8WQYQ", 
+            "id": "hWWtYeggQ-SBpIy3YRMiBQ", 
+            "needs": "Character Research", 
             "order": 3, 
             "plan": {
                 "processes": {
                     "Character Cloth Design": {
                         "depends_on": [
                             {
-                                "id": "2pIHyTIfSJqTyfS+ijfqhQ", 
+                                "id": "puZxDy8XSPioT8WCtlBjdw", 
                                 "name": "Color key", 
                                 "order": 7
                             }
                         ], 
-                        "id": "3zpPfyUwQ2SAq6y1qUravA", 
+                        "id": "fgavBbCxQRuSomjegDCSyw", 
                         "order": 8, 
                         "plan": {}, 
                         "template": "character_cloth"
@@ -48,12 +49,12 @@
                     "Character Props Design": {
                         "depends_on": [
                             {
-                                "id": "3zpPfyUwQ2SAq6y1qUravA", 
+                                "id": "fgavBbCxQRuSomjegDCSyw", 
                                 "name": "Character Cloth Design", 
                                 "order": 8
                             }
                         ], 
-                        "id": "6ygP6ekvSmex4cEBcx2Knw", 
+                        "id": "JW2hls35Tlebklm7uvctbQ", 
                         "order": 9, 
                         "plan": {}, 
                         "template": "character_props"
@@ -61,12 +62,12 @@
                     "Character pose sheet": {
                         "depends_on": [
                             {
-                                "id": "q1h1VW-RRz2LlAwNDvkInw", 
+                                "id": "JSTygML7TpaIq52TKolvow", 
                                 "name": "Character side and front", 
                                 "order": 3
                             }
                         ], 
-                        "id": "l-+-CCzUQv2jY+38aH5AWA", 
+                        "id": "kMRlLvr6Sb66zMmfYRnQSw", 
                         "order": 4, 
                         "plan": {}, 
                         "template": "character_pose_sheet"
@@ -74,12 +75,12 @@
                     "Character side and front": {
                         "depends_on": [
                             {
-                                "id": "GvytJJfQRui2xcVddIG7fg", 
+                                "id": "LyEhOUOgTf+hIkE+29UYyQ", 
                                 "name": "Sketch", 
                                 "order": 2
                             }
                         ], 
-                        "id": "q1h1VW-RRz2LlAwNDvkInw", 
+                        "id": "JSTygML7TpaIq52TKolvow", 
                         "order": 3, 
                         "plan": {}, 
                         "template": "character_side_and_front"
@@ -87,19 +88,19 @@
                     "Color key": {
                         "depends_on": [
                             {
-                                "id": "85tBaCFfRwKgnmhPyhk9Mg", 
+                                "id": "queTu1zQQiyuHkcdHFQWXw", 
                                 "name": "Texture refrerences", 
                                 "order": 6
                             }
                         ], 
-                        "id": "2pIHyTIfSJqTyfS+ijfqhQ", 
+                        "id": "puZxDy8XSPioT8WCtlBjdw", 
                         "order": 7, 
                         "plan": {}, 
                         "template": "character_color_key"
                     }, 
                     "Scale Sheet": {
                         "depends_on": [], 
-                        "id": "Oezz6pP-SyqWCx+jMcashg", 
+                        "id": "yaXsST0ITRSvnmTIz54ZMw", 
                         "order": 1, 
                         "plan": {}, 
                         "template": "scale_sheet"
@@ -107,12 +108,12 @@
                     "Shading references": {
                         "depends_on": [
                             {
-                                "id": "q1h1VW-RRz2LlAwNDvkInw", 
+                                "id": "JSTygML7TpaIq52TKolvow", 
                                 "name": "Character side and front", 
                                 "order": 3
                             }
                         ], 
-                        "id": "-zLTsLEuRwOd6bGeqq4kwQ", 
+                        "id": "1R4nNBpZQ22M2D1aYdTR7A", 
                         "order": 4, 
                         "plan": {}, 
                         "template": "character_shading_ref"
@@ -120,12 +121,12 @@
                     "Sketch": {
                         "depends_on": [
                             {
-                                "id": "Oezz6pP-SyqWCx+jMcashg", 
+                                "id": "yaXsST0ITRSvnmTIz54ZMw", 
                                 "name": "Scale Sheet", 
                                 "order": 1
                             }
                         ], 
-                        "id": "GvytJJfQRui2xcVddIG7fg", 
+                        "id": "LyEhOUOgTf+hIkE+29UYyQ", 
                         "order": 2, 
                         "plan": {}, 
                         "template": "character_sketch"
@@ -133,17 +134,17 @@
                     "Texture refrerences": {
                         "depends_on": [
                             {
-                                "id": "-zLTsLEuRwOd6bGeqq4kwQ", 
+                                "id": "1R4nNBpZQ22M2D1aYdTR7A", 
                                 "name": "Shading references", 
                                 "order": 4
                             }, 
                             {
-                                "id": "l-+-CCzUQv2jY+38aH5AWA", 
+                                "id": "kMRlLvr6Sb66zMmfYRnQSw", 
                                 "name": "Character pose sheet", 
                                 "order": 4
                             }
                         ], 
-                        "id": "85tBaCFfRwKgnmhPyhk9Mg", 
+                        "id": "queTu1zQQiyuHkcdHFQWXw", 
                         "order": 6, 
                         "plan": {}, 
                         "template": "character_texture_ref"
@@ -155,7 +156,7 @@
         "Character Research": {
             "depends_on": [], 
             "description": "Research about character", 
-            "id": "jfo4djbdSrefkA7ERydhPA", 
+            "id": "XQQfUB2sSYCp0j1QH+co1Q", 
             "order": 1, 
             "plan": {}, 
             "template": "character_research"
@@ -163,19 +164,19 @@
         "Check Points, Finilize and Quality Control": {
             "depends_on": [
                 {
-                    "id": "p-yqIDIISVynsDnSL8WQYQ", 
+                    "id": "hWWtYeggQ-SBpIy3YRMiBQ", 
                     "name": "Character Design", 
                     "order": 3
                 }
             ], 
             "description": "", 
-            "id": "MIK-fStvTXGPjdqODB8Z-A", 
+            "id": "zF77lIQ3Ram1VR7CInn4gg", 
             "order": 4, 
             "plan": {
                 "tasks": {
                     "check me": {
                         "depends_on": [], 
-                        "id": "uwih52bERD6waddWS+H56A", 
+                        "id": "GhDr5PdzRK6JP-8uPOxfqg", 
                         "order": 1
                     }
                 }
@@ -185,7 +186,8 @@
         "Free Illustration For Character": {
             "depends_on": [], 
             "description": "Free illustrations on character", 
-            "id": "U1IuBvxhSD+voi94iqH3YQ", 
+            "id": "Yqa9WC7UQPC1zDJnX3-coQ", 
+            "needs": "Character Research", 
             "order": 1, 
             "plan": {}, 
             "template": "character_free_illustration"
@@ -195,12 +197,12 @@
         "Asset Management": {
             "depends_on": [
                 {
-                    "id": "MIK-fStvTXGPjdqODB8Z-A", 
+                    "id": "zF77lIQ3Ram1VR7CInn4gg", 
                     "name": "Check Points, Finilize and Quality Control", 
                     "order": 4
                 }
             ], 
-            "id": "dIt2cG0eTUa5d50bG0lCAg", 
+            "id": "4ryXZeRqTRefT5J18rV0oA", 
             "order": 5, 
             "plan": {
                 "max_effort": 8, 
@@ -219,21 +221,45 @@
                     "layout artist": {
                         "minimum_rate": 5
                     }
-                }
+                }, 
+                "tags": [
+                    "asset"
+                ]
             }, 
             "template": "asset_management"
         }, 
         "Documentation": {
             "depends_on": [
                 {
-                    "id": "dIt2cG0eTUa5d50bG0lCAg", 
+                    "id": "4ryXZeRqTRefT5J18rV0oA", 
                     "name": "Asset Management", 
                     "order": 5
                 }
             ], 
-            "id": "e0tSw0xBTuKxHJ7GwphHFg", 
+            "id": "6fK3HnCVQKG1mGb28vljPg", 
             "order": 6, 
-            "plan": {}, 
+            "plan": {
+                "max_effort": 10, 
+                "min_effort": 2, 
+                "outputs": {
+                    "Document about parent tasks": {
+                        "checklist": "asset_documentation_checklist", 
+                        "type": "Markdown and pdf file of documentation"
+                    }, 
+                    "Url of document on ams": {
+                        "checklist": "url_checklist", 
+                        "type": "url"
+                    }
+                }, 
+                "resource_expertize": {
+                    "layout artist": {
+                        "minimum_rate": 0.75
+                    }
+                }, 
+                "tags": [
+                    "documentation"
+                ]
+            }, 
             "template": "documentation"
         }
     }

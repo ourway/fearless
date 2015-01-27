@@ -32,7 +32,7 @@ import os
 import uuid
 from envelopes import Envelope, GMailSMTP
 from utils.validators import email_validator
-from models import session, fdb
+from models import Session, fdb
 from opensource.contenttype import contenttype
 # riak bucket for our files
 import sh
@@ -99,6 +99,7 @@ def add_asset(dataMD5, uploadedFilePath):
     ''' Add asset to database
         Why I provide the md5? Cause we can get md5 in uploading process before.
     '''
+    session = Session()
     if not uploadedFilePath:
         return 'Not any path'
 
@@ -141,8 +142,11 @@ def add_asset(dataMD5, uploadedFilePath):
 
     try:
         session.commit()
+        session.close()
         return targetAsset.key
     except IntegrityError:
+        session.rollback()
+        session.close()
         return 'Error'
 
 
@@ -258,6 +262,7 @@ def getTags(path, assetUuid):
 @Capp.task
 def identify(path, assetId):
     '''Find video duration'''
+    session = Session()
     path = path.encode('utf-8')
     content_type = contenttype(path)
     # if content_type.split('/')[0]=='image':
@@ -271,14 +276,17 @@ def identify(path, assetId):
         if target and result:
             target.fileinfo = result.replace(path, '').strip()
             session.commit()
+    session.close()
 
 
 @Capp.task
 def generateVideoThumbnail(path, assetUuid, version, w=146, h=110, text='thmb'):
     '''generate a thumbnail from a video file and return a vfile db'''
     from models import Asset
+    session = Session()
     target = session.query(Asset).filter_by(uuid=assetUuid).first()
     if not target:
+        session.close()
         return
     path = path.encode('utf-8')
 
@@ -288,6 +296,7 @@ def generateVideoThumbnail(path, assetUuid, version, w=146, h=110, text='thmb'):
     arg = '''"%s" -i "%s" -an -r 1 -vf "select=gte(n\,100)" -vframes 1 -s %sx%s -y "%s"''' \
         % (ffmpeg, path, w, h, thpath)
     pr = process(arg)
+    session.close()
     if os.path.isfile(thpath):
         return thpath
 
@@ -316,6 +325,7 @@ def generateVideoPreview(path, version, assetUuid):
 def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb'):
     '''generate thumbnails using convert command'''
     from models import Asset
+    session = Session()
     target = session.query(Asset).filter_by(id=asset).first()
     if not target:
         return
@@ -336,6 +346,7 @@ def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb')
     if content_type == 'image/webp':
         cmd = '%s -i "%s" -s %sx%s "%s"' % (ffmpeg, path, w, h, newthmbPath)
     pr = process(cmd)
+    session.close()
     if os.path.isfile(newthmbPath):
         return newthmbPath
 

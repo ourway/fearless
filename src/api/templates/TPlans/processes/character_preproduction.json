@@ -11,7 +11,8 @@
             {
                 "template":"character_free_illustration",
                 "description":"Free illustrations on character",
-                "order":1
+                "order":1,
+                "needs": "Character Research"
             },
             "Character Concept":
             {
@@ -23,7 +24,8 @@
             {
                 "template":"character_design",
                 "description":"Character Design Process",
-                "order":3
+                "order":3,
+                "needs":"Character Research"
             },
             "Check Points, Finilize and Quality Control":
             {
@@ -42,7 +44,8 @@
             "Documentation":
             {
                 "template":"documentation",
-                "order":6
+                "order":6,
+                "asset_management_output"
             }
         }
 }

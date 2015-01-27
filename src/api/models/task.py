@@ -19,7 +19,6 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
     Float, Boolean, event, Unicode
 
 import json as json
-from db import session
 from mako.template import Template
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.ext.associationproxy import association_proxy

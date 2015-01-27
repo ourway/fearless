@@ -198,6 +198,7 @@ def AfterUserCreationFuncs(mapper, connection, target):
         if not usersGroup in user.grps:
             user.grps.append(usersGroup)
     session.commit()
+    session.close()
 
 
 event.listen(User, 'after_insert', AfterUserCreationFuncs)

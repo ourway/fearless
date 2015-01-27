@@ -12,22 +12,25 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
-import re
+
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
-from . import Group
+
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.associationproxy import association_proxy
-from mixin import IDMixin, Base, getUUID, logger
-import datetime
+from mixin import IDMixin, Base, getUUID
 
 
-class Item(IDMixin, Base):
+class Expert(IDMixin, Base):
 
-    '''Main users group
+    '''Rules for permissions and authorizations
     '''
-    path = Column(
-        String(128), unique=True, nullable=False)  # showtime/#/DmWdMXXw
+
+    name = Column(String(128), nullable=False, unique=True)
+    tgs = relationship("Tag", backref='roles')
+    tags = association_proxy('tgs', 'name')
+
+    def __init__(self, name):
+        self.name = name

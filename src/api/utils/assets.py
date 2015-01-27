@@ -75,7 +75,6 @@ class AssetSave:
                 req.session.add(targetRepo)
             else:
                 targetRepo = pr
-
         _cid = req.get_param('collection_id')
         if _cid:
             collection = req.session.query(Collection).filter_by(repository=targetRepo)\
@@ -87,11 +86,7 @@ class AssetSave:
         if not collection:
             collection = Collection(path='danger', repository=targetRepo)
             req.session.add(collection)
-
-
-        
         body = req.stream
-
         b64 = req.get_param('b64')
         thumbnail = req.get_param('thmb')
         mt = req.get_param('multipart')
@@ -103,38 +98,31 @@ class AssetSave:
                 resp.status = falcon.HTTP_400
                 resp.body={'message':'error'}
                 return
-
             body = fs['file'].file
             if fs.has_key('thumbnail'): ## thumbnails are dataURLs
                 thumbnail = fs['thumbnail'].file.read()  ## thumbs are mostly small
 
             mtname = fs['file'].filename
-
-
         attach_to = req.get_param('attach_to')
         if targetRepo and body:
             if not mtname:
                 name = req.get_param('name') or 'undefined.%s.raw' % _generate_id()
             else:
                 name = mtname
-
             if name:
                 name = slugify_filename(name)
-
             name = name.decode('utf-8')
             assetExt = name.split('.')[-1]
             content_type = contenttype(name)
             assetPath = name
             tempraryStoragePath = path.join(targetRepo.path, collection.path,
                                             name)
-
             name, bodyMd5 = safeCopyAndMd5(req, body, tempraryStoragePath, targetRepo.id, b64=b64)
             fullname = name
             name = (name[:10] + '..') if len(name) > 10 else name
             asset = req.session.query(Asset).filter(
                 Asset.repository == targetRepo).filter_by(collection=collection)\
                         .filter_by(fullname=fullname).first()
-
             if not asset:
                 _uid = getUUID()
                 asset = Asset(key=bodyMd5, version=1, repository=targetRepo,uuid=_uid,
@@ -147,14 +135,9 @@ class AssetSave:
                 asset.name = name
                 asset.fullname = fullname
                 asset.key = bodyMd5
-
             # Asset descriptions
-
             if req.get_param('description'):
                 asset.description = req.get_param('description')
-            
-
-
             if targetUser:
                 asset.modifiers.append(targetUser)
                 asset.users.append(targetUser)
@@ -166,19 +149,14 @@ class AssetSave:
                 thmb_data = decodestring(unquote(thumbnail).split(',')[1])
                 with open(thmbpath, 'wb') as f:
                     f.write(thmb_data)
-
-
             if attach_to:
                 parent_id = int(attach_to)
                 parent = req.session.query(Asset).filter(Asset.id == parent_id).first()
                 asset.attached_to.append(parent)
-
-
-                
                 #newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
                 #asset.task_id = newAsset.task_id
             resp.body = {'message': 'Asset created|updated', 'key': asset.key,
-                         'url': asset.url, 'fullname':asset.fullname, 'id':asset.id,
+                         'url': asset.url, 'fullname':asset.fullname, 'uuid':asset.uuid,
                          'name':asset.name, 'content_type':asset.content_type.split('/')[0],
                          'datetime':time.time()}
                 #resp.body = "I am working"
@@ -189,6 +167,8 @@ class AssetSave:
                     break
 
             resp.body = {'message': 'Repo is not available'}
+
+
 
 
 def safeCopyAndMd5(req, fileobj, destinationPath, repoId, b64=False):
@@ -483,7 +463,8 @@ class AddCollection:
 
         template = data.get('template').lower()
         if name and repository_id:
-            newC = Collection(name=name, path=name, repository_id=repository_id)
+            _uid = getUUID()
+            newC = Collection(name=name, uuid=_uid, path=name, repository_id=repository_id)
             if parent_id:
                 newC.parent_id = parent_id
             if template:
@@ -491,7 +472,7 @@ class AddCollection:
 
             #if not os.path.isdir(newC.url):
             req.session.add(newC)
-            resp.body = {'message':'OK', 'info':'Collection created'}
+            resp.body = {'message':'OK', 'info':{'uuid':_uid}}
             #else:
             #    resp.body = {'message':'ERROR', 'info':'Collection is available on server'}
 
@@ -524,12 +505,3 @@ class AssetCheckout:
         preview =  os.path.join('uploads', fid+'.'+fmt)
         resp.body = {'poster':poster, 'thumbnail':thumbnail, 'version':version, 'preview':preview}
 
-
-        
-
- 
-        
-        
-
-
-        
