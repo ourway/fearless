@@ -221,7 +221,7 @@ class DB:
         # if not isAuthorizedTo(u.get('id'), 'create_%s'%table):
         #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         query_params = get_params(req.stream, flat=False)
-        insert_cmd = '{t}(*query_params)'.format(t=table)
+        insert_cmd = '{t}(**query_params)'.format(t=table)
         new = eval(insert_cmd)
         #for i in query_params:
         #    setattr(new, i, query_params.get(i))
