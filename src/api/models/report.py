@@ -55,7 +55,7 @@ class Report(IDMixin, Base):
     def save_data_in_riak(self, key, data):
         self.uuid = getUUID()
         #c = bz2.compress(data)
-        newReportObject = rdb.new(self.uuid, data.encode('utf-8'))
+        newReportObject = rdb.new(self.uuid, {'body': data})
         #result = base64.encodestring(c)
         # with open(os.path.join(db_files_path, self.uuid), 'wb') as f:
         #    f.write(c)
@@ -67,4 +67,5 @@ class Report(IDMixin, Base):
         # with open(os.path.join(db_files_path, self.uuid), 'rb') as f:
         #    data = bz2.decompress(f.read())
         dataObject = rdb.get(self.uuid)
-        return dataObject.data
+        if dataObject.data:
+            return dataObject.data.get('body')
