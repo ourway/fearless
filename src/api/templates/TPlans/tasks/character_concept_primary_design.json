@@ -1,0 +1,20 @@
+{
+    "tags":["asset"],
+    "min_effort":1,
+    "max_effort":8,
+    "resource_expertize":
+        {
+            "character concept artist":
+                {
+                    "minimum_rate":0.75
+                }
+        },
+    "outputs":
+        {
+            "Link to final primary design file":
+                {
+                    "type":"url",
+                    "checklist":"url_checklist"
+                }
+        }
+}

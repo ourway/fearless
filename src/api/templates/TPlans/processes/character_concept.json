@@ -1,2 +1,10 @@
 {
+    "tasks":
+        {
+           "primary design":
+                {
+                    "template":"character_concept_primary_design",
+                    "order":1
+                }
+        }
 }
