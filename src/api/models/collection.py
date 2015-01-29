@@ -155,8 +155,12 @@ def AfterUserCreationFuncs(mapper, connection, target):
                     holdAssets = False
                     index = folder.split('/').index(part)
                     if index == len(folder.split('/')) - 1:
-                        container = True
+                        container = False
                         holdAssets = True
+                    if len(folder.split('/')) == 1:
+                        container = True
+                        holdAssets = False
+
 
                     part = part.strip()
                     tn = folder.split('/').index(part)
