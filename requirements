@@ -19,6 +19,7 @@ MySQL-Python
 oursql
 psycopg2
 lxml
+readline
 ipython
 sh
 eventlet

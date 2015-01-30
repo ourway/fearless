@@ -171,7 +171,8 @@ class Project(IDMixin, Base):
         _tasks = []
         #_resources = list()
         for task in self.tasks:
-            _tasks.append(task.tjp_task())
+            if not task.parent or (not task.parent and not task.children):
+                _tasks.append(task.tjp_task())
             #_resources.extend(task.resources)
         # send tasks in reverse order
         subProjectTasks = sp.render(tasks=_tasks, subproject=self)
