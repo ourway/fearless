@@ -62,6 +62,8 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
     % endif
     % if task.complete!=None and not isMilestone and all([i.complete==100 for i in task.depends]):
         complete ${task.complete}
+    % else:
+        complete 0
     % endif
     % if (not task.effort and not isMilestone):
         start ${task.start.strftime('%Y-%m-%d')}

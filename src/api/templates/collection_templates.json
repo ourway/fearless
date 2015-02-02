@@ -198,7 +198,7 @@
             "maya/scenes/rig": ["ma", "mb"],
             "maya/scenes/dynamics": ["ma", "mb"],
             "maya/scenes/shader": ["ma", "mb"],
-            "maya/scenes/light": ["ma", "mb"],
+            "scenes/light": ["ma", "mb"],
             "textures/128": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
             "textures/256": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
             "textures/512": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
@@ -268,7 +268,13 @@
             "nuke/output": [""],
             "preview": [""],
             "output": [""],
-
+            "textures/128": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/256": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/512": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/1k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/2k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/4k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
+            "textures/8k": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
         },
         "copy": {
             "thumb.png": "icons/sequences.png"

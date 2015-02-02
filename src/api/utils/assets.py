@@ -186,6 +186,9 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, b64=False):
     #    basename = _generate_id() + '@@' + basename
     #    destinationPath = os.path.join(destDir, basename)
         #os.remove(destinationPath)
+    ''' if available asset, then we need to symblink it if asset uuid if different than available one!'''
+    if os.path.islink(destinationPath):
+        os.remove(destinationPath)
     f = open(destinationPath, 'wb')
     md5 = hashlib.md5()
     if b64:
@@ -208,13 +211,19 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, b64=False):
         availableAsset = req.session.query(Asset).filter_by(key=dataMd5).first()
     else:
         availableAsset = req.session.query(Asset).filter_by(key=dataMd5).join(Collection).filter_by(repository_id=repoId).first()
+
+    '''First lets clean asset is there no files linked to it'''
     if availableAsset and not os.path.isfile(availableAsset.full_path):
         req.session.delete(availableAsset)
+
+
     elif availableAsset:
         if os.path.isfile(availableAsset.full_path) and availableAsset.full_path!=destinationPath:
             os.remove(destinationPath) ## we dont need it anymore
             os.symlink(availableAsset.full_path, destinationPath)
             #print 'Symblink: %s generated' % destinationPath
+
+
 
 
     

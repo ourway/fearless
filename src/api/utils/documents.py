@@ -22,13 +22,13 @@ class GetNote:
     def on_get(self, req, resp, key):
         obj = ddb.get(key)
         if obj.data:
-
             resp.body = {'note': obj.data.get('note_s')}
 
 
 class SetNote:
 
-    def on_get(self, req, resp, key, value):
+    def on_get(self, req, resp, key):
+        value = req.stream.read()
         data = {'note_s': value}
         obj = ddb.new(key, data).store()
         resp.body = {'note': obj.data.get('note_s')}

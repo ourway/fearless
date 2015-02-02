@@ -239,7 +239,7 @@ def addFileToGit(path, assetUuid, version):
     # now lets clone it to assets folder
     asset_folder = os.path.join(ASSETS, assetUuid)
     if not os.path.isdir(asset_folder):  # not cloned
-        command = 'git clone "%s" "%s"' % (git_dir, asset_folder)
+        command = 'git clone -l "%s" "%s"' % (git_dir, asset_folder)
         process(command)
     else:
         command = 'pull'
