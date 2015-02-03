@@ -117,7 +117,8 @@ class AssetSave:
             assetPath = name
             tempraryStoragePath = path.join(targetRepo.path, collection.path,
                                             name)
-            name, bodyMd5 = safeCopyAndMd5(req, body, tempraryStoragePath, targetRepo.id, b64=b64)
+            #name = os.path.basename(tempraryStoragePath)
+            bodyMd5 = safeCopyAndMd5(req, body, tempraryStoragePath, targetRepo.id, targetUser, b64=b64)
             fullname = name
             name = (name[:10] + '..') if len(name) > 10 else name
             asset = req.session.query(Asset).filter(
@@ -171,21 +172,17 @@ class AssetSave:
 
 
 
-def safeCopyAndMd5(req, fileobj, destinationPath, repoId, b64=False):
+def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False):
     '''copy a file in chunked mode safely'''
 
     destDir = path.dirname(destinationPath)
     extsp = destinationPath.split('.')
-    basename = os.path.basename(destinationPath)
     if len(extsp)>1:
         ext = extsp[1]
     else:
         ext = 'raw'
     checkPath(destDir)
-    #if path.isfile(destinationPath):
-    #    basename = _generate_id() + '@@' + basename
-    #    destinationPath = os.path.join(destDir, basename)
-        #os.remove(destinationPath)
+
     ''' if available asset, then we need to symblink it if asset uuid if different than available one!'''
     if os.path.islink(destinationPath):
         os.remove(destinationPath)
@@ -213,21 +210,16 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, b64=False):
         availableAsset = req.session.query(Asset).filter_by(key=dataMd5).join(Collection).filter_by(repository_id=repoId).first()
 
     '''First lets clean asset is there no files linked to it'''
-    if availableAsset and not os.path.isfile(availableAsset.full_path):
-        req.session.delete(availableAsset)
+    if availableAsset: 
+        if not os.path.isfile(availableAsset.full_path):
+            req.session.delete(availableAsset)
 
-
-    elif availableAsset:
-        if os.path.isfile(availableAsset.full_path) and availableAsset.full_path!=destinationPath:
+        elif not availableAsset.full_path==destinationPath:
             os.remove(destinationPath) ## we dont need it anymore
             os.symlink(availableAsset.full_path, destinationPath)
             #print 'Symblink: %s generated' % destinationPath
-
-
-
-
     
-    return (basename, dataMd5)
+    return dataMd5
 
 
 def getAssetInfo(key):

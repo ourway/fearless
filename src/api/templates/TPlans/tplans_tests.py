@@ -5,7 +5,6 @@ from uuid import uuid4  # for random guid generation
 import base64
 from collections import OrderedDict
 import datetime
-
 class Task:
     effort = 0
     duration = 0
@@ -16,17 +15,12 @@ class Task:
     end = None
     milestone = None
 
-
 def getUUID():
     data = base64.encodestring(uuid4().get_bytes()).strip()[:-2]
     return data.replace('/', '-')
 
-
 def sort_by_order(a):
-
     return a[1].get('order')
-
- 
 
 def render_process(t):
     ''' 
@@ -44,7 +38,6 @@ def render_process(t):
     outputs = []
     last_order = 0
     found_tasks = False
-
     #print plan
 
     if plan.get('processes'):
