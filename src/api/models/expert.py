@@ -23,13 +23,16 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, getUUID
 
 
+
+
+
 class Expert(IDMixin, Base):
 
     '''Rules for permissions and authorizations
     '''
 
     name = Column(String(128), nullable=False, unique=True)
-    tgs = relationship("Tag", backref='roles')
+    tgs = relationship("Tag", backref='expert')
     tags = association_proxy('tgs', 'name')
 
     def __init__(self, name):

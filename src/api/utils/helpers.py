@@ -155,3 +155,31 @@ def csv2json(csvfile):
             value = s[index].strip()
             obj[key].append(value)
     return dict(obj)
+
+
+
+def expertizer(name):
+    from models import Expert, Session
+    session=Session()
+    _ex = session.query(Expert).filter_by(name=name).first()
+    if _ex:
+        session.close()
+        return _ex
+    else:
+        ex = Expert(name)
+        session.close()
+        return ex
+    
+
+
+def tag_maker(name):
+    from models import Tag, Session
+    session=Session()
+    _ex = session.query(Tag).filter_by(name=name).first()
+    if _ex:
+        session.close()
+        return _ex
+    else:
+        ex = Tag(name)
+        session.close()
+        return ex

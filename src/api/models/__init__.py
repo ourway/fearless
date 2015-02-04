@@ -24,7 +24,7 @@ __all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
            'Repository', 'Project', 'now', 'Ticket', 'Session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
            'Document', 'Account', 'Date', 'Collection', 'r', 'es', 'Departement',
-           'Comment', 'fdb', 'vdb', 'adb', 'rdb', 'ddb', 'mdb', 'riakClient']
+           'Comment', 'fdb', 'vdb', 'adb', 'rdb', 'ddb', 'mdb', 'riakClient', 'Expert']
 
 import os
 
@@ -64,7 +64,6 @@ from db import Session, engine, Base
 from models.group import Group
 from models.document import Document
 from models.account import Account
-from models.user import User
 from models.report import Report
 from models.role import Role
 from models.client import Client
@@ -83,6 +82,8 @@ from models.departement import Departement
 from models.document import Document
 from models.comment import Comment
 from models.date import Date
+from models.expert import Expert
+from models.user import User
 from utils.defaults import public_repository_path
 Base.metadata.create_all(engine)
 

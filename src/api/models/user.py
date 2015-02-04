@@ -23,6 +23,7 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, getUUID, logger, convert_to_datetime
+from utils.helpers import expertizer, tag_maker
 import datetime
 
 users_groups = Table('users_groups', Base.metadata,
@@ -76,6 +77,14 @@ user_accounts = Table('user_accounts', Base.metadata,
                       Column('account_id', Integer, ForeignKey("account.id"),
                              primary_key=True)
                       )
+
+users_expertise = Table('users_expertise', Base.metadata,
+                      Column('user_id', Integer, ForeignKey("user.id"),
+                             primary_key=True),
+                      Column('expert_id', Integer, ForeignKey("expert.id"),
+                             primary_key=True)
+                      )
+
 
 
 class User(IDMixin, Base):
@@ -132,10 +141,13 @@ class User(IDMixin, Base):
     agreement_period = relationship("Date", uselist=False)
     # when we refer to reports, id will be returned.
     reports = association_proxy('reps', 'id')
+    exps = relationship('Expert', backref='users', secondary='users_expertise')
+    expertise = association_proxy('exps', 'name', creator=expertizer)
+    groups = association_proxy('grps', 'name')
     grps = relationship('Group', backref='users', secondary='users_groups')
     groups = association_proxy('grps', 'name')
     tgs = relationship("Tag", backref='users')
-    tags = association_proxy('tgs', 'name')
+    tags = association_proxy('tgs', 'name', creator=tag_maker)
 
     @validates('email')
     def _validate_email(self, key, data):

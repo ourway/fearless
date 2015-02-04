@@ -46,6 +46,7 @@ class Tag(IDMixin, Base):
     role_id = Column(Integer, ForeignKey('role.id'))
     group_id = Column(Integer, ForeignKey('group.id'))
     report_id = Column(Integer, ForeignKey('report.id'))
+    expert_id = Column(Integer, ForeignKey('expert.id'))
     document_id = Column(Integer, ForeignKey('document.id'))
     ticket_id = Column(Integer, ForeignKey('ticket.id'))
     account_id = Column(Integer, ForeignKey('account.id'))

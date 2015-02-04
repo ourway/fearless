@@ -47,6 +47,8 @@ user31 = User(email='bitarafali@yahoo.com', password='123456', active=True, firs
 user32 = User(email='mj.hagh@gmail.com', password='123456', active=True, firstname='Majid', lastname='Hagighighatjoo')
 
 
+session = Session()
+
 
 session.add_all([ user1, user2, user3, user4, user5, user6, user7, user8, user9,
                  user10, user11, user12, user13, user14, user15, user16, user17,
@@ -61,6 +63,7 @@ session.commit()
 
 
 session.commit()
+session.close()
 
     #print maya_section.assets
     #shutil.copyfileobj(maya_section.archive, open('maya_section.tar', 'w'))

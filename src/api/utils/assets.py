@@ -75,6 +75,11 @@ class AssetSave:
                 req.session.add(targetRepo)
             else:
                 targetRepo = pr
+        ''' When client sends md5, it means that there is probabaly an exsisting file with that md5
+            So we server doesnt need file data.  Just need to link old data '''
+        _md5 = req.get_param('md5')
+
+
         _cid = req.get_param('collection_id')
         if _cid:
             collection = req.session.query(Collection).filter_by(repository=targetRepo)\
@@ -104,7 +109,7 @@ class AssetSave:
 
             mtname = fs['file'].filename
         attach_to = req.get_param('attach_to')
-        if targetRepo and body:
+        if targetRepo and (body or _md5):
             if not mtname:
                 name = req.get_param('name') or 'undefined.%s.raw' % _generate_id()
             else:
@@ -118,7 +123,21 @@ class AssetSave:
             tempraryStoragePath = path.join(targetRepo.path, collection.path,
                                             name)
             #name = os.path.basename(tempraryStoragePath)
-            bodyMd5 = safeCopyAndMd5(req, body, tempraryStoragePath, targetRepo.id, targetUser, b64=b64)
+            if _md5:
+                availableAsset = req.session.query(Asset).filter_by(key=_md5).join(Collection).filter_by(repository_id=targetRepo.id).first()
+                if availableAsset:
+                    checkPath(os.path.dirname(tempraryStoragePath))  ## create folder if not available
+                    if os.path.isfile(tempraryStoragePath):
+                        os.remove(tempraryStoragePath)
+                    os.symlink(availableAsset.full_path, tempraryStoragePath)
+                    bodyMd5 = _md5
+                else:
+                    resp.status = falcon.HTTP_404
+                    return
+            else:
+                bodyMd5 = safeCopyAndMd5(req, body, tempraryStoragePath, targetRepo.id, targetUser, b64=b64)
+
+
             fullname = name
             name = (name[:10] + '..') if len(name) > 10 else name
             asset = req.session.query(Asset).filter(
@@ -167,7 +186,7 @@ class AssetSave:
                 if not chunk:
                     break
 
-            resp.body = {'message': 'Repo is not available'}
+            resp.body = {'message': 'Something Wrong!'}
 
 
 
