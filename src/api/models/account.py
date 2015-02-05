@@ -21,7 +21,19 @@ from sqlalchemy.orm import validates, deferred
 from mixin import IDMixin, Base, getUUID
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.ext.associationproxy import association_proxy
+from utils.helpers import tag_maker
 from db import Session
+
+
+
+accounts_tags = Table("accounts_tags", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "account_id", Integer, ForeignKey("account.id"), primary_key=True),
+                     Column(
+                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                     )
+
 
 
 class Account(IDMixin, Base):
@@ -37,19 +49,16 @@ class Account(IDMixin, Base):
     max_credit = Column(Float(precision=3), default=0)
     credit = Column(Float(precision=3), default=0)
     parent_id = Column(Integer, ForeignKey('account.id'))
-    departement_id = Column(Integer, ForeignKey('departement.id'))
-    user_id = Column(Integer, ForeignKey('user.id'))
-    project_id = Column(Integer, ForeignKey('project.id'))
-    sequence_id = Column(Integer, ForeignKey('sequence.id'))
-    shot_id = Column(Integer, ForeignKey('shot.id'))
-    client_id = Column(Integer, ForeignKey('client.id'))
-    asset_id = Column(Integer, ForeignKey('asset.id'))
-    task_id = Column(Integer, ForeignKey('task.id'))
     parent = relationship("Account", backref="children", remote_side=[id])
     period = relationship("Date", uselist=False)
-    tgs = relationship("Tag", backref='accounts')
-    tags = association_proxy('tgs', 'name')
+    tgs = relationship("Tag", backref='accounts', secondary="accounts_tags")
+    tags = association_proxy('tgs', 'name', creator=tag_maker)
+
     #start = Column(DateTime, nullable=False, default=now)
+
+    def __init__(self, data, *args, **kw):
+        self.name = data
+
 
     @validates('credit')
     def check_credit(self, key, data):
@@ -61,3 +70,4 @@ class Account(IDMixin, Base):
                 session.close()
                 return data
         session.close()
+

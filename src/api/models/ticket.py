@@ -23,6 +23,16 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 
 
+
+tickets_tags = Table("tickets_tags", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "ticket_id", Integer, ForeignKey("ticket.id"), primary_key=True),
+                     Column(
+                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                     )
+
+
 class Ticket(IDMixin, Base):
 
     """Tickets are the way of reporting errors or asking for changes.
@@ -31,7 +41,7 @@ class Ticket(IDMixin, Base):
     name = Column(String(64), nullable=False)
     body = deferred(Column(Text))
     period = relationship("Date", uselist=False)
-    tgs = relationship("Tag", backref='tickets')
+    tgs = relationship("Tag", backref='tickets', secondary="tickets_tags")
     tags = association_proxy('tgs', 'name')
 
     def __init__(self, name):

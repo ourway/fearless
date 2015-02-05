@@ -21,8 +21,23 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, getUUID
+from utils.helpers import tag_maker, account_maker
 
+experts_accounts = Table("experts_accounts", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "expert_id", Integer, ForeignKey("expert.id"), primary_key=True),
+                     Column(
+                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                     )
 
+experts_tags = Table("experts_tags", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "expert_id", Integer, ForeignKey("expert.id"), primary_key=True),
+                     Column(
+                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                     )
 
 
 
@@ -32,8 +47,11 @@ class Expert(IDMixin, Base):
     '''
 
     name = Column(String(128), nullable=False, unique=True)
-    tgs = relationship("Tag", backref='expert')
-    tags = association_proxy('tgs', 'name')
+    acns = relationship("Account", backref='expertise', secondary="experts_accounts")
+    accounts = association_proxy('acns', 'name', creator=account_maker)
+    tgs = relationship("Tag", backref='expert', secondary="experts_tags")
+    tags = association_proxy('tgs', 'name', creator=tag_maker)
+
 
     def __init__(self, name):
         self.name = name

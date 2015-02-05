@@ -21,6 +21,7 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
+from utils.helpers import tag_maker, account_maker
 
 shots_sequences = Table("shots_sequences", Base.metadata,
                         Column('id', Integer, primary_key=True),
@@ -29,6 +30,23 @@ shots_sequences = Table("shots_sequences", Base.metadata,
                         Column("sequence_id", Integer, ForeignKey(
                             "sequence.id"), primary_key=True)
                         )
+
+
+sequences_accounts = Table("sequences_accounts", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "sequence_id", Integer, ForeignKey("sequence.id"), primary_key=True),
+                     Column(
+                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                     )
+
+sequences_tags = Table("sequences_tags", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "sequence_id", Integer, ForeignKey("sequence.id"), primary_key=True),
+                     Column(
+                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                     )
 
 
 class Sequence(IDMixin, Base):
@@ -45,9 +63,11 @@ class Sequence(IDMixin, Base):
     shots = relationship('Shot', backref='sequences',
                          secondary='shots_sequences')
     period = relationship("Date", uselist=False)
-    account = relationship("Account", backref='sequences')
-    tgs = relationship("Tag", backref='sequences')
-    tags = association_proxy('tgs', 'name')
+    acns = relationship("Account", backref='sequences', secondary="sequences_accounts")
+    accounts = association_proxy('acns', 'name', creator=account_maker)
+    tgs = relationship("Tag", backref='sequences', secondary="sequences_tags")
+    tags = association_proxy('tgs', 'name', creator=tag_maker)
+
 
     @validates('number')
     def _assign_name_code(self, key, data):

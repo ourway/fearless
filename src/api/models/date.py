@@ -21,7 +21,18 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, now
+from utils.helpers import tag_maker
 
+
+
+
+dates_tags = Table("dates_tags", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "date_id", Integer, ForeignKey("date.id"), primary_key=True),
+                     Column(
+                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                     )
 
 class Date(IDMixin, Base):
 
@@ -45,5 +56,6 @@ class Date(IDMixin, Base):
     account_id = Column(Integer, ForeignKey('account.id'))
     document_id = Column(Integer, ForeignKey('document.id'))
     departement_id = Column(Integer, ForeignKey('departement.id'))
-    tgs = relationship("Tag", backref='dates')
-    tags = association_proxy('tgs', 'name')
+    tgs = relationship("Tag", backref='dates', secondary="dates_tags")
+    tags = association_proxy('tgs', 'name', creator=tag_maker)
+

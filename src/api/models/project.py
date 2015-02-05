@@ -30,7 +30,7 @@ from sqlalchemy import desc, asc
 from .task import Task
 from .user import User
 from . import r
-from utils.helpers import dumps
+from utils.helpers import dumps, tag_maker, account_maker
 
 project_users = Table('project_users', Base.metadata,
                       Column('id', Integer, primary_key=True),
@@ -55,6 +55,24 @@ project_reports = Table('project_reports', Base.metadata,
                         Column('report_id', Integer, ForeignKey("report.id"),
                                primary_key=True)
                         )
+
+
+
+projects_accounts = Table("projects_accounts", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "project_id", Integer, ForeignKey("project.id"), primary_key=True),
+                     Column(
+                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                     )
+
+projects_tags = Table("projects_tags", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "project_id", Integer, ForeignKey("project.id"), primary_key=True),
+                     Column(
+                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                     )
 
 
 class Project(IDMixin, Base):
@@ -107,9 +125,11 @@ class Project(IDMixin, Base):
     reports = association_proxy('rep', 'id')
     subproject = relationship("Project", backref='parent', remote_side=[id])
     period = relationship("Date", uselist=False)
-    account = relationship("Account", backref='projects')
-    tgs = relationship("Tag", backref='projects')
-    tags = association_proxy('tgs', 'name')
+    acns = relationship("Account", backref='projects', secondary="projects_accounts")
+    accounts = association_proxy('acns', 'name', creator=account_maker)
+    tgs = relationship("Tag", backref='projects', secondary="projects_tags")
+    tags = association_proxy('tgs', 'name', creator=tag_maker)
+
 
     @aggregated('tasks', Column(Integer))
     def calculate_number_of_tasks(self):

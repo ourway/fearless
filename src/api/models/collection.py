@@ -27,10 +27,20 @@ import ujson as json  # for schema validations
 from mako.template import Template
 
 from utils.fagit import GIT
+from utils.helpers import tag_maker
 from . import Repository
 from db import Session
 from collections import defaultdict
 
+
+
+collections_tags = Table("collections_tags", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "collection_id", Integer, ForeignKey("collection.id"), primary_key=True),
+                     Column(
+                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                     )
 
 class Collection(IDMixin, Base):
 
@@ -54,8 +64,9 @@ class Collection(IDMixin, Base):
     repository_id = Column(
         Integer, ForeignKey('repository.id'), nullable=False)
     assets = relationship('Asset', backref='collection', cascade="all, delete, delete-orphan")
-    tgs = relationship("Tag", backref='collections')
-    tags = association_proxy('tgs', 'name')
+    tgs = relationship("Tag", backref='collections', secondary="collections_tags")
+    tags = association_proxy('tgs', 'name', creator=tag_maker)
+
 
     @validates('schema')
     def load_json(self, key, schema):

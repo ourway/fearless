@@ -183,3 +183,53 @@ def tag_maker(name):
         ex = Tag(name)
         session.close()
         return ex
+
+
+def group_maker(name):
+    from models import Group, Session
+    session=Session()
+    _ex = session.query(Group).filter_by(name=name).first()
+    if _ex:
+        session.close()
+        return _ex
+    else:
+        ex = Group(name)
+        session.close()
+        return ex
+
+def role_maker(name):
+    from models import Role, Session
+    session=Session()
+    _ex = session.query(Role).filter_by(name=name).first()
+    if _ex:
+        session.close()
+        return _ex
+    else:
+        ex = Role(name)
+        session.close()
+        return ex
+
+def departement_maker(name):
+    from models import Departement, Session
+    session=Session()
+    _ex = session.query(Departement).filter_by(name=name).first()
+    if _ex:
+        session.close()
+        return _ex
+    else:
+        ex = Departement(name)
+        session.close()
+        return ex
+
+
+def account_maker(name):
+    from models import Account, Session
+    session=Session()
+    _ex = session.query(Account).filter_by(name=name).first()
+    if _ex:
+        session.close()
+        return _ex
+    else:
+        ex = Account(name)
+        session.close()
+        return ex

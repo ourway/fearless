@@ -24,8 +24,20 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from mixin import IDMixin, Base, db_files_path, getUUID
 from sqlalchemy.ext.associationproxy import association_proxy
+from utils.helpers import tag_maker
 import os
 from . import rdb
+
+
+
+
+reports_tags = Table("reports_tags", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "report_id", Integer, ForeignKey("report.id"), primary_key=True),
+                     Column(
+                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                     )
 
 
 class Report(IDMixin, Base):
@@ -45,8 +57,9 @@ class Report(IDMixin, Base):
     sequence = relationship("Sequence", backref='reports')
     task_id = Column(Integer, ForeignKey("task.id"))
     due = relationship("Date")
-    tgs = relationship("Tag", backref='reports')
-    tags = association_proxy('tgs', 'name')
+    tgs = relationship("Tag", backref='reports', secondary="reports_tags")
+    tags = association_proxy('tgs', 'name', creator=tag_maker)
+
 
     def __init__(self, data, *args, **kw):
         self.data = data

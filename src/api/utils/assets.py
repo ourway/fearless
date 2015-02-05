@@ -21,7 +21,7 @@ from urllib import unquote
 import os
 import cgi
 import uuid
-from helpers import commit, Commit, get_params
+from helpers import commit, Commit, get_params, tag_maker
 from sys import stderr
 from os import path
 from opensource.contenttype import contenttype

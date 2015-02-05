@@ -21,7 +21,17 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, getUUID
+from utils.helpers import tag_maker
 
+
+
+roles_tags = Table("roles_tags", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "role_id", Integer, ForeignKey("role.id"), primary_key=True),
+                     Column(
+                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                     )
 
 class Role(IDMixin, Base):
 
@@ -29,8 +39,9 @@ class Role(IDMixin, Base):
     '''
 
     name = Column(String(32), nullable=False, unique=True)
-    tgs = relationship("Tag", backref='roles')
-    tags = association_proxy('tgs', 'name')
+    tgs = relationship("Tag", backref='roles', secondary="roles_tags")
+    tags = association_proxy('tgs', 'name', creator=tag_maker)
+
 
     def __init__(self, name):
         self.name = name

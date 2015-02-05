@@ -23,7 +23,8 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, getUUID, logger, convert_to_datetime
-from utils.helpers import expertizer, tag_maker
+from utils.helpers import expertizer, tag_maker, group_maker, role_maker,\
+    departement_maker, account_maker
 import datetime
 
 users_groups = Table('users_groups', Base.metadata,
@@ -71,7 +72,7 @@ user_reports = Table('user_reports', Base.metadata,
                      )
 
 
-user_accounts = Table('user_accounts', Base.metadata,
+users_accounts = Table('users_accounts', Base.metadata,
                       Column('user_id', Integer, ForeignKey("user.id"),
                              primary_key=True),
                       Column('account_id', Integer, ForeignKey("account.id"),
@@ -82,6 +83,20 @@ users_expertise = Table('users_expertise', Base.metadata,
                       Column('user_id', Integer, ForeignKey("user.id"),
                              primary_key=True),
                       Column('expert_id', Integer, ForeignKey("expert.id"),
+                             primary_key=True)
+                      )
+
+users_tags = Table('users_tags', Base.metadata,
+                      Column('user_id', Integer, ForeignKey("user.id"),
+                             primary_key=True),
+                      Column('tag_id', Integer, ForeignKey("tag.id"),
+                             primary_key=True)
+                      )
+
+users_departements = Table('users_departements', Base.metadata,
+                      Column('user_id', Integer, ForeignKey("user.id"),
+                             primary_key=True),
+                      Column('departement_id', Integer, ForeignKey("departement.id"),
                              primary_key=True)
                       )
 
@@ -136,8 +151,7 @@ class User(IDMixin, Base):
         "Report", secondary=lambda: user_reports, backref='user')
     agreements = relationship("Document", backref='agreement_of')
     payment_invoices = relationship("Document", backref='invoice_of')
-    chargeset = relationship(
-        "Account", backref='users', secondary="user_accounts")
+
     agreement_period = relationship("Date", uselist=False)
     # when we refer to reports, id will be returned.
     reports = association_proxy('reps', 'id')
@@ -145,8 +159,12 @@ class User(IDMixin, Base):
     expertise = association_proxy('exps', 'name', creator=expertizer)
     groups = association_proxy('grps', 'name')
     grps = relationship('Group', backref='users', secondary='users_groups')
-    groups = association_proxy('grps', 'name')
-    tgs = relationship("Tag", backref='users')
+    acns = relationship('Account', backref='users', secondary='users_accounts')
+    accounts = association_proxy('acns', 'name', creator=account_maker)
+    groups = association_proxy('grps', 'name', creator=group_maker)
+    dps = relationship("Departement", backref='users', secondary="users_departements")
+    departements = association_proxy('dps', 'name', creator=departement_maker)
+    tgs = relationship("Tag", backref='users', secondary="users_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
 
     @validates('email')

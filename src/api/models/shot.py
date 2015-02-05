@@ -21,7 +21,7 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
-
+from utils.helpers import tag_maker, account_maker
 
 shots_scenes = Table("shots_scenes", Base.metadata,
                      Column('id', Integer, primary_key=True),
@@ -29,6 +29,22 @@ shots_scenes = Table("shots_scenes", Base.metadata,
                          "shot_id", Integer, ForeignKey("shot.id"), primary_key=True),
                      Column(
                          "scene_id", Integer, ForeignKey("scene.id"), primary_key=True)
+                     )
+
+shots_accounts = Table("shots_accounts", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "shot_id", Integer, ForeignKey("shot.id"), primary_key=True),
+                     Column(
+                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                     )
+
+shots_tags = Table("shots_tags", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "shot_id", Integer, ForeignKey("shot.id"), primary_key=True),
+                     Column(
+                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
                      )
 
 
@@ -50,9 +66,11 @@ class Shot(IDMixin, Base):
     preview = relationship("Asset", backref='shots')
     scenes = relationship("Scene", backref='shots', secondary="shots_scenes")
     period = relationship("Date", uselist=False)
-    account = relationship("Account", backref='shots')
-    tgs = relationship("Tag", backref='shots')
-    tags = association_proxy('tgs', 'name')
+    acns = relationship("Account", backref='shots', secondary="shots_accounts")
+    aacounts = association_proxy('acns', 'name', creator=account_maker)
+    tgs = relationship("Tag", backref='shots', secondary="shots_tags")
+    tags = association_proxy('tgs', 'name', creator=tag_maker)
+
 
     @validates('number')
     def _assign_name_code(self, key, data):

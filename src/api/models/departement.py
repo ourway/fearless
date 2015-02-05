@@ -21,14 +21,10 @@ from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
+from utils.helpers import tag_maker, account_maker
 
 
-users_departements = Table('users_departements', Base.metadata,
-                           Column('id', Integer, primary_key=True),
-                           Column('user_id', Integer, ForeignKey('user.id')),
-                           Column(
-                               'departement_id', Integer, ForeignKey('departement.id'))
-                           )
+
 
 
 sequences_departements = Table('sequences_departements', Base.metadata,
@@ -49,18 +45,33 @@ shots_departements = Table('shots_departements', Base.metadata,
                            )
 
 
+departements_accounts = Table("departements_accounts", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "departement_id", Integer, ForeignKey("departement.id"), primary_key=True),
+                     Column(
+                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                     )
+
+departements_tags = Table("departements_tags", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "departement_id", Integer, ForeignKey("departement.id"), primary_key=True),
+                     Column(
+                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                     )
+
+
 class Departement(IDMixin, Base):
 
     '''Groups for membership management
     '''
     name = Column(String(64), nullable=False)
-    users = relationship(
-        'User', backref='departements', secondary='users_departements')
-    sequences = relationship(
-        'Sequence', backref='departements', secondary='sequences_departements')
-    sequences = relationship(
-        'Shot', backref='departements', secondary='shots_departements')
     period = relationship("Date", uselist=False)
-    account = relationship("Account", backref='departements')
-    tgs = relationship("Tag", backref='departements')
-    tags = association_proxy('tgs', 'name')
+    acns = relationship("Account", backref='departements', secondary="departements_accounts")
+    accounts = association_proxy('acns', 'name', creator=account_maker)
+    tgs = relationship("Tag", backref='departements', secondary="departements_tags")
+    tags = association_proxy('tgs', 'name', creator=tag_maker)
+
+    def __init__(self, data, *args, **kw):
+        self.name = data

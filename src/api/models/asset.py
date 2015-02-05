@@ -23,6 +23,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 from utils.fagit import GIT
+from utils.helpers import tag_maker, account_maker
 from db import Session
 from . import fdb
 import uuid
@@ -40,6 +41,24 @@ assets_assets = Table('assets_assets', Base.metadata,
                       Column('asset_a_id', Integer, ForeignKey('asset.id')),
                       Column('asset_b_id', Integer, ForeignKey('asset.id'))
                       )
+
+
+
+aasets_accounts = Table("assets_accounts", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "asset_id", Integer, ForeignKey("asset.id"), primary_key=True),
+                     Column(
+                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                     )
+
+assets_tags = Table("assets_tags", Base.metadata,
+                     Column('id', Integer, primary_key=True),
+                     Column(
+                         "asset_id", Integer, ForeignKey("asset.id"), primary_key=True),
+                     Column(
+                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                     )
 
 
 class Asset(IDMixin, Base):
@@ -80,9 +99,10 @@ class Asset(IDMixin, Base):
 
     collection_id = Column(
         Integer, ForeignKey('collection.id'), nullable=False)
-    account = relationship("Account", backref='assets')
-    tgs = relationship("Tag", backref='assets')
-    tags = association_proxy('tgs', 'name')
+    acns = relationship("Account", backref='assets', secondary="assets_accounts")
+    accounts = association_proxy('acns', 'name', creator=account_maker)
+    tgs = relationship("Tag", backref='assets', secondary="assets_tags")
+    tags = association_proxy('tgs', 'name', creator=tag_maker)
 
     @validates('name')
     def check_name(self, key, name):
