@@ -34,6 +34,8 @@ from models import *
 from sqlalchemy import desc, asc
 from datetime import datetime
 
+from models.db import CS  ## scopped session
+
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
     Verify, Reactivate, Reset, Logout, GetUserInfo, Authorize, \
@@ -51,8 +53,7 @@ tables = [i for i in av if i[0] in ascii_uppercase]
 
 
 def getSession(req, resp, params):
-    from models.db import Session
-    req.session = Session()
+    req.session = CS()  ## imported from models.db
 
 
 def closeSession(req, resp):
@@ -64,7 +65,8 @@ def closeSession(req, resp):
         print '*' * 80
         req.session.rollback()
     finally:
-        req.session.close()
+        #req.session.close()
+        CS.remove()
 
 
 class ThingsResource:
@@ -167,7 +169,7 @@ class DB:
         field = req.get_param('field')
         if field:
             try:
-                if len(args) != 5:
+                if len(args) != 5 and data:
                     data = [eval('i.%s' % field) for i in data]
 
                 elif len(args) == 5:

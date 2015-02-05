@@ -20,7 +20,7 @@ from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
-from mixin import IDMixin, Base, getUUID
+from mixin import IDMixin, Base, getUUID, UniqueMixin
 from utils.helpers import tag_maker
 
 
@@ -33,7 +33,7 @@ roles_tags = Table("roles_tags", Base.metadata,
                          "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
                      )
 
-class Role(IDMixin, Base):
+class Role(IDMixin, UniqueMixin, Base):
 
     '''Rules for permissions and authorizations
     '''
@@ -45,3 +45,11 @@ class Role(IDMixin, Base):
 
     def __init__(self, name):
         self.name = name
+
+    @classmethod
+    def unique_hash(cls, name):
+        return name
+
+    @classmethod
+    def unique_filter(cls, query, name):
+        return query.filter(Role.name == name)

@@ -20,7 +20,7 @@ from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
-from mixin import IDMixin, Base, getUUID
+from mixin import IDMixin, Base, getUUID, UniqueMixin
 from utils.helpers import tag_maker, account_maker
 
 experts_accounts = Table("experts_accounts", Base.metadata,
@@ -41,7 +41,7 @@ experts_tags = Table("experts_tags", Base.metadata,
 
 
 
-class Expert(IDMixin, Base):
+class Expert(IDMixin, UniqueMixin, Base):
 
     '''Rules for permissions and authorizations
     '''
@@ -55,3 +55,14 @@ class Expert(IDMixin, Base):
 
     def __init__(self, name):
         self.name = name
+
+
+    @classmethod
+    def unique_hash(cls, name):
+        return name
+
+    @classmethod
+    def unique_filter(cls, query, name):
+        return query.filter(Expert.name == name)
+
+

@@ -159,89 +159,37 @@ def csv2json(csvfile):
 
 
 def expertizer(name):
-    from models import Expert, Session
-    session=Session()
-    _ex = session.query(Expert).filter_by(name=name).first()
-    if _ex:
-        session.close()
-        return _ex
-    else:
-        ex = Expert(name)
-        session.add(ex)
-        session.commit()
-        session.close()
-        return ex
+    from models import Expert
+    _t = Expert.as_unique(name=name)
+    return _t
     
 
 
 def tag_maker(name):
-    from models import Tag, Session
-    s=Session()
-    _ex = s.query(Tag).filter_by(name=name).first()
-    if _ex:
-        s.close()
-        return _ex
-    else:
-        ex = Tag(name)
-        s.add(ex)
-        s.commit()
-        s.close()
-        return ex
+    from models import Tag
+    _t = Tag.as_unique(name=name)
+    return _t
 
 
 def group_maker(name):
-    from models import Group, Session
-    s=Session()
-    _ex = s.query(Group).filter_by(name=name).first()
-    if _ex:
-        s.close()
-        return _ex
-    else:
-        ex = Group(name)
-        s.add(ex)
-        s.commit()
-        s.close()
-        return ex
+    from models import Group
+    _t = Group.as_unique(name=name)
+    return _t
 
 def role_maker(name):
-    from models import Role, Session
-    s=Session()
-    _ex = s.query(Role).filter_by(name=name).first()
-    if _ex:
-        s.close()
-        return _ex
-    else:
-        ex = Role(name)
-        s.add(ex)
-        s.commit()
-        s.close()
-        return ex
+    from models import Role
+    _t = Role.as_unique(name=name)
+    return _t
+
 
 def departement_maker(name):
-    from models import Departement, Session
-    s=Session()
-    _ex = s.query(Departement).filter_by(name=name).first()
-    if _ex:
-        s.close()
-        return _ex
-    else:
-        ex = Departement(name)
-        s.add(ex)
-        s.commit()
-        s.close()
-        return ex
+    from models import Departement
+    _t = Departement.as_unique(name=name)
+    return _t
 
 
 def account_maker(name):
-    from models import Account, Session
-    s=Session()
-    _ex = s.query(Account).filter_by(name=name).first()
-    if _ex:
-        s.close()
-        return _ex
-    else:
-        ex = Account(name)
-        s.add(ex)
-        s.commit()
-        s.close()
-        return ex
+    from models import Account
+    _t = Account.as_unique(name=name)
+    return _t
+

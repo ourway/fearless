@@ -18,7 +18,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
-from mixin import IDMixin, Base, getUUID
+from mixin import IDMixin, Base, getUUID, UniqueMixin
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.ext.associationproxy import association_proxy
 from utils.helpers import tag_maker
@@ -36,7 +36,7 @@ accounts_tags = Table("accounts_tags", Base.metadata,
 
 
 
-class Account(IDMixin, Base):
+class Account(IDMixin, UniqueMixin, Base):
 
     '''Rules for permissions and authorizations
     '''
@@ -58,6 +58,15 @@ class Account(IDMixin, Base):
 
     def __init__(self, data, *args, **kw):
         self.name = data
+
+
+    @classmethod
+    def unique_hash(cls, name):
+        return name
+
+    @classmethod
+    def unique_filter(cls, query, name):
+        return query.filter(Account.name == name)
 
 
     @validates('credit')

@@ -19,10 +19,10 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
-from mixin import IDMixin, Base
+from mixin import IDMixin, Base, UniqueMixin
 
 
-class Tag(IDMixin, Base):
+class Tag(IDMixin, UniqueMixin, Base):
 
     """Used for any tag in orm
     """
@@ -33,5 +33,11 @@ class Tag(IDMixin, Base):
     parent_id = Column(Integer, ForeignKey('tag.id'))
     parent = relationship("Tag", backref="children", remote_side=[id])
 
-    def __init__(self, data, *args, **kw):
-        self.name = data
+
+    @classmethod
+    def unique_hash(cls, name):
+        return name
+
+    @classmethod
+    def unique_filter(cls, query, name):
+        return query.filter(Tag.name == name)

@@ -20,7 +20,7 @@ from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
-from mixin import IDMixin, Base
+from mixin import IDMixin, Base, UniqueMixin
 from utils.helpers import tag_maker, account_maker
 
 
@@ -62,7 +62,7 @@ departements_tags = Table("departements_tags", Base.metadata,
                      )
 
 
-class Departement(IDMixin, Base):
+class Departement(IDMixin, UniqueMixin, Base):
 
     '''Groups for membership management
     '''
@@ -75,3 +75,11 @@ class Departement(IDMixin, Base):
 
     def __init__(self, data, *args, **kw):
         self.name = data
+
+    @classmethod
+    def unique_hash(cls, name):
+        return name
+
+    @classmethod
+    def unique_filter(cls, query, name):
+        return query.filter(Departement.name == name)

@@ -72,6 +72,57 @@ def convert_to_datetime(inp):
         return datetime.datetime.strptime(inp, fmt)
 
 
+
+
+
+
+
+def _unique(cls, hashfunc, queryfunc, constructor, arg, kw):
+    from .db import CS
+    session=CS()
+    cache = getattr(session, '_unique_cache', None)
+    if cache is None:
+        session._unique_cache = cache = {}
+
+    key = (cls, hashfunc(*arg, **kw))
+    if key in cache:
+        return cache[key]
+    else:
+        q = session.query(cls)
+        q = queryfunc(q, *arg, **kw)
+        obj = q.first()
+        if not obj:
+            obj = constructor(*arg, **kw)
+            session.add(obj)
+            session.commit()
+        cache[key] = obj
+        return obj
+
+
+
+class UniqueMixin(object):
+    @classmethod
+    def unique_hash(cls, *arg, **kw):
+        raise NotImplementedError()
+
+    @classmethod
+    def unique_filter(cls, query, *arg, **kw):
+        raise NotImplementedError()
+
+    @classmethod
+    def as_unique(cls, *arg, **kw):
+        return _unique(
+                    cls,
+                    cls.unique_hash,
+                    cls.unique_filter,
+                    cls,
+                    arg, kw
+               )
+
+
+
+
+
 class IDMixin(object):
 
     @declared_attr

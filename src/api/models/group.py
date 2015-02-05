@@ -21,7 +21,7 @@ from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
-from mixin import IDMixin, Base
+from mixin import IDMixin, Base, UniqueMixin
 from utils.helpers import tag_maker
 
 
@@ -42,7 +42,7 @@ groups_tags = Table("groups_tags", Base.metadata,
                      )
 
 
-class Group(IDMixin, Base):
+class Group(IDMixin, UniqueMixin, Base):
 
     '''Groups for membership management
     '''
@@ -60,3 +60,12 @@ class Group(IDMixin, Base):
         self.typ = typ
         if role:
             self.roles.append(role)
+
+
+    @classmethod
+    def unique_hash(cls, name):
+        return name
+
+    @classmethod
+    def unique_filter(cls, query, name):
+        return query.filter(Group.name == name)
