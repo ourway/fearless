@@ -167,6 +167,8 @@ def expertizer(name):
         return _ex
     else:
         ex = Expert(name)
+        session.add(ex)
+        session.commit()
         session.close()
         return ex
     
@@ -174,62 +176,72 @@ def expertizer(name):
 
 def tag_maker(name):
     from models import Tag, Session
-    session=Session()
-    _ex = session.query(Tag).filter_by(name=name).first()
+    s=Session()
+    _ex = s.query(Tag).filter_by(name=name).first()
     if _ex:
-        session.close()
+        s.close()
         return _ex
     else:
         ex = Tag(name)
-        session.close()
+        s.add(ex)
+        s.commit()
+        s.close()
         return ex
 
 
 def group_maker(name):
     from models import Group, Session
-    session=Session()
-    _ex = session.query(Group).filter_by(name=name).first()
+    s=Session()
+    _ex = s.query(Group).filter_by(name=name).first()
     if _ex:
-        session.close()
+        s.close()
         return _ex
     else:
         ex = Group(name)
-        session.close()
+        s.add(ex)
+        s.commit()
+        s.close()
         return ex
 
 def role_maker(name):
     from models import Role, Session
-    session=Session()
-    _ex = session.query(Role).filter_by(name=name).first()
+    s=Session()
+    _ex = s.query(Role).filter_by(name=name).first()
     if _ex:
-        session.close()
+        s.close()
         return _ex
     else:
         ex = Role(name)
-        session.close()
+        s.add(ex)
+        s.commit()
+        s.close()
         return ex
 
 def departement_maker(name):
     from models import Departement, Session
-    session=Session()
-    _ex = session.query(Departement).filter_by(name=name).first()
+    s=Session()
+    _ex = s.query(Departement).filter_by(name=name).first()
     if _ex:
-        session.close()
+        s.close()
         return _ex
     else:
         ex = Departement(name)
-        session.close()
+        s.add(ex)
+        s.commit()
+        s.close()
         return ex
 
 
 def account_maker(name):
     from models import Account, Session
-    session=Session()
-    _ex = session.query(Account).filter_by(name=name).first()
+    s=Session()
+    _ex = s.query(Account).filter_by(name=name).first()
     if _ex:
-        session.close()
+        s.close()
         return _ex
     else:
         ex = Account(name)
-        session.close()
+        s.add(ex)
+        s.commit()
+        s.close()
         return ex
