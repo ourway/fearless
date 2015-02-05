@@ -23,7 +23,7 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, getUUID, logger, convert_to_datetime
-from utils.helpers import expertizer, tag_maker, group_maker, role_maker,\
+from utils.helpers import expertizer, tag_maker, group_maker,\
     departement_maker, account_maker
 import datetime
 

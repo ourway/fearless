@@ -56,8 +56,7 @@ class Account(IDMixin, UniqueMixin, Base):
 
     #start = Column(DateTime, nullable=False, default=now)
 
-    def __init__(self, data, *args, **kw):
-        self.name = data
+
 
 
     @classmethod

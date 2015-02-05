@@ -176,12 +176,6 @@ def group_maker(name):
     _t = Group.as_unique(name=name)
     return _t
 
-def role_maker(name):
-    from models import Role
-    _t = Role.as_unique(name=name)
-    return _t
-
-
 def departement_maker(name):
     from models import Departement
     _t = Departement.as_unique(name=name)

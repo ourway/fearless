@@ -73,8 +73,6 @@ class Departement(IDMixin, UniqueMixin, Base):
     tgs = relationship("Tag", backref='departements', secondary="departements_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
 
-    def __init__(self, data, *args, **kw):
-        self.name = data
 
     @classmethod
     def unique_hash(cls, name):
