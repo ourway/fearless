@@ -75,6 +75,25 @@
 
 
             </div>
+            <hr/>
+            <div ng-controller="taggerCtrl" class="col-md-12">
+                <input type="search" id="tagSearchInput"  class="typeahead form-control" 
+                options="tagOptions" datasets="completeData" placeholder="Tag this asset"
+                ng-model="tags.userTagFilter" ng-keyup="$event.keyCode == 13 ? addTag('asset', $parent.asset) : null" sf-typeahead>
+					<div class="col-sm-12">
+                        <br/>
+                        <ul class="nav nav-pills nav-stacked" style="margin-left: -15px;">
+                            <li class="" ng-repeat="tag in $parent.asset.tgs track by $index">
+                            <a><em class="fa fa-tag"></em> <span ng-show="true" 
+                                    style="cursor:pointer" ng-click="$parent.asset.tgs.splice($index, 1);addTag('asset', $parent.asset)" 
+                                    class="badge pull-right fa fa-remove"> </span>{{tag.name}}</a>
+                            </li>
+                        </ul>
+
+					</div>
+
+
+            </div>
             </div>
 
 
@@ -89,7 +108,7 @@
                 </div>
 
 
-                <div ng-if="asset.content_type.split('/')[0]=='image' || asset.content_type.split('/')[1]=='pdf'">
+                <div ng-if="asset.content_type.split('/')[0]=='image'">
                     <img ng-src="{{'/static/'+asset.poster}}" style="margin:auto;width:100%" class="thumbnail"/>
                 </div>
                 <div style="padding:15px;" class="col-md-12" ng-if="asset.thumbnail && assetVersions.length>1">
@@ -101,6 +120,34 @@
                 <div ng-if="asset.content_type.split('/')[1]=='x-python; charset=utf-8'" ng-init="loadAssetData()">
                     <pre><code class="lang-py">{{asset.data}}</code></pre>
                 </div>
+                <div ng-if="asset.content_type.split('/')[1]=='css; charset=utf-8'" ng-init="loadAssetData()">
+                    <pre><code class="lang-css">{{asset.data}}</code></pre>
+                </div>
+                <div ng-if="asset.content_type.split('/')[1]=='javascript'" ng-init="loadAssetData()">
+                    <pre><code class="lang-js">{{asset.data}}</code></pre>
+                </div>
+                <div ng-if="asset.content_type.split('/')[1]=='x-markdown; charset=utf-8'" ng-init="loadAssetData()">
+                    <div style="word-break: break-word" ng-bind-html="marked(asset.data)"></div>
+                </div>
+                <div ng-if="asset.content_type.split('/')[1]=='plain; charset=utf-8'" ng-init="loadAssetData()">
+                    <pre><code class="lang-text">{{asset.data}}</code></pre>
+                </div>
+                <div ng-if="asset.content_type.split('/')[1]=='x-csrc; charset=utf-8'" ng-init="loadAssetData()">
+                    <pre><code class="lang-c">{{asset.data}}</code></pre>
+                </div>
+                <div ng-if="asset.content_type.split('/')[1]=='x-chdr; charset=utf-8'" ng-init="loadAssetData()">
+                    <pre><code class="lang-h">{{asset.data}}</code></pre>
+                </div>
+                <div ng-if="asset.content_type.split('/')[1]=='x-c++src; charset=utf-8'" ng-init="loadAssetData()">
+                    <pre><code class="lang-cpp">{{asset.data}}</code></pre>
+                </div>
+
+                <div ng-if="asset.content_type.split('/')[1]=='pdf' || asset.content_type.split('/')[1]=='html; charset=utf-8'" ng-init="loadAssetData()">
+                    <iframe class="col-md-12" height="600" src="{{'/static/'+asset.url}}" seamless="seamless" ></iframe>
+                </div>
+
+
+
 
                 <!-- 
                 <select

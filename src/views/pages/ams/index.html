@@ -10,7 +10,7 @@
         <div class="col-md-10">
             <div id="from-group">
                 <input type="search" id="assetsSearchInput" class="typeahead form-control" 
-                options="typeheadOptions" datasets="completeData" placeholder="Search for your assets ..."
+                options="assetOptions" datasets="completeData" placeholder="Search for your assets ..."
                 ng-model="assetOptions.userAssetsFilter" ng-change="search()" autofocus sf-typeahead>
                 <div class="btn-group btn-group" ng-show="assetsCount>50">
                 <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: page == 1}" 

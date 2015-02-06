@@ -29,6 +29,7 @@ import uuid
 from opensource.contenttype import contenttype
 
 
+
 def get_ip():
     '''Simple method'''
     ip = commands.getoutput("/sbin/ifconfig").split("\n")[1].split()[1][5:]

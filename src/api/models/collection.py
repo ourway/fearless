@@ -33,7 +33,6 @@ from db import session
 from collections import defaultdict
 
 
-
 collections_tags = Table("collections_tags", Base.metadata,
                      Column('id', Integer, primary_key=True),
                      Column(
@@ -113,6 +112,8 @@ class Collection(IDMixin, Base):
     @staticmethod
     def AfterUserCreationFuncs(mapper, connection, target):
         '''Some operations after getting ID'''
+        from .db import Session
+        session = Session()
         repository = session.query(Repository).filter_by(id=target.repository_id).first()
         if target.path:
             collection_path = os.path.join(repository.path, target.path)
@@ -195,6 +196,10 @@ class Collection(IDMixin, Base):
 
                     if os.path.isfile(src):
                         shutil.copyfile(src, dest)
+
+        session.commit()
+        session.close()
+
 
 
 

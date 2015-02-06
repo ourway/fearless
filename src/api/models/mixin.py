@@ -78,8 +78,7 @@ def convert_to_datetime(inp):
 
 
 def _unique(cls, hashfunc, queryfunc, constructor, arg, kw):
-    from .db import CS
-    session = CS()
+    from models.db import session
     cache = getattr(session, '_unique_cache', None)
     if cache is None:
         session._unique_cache = cache = {}
@@ -88,12 +87,13 @@ def _unique(cls, hashfunc, queryfunc, constructor, arg, kw):
     if key in cache:
         return cache[key]
     else:
-        q = session.query(cls)
-        q = queryfunc(q, *arg, **kw)
-        obj = q.first()
-        if not obj:
-            obj = constructor(*arg, **kw)
-            #session.add(obj)
+        with session.no_autoflush:
+            q = session.query(cls)
+            q = queryfunc(q, *arg, **kw)
+            obj = q.first()
+            if not obj:
+                obj = constructor(*arg, **kw)
+                session.add(obj)
         cache[key] = obj
         return obj
 
@@ -111,6 +111,7 @@ class UniqueMixin(object):
     @classmethod
     def as_unique(cls, *arg, **kw):
         return _unique(
+                    
                     cls,
                     cls.unique_hash,
                     cls.unique_filter,
@@ -123,7 +124,7 @@ class UniqueMixin(object):
 
 
 class IDMixin(object):
-
+    session = None
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()

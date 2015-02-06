@@ -1494,6 +1494,7 @@ fearlessApp.controller('sequenceDetailCtrl', function($scope, $rootScope, $route
 
 fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
         assetId = $routeParams.assetId;
+        $scope.marked = marked;
 
 
 
@@ -1614,9 +1615,9 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                     //$location.search('version', Resp.version)
                     $scope.asset = Resp;
 
-                    getTags = $http.get('/api/db/asset/'+assetId+'?field=tags');
-                    getTags.success(function(tags){
-                        $scope.asset._tags = tags;
+                    getTags = $http.get('/api/db/asset/'+assetId+'?field=tgs');
+                    getTags.success(function(tgs){
+                        $scope.asset.tgs = tgs;
                         })
 
                     $scope.checkout('v_'+Resp.version);
@@ -2126,9 +2127,59 @@ fearlessApp.controller('messagesCtrl',  function ($scope) {
 });// end messageCtrl
 
 
+fearlessApp.controller('taggerCtrl',  function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
+        
+    $scope.tags = {};
+    $scope.tags.data = [];
+    var tags = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      limit: 5,
+      prefetch: {
+        // url points to a json file that contains an array of country names, see
+        // https://github.com/twitter/typeahead.js/blob/gh-pages/data/countries.json
+        url: '/api/db/tag',
+        // the json file contains an array of strings, but the Bloodhound
+        // suggestion engine expects JavaScript objects so this converts all of
+        // those strings
+
+                
+      }
+    });
+    tags.initialize();
+
+    $scope.completeData = {
+      name: 'tags',
+      displayKey: 'name',
+      source: tags.ttAdapter(),
+    };
+    
+    $scope.addTag = function(type, target){
+        target.tgs.forEach(function(e){
+                    $scope.tags.data.push(e.name)
+                }
+            )
+        if ($scope.tags.userTagFilter && $scope.tags.userTagFilter.name)
+        {
+            $scope.tags.data.push($scope.tags.userTagFilter.name);
+            target.tgs.push({'name':$scope.tags.userTagFilter.name})
+        }
+        else if ($scope.tags.userTagFilter)
+        {
+            $scope.tags.data.push($scope.tags.userTagFilter);
+            target.tgs.push({'name':$scope.tags.userTagFilter})
+        }
+        $scope.tags.userTagFilter = null;
+        console.log($scope.tags.data)
+        $http.post('/api/setTags/'+type+'/'+target.uuid, {'tags':$scope.tags.data});
+        $scope.tags.data = [];
+    }
+
+        });
+
 fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
 
-        $scope.assetOptions = {};
+$scope.assetOptions = {};
         // main assets index page
 var assets = new Bloodhound({
   datumTokenizer: Bloodhound.tokenizers.obj.whitespace('fullname'),
@@ -2150,7 +2201,7 @@ var assets = new Bloodhound({
 // kicks off the loading/processing of `local` and `prefetch`
 assets.initialize();
 
-$scope.typeheadOptions =  {
+$scope.assetOptions =  {
     highlight: true
   };
 // passing in `null` for the `options` arguments will result in the default

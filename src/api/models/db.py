@@ -36,5 +36,4 @@ engine = create_engine(DB, echo=False, convert_unicode=True, pool_recycle=3600)
 #engine.raw_connection().connection.text_factory = str
 #Session = mptt_sessionmaker(sessionmaker(bind=engine, expire_on_commit=False))
 Session = sessionmaker(bind=engine)
-CS = scoped_session(Session)
-session = CS()
+session = Session()

@@ -27,7 +27,7 @@ class GetNote:
 
 class SetNote:
 
-    def on_get(self, req, resp, key):
+    def on_put(self, req, resp, key):
         value = req.stream.read()
         data = {'note_s': value}
         obj = ddb.new(key, data).store()
@@ -36,7 +36,7 @@ class SetNote:
 
 class SearchNote:
 
-    def on_get(self, req, resp, query):
+    def on_post(self, req, resp, query):
         res = ddb.search('note_s:*%s*' % query)['docs']
         data = []
         for result in res:

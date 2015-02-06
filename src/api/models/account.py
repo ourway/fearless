@@ -22,7 +22,8 @@ from mixin import IDMixin, Base, getUUID, UniqueMixin
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.ext.associationproxy import association_proxy
 from utils.helpers import tag_maker
-from db import session
+from db import Session
+session = Session()
 
 
 
@@ -75,7 +76,7 @@ class Account(IDMixin, UniqueMixin, Base):
         if self.parent:
             chs = session.query(func.sum("Account.credit").label(total_credit)).filter_by(
                 parent=parent).first()
+            session.close()
             if chs.total_credit <= self.parent.max_credit + data:
-                session.close()
                 return data
 

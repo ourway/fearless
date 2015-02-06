@@ -21,7 +21,7 @@ usage:
 '''
 
 __all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
-           'Repository', 'Project', 'now', 'Ticket', 'session',
+           'Repository', 'Project', 'now', 'Ticket', 'Session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
            'Document', 'Account', 'Date', 'Collection', 'r', 'es', 'Departement',
            'Comment', 'fdb', 'vdb', 'adb', 'rdb', 'ddb', 'mdb', 'riakClient', 'Expert']
@@ -58,7 +58,8 @@ mdb.set_properties({'search_index': 'fearless_messages_database'})
 mdb.enable_search()
 # r.flushdb()
 
-from db import session, engine, Base
+from db import Session, engine, Base
+session = Session()
 
 
 from models.group import Group
@@ -160,6 +161,7 @@ def init():
 
 
     session.commit()
+    session.close()
 
 
 

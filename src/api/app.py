@@ -34,7 +34,7 @@ from models import *
 from sqlalchemy import desc, asc
 from datetime import datetime
 
-from models.db import CS  ## scopped session
+from models.db import session  ## scopped session
 
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
@@ -52,9 +52,12 @@ from utils.sequence import AddSequence
 tables = [i for i in av if i[0] in ascii_uppercase]
 
 
-def getSession(req, resp, params):
-    req.session = CS()  ## imported from models.db
 
+
+
+def getSession(req, resp, params):
+    from utils import helpers
+    req.session = session  ## imported from models.db
 
 def closeSession(req, resp):
     try:
@@ -65,8 +68,8 @@ def closeSession(req, resp):
         print '*' * 80
         req.session.rollback()
     finally:
-        req.session.close()
-        CS.remove()
+        pass
+        #req.session.close()
 
 
 class ThingsResource:
@@ -79,6 +82,15 @@ class ThingsResource:
         # print req.get_header('Cookie')
         resp.body = "okokokoko"
 
+
+
+class UpdateAssetTags:
+
+    def on_post(self, req, resp, key):
+        target = req.session.query(Asset).filter_by(uuid=key).first()
+        data = get_params(req.stream, False)
+        target.tags = data.get('tags')
+        resp.status = falcon.HTTP_202
 
 class DB:
 
@@ -353,6 +365,7 @@ app.add_route('/api/messages/search/{query}', SearchMessages())
 app.add_route('/api/messages/move/{key}', MoveMessage())
 app.add_route('/api/messages/delete/{key}', DeleteMessage())
 app.add_route('/api/messages/update/{key}', UpdateMessage())
+app.add_route('/api/setTags/asset/{key}', UpdateAssetTags())
 
 
 if __name__ == '__main__':
