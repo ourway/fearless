@@ -61,12 +61,14 @@ class Account(IDMixin, UniqueMixin, Base):
 
     @classmethod
     def unique_hash(cls, name):
+        if name:
+            name = name.lower()
         return name
 
     @classmethod
     def unique_filter(cls, query, name):
-        return query.filter(Account.name == name)
-
+        if name:
+            return query.filter(Account.name == name.lower())
 
     @validates('credit')
     def check_credit(self, key, data):

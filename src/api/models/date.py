@@ -59,3 +59,6 @@ class Date(IDMixin, Base):
     tgs = relationship("Tag", backref='dates', secondary="dates_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
 
+
+
+

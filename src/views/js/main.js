@@ -379,6 +379,18 @@ function updateImageSize(img, maxWidth, maxHeight){
             req = $http.get('/api/db/group').success(function(resp){
                     $scope.groups = resp;
                 });
+        }
+        $scope.getDeps = function(){
+            req = $http.get('/api/db/departement').success(function(resp){
+                    $scope.departements = resp;
+                });
+         
+        }
+
+        $scope.getExps = function(){
+            req = $http.get('/api/db/expert').success(function(resp){
+                    $scope.experts = resp;
+                });
          
         }
         $scope.sendmail = function(mail){
@@ -685,6 +697,8 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
             userId = $scope.$parent.userInfo.userid;
     $scope.accounting = accounting; 
     $scope.$parent.getGroups();
+    $scope.$parent.getDeps();
+    $scope.$parent.getExps();
     $scope.print = function(){
         $scope.printable = $('#invoice_print_area').html();
         styles = '<html><head><title>Fearless Monthly Invoice</title><link rel="stylesheet" href="css/bootstrap.min.css"> <link rel="stylesheet" href="css/main.css"> </head><body>';
@@ -718,6 +732,12 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
             $scope.user = resp; 
             $http.get('/api/db/user/'+userId+'?field=grps&list=true').success(function(grps){
                 $scope.user.grps = grps; 
+                })
+            $http.get('/api/db/user/'+userId+'?field=dps&list=true').success(function(dps){
+                $scope.user.dps = dps;
+                })
+            $http.get('/api/db/user/'+userId+'?field=exps&list=true').success(function(exps){
+                $scope.user.exps = exps;
                 })
             //console.log(resp);
             });
@@ -784,11 +804,13 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
                 mail['to'] = $scope.user.email;
                 mail['subject'] = 'Fearless profile';
                 //console.log(mail)
-                $scope.$parent.sendmail(mail);
+                //$scope.$parent.sendmail(mail);
                 }
             });
         // lets update groups or other list type data:
          y = $http.post('/api/user/'+userId+'/groups', {'groups':$scope.user.grps});
+         z = $http.post('/api/user/'+userId+'/departements', {'departements':$scope.user.dps});
+         x = $http.post('/api/user/'+userId+'/expertise', {'expertise':$scope.user.exps});
     }
 
 });

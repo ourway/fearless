@@ -36,8 +36,11 @@ class Tag(IDMixin, UniqueMixin, Base):
 
     @classmethod
     def unique_hash(cls, name):
+        if name:
+            name = name.lower()
         return name
 
     @classmethod
     def unique_filter(cls, query, name):
-        return query.filter(Tag.name == name)
+        if name:
+            return query.filter(Tag.name == name.lower())

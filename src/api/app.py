@@ -40,7 +40,7 @@ from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
     Verify, Reactivate, Reset, Logout, GetUserInfo, Authorize, \
     getUserInfoFromSession, isAuthorizedTo, GetPermissions, ChangePasswordVerify, \
-    ChangePassword, Users, UpdateGroups
+    ChangePassword, Users, UpdateGroups, UpdateDepartements, UpdateExpertise
 from utils.showtime import GetUserShows
 from utils.project import GetProjectDetails, GetProjectLatestReport, \
     ListProjects, AddProject, AddTask, ListTasks, GetTask, UpdateTask, \
@@ -65,7 +65,7 @@ def closeSession(req, resp):
         print '*' * 80
         req.session.rollback()
     finally:
-        #req.session.close()
+        req.session.close()
         CS.remove()
 
 
@@ -343,6 +343,8 @@ app.add_route('/api/note/get/{key}', GetNote())
 app.add_route('/api/note/set/{key}', SetNote())
 app.add_route('/api/note/search/{query}', SearchNote())
 app.add_route('/api/user/{userId}/groups', UpdateGroups())
+app.add_route('/api/user/{userId}/departements', UpdateDepartements())
+app.add_route('/api/user/{userId}/expertise', UpdateExpertise())
 app.add_route('/api/messages/list', GetMessagesList())
 app.add_route('/api/messages/all', GetMessages())
 app.add_route('/api/messages/get/{key}', GetMessage())

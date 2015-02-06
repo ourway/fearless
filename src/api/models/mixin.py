@@ -79,7 +79,7 @@ def convert_to_datetime(inp):
 
 def _unique(cls, hashfunc, queryfunc, constructor, arg, kw):
     from .db import CS
-    session=CS()
+    session = CS()
     cache = getattr(session, '_unique_cache', None)
     if cache is None:
         session._unique_cache = cache = {}
@@ -93,8 +93,7 @@ def _unique(cls, hashfunc, queryfunc, constructor, arg, kw):
         obj = q.first()
         if not obj:
             obj = constructor(*arg, **kw)
-            session.add(obj)
-            session.commit()
+            #session.add(obj)
         cache[key] = obj
         return obj
 

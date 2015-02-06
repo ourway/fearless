@@ -64,8 +64,11 @@ class Group(IDMixin, UniqueMixin, Base):
 
     @classmethod
     def unique_hash(cls, name):
+        if name:
+            name = name.lower()
         return name
 
     @classmethod
     def unique_filter(cls, query, name):
-        return query.filter(Group.name == name)
+        if name:
+            return query.filter(Group.name == name.lower())

@@ -522,22 +522,45 @@ class UpdateGroups:
         target = req.session.query(User).filter_by(id=int(userId)).first()
         data = get_params(req.stream, False)
         added = []
-        user_group = req.session.query(Group).filter_by(name='users').first()
-        admin_group = req.session.query(Group).filter_by(name='admin').first()
         if data.get('groups'):
             target.grps = []
+            target.groups = [i.get('name') for i in data.get('groups')]
+            if 'guests' in target.groups and 'users' not in target.groups:
+                    target.groups.append('users')
 
-            for grpinfo in data.get('groups'):
-                if grpinfo.get('name') != 'guests' and user_group and not user_group in target.grps:
-                    target.grps.append(user_group)
-                group = req.session.query(Group).filter_by(
-                    id=grpinfo.get('id')).first()
-                if group:
-                    target.grps.append(group)
-                    added.append(group.name)
-
-            if target.id == 1 and not admin_group in target.grps:
-                target.grps.append(admin_group)
+            if target.id == 1 and not 'admin' in target.groups:
+                target.groups.append('admin')
 
             resp.status = falcon.HTTP_202
-            resp.body = {'message': 'OK', 'info': added}
+            resp.body = {'message': 'OK'}
+
+
+class UpdateDepartements:
+
+    def on_get(self, req, resp, userId, **kw):
+        pass
+
+    def on_post(self, req, resp, userId):
+        target = req.session.query(User).filter_by(id=int(userId)).first()
+        data = get_params(req.stream, False)
+        if data.get('departements'):
+            target.dps = []
+            target.departements = [i.get('name') for i in data.get('departements')]
+
+            resp.status = falcon.HTTP_202
+            resp.body = {'message': 'OK'}
+
+class UpdateExpertise:
+
+    def on_get(self, req, resp, userId, **kw):
+        pass
+
+    def on_post(self, req, resp, userId):
+        target = req.session.query(User).filter_by(id=int(userId)).first()
+        data = get_params(req.stream, False)
+        if data.get('expertise'):
+            target.exps = []
+            target.expertise = [i.get('name') for i in data.get('expertise')]
+
+            resp.status = falcon.HTTP_202
+            resp.body = {'message': 'OK'}

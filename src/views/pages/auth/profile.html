@@ -14,8 +14,6 @@
 		</div>
 		<div class="col-md-6 column">
 
-            <br/>
-            <br/>
 			<form class="form-horizontal" role="form">
 				<div class="form-group">
 					 <label for="inputEmail3" class="col-sm-4 control-label">First name</label>
@@ -60,6 +58,57 @@
 						<input type="tel" class="form-control" placeholder="Example: P9-Gisha St,Tehran,Iran" ng-model="user.address" />
 					</div>
                 </div>
+
+
+                    <br/>
+                <div class="form-group">
+					 <label class="col-sm-4 control-label">Groups</label>
+                
+					<div class="col-sm-6">
+                        <ul class="nav nav-pills nav-stacked">
+                            <li class="" ng-repeat="group in user.grps track by $index">
+                            <a><em class="fa fa-child"></em> <span ng-show="$parent.isAdmin || $parent.isManager" style="cursor:pointer" ng-click="user.grps.splice($index, 1)" class="badge pull-right fa fa-remove"> </span>{{group.name}}</a>
+                            
+                            </li>
+                        </ul>
+
+					</div>
+                </div>
+
+                    <br/>
+                <div class="form-group">
+					 <label class="col-sm-4 control-label">Departements</label>
+                
+					<div class="col-sm-6">
+                        <ul class="nav nav-pills nav-stacked">
+                            <li class="active" ng-repeat="departement in user.dps track by $index">
+                            <a><em class="fa fa-group"></em> <span ng-show="$parent.isAdmin || $parent.isManager" style="cursor:pointer" ng-click="user.dps.splice($index, 1)" class="badge pull-right fa fa-sm fa-remove"> </span>{{departement.name}}</a>
+                            
+                            </li>
+                        </ul>
+
+					</div>
+                </div>
+
+                    <br/>
+                <div class="form-group">
+					 <label class="col-sm-4 control-label">Expertise</label>
+                
+					<div class="col-sm-6">
+                        <ul class="nav nav-pills nav-stacked">
+                            <li ng-repeat="expert in user.exps track by $index">
+                            <a><em class="fa fa-mortar-board"></em> <span ng-show="$parent.isAdmin || $parent.isManager" style="cursor:pointer" ng-click="user.exps.splice($index, 1)" class="badge pull-right fa fa-remove"> </span>{{expert.name}}</a>
+                            
+                            </li>
+                        </ul>
+
+					</div>
+                </div>
+
+
+
+
+
                     <br/>
 
 
@@ -104,8 +153,30 @@
                             ng-options="group.name for group in $parent.groups track by group.id">
                             <option value="0"></option>
                         </select>
+                    </div>
                 </div>
+
+				<div class="form-group" ng-if="$parent.isAdmin">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Departements</label>
+					<div class="col-sm-6">
+                        <select class="form-control" ng-model="user.dps" multiple 
+                            ng-options="dep.name for dep in $parent.departements track by dep.id">
+                            <option value="0"></option>
+                        </select>
+                    </div>
                 </div>
+
+				<div class="form-group" ng-if="$parent.isAdmin">
+					 <label for="inputPassword3" class="col-sm-4 control-label">Expertise</label>
+					<div class="col-sm-6">
+                        <select class="form-control" ng-model="user.exps" multiple 
+                            ng-options="expert.name for expert in $parent.experts track by expert.id">
+                            <option value="0"></option>
+                        </select>
+                    </div>
+                </div>
+
+
 
                 
                 <div class="form-group" >
