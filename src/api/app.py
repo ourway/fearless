@@ -68,8 +68,8 @@ def closeSession(req, resp):
         print '*' * 80
         req.session.rollback()
     finally:
-        pass
-        #req.session.close()
+        #pass
+        req.session.close()
 
 
 class ThingsResource:
