@@ -47,13 +47,14 @@ user31 = User(email='bitarafali@yahoo.com', password='123456', active=True, firs
 user32 = User(email='mj.hagh@gmail.com', password='123456', active=True, firstname='Majid', lastname='Hagighighatjoo')
 
 
-session = Session()
+from models.db import session, CS
 
 
 session.add_all([ user1, user2, user3, user4, user5, user6, user7, user8, user9,
                  user10, user11, user12, user13, user14, user15, user16, user17,
                  user18, user19, user20, user21, user22, user23, user24, user25,
                     user26, user27, user28, user29, user30, user31, user32])
+user1.groups.append('admin')
 session.commit()
     #import shutil
 #print animate.get_tree(session, json=True)
@@ -62,8 +63,7 @@ session.commit()
 
 
 
-session.commit()
-session.close()
+CS.remove()
 
     #print maya_section.assets
     #shutil.copyfileobj(maya_section.archive, open('maya_section.tar', 'w'))

@@ -21,7 +21,7 @@ usage:
 '''
 
 __all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
-           'Repository', 'Project', 'now', 'Ticket', 'Session',
+           'Repository', 'Project', 'now', 'Ticket', 'session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
            'Document', 'Account', 'Date', 'Collection', 'r', 'es', 'Departement',
            'Comment', 'fdb', 'vdb', 'adb', 'rdb', 'ddb', 'mdb', 'riakClient', 'Expert']
@@ -58,7 +58,7 @@ mdb.set_properties({'search_index': 'fearless_messages_database'})
 mdb.enable_search()
 # r.flushdb()
 
-from db import Session, engine, Base
+from db import session, engine, Base
 
 
 from models.group import Group
@@ -91,7 +91,6 @@ Base.metadata.create_all(engine)
 def init():
     '''set some defaults values. Like admin role and group, managers, etc...
     '''
-    session = Session()
     groups = session.query(Group).all()
     departements = ['animation', 'rigging', 'character', 'storyboard', 'voice', 'sound', 'texture', 'layout', 'editorial', 'technical',
                     'story', 'rendering', 'compositing', 'lighting', 'dynamics', 'stereoscopic', 'staff', 'management', 'directing', 'art']
@@ -137,8 +136,9 @@ def init():
                 name=repo, path=os.path.join(public_repository_path, repo))
             session.add(new_repository)
 
+
     session.commit()
-    session.close()
+
 
 
 init()

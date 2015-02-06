@@ -24,7 +24,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 from utils.fagit import GIT
 from utils.helpers import tag_maker, account_maker
-from db import Session
 from . import fdb
 import uuid
 from opensource.contenttype import contenttype
@@ -195,41 +194,41 @@ class Asset(IDMixin, Base):
                             self.collection.path, self.fullname)
 
 
-def AfterAssetCreationFuncs(mapper, connection, target):
-    '''Some operations after getting ID'''
-    from tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
-    from tasks import addFileToGit
-    session = Session()
-    Target = session.query(Asset).filter_by(id=target.id).first()
-    addFileToGit(Target.full_path, Target.uuid, Target.version)
-    identify.delay(Target.full_path, Target.id)
+    @staticmethod
+    def AfterAssetCreationFuncs(mapper, connection, target):
+        '''Some operations after getting ID'''
+        from tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
+        from tasks import addFileToGit
+        addFileToGit(target.full_path, target.uuid, target.version)
+        identify.delay(target.full_path, target.id)
 
-    # videos using ffmpeg
-    if Target.content_type.split('/')[0] == 'video':
-        generateVideoPreview.delay(
-            Target.full_path, Target.version, Target.uuid)
-        newThumb = generateVideoThumbnail.delay(
-            Target.full_path, Target.uuid, Target.version)
-        newPoster = generateVideoThumbnail.delay(Target.full_path, Target.uuid, Target.version,
-                                                 720, 480, 'poster')  # hd480
+        # videos using ffmpeg
+        if target.content_type.split('/')[0] == 'video':
+            generateVideoPreview.delay(
+                target.full_path, target.version, target.uuid)
+            newThumb = generateVideoThumbnail.delay(
+                target.full_path, target.uuid, target.version)
+            newPoster = generateVideoThumbnail.delay(target.full_path, target.uuid, target.version,
+                                                     720, 480, 'poster')  # hd480
 
-    if Target.content_type.split('/')[0] == 'image' or Target.content_type.split('/')[1] in ['pdf']:
-        poster = generateImageThumbnail.delay(Target.full_path,
-                                              Target.version, 720, 480, Target.id, 'poster')
-        newThumb = generateImageThumbnail.delay(Target.full_path, Target.version,
-                                                146, 110, Target.id, 'thmb')
-
-    session.commit()
-    session.close()
+        if target.content_type.split('/')[0] == 'image' or target.content_type.split('/')[1] in ['pdf']:
+            poster = generateImageThumbnail.delay(target.full_path,
+                                                  target.version, 720, 480, target.id, 'poster')
+            newThumb = generateImageThumbnail.delay(target.full_path, target.version,
+                                                    146, 110, target.id, 'thmb')
 
 
-def before_delete(mapper, connection, target):
-    if os.path.isfile(target.full_path):
-        try:
-            os.remove(full_path)
-        except:
-            pass
 
 
-event.listen(Asset, 'after_insert', AfterAssetCreationFuncs)
-event.listen(Asset, 'before_delete', before_delete)
+    @staticmethod
+    def before_delete(mapper, connection, target):
+        if os.path.isfile(target.full_path):
+            try:
+                os.remove(target.full_path)
+            except:
+                pass
+
+    @classmethod
+    def __declare_last__(cls):
+        event.listen(cls, 'after_insert', cls.AfterAssetCreationFuncs)
+        event.listen(cls, 'before_delete', cls.before_delete)

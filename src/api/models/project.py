@@ -45,7 +45,7 @@ project_watchers = Table('project_watchers', Base.metadata,
                          Column('user_id', Integer, ForeignKey('user.id'))
                          )
 
-from db import Session
+from db import session
 from mako.template import Template
 
 
@@ -201,7 +201,6 @@ class Project(IDMixin, Base):
 
     #@property
     def plan(self):
-        session=Session()
         # lets select just one task
         if not r.get('fearless_tj3_lock'):
             r.set('fearless_tj3_lock', 'OK')
@@ -246,8 +245,6 @@ class Project(IDMixin, Base):
                     '\\x1b[31m', '<b>').replace('\\x1b[0m', '</b>').split('\\x1b[35m')
                 if len(_d) > 1:
                     self.reports.append(_d[1])
-            session.commit()
-            session.close()
             return
         # if not tj.stderr:
         plan, guntt, resource, msproject, profit, csvfile, trace, burndown = None, None, None, None, None, None, None, None
@@ -318,8 +315,6 @@ class Project(IDMixin, Base):
             data['burndown'] = burndown
         data = dumps(data)
         self.reports.append(data)
-        session.commit()
-        session.close()
         return data
         # else:
         # return tj.stderr

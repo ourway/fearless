@@ -17,7 +17,7 @@ Clean code is much better than Cleaner comments!
 
 
 from models import User, Group, Role, r, now  # r is redis
-from helpers import commit, get_ip, get_params
+from helpers import get_ip, get_params
 import ujson as json
 import hmac
 import uuid
@@ -247,6 +247,10 @@ class Signup:
                            token=str(uuid.uuid4()))
 
             req.session.add(newuser)
+            oldUsersCount = req.session.query(User).count()
+            if oldUsersCount == 1:
+                newuser.groups.append('admin')
+
 
             activation_link = host + \
                 '/api/auth/activate?token=' + newuser.token

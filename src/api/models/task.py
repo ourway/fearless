@@ -232,23 +232,4 @@ class Task(IDMixin, Base):
         return data
 
 
-@event.listens_for(Task, 'before_insert')
-def receive_before_insert(mapper, connection, target):
-    target.effort = target.effort or 0
 
-    # ... (event handling logic) ...
-
-
-@event.listens_for(Task, 'after_insert')
-def receive_before_insert(mapper, connection, target):
-    pass
-    # print target.title
-    # ... (update task confighandling logic) ...
-
-
-# def schedule(mapper, connection, target):
-
-    # target.project.plan()
-
-
-#event.listen(Task, 'after_insert', schedule)

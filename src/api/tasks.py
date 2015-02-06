@@ -32,7 +32,8 @@ import os
 import uuid
 from envelopes import Envelope, GMailSMTP
 from utils.validators import email_validator
-from models import Session, fdb
+from models import fdb
+from models.db import Session
 from opensource.contenttype import contenttype
 # riak bucket for our files
 import sh
