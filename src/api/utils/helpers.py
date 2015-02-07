@@ -15,8 +15,7 @@ Clean code is much better than Cleaner comments!
 import falcon
 import os
 from sqlalchemy.exc import IntegrityError  # for exception handeling
-import json
-import ujson
+import ujson as json
 import commands
 import cStringIO
 from sqlalchemy.ext import associationproxy
@@ -47,8 +46,7 @@ def commit(req, resp):
 
 
 def dumps(obj):
-    import ujson
-    return ujson.encode(obj)
+    return json.dumps(obj)
 
 
 def jsonify(self, resp):
@@ -61,16 +59,16 @@ def jsonify(self, resp):
         resp.body = data
         return
     if isinstance(resp.body, (dict)):
-        data = ujson.encode(resp.body)
+        data = json.dumps(resp.body)
     elif isinstance(resp.body, (str)):
-        data = ujson.encode(resp.body)
+        data = json.dumps(resp.body)
     elif isinstance(resp.body, (list)):
         try:
             data = json.loads(repr(resp.body))
         except:
             data = resp.body
         finally:
-            data = ujson.encode(data)
+            data = json.dumps(data)
     else:
         data = repr(resp.body)
 

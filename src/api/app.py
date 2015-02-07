@@ -23,7 +23,7 @@ import urlparse
 from urllib import unquote
 from string import ascii_uppercase
 from sqlalchemy.ext.serializer import loads, dumps
-import json as json
+import simplejson as json
 from utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection
 from utils.messages import GetMessagesList, GetMessages, GetMessage, SetMessage, \
     SearchMessages, MoveMessage, DeleteMessage, UpdateMessage
@@ -180,10 +180,14 @@ class DB:
             except (AttributeError):
                 data = None
         field = req.get_param('field')
+        af = req.get_param('af') ## append field
         if field:
             try:
                 if len(args) != 5 and data:
-                    data = [eval('i.%s' % field) for i in data]
+                    if af:
+                        data = {'message':'not implemented'}
+                    else:
+                        data = [eval('i.%s' % field) for i in data]
 
                 elif len(args) == 5:
                     '''/api/db/user/1?field=tasks'''
