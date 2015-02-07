@@ -1099,7 +1099,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.mode=mode;
             //$('.tj_table_frame').fadeOut(2000);
             data = localStorage.getItem(getprefix +  mode);
-            if ($scope.replan || !data){
+            if ($scope.replan || !data)
                 localStorage.clear();
             projectReport = $http.get('/api/project/report/'+$scope.projId);
             projectReport.success(function(resp){
@@ -1150,7 +1150,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
                 })
 
-            }
 
            
 

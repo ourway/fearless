@@ -87,13 +87,13 @@ class Task(IDMixin, Base):
     note = Column(String(512))  # task note
     description = Column(String(512))  # task note
     gauge = Column(String(64))  # task note
-    start = Column(DateTime, nullable=False, default=now)
+    start = Column(DateTime, default=now)
     computed_start = Column(DateTime)
     computed_end = Column(DateTime)
-    end = Column(DateTime, nullable=False)
+    end = Column(DateTime, default=now)
     duration = Column(Float(precision=3), default=0)
     period = relationship("Date", uselist=False)
-    effort = Column(Float(precision=3), nullable=False, default=0)
+    effort = Column(Float(precision=3), default=0)
     effort_left = Column(Float(precision=3), default=0)
     effort_done = Column(Float(precision=3), default=0)
     length = Column(Float(precision=3), default=0)

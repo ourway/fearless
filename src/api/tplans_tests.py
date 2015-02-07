@@ -1,19 +1,17 @@
-#!../../../../pyenv/bin/python
+#!../../pyenv/bin/python
+
 from mako.template import Template
-import json as json
+import ujson as json
+from models import User, Task, Expert, Project
+from models.db import Session
 from uuid import uuid4  # for random guid generation
 import base64
 from collections import OrderedDict
 import datetime
-class Task:
-    effort = 0
-    duration = 0
-    depends = []
-    uuid = None
-    resources = []
-    start = None
-    end = None
-    milestone = None
+
+
+
+
 
 def getUUID():
     data = base64.encodestring(uuid4().get_bytes()).strip()[:-2]
@@ -22,7 +20,7 @@ def getUUID():
 def sort_by_order(a):
     return a[1].get('order')
 
-def render_process(t):
+def render_process(session, t, project_id, prefix):
     ''' 
         Renders a process template
         @t: mako template
@@ -32,7 +30,7 @@ def render_process(t):
         @desciption: string
     
     '''
-    templ = Template(filename='processes/'+t+'.json')  ## create a mako template
+    templ = Template(filename='templates/TPlans/processes/'+t+'.json')  ## create a mako template
     raw_root =  templ.render()
     plan = json.loads(raw_root)
     outputs = []
@@ -47,11 +45,19 @@ def render_process(t):
         multies = []
         plan['processes'] = processes
         for process in processes:
+
             depends = []
             _id = getUUID()
             plan['processes'][process]['uuid'] = _id
 
             po = int(plan['processes'][process]['order'])
+            old_task = session.query(Task).filter_by(title=prefix+process).filter_by(project_id=project_id).first()
+            if not old_task:
+                new = Task(title=prefix+process, project_id=project_id, priority=600-po, uuid=_id)
+                session.add(new)
+            else:
+                old_task.uuid  = _id
+
             _this = {'name':process, 'uuid':_id, 'order':po}
             if list_of_order_numbers.count(po)>1:
                 multies.append(_this)
@@ -71,7 +77,7 @@ def render_process(t):
             last_order = max(po, last_order)
 
 
-            process_plan = render_process(plan['processes'][process]['template'])
+            process_plan = render_process(session, plan['processes'][process]['template'], project_id, prefix)
 
             if process_plan:
                 subprocesses = process_plan.get('processes')
@@ -87,6 +93,7 @@ def render_process(t):
                     del(plan['processes'][process]['tasks'])
 
             else:
+                #print "plan for " + plan['processes'][process]['template'] + " not available"
                 del(plan['processes'][process])
 
 
@@ -101,6 +108,12 @@ def render_process(t):
                 continue
             _id = getUUID()
             depends = outputs
+            old_task = session.query(Task).filter_by(title=prefix+task).filter_by(project_id=project_id).first()
+            if not old_task:
+                nt = Task(title=prefix+task, project_id=project_id, uuid=_id)
+                session.add(nt)
+            else:
+                old_task.uuid  = _id
             plan['tasks'][task]['uuid'] = _id
 
             to = int(plan['tasks'][task]['order'])
@@ -122,7 +135,8 @@ def render_process(t):
             last_order = max(to, last_order)
 
             if plan['tasks'][task].get('template'):
-                process_task = render_task(plan['tasks'][task]['template'])
+                process_task = render_task(plan['tasks'][task]['template'], session, 
+                            project_id, _id, prefix, plan['tasks'][task].get('template'))
                 if process_task:
                     found_tasks = True
                     plan['tasks'][task]['plan'] = process_task
@@ -134,17 +148,51 @@ def render_process(t):
     #if not found_tasks:
     #    return {}
 
-    with open('plan.json', 'wb') as f:
-        f.write(json.dumps(plan, sort_keys=True, indent=4))
+    with open('templates/TPlans/plan.json', 'wb') as f:
+        f.write(json.dumps(plan))
     return plan
 
 
 
-def render_task(t):
+def render_task(t, session, project_id, parent, prefix, title):
     '''lets see what will happen'''
-    templ = Template(filename='tasks/'+t+'.json')  ## create a mako template
+    templ = Template(filename='templates/TPlans/tasks/'+t+'.json')  ## create a mako template
     raw_process = templ.render()
+    _id = getUUID()
     task = json.loads(raw_process)
+    task['parent'] = parent
+    task['title'] = title
+    task['uuid'] = _id
+    _expert = task.get('resource_expertize')
+    min_effort = task.get('min_effort')
+    max_effort = task.get('max_effort')
+    task['effort'] = effort = (max_effort+min_effort)/2.0
+    if _expert.keys():
+        Rate = _expert[_expert.keys()[0]]
+        minRate = Rate['minimum_rate']
+        _expert = _expert.keys()[0]
+    resources = list()
+    eDb = session.query(Expert).filter_by(name=_expert).first()
+    if eDb:
+        resources = eDb.users
+    else:
+        raise ValueError('Expertise: "%s" that is specified is not found in database.' % _expert)
+    if resources:
+        Sresources = [{'name':i.fullname, 'id':i.id, 'uuid':i.uuid, 'effectiveness':i.effectiveness} for i in resources if i.effectiveness>=minRate]
+        if Sresources:
+            parent_task = session.query(Task).filter_by(uuid=parent).first()
+            theTask = session.query(Task).filter_by(title=title).filter_by(project_id=project_id).first()
+            if not theTask:
+                theTask = Task(title=prefix+title, project_id=project_id, uuid=_id, effort=effort)
+            else:
+                theTask.uuid = _id
+            if parent_task:
+                theTask.parent.append(parent_task)
+            theTask.resources = [i for i in resources if i.effectiveness>=minRate]
+            session.add(theTask)
+            task['resources'] =  Sresources
+        else:
+            raise ValueError('Cant find any reources for expertise "%s"' % _expert)
     return task
 
 
@@ -167,14 +215,17 @@ def flatten(plan):
         target = target.get('processes')
 
 
-    with open('flat.json', 'wb') as f:
-        f.write(json.dumps(flat, sort_keys=True, indent=4))
+    with open('templates/TPlans/flat.json', 'wb') as f:
+        f.write(json.dumps(flat))
     return flat
 
 
 if __name__ == '__main__':
     character_preproduction_template = "character_preproduction"
-    plan = render_process(character_preproduction_template)
+    session = Session
+    plan = render_process(session, character_preproduction_template, 4, 'merida_')
+    session.commit()
+    session.close()
     flat = flatten(plan)
 
 
