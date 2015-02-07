@@ -35,12 +35,13 @@ from collections import defaultdict
 
 
 collections_tags = Table("collections_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "collection_id", Integer, ForeignKey("collection.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
+                         Column('id', Integer, primary_key=True),
+                         Column(
+                             "collection_id", Integer, ForeignKey("collection.id"), primary_key=True),
+                         Column(
+                             "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                         )
+
 
 class Collection(IDMixin, Base):
 
@@ -63,10 +64,11 @@ class Collection(IDMixin, Base):
     url = Column(String(512))  # relative to repo path path
     repository_id = Column(
         Integer, ForeignKey('repository.id'), nullable=False)
-    assets = relationship('Asset', backref='collection', cascade="all, delete, delete-orphan")
-    tgs = relationship("Tag", backref='collections', secondary="collections_tags")
+    assets = relationship(
+        'Asset', backref='collection', cascade="all, delete, delete-orphan")
+    tgs = relationship(
+        "Tag", backref='collections', secondary="collections_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-
 
     @validates('schema')
     def load_json(self, key, schema):
@@ -109,11 +111,11 @@ class Collection(IDMixin, Base):
         #git = GIT('.', wt=collection_path)
         # return git.archive()
 
-
     @staticmethod
     def AfterUserCreationFuncs(mapper, connection, target):
         '''Some operations after getting ID'''
-        repository = session.query(Repository).filter_by(id=target.repository_id).first()
+        repository = session.query(Repository).filter_by(
+            id=target.repository_id).first()
         if target.path:
             collection_path = os.path.join(repository.path, target.path)
             if not os.path.isdir(collection_path):
@@ -160,7 +162,6 @@ class Collection(IDMixin, Base):
                             container = True
                             holdAssets = False
 
-
                         part = part.strip()
                         tn = folder.split('/').index(part)
                         tc = '@@'.join(folder.split('/')[:tn + 1])
@@ -195,12 +196,6 @@ class Collection(IDMixin, Base):
 
                     if os.path.isfile(src):
                         shutil.copyfile(src, dest)
-
-
-
-
-
-
 
     @classmethod
     def __declare_last__(cls):

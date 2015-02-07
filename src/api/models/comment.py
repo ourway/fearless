@@ -24,14 +24,14 @@ from mixin import IDMixin, Base
 from utils.helpers import tag_maker
 
 
-
 comments_tags = Table("comments_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "comment_id", Integer, ForeignKey("comment.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
+                      Column('id', Integer, primary_key=True),
+                      Column(
+                          "comment_id", Integer, ForeignKey("comment.id"), primary_key=True),
+                      Column(
+                          "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                      )
+
 
 class Comment(IDMixin, Base):
 
@@ -44,4 +44,3 @@ class Comment(IDMixin, Base):
     user = relationship("User", backref='comments')
     tgs = relationship("Tag", backref='comments', secondary="comments_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-

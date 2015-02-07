@@ -77,7 +77,7 @@ def Authenticate(req, resp, params):
     sid = req.cookie('session-id')
     if sid:
         sid_digest = hashlib.sha1(sid).hexdigest()
-    ip_digest =  hashlib.sha1(ip).hexdigest()
+    ip_digest = hashlib.sha1(ip).hexdigest()
     ''' Now we need to check if session is available and it's sha1 is in redis'''
     if req.path in free_services or '/api/note' in req.path or (sid and r.get(sid_digest)):
         ''' User can access 300 api calls per minute (for now! NOTE)'''
@@ -95,7 +95,7 @@ def Authenticate(req, resp, params):
         else:
             message = 'Too many api access in short amount of time'
             raise falcon.HTTPUnauthorized('Authentication required', message)
- 
+
     else:
         auth_header = req.headers.get('AUTHORIZATION')
         if auth_header:
@@ -250,7 +250,6 @@ class Signup:
             oldUsersCount = req.session.query(User).count()
             if oldUsersCount == 1:
                 newuser.groups.append('admin')
-
 
             activation_link = host + \
                 '/api/auth/activate?token=' + newuser.token
@@ -469,7 +468,8 @@ def getUserInfoFromSession(req, resp):
             resp.append_header(
                 'set-cookie', 'userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/')
             r.delete(hashed_sid)
-            raise falcon.HTTPUnauthorized('Not Authorized', 'You need to login before using Fearless API')
+            raise falcon.HTTPUnauthorized(
+                'Not Authorized', 'You need to login before using Fearless API')
 
     return {'message': 'ERROR'}
 
@@ -526,7 +526,7 @@ class UpdateGroups:
             target.grps = []
             target.groups = [i.get('name') for i in data.get('groups')]
             if 'guests' in target.groups and 'users' not in target.groups:
-                    target.groups.append('users')
+                target.groups.append('users')
 
             if target.id == 1 and not 'admin' in target.groups:
                 target.groups.append('admin')
@@ -545,10 +545,12 @@ class UpdateDepartements:
         data = get_params(req.stream, False)
         if data.get('departements'):
             target.dps = []
-            target.departements = [i.get('name') for i in data.get('departements')]
+            target.departements = [i.get('name')
+                                   for i in data.get('departements')]
 
             resp.status = falcon.HTTP_202
             resp.body = {'message': 'OK'}
+
 
 class UpdateExpertise:
 

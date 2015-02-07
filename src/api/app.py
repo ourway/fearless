@@ -34,7 +34,7 @@ from models import *
 from sqlalchemy import desc, asc
 from datetime import datetime
 
-from models.db import Session  ## scopped session
+from models.db import Session  # scopped session
 
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
@@ -52,12 +52,10 @@ from utils.sequence import AddSequence
 tables = [i for i in av if i[0] in ascii_uppercase]
 
 
-
-
-
 def getSession(req, resp, params):
     from utils import helpers
-    req.session = Session()  ## imported from models.db
+    req.session = Session()  # imported from models.db
+
 
 def closeSession(req, resp):
     try:
@@ -68,7 +66,7 @@ def closeSession(req, resp):
         print '*' * 80
         req.session.rollback()
     finally:
-        #pass
+        # pass
         req.session.close()
         Session.remove()
 
@@ -84,7 +82,6 @@ class ThingsResource:
         resp.body = "okokokoko"
 
 
-
 class UpdateAssetTags:
 
     def on_post(self, req, resp, key):
@@ -92,6 +89,7 @@ class UpdateAssetTags:
         data = get_params(req.stream, False)
         target.tags = data.get('tags')
         resp.status = falcon.HTTP_202
+
 
 class DB:
 
@@ -145,13 +143,15 @@ class DB:
             end = start + 10
         if len(args) == 5:
             id = args[4]
-            query = 'req.session.query({t}).filter({t}.{key}=="{id}")'.format(t=table, id=id, key=key)
+            query = 'req.session.query({t}).filter({t}.{key}=="{id}")'.format(
+                t=table, id=id, key=key)
             if get_count:
                 data = eval(query).count()
-                resp.body = {'count':data}
+                resp.body = {'count': data}
                 return
-            query += '.order_by({sort}({t}.{order}))'.format(sort=sort, t=table, order=order_by)
-            if start!=None and end!=None:
+            query += '.order_by({sort}({t}.{order}))'.format(sort=sort,
+                                                             t=table, order=order_by)
+            if start != None and end != None:
                 query += '.slice(start, end)'
             data = eval(query).all()
             resp.body = data
@@ -167,25 +167,26 @@ class DB:
                         if isinstance(filter, dict):
                             eq = filter.pop('_')
                             query += '.filter({t}.{k}{eq}"{v}")'.format(t=table, eq=eq,
-                                                  k=filter.keys()[0], v=filter[filter.keys()[0]])
+                                                                        k=filter.keys()[0], v=filter[filter.keys()[0]])
                 if get_count:
                     data = eval(query).count()
-                    resp.body = {'count':data}
+                    resp.body = {'count': data}
                     return
-                query += '.order_by({sort}({t}.{order}))'.format(sort=sort, order=order_by, t=table)
-                if start!=None and end!=None:
+                query += '.order_by({sort}({t}.{order}))'.format(sort=sort,
+                                                                 order=order_by, t=table)
+                if start != None and end != None:
                     query += '.slice(start, end)'
                 data = eval(query).all()
                 resp.body = data
             except (AttributeError):
                 data = None
         field = req.get_param('field')
-        af = req.get_param('af') ## append field
+        af = req.get_param('af')  # append field
         if field:
             try:
                 if len(args) != 5 and data:
                     if af:
-                        data = {'message':'not implemented'}
+                        data = {'message': 'not implemented'}
                     else:
                         data = [eval('i.%s' % field) for i in data]
 
@@ -242,7 +243,7 @@ class DB:
         query_params = get_params(req.stream, flat=False)
         insert_cmd = '{t}(**query_params)'.format(t=table)
         new = eval(insert_cmd)
-        #for i in query_params:
+        # for i in query_params:
         #    setattr(new, i, query_params.get(i))
         resp.status = falcon.HTTP_201
         req.session.add(new)

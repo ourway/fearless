@@ -24,9 +24,6 @@ from mixin import IDMixin, Base, UniqueMixin
 from utils.helpers import tag_maker, account_maker
 
 
-
-
-
 sequences_departements = Table('sequences_departements', Base.metadata,
                                Column('id', Integer, primary_key=True),
                                Column(
@@ -46,20 +43,20 @@ shots_departements = Table('shots_departements', Base.metadata,
 
 
 departements_accounts = Table("departements_accounts", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "departement_id", Integer, ForeignKey("departement.id"), primary_key=True),
-                     Column(
-                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
-                     )
+                              Column('id', Integer, primary_key=True),
+                              Column(
+                                  "departement_id", Integer, ForeignKey("departement.id"), primary_key=True),
+                              Column(
+                                  "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                              )
 
 departements_tags = Table("departements_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "departement_id", Integer, ForeignKey("departement.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
+                          Column('id', Integer, primary_key=True),
+                          Column(
+                              "departement_id", Integer, ForeignKey("departement.id"), primary_key=True),
+                          Column(
+                              "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                          )
 
 
 class Departement(IDMixin, UniqueMixin, Base):
@@ -68,11 +65,12 @@ class Departement(IDMixin, UniqueMixin, Base):
     '''
     name = Column(String(64), nullable=False)
     period = relationship("Date", uselist=False)
-    acns = relationship("Account", backref='departements', secondary="departements_accounts")
+    acns = relationship(
+        "Account", backref='departements', secondary="departements_accounts")
     accounts = association_proxy('acns', 'name', creator=account_maker)
-    tgs = relationship("Tag", backref='departements', secondary="departements_tags")
+    tgs = relationship(
+        "Tag", backref='departements', secondary="departements_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-
 
     @classmethod
     def unique_hash(cls, name):

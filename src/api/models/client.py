@@ -31,17 +31,13 @@ client_users = Table('client_users', Base.metadata,
                      )
 
 
-
-
-
 clients_accounts = Table("clients_accounts", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "client_id", Integer, ForeignKey("client.id"), primary_key=True),
-                     Column(
-                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
-                     )
-
+                         Column('id', Integer, primary_key=True),
+                         Column(
+                             "client_id", Integer, ForeignKey("client.id"), primary_key=True),
+                         Column(
+                             "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                         )
 
 
 clients_tags = Table("clients_tags", Base.metadata,
@@ -60,8 +56,8 @@ class Client(IDMixin, Base):
     name = Column(String(64), unique=True, nullable=False)
     users = relationship('User', backref='companies', secondary='client_users')
     period = relationship("Date", uselist=False)
-    acns = relationship("Account", backref='client', secondary="clients_accounts")
+    acns = relationship(
+        "Account", backref='client', secondary="clients_accounts")
     accounts = association_proxy('acns', 'name', creator=account_maker)
     tgs = relationship("Tag", backref='clients', secondary="clients_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-

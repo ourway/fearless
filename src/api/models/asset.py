@@ -42,22 +42,21 @@ assets_assets = Table('assets_assets', Base.metadata,
                       )
 
 
-
 aasets_accounts = Table("assets_accounts", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "asset_id", Integer, ForeignKey("asset.id"), primary_key=True),
-                     Column(
-                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
-                     )
+                        Column('id', Integer, primary_key=True),
+                        Column(
+                            "asset_id", Integer, ForeignKey("asset.id"), primary_key=True),
+                        Column(
+                            "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                        )
 
 assets_tags = Table("assets_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "asset_id", Integer, ForeignKey("asset.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
+                    Column('id', Integer, primary_key=True),
+                    Column(
+                        "asset_id", Integer, ForeignKey("asset.id"), primary_key=True),
+                    Column(
+                        "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                    )
 
 
 class Asset(IDMixin, Base):
@@ -98,7 +97,8 @@ class Asset(IDMixin, Base):
 
     collection_id = Column(
         Integer, ForeignKey('collection.id'), nullable=False)
-    acns = relationship("Account", backref='assets', secondary="assets_accounts")
+    acns = relationship(
+        "Account", backref='assets', secondary="assets_accounts")
     accounts = association_proxy('acns', 'name', creator=account_maker)
     tgs = relationship("Tag", backref='assets', secondary="assets_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
@@ -193,7 +193,6 @@ class Asset(IDMixin, Base):
         return os.path.join(os.path.basename(self.collection.repository.path),
                             self.collection.path, self.fullname)
 
-
     @staticmethod
     def AfterAssetCreationFuncs(mapper, connection, target):
         '''Some operations after getting ID'''
@@ -216,9 +215,6 @@ class Asset(IDMixin, Base):
                                                   target.version, 720, 480, target.id, 'poster')
             newThumb = generateImageThumbnail.delay(target.full_path, target.version,
                                                     146, 110, target.id, 'thmb')
-
-
-
 
     @staticmethod
     def before_delete(mapper, connection, target):

@@ -28,7 +28,6 @@ import uuid
 from opensource.contenttype import contenttype
 
 
-
 def get_ip():
     '''Simple method'''
     ip = commands.getoutput("/sbin/ifconfig").split("\n")[1].split()[1][5:]
@@ -156,12 +155,10 @@ def csv2json(csvfile):
     return dict(obj)
 
 
-
 def expertizer(name):
     from models import Expert
     _t = Expert.as_unique(name=name)
     return _t
-    
 
 
 def tag_maker(name):
@@ -175,6 +172,7 @@ def group_maker(name):
     _t = Group.as_unique(name=name)
     return _t
 
+
 def departement_maker(name):
     from models import Departement
     _t = Departement.as_unique(name=name)
@@ -185,4 +183,3 @@ def account_maker(name):
     from models import Account
     _t = Account.as_unique(name=name)
     return _t
-

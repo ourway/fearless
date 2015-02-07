@@ -99,15 +99,13 @@ def init():
                     'story', 'rendering', 'compositing', 'lighting', 'dynamics', 'stereoscopic', 'staff', 'management', 'directing', 'art']
 
     experts = ['character design', 'character concept', 'matte paint', 'composite', 'mel scripting', 'python programming', 'team management',
-               'directing', 'hair dynamic', 'hair style', 'cloth dynamic', 'cloth design', 'arnold technical', 'renderman technical', 'nuke', 'maya', 
-               'adobe photoshop', 'zbrush', 'mudbox', 'toxik', 'character modeling', 'set modeling', 'set designer', 'set concept', 
+               'directing', 'hair dynamic', 'hair style', 'cloth dynamic', 'cloth design', 'arnold technical', 'renderman technical', 'nuke', 'maya',
+               'adobe photoshop', 'zbrush', 'mudbox', 'toxik', 'character modeling', 'set modeling', 'set designer', 'set concept',
                'technical directing', 'office tools', 'concept painter', 'character shading', 'character paint', '2d motion design',
                'motion bulder', 'motion capture', 'sound design', 'editing', 'adobe premiere', 'uv layout', 'ptex', 'character animation',
-               'rigging', 'skinning', 'blend shape', 'prop design', 'prop concept', 'storyboard', 'screenplay', 'story', 'planning', 'texturing', 
+               'rigging', 'skinning', 'blend shape', 'prop design', 'prop concept', 'storyboard', 'screenplay', 'story', 'planning', 'texturing',
                '2d layout', '3d layout', 'animatic', 'previz', 'camera', 'cinematography', 'lighting', 'tracking', 'dispatching', 'rendering rnd',
                'software developer', 'it', 'dba', 'finance', 'supervisor', 'character cloth concept', 'character cloth design']
-
-
 
     for exp in experts:
         if not exp in [i.name for i in exps]:
@@ -160,10 +158,8 @@ def init():
                 name=repo, path=os.path.join(public_repository_path, repo))
             session.add(new_repository)
 
-
     session.commit()
     session.close()
-
 
 
 init()

@@ -24,14 +24,14 @@ from mixin import IDMixin, Base, getUUID, UniqueMixin
 from utils.helpers import tag_maker
 
 
-
 roles_tags = Table("roles_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "role_id", Integer, ForeignKey("role.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
+                   Column('id', Integer, primary_key=True),
+                   Column(
+                       "role_id", Integer, ForeignKey("role.id"), primary_key=True),
+                   Column(
+                       "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                   )
+
 
 class Role(IDMixin, UniqueMixin, Base):
 
@@ -41,7 +41,6 @@ class Role(IDMixin, UniqueMixin, Base):
     name = Column(String(32), nullable=False, unique=True)
     tgs = relationship("Tag", backref='roles', secondary="roles_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-
 
     def __init__(self, name):
         self.name = name

@@ -72,11 +72,6 @@ def convert_to_datetime(inp):
         return datetime.datetime.strptime(inp, fmt)
 
 
-
-
-
-
-
 def _unique(cls, hashfunc, queryfunc, constructor, arg, kw):
     from models.db import Session
     session = Session()
@@ -99,8 +94,8 @@ def _unique(cls, hashfunc, queryfunc, constructor, arg, kw):
         return obj
 
 
-
 class UniqueMixin(object):
+
     @classmethod
     def unique_hash(cls, *arg, **kw):
         raise NotImplementedError()
@@ -112,20 +107,18 @@ class UniqueMixin(object):
     @classmethod
     def as_unique(cls, *arg, **kw):
         return _unique(
-                    
-                    cls,
-                    cls.unique_hash,
-                    cls.unique_filter,
-                    cls,
-                    arg, kw
-               )
 
-
-
+            cls,
+            cls.unique_hash,
+            cls.unique_filter,
+            cls,
+            arg, kw
+        )
 
 
 class IDMixin(object):
     session = None
+
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()

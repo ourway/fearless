@@ -24,15 +24,14 @@ from mixin import IDMixin, Base, now
 from utils.helpers import tag_maker
 
 
-
-
 dates_tags = Table("dates_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "date_id", Integer, ForeignKey("date.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
+                   Column('id', Integer, primary_key=True),
+                   Column(
+                       "date_id", Integer, ForeignKey("date.id"), primary_key=True),
+                   Column(
+                       "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                   )
+
 
 class Date(IDMixin, Base):
 
@@ -58,7 +57,3 @@ class Date(IDMixin, Base):
     departement_id = Column(Integer, ForeignKey('departement.id'))
     tgs = relationship("Tag", backref='dates', secondary="dates_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-
-
-
-

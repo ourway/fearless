@@ -54,20 +54,20 @@ task_alternative = Table('task_alternative', Base.metadata,
 
 
 tasks_accounts = Table("tasks_accounts", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "task_id", Integer, ForeignKey("task.id"), primary_key=True),
-                     Column(
-                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
-                     )
+                       Column('id', Integer, primary_key=True),
+                       Column(
+                           "task_id", Integer, ForeignKey("task.id"), primary_key=True),
+                       Column(
+                           "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                       )
 
 tasks_tags = Table("tasks_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "task_id", Integer, ForeignKey("task.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
+                   Column('id', Integer, primary_key=True),
+                   Column(
+                       "task_id", Integer, ForeignKey("task.id"), primary_key=True),
+                   Column(
+                       "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                   )
 
 
 task_relations = Table(
@@ -128,7 +128,6 @@ class Task(IDMixin, Base):
     accounts = association_proxy('acns', 'name', creator=account_maker)
     tgs = relationship("Tag", backref='tasks', secondary="tasks_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-
 
     ##########################################################################
 
@@ -230,6 +229,3 @@ class Task(IDMixin, Base):
         if data:
             data = int(float(data))
         return data
-
-
-

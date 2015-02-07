@@ -72,33 +72,32 @@ user_reports = Table('user_reports', Base.metadata,
 
 
 users_accounts = Table('users_accounts', Base.metadata,
-                      Column('user_id', Integer, ForeignKey("user.id"),
-                             primary_key=True),
-                      Column('account_id', Integer, ForeignKey("account.id"),
-                             primary_key=True)
-                      )
+                       Column('user_id', Integer, ForeignKey("user.id"),
+                              primary_key=True),
+                       Column('account_id', Integer, ForeignKey("account.id"),
+                              primary_key=True)
+                       )
 
 users_expertise = Table('users_expertise', Base.metadata,
-                      Column('user_id', Integer, ForeignKey("user.id"),
-                             primary_key=True),
-                      Column('expert_id', Integer, ForeignKey("expert.id"),
-                             primary_key=True)
-                      )
+                        Column('user_id', Integer, ForeignKey("user.id"),
+                               primary_key=True),
+                        Column('expert_id', Integer, ForeignKey("expert.id"),
+                               primary_key=True)
+                        )
 
 users_tags = Table('users_tags', Base.metadata,
-                      Column('user_id', Integer, ForeignKey("user.id"),
-                             primary_key=True),
-                      Column('tag_id', Integer, ForeignKey("tag.id"),
-                             primary_key=True)
-                      )
+                   Column('user_id', Integer, ForeignKey("user.id"),
+                          primary_key=True),
+                   Column('tag_id', Integer, ForeignKey("tag.id"),
+                          primary_key=True)
+                   )
 
 users_departements = Table('users_departements', Base.metadata,
-                      Column('user_id', Integer, ForeignKey("user.id"),
-                             primary_key=True),
-                      Column('departement_id', Integer, ForeignKey("departement.id"),
-                             primary_key=True)
-                      )
-
+                           Column('user_id', Integer, ForeignKey("user.id"),
+                                  primary_key=True),
+                           Column('departement_id', Integer, ForeignKey("departement.id"),
+                                  primary_key=True)
+                           )
 
 
 class User(IDMixin, Base):
@@ -161,13 +160,11 @@ class User(IDMixin, Base):
     acns = relationship('Account', backref='users', secondary='users_accounts')
     accounts = association_proxy('acns', 'name', creator=account_maker)
     groups = association_proxy('grps', 'name', creator=group_maker)
-    dps = relationship("Departement", backref='users', secondary="users_departements")
+    dps = relationship(
+        "Departement", backref='users', secondary="users_departements")
     departements = association_proxy('dps', 'name', creator=departement_maker)
     tgs = relationship("Tag", backref='users', secondary="users_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-
-
-
 
     @validates('email')
     def _validate_email(self, key, data):
@@ -219,7 +216,6 @@ class User(IDMixin, Base):
     # group =
     #reports = Set("Report")
     #groups = Set("Group")
-
 
     @staticmethod
     def AfterUserCreationFuncs(mapper, connection, target):

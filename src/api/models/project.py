@@ -58,22 +58,21 @@ project_reports = Table('project_reports', Base.metadata,
                         )
 
 
-
 projects_accounts = Table("projects_accounts", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "project_id", Integer, ForeignKey("project.id"), primary_key=True),
-                     Column(
-                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
-                     )
+                          Column('id', Integer, primary_key=True),
+                          Column(
+                              "project_id", Integer, ForeignKey("project.id"), primary_key=True),
+                          Column(
+                              "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                          )
 
 projects_tags = Table("projects_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "project_id", Integer, ForeignKey("project.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
+                      Column('id', Integer, primary_key=True),
+                      Column(
+                          "project_id", Integer, ForeignKey("project.id"), primary_key=True),
+                      Column(
+                          "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                      )
 
 
 class Project(IDMixin, Base):
@@ -126,11 +125,11 @@ class Project(IDMixin, Base):
     reports = association_proxy('rep', 'id')
     subproject = relationship("Project", backref='parent', remote_side=[id])
     period = relationship("Date", uselist=False)
-    acns = relationship("Account", backref='projects', secondary="projects_accounts")
+    acns = relationship(
+        "Account", backref='projects', secondary="projects_accounts")
     accounts = association_proxy('acns', 'name', creator=account_maker)
     tgs = relationship("Tag", backref='projects', secondary="projects_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-
 
     @aggregated('tasks', Column(Integer))
     def calculate_number_of_tasks(self):
@@ -236,7 +235,8 @@ class Project(IDMixin, Base):
             print 'Start Calculating project %s' % self.id
             import time
             s = time.time()
-            tj = tj3( plan_path, '--silent', '--no-color', '--add-trace', o='/tmp', c='1')
+            tj = tj3(
+                plan_path, '--silent', '--no-color', '--add-trace', o='/tmp', c='1')
             print 'Finished in %s seconds' % round(time.time() - s, 3)
         except Exception, e:
             print e

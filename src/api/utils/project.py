@@ -28,6 +28,7 @@ from cStringIO import StringIO
 
 
 class GetProjectDetails:
+
     def on_get(self, req, resp, id):
         project = req.session.query(Project).filter(Project.id == id).first()
         collections = list()
@@ -139,6 +140,7 @@ class AddProject:
 
 
 class GetProjectLatestReport:
+
     def on_get(self, req, resp, id):
         project = req.session.query(Project).filter(Project.id == id).first()
         if not project:

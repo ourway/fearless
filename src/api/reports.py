@@ -52,6 +52,7 @@ session.close()
 
 #################################################################
 
+
 def getTemplate(name):
     t = os.path.join(templates_folder, name)
     return Template(filename=t)

@@ -23,14 +23,14 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 
 
-
 versions_tags = Table("versions_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "version_id", Integer, ForeignKey("version.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
+                      Column('id', Integer, primary_key=True),
+                      Column(
+                          "version_id", Integer, ForeignKey("version.id"), primary_key=True),
+                      Column(
+                          "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                      )
+
 
 class Version(IDMixin, Base):
 

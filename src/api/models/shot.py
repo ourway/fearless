@@ -32,20 +32,20 @@ shots_scenes = Table("shots_scenes", Base.metadata,
                      )
 
 shots_accounts = Table("shots_accounts", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "shot_id", Integer, ForeignKey("shot.id"), primary_key=True),
-                     Column(
-                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
-                     )
+                       Column('id', Integer, primary_key=True),
+                       Column(
+                           "shot_id", Integer, ForeignKey("shot.id"), primary_key=True),
+                       Column(
+                           "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                       )
 
 shots_tags = Table("shots_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "shot_id", Integer, ForeignKey("shot.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
+                   Column('id', Integer, primary_key=True),
+                   Column(
+                       "shot_id", Integer, ForeignKey("shot.id"), primary_key=True),
+                   Column(
+                       "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                   )
 
 
 class Shot(IDMixin, Base):
@@ -70,7 +70,6 @@ class Shot(IDMixin, Base):
     aacounts = association_proxy('acns', 'name', creator=account_maker)
     tgs = relationship("Tag", backref='shots', secondary="shots_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-
 
     @validates('number')
     def _assign_name_code(self, key, data):

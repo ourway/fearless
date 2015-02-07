@@ -26,15 +26,13 @@ from db import Session
 session = Session()
 
 
-
 accounts_tags = Table("accounts_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "account_id", Integer, ForeignKey("account.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
-
+                      Column('id', Integer, primary_key=True),
+                      Column(
+                          "account_id", Integer, ForeignKey("account.id"), primary_key=True),
+                      Column(
+                          "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                      )
 
 
 class Account(IDMixin, UniqueMixin, Base):
@@ -57,9 +55,6 @@ class Account(IDMixin, UniqueMixin, Base):
 
     #start = Column(DateTime, nullable=False, default=now)
 
-
-
-
     @classmethod
     def unique_hash(cls, name):
         if name:
@@ -79,4 +74,3 @@ class Account(IDMixin, UniqueMixin, Base):
             session.close()
             if chs.total_credit <= self.parent.max_credit + data:
                 return data
-

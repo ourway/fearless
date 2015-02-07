@@ -23,7 +23,6 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
 
 
-
 tickets_tags = Table("tickets_tags", Base.metadata,
                      Column('id', Integer, primary_key=True),
                      Column(

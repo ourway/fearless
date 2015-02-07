@@ -29,15 +29,13 @@ from utils.helpers import tag_maker
 import json as json  # for collection data validation and parsing
 
 
-
 repositories_tags = Table("repositories_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "repository_id", Integer, ForeignKey("repository.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
-
+                          Column('id', Integer, primary_key=True),
+                          Column(
+                              "repository_id", Integer, ForeignKey("repository.id"), primary_key=True),
+                          Column(
+                              "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                          )
 
 
 class Repository(IDMixin, Base):
@@ -59,9 +57,9 @@ class Repository(IDMixin, Base):
     owner_id = Column(Integer, ForeignKey('user.id'))
     owner = relationship("User", backref="ownes_repositories")
     period = relationship("Date", uselist=False)
-    tgs = relationship("Tag", backref='repositories', secondary="repositories_tags")
+    tgs = relationship(
+        "Tag", backref='repositories', secondary="repositories_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-
 
     @validates('path')
     def create_folders(self, key, path):

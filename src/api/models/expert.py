@@ -24,12 +24,12 @@ from mixin import IDMixin, Base, getUUID, UniqueMixin
 from utils.helpers import tag_maker, account_maker
 
 experts_accounts = Table("experts_accounts", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "expert_id", Integer, ForeignKey("expert.id"), primary_key=True),
-                     Column(
-                         "account_id", Integer, ForeignKey("account.id"), primary_key=True)
-                     )
+                         Column('id', Integer, primary_key=True),
+                         Column(
+                             "expert_id", Integer, ForeignKey("expert.id"), primary_key=True),
+                         Column(
+                             "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                         )
 
 experts_tags = Table("experts_tags", Base.metadata,
                      Column('id', Integer, primary_key=True),
@@ -40,22 +40,20 @@ experts_tags = Table("experts_tags", Base.metadata,
                      )
 
 
-
 class Expert(IDMixin, UniqueMixin, Base):
 
     '''Rules for permissions and authorizations
     '''
 
     name = Column(String(128), nullable=False, unique=True)
-    acns = relationship("Account", backref='expertise', secondary="experts_accounts")
+    acns = relationship(
+        "Account", backref='expertise', secondary="experts_accounts")
     accounts = association_proxy('acns', 'name', creator=account_maker)
     tgs = relationship("Tag", backref='expert', secondary="experts_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
 
-
     def __init__(self, name):
         self.name = name
-
 
     @classmethod
     def unique_hash(cls, name):
@@ -64,5 +62,3 @@ class Expert(IDMixin, UniqueMixin, Base):
     @classmethod
     def unique_filter(cls, query, name):
         return query.filter(Expert.name == name)
-
-

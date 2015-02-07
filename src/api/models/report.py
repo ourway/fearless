@@ -29,8 +29,6 @@ import os
 from . import rdb
 
 
-
-
 reports_tags = Table("reports_tags", Base.metadata,
                      Column('id', Integer, primary_key=True),
                      Column(
@@ -59,7 +57,6 @@ class Report(IDMixin, Base):
     due = relationship("Date")
     tgs = relationship("Tag", backref='reports', secondary="reports_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-
 
     def __init__(self, data, *args, **kw):
         self.data = data

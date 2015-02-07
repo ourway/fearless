@@ -32,14 +32,13 @@ groups_roles = Table('group_roles', Base.metadata,
                      )
 
 
-
 groups_tags = Table("groups_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "group_id", Integer, ForeignKey("group.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
+                    Column('id', Integer, primary_key=True),
+                    Column(
+                        "group_id", Integer, ForeignKey("group.id"), primary_key=True),
+                    Column(
+                        "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                    )
 
 
 class Group(IDMixin, UniqueMixin, Base):
@@ -54,13 +53,11 @@ class Group(IDMixin, UniqueMixin, Base):
     tgs = relationship("Tag", backref='groups', secondary="groups_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
 
-
     def __init__(self, name, role=None, typ='private'):
         self.name = name
         self.typ = typ
         if role:
             self.roles.append(role)
-
 
     @classmethod
     def unique_hash(cls, name):

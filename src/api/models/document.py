@@ -34,15 +34,13 @@ user_documents = Table('user_documents', Base.metadata,
                        )
 
 
-
-
 documents_tags = Table("documents_tags", Base.metadata,
-                     Column('id', Integer, primary_key=True),
-                     Column(
-                         "document_id", Integer, ForeignKey("document.id"), primary_key=True),
-                     Column(
-                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                     )
+                       Column('id', Integer, primary_key=True),
+                       Column(
+                           "document_id", Integer, ForeignKey("document.id"), primary_key=True),
+                       Column(
+                           "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                       )
 
 
 class Document(IDMixin, Base):
@@ -72,7 +70,6 @@ class Document(IDMixin, Base):
     period = relationship("Date", uselist=False)
     tgs = relationship("Tag", backref='documents', secondary="documents_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
-
 
     @validates('data')
     def save_data_in_riak(self, key, data):
