@@ -78,7 +78,8 @@ def convert_to_datetime(inp):
 
 
 def _unique(cls, hashfunc, queryfunc, constructor, arg, kw):
-    from models.db import session
+    from models.db import Session
+    session = Session()
     cache = getattr(session, '_unique_cache', None)
     if cache is None:
         session._unique_cache = cache = {}

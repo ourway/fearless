@@ -34,7 +34,7 @@ from models import *
 from sqlalchemy import desc, asc
 from datetime import datetime
 
-from models.db import session  ## scopped session
+from models.db import Session  ## scopped session
 
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from utils.AAA import Login, Signup, Authenticate,\
@@ -57,7 +57,7 @@ tables = [i for i in av if i[0] in ascii_uppercase]
 
 def getSession(req, resp, params):
     from utils import helpers
-    req.session = session  ## imported from models.db
+    req.session = Session()  ## imported from models.db
 
 def closeSession(req, resp):
     try:
@@ -70,6 +70,7 @@ def closeSession(req, resp):
     finally:
         #pass
         req.session.close()
+        Session.remove()
 
 
 class ThingsResource:

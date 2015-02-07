@@ -1572,6 +1572,10 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
 
         }
 
+        $scope.updateAssetDescription = function(){
+            $http.post('/api/db/asset/'+$scope.asset.id, {'description':$scope.asset.description});
+        }
+
         $scope.highlightCode = function(){
               $('pre code').each(function(i, block) {
                 hljs.highlightBlock(block);

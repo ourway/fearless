@@ -72,15 +72,24 @@
                 </div>
                     <a><button ng-click="checkout(checkouted, true)" 
                             class="btn btn-primary">Download Version {{checkouted.split('v_')[1]}}</button></a>
+                </div>
 
 
+                <hr/>
+
+             <div >
+
+            <p>
+            <textarea class="form-control" style="height:150px;font-size:16px;" ng-model="asset.description" ng-blur="updateAssetDescription()"
+                placeholder="Asset Desciption ..."></textarea>
+            </p>
             </div>
-            <hr/>
-            <div ng-controller="taggerCtrl" class="col-md-12">
+
+            <div ng-controller="taggerCtrl" class="">
                 <input type="search" id="tagSearchInput"  class="typeahead form-control" 
                 options="tagOptions" datasets="completeData" placeholder="Tag this asset"
                 ng-model="tags.userTagFilter" ng-keyup="$event.keyCode == 13 ? addTag('asset', $parent.asset) : null" sf-typeahead>
-					<div class="col-sm-12">
+					<div class="">
                         <br/>
                         <ul class="nav nav-pills nav-stacked" style="margin-left: -15px;">
                             <li class="" ng-repeat="tag in $parent.asset.tgs track by $index">
@@ -93,7 +102,10 @@
 					</div>
 
 
-            </div>
+                </div>
+
+
+
             </div>
 
 

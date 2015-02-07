@@ -45,7 +45,8 @@ project_watchers = Table('project_watchers', Base.metadata,
                          Column('user_id', Integer, ForeignKey('user.id'))
                          )
 
-from db import session
+from db import Session
+session = Session()
 from mako.template import Template
 
 
