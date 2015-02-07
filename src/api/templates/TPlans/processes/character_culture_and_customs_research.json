@@ -1,0 +1,27 @@
+{
+    "processes": 
+        {
+            "character research on symbols of culture and customs":
+                {
+                    "order":1,
+                    "template":"character_culture_symbols_research"
+                },
+            "character culture and customs ceremony research":
+                {
+                    "order":2,
+                    "template":"character_culture_ceremony_research"
+                },
+            "character jobs research":
+                {
+                    "order":3,
+                    "template":"character_jobs_research"
+                },
+            "character culture research":
+                {
+                    "order":4,
+                    "template":"character_culture_research"
+                }
+    
+        }, 
+    "tasks": {}
+}

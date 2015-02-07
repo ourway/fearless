@@ -10,7 +10,7 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
 %>
 % for dependency in task.depends:
     <%
-        if dependency == task.parent:
+        if dependency == task.parent or dependency==task:
             continue
         hr = []
         hr.append(str(dependency.id))

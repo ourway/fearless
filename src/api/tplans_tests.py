@@ -119,13 +119,13 @@ def render_process(session, t, project_id, prefix):
                 continue
             _id = getUUID()
             depends = outputs
-            old_task = session.query(Task).filter_by(
+            nt = session.query(Task).filter_by(
                 title=prefix + task).filter_by(project_id=project_id).first()
-            if not old_task:
+            if not nt:
                 nt = Task(title=prefix + task, project_id=project_id, uuid=_id)
                 session.add(nt)
             else:
-                old_task.uuid = _id
+                nt.uuid = _id
             plan['tasks'][task]['uuid'] = _id
 
             to = int(plan['tasks'][task]['order'])
@@ -143,8 +143,17 @@ def render_process(session, t, project_id, prefix):
                     outputs = multies
                     multies = []
                 plan['tasks'][task]['depends_on'] = outputs
+                
                 outputs = [_this]
+            deps = plan['tasks'][task].get('depends_on')
+            for i in deps:
+                dep_title = prefix+i.get('name')
+                dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).first()
+                assert dep != nt
+                nt.depends.append(dep)
+
             last_order = max(to, last_order)
+            
 
             if plan['tasks'][task].get('template'):
                 process_task = render_task(plan['tasks'][task]['template'], session,
@@ -201,14 +210,18 @@ def render_task(t, session, project_id, parent, prefix, title):
         if Sresources:
             parent_task = session.query(Task).filter_by(uuid=parent).first()
             theTask = session.query(Task).filter_by(
-                title=title).filter_by(project_id=project_id).first()
+                title=prefix+title+'_task').filter_by(project_id=project_id).first()
             if not theTask:
                 theTask = Task(
-                    title=prefix + title, project_id=project_id, uuid=_id, effort=effort)
+                    title=prefix + title + '_task', project_id=project_id, uuid=_id, effort=effort)
             else:
                 theTask.uuid = _id
             if parent_task:
-                theTask.parent.append(parent_task)
+                assert parent_task!=theTask
+                if not theTask in parent_task.depends:
+                    theTask.depends.append(parent_task)
+                else:
+                    print parent_task.title, theTask.title
             theTask.resources = [
                 i for i in resources if i.effectiveness >= minRate]
             session.add(theTask)
@@ -246,7 +259,7 @@ if __name__ == '__main__':
     character_preproduction_template = "character_preproduction"
     session = Session
     plan = render_process(
-        session, character_preproduction_template, 4, 'merida_')
+        session, character_preproduction_template, 8, 'merida_')
     session.commit()
     session.close()
     flat = flatten(plan)

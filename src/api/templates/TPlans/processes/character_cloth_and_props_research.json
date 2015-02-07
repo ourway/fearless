@@ -1,0 +1,20 @@
+{
+    "processes":
+        {
+            "character commons research":
+                {
+                    "order":1,
+                    "template":"character_commons_research"
+                },
+            "character cloth and props ceremony research":
+                {
+                    "order":2,
+                    "template":"character_cloth_ceremony_research"
+                },
+            "character weapons research":
+                {
+                    "order":3,
+                    "template":"character_weapons_research"
+                }
+        }
+}
