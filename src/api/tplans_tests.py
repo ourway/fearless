@@ -259,7 +259,7 @@ if __name__ == '__main__':
     character_preproduction_template = "character_preproduction"
     session = Session
     plan = render_process(
-        session, character_preproduction_template, 8, 'merida_')
+        session, character_preproduction_template, 11, 'merida_')
     session.commit()
     session.close()
     flat = flatten(plan)

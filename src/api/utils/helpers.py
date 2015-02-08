@@ -70,7 +70,6 @@ def jsonify(self, resp):
             data = json.dumps(data)
     else:
         data = repr(resp.body)
-
     resp.body = data
 
 
