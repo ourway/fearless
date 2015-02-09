@@ -47,7 +47,8 @@ user31 = User(email='bitarafali@yahoo.com', password='123456', active=True, firs
 user32 = User(email='mj.hagh@gmail.com', password='123456', active=True, firstname='Majid', lastname='Hagighighatjoo')
 
 
-from models.db import session
+from models.db import Session
+session = Session()
 
 
 session.add_all([ user1, user2, user3, user4, user5, user6, user7, user8, user9,

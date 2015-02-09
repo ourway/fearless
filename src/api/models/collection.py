@@ -58,7 +58,8 @@ class Collection(IDMixin, Base):
     template = Column(String(64))
     owner_id = Column(Integer, ForeignKey('user.id'))
     parent_id = Column(Integer, ForeignKey('collection.id'))
-    parent = relationship("Collection", backref="children", remote_side=[id])
+    parent = relationship("Collection", backref=backref("children", cascade="all, delete, delete-orphan"), 
+                          remote_side=[id])
     owner = relationship("User", backref="ownes_collections")
     path = Column(String(512), nullable=False)  # relative to repo path path
     url = Column(String(512))  # relative to repo path path
