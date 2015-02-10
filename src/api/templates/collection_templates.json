@@ -37,6 +37,7 @@
             "maya/scenes/dynamics/hair": ["ma", "mb"],
             "maya/scenes/dynamics/cloth": ["ma", "mb"],
             "maya/scenes/shader": ["ma", "mb"],
+            "maya/cache": ["mc", "mcx"],
             "zbrush": ["ztl", "zbr", "obj"],
             "textures/128": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
             "textures/256": ["exr", "png", "tga", "jpg", "tiff", "tdl", "tx"],
