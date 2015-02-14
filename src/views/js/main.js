@@ -909,7 +909,7 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
 
         $scope.calculate_salery = function(user, rawMode){
                 result = $scope.ceilG(user.monthly_salary - 
-                (user.monthly_salary*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + 
+                ((user.monthly_salary/user.monthly_working_hours)*user.monthly_present_hours*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + 
                 ($scope.roundG((user.monthly_salary/user.monthly_working_hours)*($scope.ceilG(user.monthly_working_hours-user.monthly_present_hours))))));
                 //$scope.final_payment+=result;
                 if (rawMode)

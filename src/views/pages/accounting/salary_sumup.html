@@ -26,9 +26,9 @@
                         <td>{{$index+1}}</td>
                         <td><a href="#user/{{user.id}}">{{user.persian_firstname || user.firstname}} {{user.persian_lastname || user.lastname}}</a></td>
                         <td ng-if="user.monthly_salary">{{accounting.formatNumber(user.monthly_salary)}}</td>
-                        <td ng-if="user.monthly_salary">{{accounting.formatNumber(user.monthly_salary*user.insurance_deductions/100)}}</td>
-                        <td ng-if="user.monthly_salary">{{accounting.formatNumber(user.monthly_salary*user.payroll_tax/100)}}</td>
-                        <td ng-if="user.monthly_salary">{{accounting.formatNumber(user.monthly_salary*user.retention/100)}}</td>
+                        <td ng-if="user.monthly_salary">{{accounting.formatNumber((user.monthly_salary/user.monthly_working_hours)*user.monthly_present_hours*user.insurance_deductions/100)}}</td>
+                        <td ng-if="user.monthly_salary">{{accounting.formatNumber((user.monthly_salary/user.monthly_working_hours)*user.monthly_present_hours*user.payroll_tax/100)}}</td>
+                        <td ng-if="user.monthly_salary">{{accounting.formatNumber((user.monthly_salary/user.monthly_working_hours)*user.monthly_present_hours*user.retention/100)}}</td>
                         <td ng-if="user.monthly_salary">{{accounting.formatNumber(roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours))))}}</td>
                         <td ng-if="user.monthly_salary">{{user.budget_account}}</td>
                         <td ng-if="user.monthly_salary">{{user.bank_account_number || 'صدور چک'}}</td>
