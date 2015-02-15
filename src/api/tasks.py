@@ -335,9 +335,9 @@ def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb')
     fmt = 'png'
     extra = ''
     page = ''
-    if content_type == 'image/vnd.adobe.photoshop':
-        extra = '-flatten'
-    if content_type == 'application/pdf' or content_type.split('/')[1] in ['gif']:
+    #if content_type == 'image/vnd.adobe.photoshop':
+    #    extra = '-flatten'
+    if content_type == 'application/pdf' or content_type.split('/')[1] in ['gif'] or content_type == 'image/vnd.adobe.photoshop':
         page = '[0]'
     fid = target.uuid + '_' + text + '_' + str(version)
     fmt = 'png'
