@@ -100,7 +100,7 @@ def init():
 
     experts = ['character design', 'character concept', 'matte paint', 'composite', 'mel scripting', 'python programming', 'team management',
                'directing', 'hair dynamic', 'hair style', 'cloth dynamic', 'cloth design', 'arnold technical', 'renderman technical', 'nuke', 'maya',
-               'adobe photoshop', 'zbrush', 'mudbox', 'toxik', 'character modeling', 'set modeling', 'set designer', 'set concept',
+               'adobe photoshop', 'zbrush', 'mudbox', 'toxik', 'fluid', 'character modeling', 'set modeling', 'set designer', 'set concept',
                'technical directing', 'office tools', 'concept painter', 'character shading', 'character paint', '2d motion design',
                'motion bulder', 'motion capture', 'sound design', 'editing', 'adobe premiere', 'uv layout', 'ptex', 'character animation',
                'rigging', 'skinning', 'blend shape', 'prop design', 'prop concept', 'storyboard', 'screenplay', 'story', 'planning', 'texturing',
