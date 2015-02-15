@@ -1727,11 +1727,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         $scope.getDropzone = function(url){
 
 
-        if (!Dropzone.instances.length)
-
-        {
-
-        $scope.dropzone = new Dropzone("#my-awesome-dropzone", {
+        return new Dropzone("#my-awesome-dropzone", {
             init: function() {
                 this.on("addedfile", function(file) {
                     _t = file.type.split('/')[0];
@@ -1740,7 +1736,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     });
                 this.on("complete", function(file) {
                     $timeout(function(){
-                        $scope.dropzone.removeFile(file);
+                        Dropzone.instances[0].removeFile(file);
                         }, 1000);
                     });
                 this.on("success", function(file, resp) {
@@ -1749,7 +1745,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
                     });
                 this.on("queuecomplete", function(file, resp) {
-                        $scope.getCollectionDetails();
+                        $scope.getCollectionDetails(undefined, true);
                         $scope.$apply();
                     });
                 this.on("thumbnail", function(file, dataUrl) {
@@ -1782,10 +1778,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             uploadMultiple:false,
         });
         }
-        else
-            Dropzone.instances[0].options.url=url;
-        }
-        $scope.getCollectionDetails = function(page){
+        $scope.getCollectionDetails = function(page, fromDropzone){
             if (page==undefined)
             {
                 if ($routeParams.page>0)
@@ -1812,8 +1805,8 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     $scope.collection.page = (page||0)+1;
                     $location.search('page', (page||0)+1);
                     $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+"&multipart=true";
-                    $scope.getDropzone( $scope.attachurl);
-                    
+                    if (!fromDropzone)
+                        $scope.getDropzone( $scope.attachurl);
                     if ($scope.$parent){
                         $scope.$parent.comment_id = resp.uuid;
                         $scope.$parent.getComments();
