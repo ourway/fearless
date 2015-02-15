@@ -20,7 +20,7 @@
                         <td>کسر کار</td>
                         <td>کد هزینه</td>
                         <td>شماره حساب</td>
-                        <td>مبلغ قابل پرداخت (تومان)</td>
+                        <td>مبلغ قابل پرداخت (ریال)</td>
                     </tr>
                     <tr ng-if="user.monthly_salary || showAll" class="active" ng-repeat="user in paylist | orderBy:'firstname' | filter:filterUA track by $index" >
                         <td>{{$index+1}}</td>
