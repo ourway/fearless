@@ -1,12 +1,14 @@
-var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular', 'ui.grid', 'ngSanitize', 
-                        'ui.bootstrap', 'checklist-model', 'siyfion.sfTypeahead', 'bootstrap-tagsinput']);
+var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular',
+        'ui.grid', 'ngSanitize', 'ui.bootstrap', 'checklist-model', 
+        'siyfion.sfTypeahead', 'bootstrap-tagsinput', 'ngAnimate']);
 
-
+/*
 fearlessApp.factory('$exceptionHandler', function () {
     return function (exception, cause) {
-        console.log(exception.message);
+        console.log(exception.message, cause);
     };
 });
+*/
 
 fearlessApp.config(function($sceDelegateProvider) {
   $sceDelegateProvider.resourceUrlWhitelist([
@@ -1720,23 +1722,15 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         $scope.collection.assets = [];
         $scope.newSubCollection = {};
         ci = $routeParams.collectionId;
+        Dropzone.autoDiscover = true;
 
-        $scope.deleteCollection = function(){
-            if (confirm('Are you sure you want to rmove this collection?'))
-                req= $http.delete('/api/db/collection/'+ci).success(function(resp){
-                            pid = $scope.collection.project.id;
-                            url = '/pms/' + pid;
-                            $location.path(url);
-                        });
-
-        }
+        $scope.getDropzone = function(url){
 
 
+        if (!Dropzone.instances.length)
 
-        $scope.$watch(ci, function(){
-                $scope.getCollectionDetails();
-                })
-        Dropzone.autoDiscover = false;
+        {
+
         $scope.dropzone = new Dropzone("#my-awesome-dropzone", {
             init: function() {
                 this.on("addedfile", function(file) {
@@ -1778,8 +1772,8 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     //    done();
                 //},
 
-            url: 'NULL',
-            //autoDiscover: false,
+            url: url,
+            autoDiscover: true,
             autoProcessQueue: true,
             method:'PUT',
             parallelUploads: 4,
@@ -1787,17 +1781,9 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             maxThumbnailFilesize: 10,
             uploadMultiple:false,
         });
-    
-
-        $scope.toggleThumbnail = function(){
-            if ($scope.thumbnails)
-                $scope.thumbnails=false;
-            else
-                $scope.thumbnails=true;
         }
-        $scope.initToggle = function(){
-            $('#toggle-thmb').bootstrapToggle();
-            $scope.thumbnails=false;
+        else
+            Dropzone.instances[0].options.url=url;
         }
         $scope.getCollectionDetails = function(page){
             if (page==undefined)
@@ -1826,7 +1812,8 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     $scope.collection.page = (page||0)+1;
                     $location.search('page', (page||0)+1);
                     $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+"&multipart=true";
-                    $scope.dropzone.options.url = $scope.attachurl;
+                    $scope.getDropzone( $scope.attachurl);
+                    
                     if ($scope.$parent){
                         $scope.$parent.comment_id = resp.uuid;
                         $scope.$parent.getComments();
@@ -1839,6 +1826,37 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                         $location.path('404')
                     })
         }
+
+
+        $scope.deleteCollection = function(){
+            if (confirm('Are you sure you want to rmove this collection?'))
+                req= $http.delete('/api/db/collection/'+ci).success(function(resp){
+                            pid = $scope.collection.project.id;
+                            url = '/pms/' + pid;
+                            $location.path(url);
+                        });
+
+        }
+
+
+
+        $scope.$watch(ci, function(){
+                $scope.getCollectionDetails();
+                })
+
+    
+
+        $scope.toggleThumbnail = function(){
+            if ($scope.thumbnails)
+                $scope.thumbnails=false;
+            else
+                $scope.thumbnails=true;
+        }
+        $scope.initToggle = function(){
+            $('#toggle-thmb').bootstrapToggle();
+            $scope.thumbnails=false;
+        }
+
         $scope.createNewSubCollection = function(){
             $scope.newSubCollection.parent_id = $scope.collection.id;
             $scope.newSubCollection.repository_id = $scope.collection.repository.id;
