@@ -17,7 +17,7 @@ user1 = User(email='farsheed.ashouri@gmail.com', password='rrferl', active=True,
 user2 = User(email='mehdieyazdani@gmail.com', password='123456', active=True, firstname='Mehdi', lastname='Yazdani')
 user3 = User(email='mostafarayaneh@gmail.com', password='123456', active=True, firstname='Morteza', lastname='Gaamari')
 user4 = User(email='amirgholamzadeh@gmail.com', password='123456', active=True, firstname='Amir', lastname='Gholam Zadeh')
-user5 = User(email='mostafa_khaleghi64@yahoo.com', password='123456', active=True, firstname='Mostafa', lastname='Khalegi')
+user5 = User(email='mostafa.khaleghi@gmail.com', password='123456', active=True, firstname='Mostafa', lastname='Khalegi')
 user6 = User(email='hamedanime@gmail.com', password='123456', active=True, firstname='Hamed', lastname='Behroozi')
 user7 = User(email='shahriyar.shahramfar@gmail.com', password='123456', active=True, firstname='Bijan', lastname='Shahramfar')
 user8 = User(email='mhd.kheirandish@yahoo.com', password='123456', active=True, firstname='Mohammad', lastname='Kheirandish')

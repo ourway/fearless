@@ -15,7 +15,7 @@ Clean code is much better than Cleaner comments!
 import os
 import shutil
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
-    Float, Boolean, event
+    Float, Boolean, event, func
 
 #from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
@@ -70,6 +70,13 @@ class Collection(IDMixin, Base):
     tgs = relationship(
         "Tag", backref='collections', secondary="collections_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
+
+
+    @hybrid_property
+    def number_of_assets(self):
+        from . import Asset
+        return session.query(Collection).join(Asset).filter_by(collection_id=self.id).all()
+
 
     @validates('schema')
     def load_json(self, key, schema):

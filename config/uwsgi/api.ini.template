@@ -30,7 +30,8 @@ disable-logging=True
 listen=128
 optimize=2
 cache2=True,name=ctc_internal_cache,items=2000
-thunder-lock=False
+thunder-lock=True
+post-buffering=True
 max-requests=1024
 #limit-as=256
 reload-mercy=8
