@@ -10,7 +10,8 @@ USER=
 OPENSOURCE="src/api/opensource"
 
 build:
-	@if test ! -d $(PYENVDIR); then python2.7 -m virtualenv $(PYENVDIR); fi
+	@if test ! -d $(PYENVDIR); then python2.7 -m virtualenv --always-copy $(PYENVDIR); fi
+	@python2.7 -m virtualenv --relocatable $(PYENVDIR)
 	@pyenv/bin/pip install Cython
 	@pyenv/bin/pip install -r requirements
 	@sed 's:{dir}:'`pwd`':' $(CURDIR)/config/supervisor/fearless.template > $(CURDIR)/config/supervisor/fearless.conf
