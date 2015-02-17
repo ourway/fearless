@@ -90,6 +90,24 @@ class UpdateAssetTags:
         target.tags = data.get('tags')
         resp.status = falcon.HTTP_202
 
+class UpdateCollectionTags:
+
+    def on_post(self, req, resp, key):
+        target = req.session.query(Collection).filter_by(uuid=key).first()
+        data = get_params(req.stream, False)
+        target.tags = data.get('tags')
+        resp.status = falcon.HTTP_202
+
+
+class UpdateProjectTags:
+
+    def on_post(self, req, resp, key):
+        target = req.session.query(Project).filter_by(uuid=key).first()
+        data = get_params(req.stream, False)
+        target.tags = data.get('tags')
+        resp.status = falcon.HTTP_202
+
+
 
 class DB:
 
@@ -372,6 +390,8 @@ app.add_route('/api/messages/move/{key}', MoveMessage())
 app.add_route('/api/messages/delete/{key}', DeleteMessage())
 app.add_route('/api/messages/update/{key}', UpdateMessage())
 app.add_route('/api/setTags/asset/{key}', UpdateAssetTags())
+app.add_route('/api/setTags/collection/{key}', UpdateCollectionTags())
+app.add_route('/api/setTags/project/{key}', UpdateProjectTags())
 
 
 if __name__ == '__main__':

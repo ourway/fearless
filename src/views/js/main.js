@@ -1044,6 +1044,10 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                             resp.end = new Date(resp.end*1000);
                             $rootScope.title = resp.name + ' - ' + 'Fearless'
                             resp.updatedWatchers = [];
+                            getTags = $http.get('/api/db/project/'+$scope.projId+'?field=tgs');
+                            getTags.success(function(tgs){
+                                resp.tgs = tgs;
+                                })
                             resp.watchers.forEach(function(e){resp.updatedWatchers.push(e)});
                             $scope.project = resp;
                             $scope.projectBackup = resp;
@@ -1804,6 +1808,10 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
 
                     }
+                    getTags = $http.get('/api/db/collection/'+ci+'?field=tgs');
+                    getTags.success(function(tgs){
+                        $scope.collection.tgs = tgs;
+                        })
                     $rootScope.title = 'Collection: ' + resp.name + ' - ' + 'Fearless'
                     $scope.collection.page = (page||0)+1;
                     $location.search('page', (page||0)+1);
@@ -2197,6 +2205,7 @@ fearlessApp.controller('taggerCtrl',  function($scope, $rootScope, $routeParams,
 
 fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
 
+$rootScope.title = 'User Assets - Fearless'
 $scope.assetOptions = {};
         // main assets index page
 var assets = new Bloodhound({

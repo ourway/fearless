@@ -250,6 +250,31 @@ background-color: #FFEDA5;
                     <h3 style="color:grey">Sequences</h3>
                     <a class="projectSeqA" href="#pms/{{project.id}}/seq/{{seq.number}}" ng-repeat="seq in project.sequences track by $index" title="{{req.code}}">{{seq.number}}</a>
                     </div>
+                    <div class="col-md-2 column">
+
+            <div ng-controller="taggerCtrl" class="">
+                <input type="search" id="tagSearchInput"  class="typeahead form-control" 
+                options="tagOptions" datasets="completeData" placeholder="Tag this project"
+                ng-model="tags.userTagFilter" ng-keyup="$event.keyCode == 13 ? addTag('project', $parent.project) : null" sf-typeahead>
+					<div class="">
+                        <br/>
+                        <ul class="nav nav-pills nav-stacked" style="margin-left: -15px;">
+                            <li class="" ng-repeat="tag in $parent.project.tgs track by $index">
+                            <a style="word-break: break-all;"><em class="fa fa-tag"></em> <span ng-show="true" 
+                                    style="cursor:pointer" ng-click="$parent.project.tgs.splice($index, 1);addTag('project', $parent.project)" 
+                                    class="badge pull-right fa fa-remove"> </span>{{tag.name}}</a>
+                            </li>
+                        </ul>
+
+					</div>
+                </div>
+            </div>
+
+
+
+
+
+                    </div>
         </div>
 </div>
 </div>

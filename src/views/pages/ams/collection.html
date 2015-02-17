@@ -171,14 +171,37 @@
                     <table>
     <hr ng-show="collection.assets.length>0"/>
     </div>
-
-
-
-
 	</div>
+
+    <div class="col-md-12">
+    <div class="col-md-5">
+
     <div ng-include="'pages/comment/index.html'"></div>
+	</div>
+    <div class="col-md-3">
+
+            <div ng-controller="taggerCtrl" class="">
+                <input type="search" id="tagSearchInput"  class="typeahead form-control" 
+                options="tagOptions" datasets="completeData" placeholder="Tag this collection"
+                ng-model="tags.userTagFilter" ng-keyup="$event.keyCode == 13 ? addTag('collection', $parent.collection) : null" sf-typeahead>
+					<div class="">
+                        <br/>
+                        <ul class="nav nav-pills nav-stacked" style="margin-left: -15px;">
+                            <li class="" ng-repeat="tag in $parent.collection.tgs track by $index">
+                            <a style="word-break: break-all;" ><em class="fa fa-tag"></em> <span ng-show="true" 
+                                    style="cursor:pointer" ng-click="$parent.collection.tgs.splice($index, 1);addTag('collection', $parent.collection)" 
+                                    class="badge pull-right fa fa-remove"> </span>{{tag.name}}</a>
+                            </li>
+                        </ul>
+
+					</div>
+                </div>
+            </div>
+    </div>
 
 
+
+</div>
 </div>
 
 

@@ -70,7 +70,7 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
         actual:start ${task.start.strftime('%Y-%m-%d')}
         end ${task.end.strftime('%Y-%m-%d')}
         actual:end ${task.end.strftime('%Y-%m-%d')}
-    % elif task.effort and task.start.strftime('%Y-%m-%d')<=today and not task.depends and not task.parent:
+    % elif task.effort and not task.depends and not task.parent:
         start ${task.start.strftime('%Y-%m-%d')}
         actual:start ${task.start.strftime('%Y-%m-%d')}
     % endif
