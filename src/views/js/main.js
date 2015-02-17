@@ -272,6 +272,12 @@ var TITLE = 'TITLE';
                  reloadOnSearch: true // dont reload the page on $location.search
 
             })
+             .when('/ur', {
+
+                templateUrl: 'pages/crew/user_reports.html',
+                controller: 'userReportsCtrl',
+                 reloadOnSearch: false // dont reload the page on $location.search
+            })
 
     })
 
@@ -2332,6 +2338,19 @@ $scope.getUserAssets = function(order_by, sort, search_for){
 
     
 });// end messageCtrl
+
+
+
+fearlessApp.controller('userReportsCtrl',  function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
+
+
+        getReports = $http.get('/api/userReports').success(function(resp){
+                $scope.reports = resp;
+
+            });
+
+        });
+
 
 //////////////////////////////////////////////////////
 

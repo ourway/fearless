@@ -1,7 +1,12 @@
 <div class="container">
+
+
+      <h3 align="center"><small style="margin-top: -13px; position: absolute;">Fearless</small>Members&reg;</h3>
+
         <div class="col-md-12 column">
-            <h1>Members <small>[{{users.length}}]</small></h1>
-            <input placeholder="Filter users. Example: type yahoo for filtering users with yahoo! email" class="form-control" type="text" ng-model="filterUA" />
+            <h4>{{users.length}} members</h4>
+            <input ng-class="{'farsi':!$parent.isASCII(filterUA, true)}"
+            placeholder="Filter users. Example: type yahoo for filtering users with yahoo! email" class="form-control" type="text" ng-model="filterUA" />
             <br/>
             <div class="col-md-5 column thumbnail" style="background:#f2f2f2;margin:5px" ng-repeat="user in users | orderBy:'firstname'| filter:filterUA" >
                 <div class="col-md-3">

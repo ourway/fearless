@@ -146,9 +146,9 @@ class User(IDMixin, Base):
     payroll_tax = Column(Float(precision=3), default=3)
     insurance_deductions = Column(Float(precision=3), default=7.8)
     reps = relationship(
-        "Report", secondary=lambda: user_reports, backref='user')
-    agreements = relationship("Document", backref='agreement_of')
-    payment_invoices = relationship("Document", backref='invoice_of')
+        "Report", secondary=lambda: user_reports, backref='user', single_parent=True)
+    agreements = relationship("Document", backref='agreement_of', single_parent=True)
+    payment_invoices = relationship("Document", backref='invoice_of', single_parent=True)
 
     agreement_period = relationship("Date", uselist=False)
     # when we refer to reports, id will be returned.

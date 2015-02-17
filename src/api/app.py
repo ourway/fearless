@@ -27,7 +27,8 @@ import simplejson as json
 from utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection
 from utils.messages import GetMessagesList, GetMessages, GetMessage, SetMessage, \
     SearchMessages, MoveMessage, DeleteMessage, UpdateMessage
-from utils.reports import Mailer, AddReport
+from utils.reports import Mailer, AddReport, UserReports
+
 from gevent import wsgi
 from models import __all__ as av
 from models import *
@@ -392,6 +393,7 @@ app.add_route('/api/messages/update/{key}', UpdateMessage())
 app.add_route('/api/setTags/asset/{key}', UpdateAssetTags())
 app.add_route('/api/setTags/collection/{key}', UpdateCollectionTags())
 app.add_route('/api/setTags/project/{key}', UpdateProjectTags())
+app.add_route('/api/userReports', UserReports())
 
 
 if __name__ == '__main__':

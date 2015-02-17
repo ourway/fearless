@@ -489,7 +489,7 @@ class GetPermissions:
 
 
 def isAuthorizedTo(req, userId, actionName):
-    '''authorization function'''
+    '''authorization function.  It should find a role or group in user database with same name'''
     target = req.session.query(User).filter(User.id == userId).first()
     if not target:
         return
@@ -498,6 +498,8 @@ def isAuthorizedTo(req, userId, actionName):
         return True
 
     for userGroup in target.grps:  # grps is access to gourp objects
+        if actionName.lower() == userGroup.name.lower():
+                return True
         for role in userGroup.rls:  # rls is access to role object
             if actionName.lower() == role.name.lower():
                 return True

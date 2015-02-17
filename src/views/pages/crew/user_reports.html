@@ -1,0 +1,30 @@
+<div class="container">
+    
+
+      <h3 align="center"><small style="margin-top: -13px; position: absolute;">Fearless</small>Reports Center&reg;</h3>
+      <br/>
+
+      <input ng-class="{'farsi':!$parent.isASCII(reports.rfilter, true)}"
+      placeholder="Filter reports by reporter name or content" class="form-control" type="text" ng-model="reports.rfilter" />
+    <br/>
+    <div>
+        <div class="panel panel-success" ng-repeat="report in reports  | filter:reports.rfilter track by $index">
+            <div class="panel-heading"> 
+                <a href="#/user/{{report.reporter.id}}"><b>{{report.reporter.firstname}} {{report.reporter.lastname}}</b></a>
+            </div>
+            <div class="panel-body">
+                <p ng-class="{'farsi':!$parent.isASCII(report.body, true)}">
+                    {{report.body}}
+                </p>
+            </div>
+            <div class="panel-footer clearfix">
+                <div >
+                <small>Reported {{$parent.prettyDate(report.datetime)}} ago</small>
+                </div>
+            </div>
+        </div> 
+
+
+
+    </div>
+</div>

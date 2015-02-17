@@ -21,7 +21,9 @@ from validators import email_validator
 from tasks import send_envelope
 import os
 from models import User, Report
-from AAA import getUserInfoFromSession
+from AAA import getUserInfoFromSession, Authorize
+from sqlalchemy import desc, asc
+from collections import defaultdict
 
 
 class Mailer(object):
@@ -58,3 +60,23 @@ class AddReport:
             targetUser.reports.append(data.get('body'))
             resp.status = falcon.HTTP_202
             resp.body = {'message': 'OK'}
+
+
+
+class UserReports(object):
+
+    @Authorize('admin')
+    def on_get(self, req, resp, **kw):
+        reports = req.session.query(Report).filter(Report.user).\
+            order_by(desc(Report.created_on)).all()
+        result = []
+        for i in reports:
+            data = {
+                'reporter': {'id':i.user[0].id, 'firstname':i.user[0].firstname,
+                             'lastname':i.user[0].lastname},
+                    'body': i.body,
+                    'datetime': i.created_on,
+                    'tgs':i.tgs,
+                    }
+            result.append(data)
+        resp.body = result
