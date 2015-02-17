@@ -1796,6 +1796,9 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             req = $http.get('/api/collection/'+ci+'?s='+start+'&e='+end);
             req.success(function(resp){
                     $scope.collection = resp;
+                    if (!resp)
+                        $location.path('404')
+                    else {
                     for (i in $scope.collection.assets){
                         _asset = $scope.collection.assets[i];
 
@@ -1814,7 +1817,8 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
                     //$scope.activateVideo();
 
-                })
+                }
+            })
             req.error(function(er){
                         $location.path('404')
                     })

@@ -450,6 +450,7 @@ class CollectionInfo:
                     {'id': i.id,
                      'name': i.name,
                      'url': i.url,
+                     'content_size': i.content_size,
                      'fullname': i.fullname,
                      'version': i.version,
                      'thumbnail': i.thumbnail,
@@ -467,6 +468,7 @@ class CollectionInfo:
             data['id'] = target.id
             data['container'] = target.container
             data['holdAssets'] = target.holdAssets
+            data['collection_size'] = target.collection_size
             data['uuid'] = target.uuid
             data['path'] = target.path
             data['description'] = target.description
@@ -486,7 +488,7 @@ class CollectionInfo:
                 else:
                     break
             if target.children:
-                data['children'] = [{'name': i.name, 'id': i.id, 'path': i.path,
+                data['children'] = [{'name': i.name, 'id': i.id, 'path': i.path, 'number_of_assets': i.number_of_assets, 
                                      'children': [{'name': c1.name, 'id': c1.id, 'path': c1.path, } for c1 in i.children]
                                      } for i in target.children]
             resp.body = data

@@ -13,6 +13,7 @@ Clean code is much better than Cleaner comments!
 '''
 
 import os
+import shutil
 from utils.fagit import GIT
 
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
@@ -53,7 +54,7 @@ class Repository(IDMixin, Base):
     collections = relationship(
         'Collection', backref='repository', cascade="all, delete, delete-orphan")
     project_id = Column(Integer, ForeignKey("project.id"))
-    project = relationship('Project', backref='repositories')
+    project = relationship('Project', backref=backref('repositories', cascade="all, delete, delete-orphan"))
     owner_id = Column(Integer, ForeignKey('user.id'))
     owner = relationship("User", backref="ownes_repositories")
     period = relationship("Date", uselist=False)
@@ -70,3 +71,19 @@ class Repository(IDMixin, Base):
             f.write('welcome to Fearless repository.')
         #GIT(readme).add('repo *%s* created successfully' % self.name)
         return path
+
+
+    @staticmethod
+    def before_delete(mapper, connection, target):
+        print 'Deleting repository %s' % target.id
+        ipath = target.path
+        if os.path.isdir(ipath):
+            try:
+                shutil.rmtree(ipath)
+            except Exception, e:
+                pass
+
+
+    @classmethod
+    def __declare_last__(cls):
+        event.listen(cls, 'before_delete', cls.before_delete)

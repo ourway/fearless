@@ -23,6 +23,7 @@ from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base
+from sqlalchemy_utils import aggregated
 import ujson as json  # for schema validations
 from mako.template import Template
 
@@ -72,10 +73,14 @@ class Collection(IDMixin, Base):
     tags = association_proxy('tgs', 'name', creator=tag_maker)
 
 
-    @hybrid_property
+    @aggregated('assets', Column(Integer))
     def number_of_assets(self):
+        return func.sum('1')
+
+    @aggregated('assets', Column(Integer))
+    def collection_size(self):
         from . import Asset
-        return session.query(Collection).join(Asset).filter_by(collection_id=self.id).all()
+        return func.sum(Asset.content_size)
 
 
     @validates('schema')
@@ -118,6 +123,13 @@ class Collection(IDMixin, Base):
         #    self.repository.path, self.path or '')
         #git = GIT('.', wt=collection_path)
         # return git.archive()
+    @staticmethod
+    def BeforeUserDeleteFuncs(mapper, connection, target):
+        print 'deleting collection %s' % target.id
+        try:
+            shutil.rmtree(target.url)
+        except Exception, e:
+            print e
 
     @staticmethod
     def AfterUserCreationFuncs(mapper, connection, target):
@@ -208,3 +220,4 @@ class Collection(IDMixin, Base):
     @classmethod
     def __declare_last__(cls):
         event.listen(cls, 'after_insert', cls.AfterUserCreationFuncs)
+        event.listen(cls, 'before_delete', cls.BeforeUserDeleteFuncs)

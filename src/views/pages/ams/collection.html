@@ -91,7 +91,11 @@
                         <a href="#ams/c/{{subcol.id}}?page=1" title="{{subcol.description}}"
                         ><img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
 						<div class="caption">
-                            <h5><a href="#ams/c/{{subcol.id}}?page=1" style="color:#333;word-wrap: break-word;">{{subcol.name}}</a></h5>
+                            <h5><a href="#ams/c/{{subcol.id}}?page=1" style="color:#333;word-wrap: break-word;">{{subcol.name}}</a>
+                                <small ng-show="subcol.number_of_assets">[<span style="color:green">{{subcol.number_of_assets}}</span>]</small>
+                                <span ng-show="subcol.children.length">
+                                    [<span style="color:grey"><strong>{{subcol.children.length}}</strong></span>]</span>
+                        </h5>
 							<p>
 							</p>
 						</div>
@@ -106,7 +110,13 @@
         <div class="col-md-12" ng-show="collection.assets.length>0">
             <div ng-if="collection.holdAssets">
             <hr/>
-            <h3 ng-show="collection.assets.length>0">Assets <small>({{(collection.page-1)*10+1}}-{{ (collection.page-1)*10+collection.assets.length}} of {{collection.assets_count}})</small></h3>
+            <h3 ng-show="collection.assets.length>0">Assets <small>({{(collection.page-1)*10+1}}-{{ (collection.page-1)*10+collection.assets.length}} of {{collection.assets_count}}) 
+                    <span ng-if="collection.collection_size">
+                        -
+                        [{{collection.collection_size/(1024*1000)| number:2}} MB]
+                    </span>
+            
+            </small></h3>
 				<div class="form-group">
 					<div class="col-md-6">
                         <input type="text" class="form-control" placeholder="Search for {{collection.name}} Assets here" ng-model="collection.CollectionAssetFilter" />
@@ -134,7 +144,8 @@
                         <thead class="hidden-xs">
                             <td class="col-md-1"><a href="javascript:;"><strong>ID</strong></a></td>
                             <td ng-if="thumbnails" class="col-md-2"><a href="javascript:;"><strong></strong></a></td>
-                            <td ng-class="{'col-md-5':thumbnails, 'col-md-7':!thumbnails}"><a href="javascript:;"><strong>Name</strong></a></td>
+                            <td ng-class="{'col-md-4':thumbnails, 'col-md-6':!thumbnails}"><a href="javascript:;"><strong>Name</strong></a></td>
+                            <td class="col-md-1"><a href="javascript:;"><strong>Size</strong></a></td>
                             <td class="col-md-2"><a href="javascript:;"><strong>Date</strong></a></td>
                             <td class="col-md-2"><a href="javascript:;"><strong>Owner</strong></a></td>
                         </tr></thead>
@@ -146,7 +157,14 @@
                                 <td ng-if="thumbnails && asset.thumbnail" class="hidden-xs"  style="vertical-align: middle;">
                                     <a href="/static/{{asset.poster}}" data-gallery="collectionLinks"><img class="thumbnail" ng-src="/static/{{asset.thumbnail}}" /></a></td>
                                 <td  style="vertical-align: middle;"><a href="#/ams/a/{{asset.id}}">{{asset.fullname}}</strong></a></td>
-                                <td  style="vertical-align: middle;">{{$parent.prettyDate(asset.datetime)}} ago</td>
+                            <td  style="vertical-align: middle;">
+                    <span ng-if="asset.content_size<1024 && asset.content_size">{{asset.content_size}} bytes</span>
+                    <span ng-if="asset.content_size<1024*1000 && asset.content_size>=1024">{{asset.content_size/1024 | number:2}} KB</span>
+                    <span ng-if="asset.content_size<1024*1000*1000 && asset.content_size>=1024*1000">{{asset.content_size/(1024*1000) | number:2}} MB</span>
+                    <span ng-if="asset.content_size>=1024*1000*1000 && asset.content_size>=1024*1000*1000">{{asset.content_size/(1024*1000*1000) | number:2}} GB</span>
+                            
+                            </td>
+                                <td  style="vertical-align: middle;" class="hidden-xs">{{$parent.prettyDate(asset.datetime)}} ago</td>
                                 <td  style="vertical-align: middle;" class="hidden-xs" >{{asset.owner.name}}</td>
                             </tr>
                         </tbody>

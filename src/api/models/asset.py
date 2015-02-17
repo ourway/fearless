@@ -13,6 +13,7 @@ Clean code is much better than Cleaner comments!
 '''
 
 import os
+import shutil
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
 
@@ -77,6 +78,7 @@ class Asset(IDMixin, Base):
     ext = Column(String(32))
     content_type = Column(String(64))
     version = Column(Integer, default=1)  # asset versioning
+    content_size = Column(Integer)  # asset size
     task_id = Column(String(64))  # celery post processing task id
     ready = Column(Boolean, default=False)  # post processing
     period = relationship("Date", uselist=False)
@@ -91,9 +93,10 @@ class Asset(IDMixin, Base):
     #parent_id = Column(Integer, ForeignKey("asset.id"))
     asset_id = Column(Integer, ForeignKey("asset.id"))
     attachments = relationship("Asset", secondary=assets_assets,
+                               single_parent=True,
                                primaryjoin=id == assets_assets.c.asset_a_id,
                                secondaryjoin=id == assets_assets.c.asset_b_id,
-                               backref='attached_to')
+                               backref="attached_to", cascade="all, delete, delete-orphan")
 
     collection_id = Column(
         Integer, ForeignKey('collection.id'), nullable=False)
@@ -175,7 +178,7 @@ class Asset(IDMixin, Base):
     @property
     def preview(self):
         fid = self.uuid + '_preview_' + str(self.version)
-        fmt = 'ogv'
+        fmt = 'mp4'
         result = os.path.join('uploads', fid + '.' + fmt)
         if os.path.isfile(os.path.join(public_upload_folder, fid + '.' + fmt)):
             return result
@@ -192,6 +195,12 @@ class Asset(IDMixin, Base):
     def url(self):
         return os.path.join(os.path.basename(self.collection.repository.path),
                             self.collection.path, self.fullname)
+
+
+
+    @staticmethod
+    def before_insert(mapper, connection, target):
+        target.content_size = os.path.getsize(target.full_path)
 
     @staticmethod
     def AfterAssetCreationFuncs(mapper, connection, target):
@@ -216,15 +225,41 @@ class Asset(IDMixin, Base):
             newThumb = generateImageThumbnail.delay(target.full_path, target.version,
                                                     146, 110, target.id, 'thmb')
 
+
+    @staticmethod
+    def before_update(mapper, connection, target):
+        target.content_size = os.path.getsize(target.full_path)
+
+
     @staticmethod
     def before_delete(mapper, connection, target):
+        print 'deleting Asset  %s' % target.id
         if os.path.isfile(target.full_path):
             try:
                 os.remove(target.full_path)
-            except:
-                pass
+            except Exception, e:
+                print e
+        for i in [target.preview, target.poster]:
+            if i:
+                ipath =  os.path.join(os.path.dirname(public_upload_folder), i)
+                if os.path.isfile(ipath):
+                    os.remove(ipath)
+
+        afolder = os.path.join(ASSETS, target.uuid)
+        gitfolder = os.path.join(GIT_folder, target.uuid)
+        for folder in [afolder, gitfolder]:
+            if folder and os.path.isdir(folder):
+                try:
+                    shutil.rmtree(folder)
+                except Exception, e:
+                    print e
+        
+
+            
 
     @classmethod
     def __declare_last__(cls):
         event.listen(cls, 'after_insert', cls.AfterAssetCreationFuncs)
         event.listen(cls, 'before_delete', cls.before_delete)
+        event.listen(cls, 'before_update', cls.before_update)
+        event.listen(cls, 'before_insert', cls.before_insert)

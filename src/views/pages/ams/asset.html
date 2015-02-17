@@ -110,7 +110,13 @@
 
 
             <div class="col-md-9" ng-if="asset">
-                <h4><a href="/static/{{asset.url}}">{{asset.fullname}}</a> <Small>version {{asset.version}}</small></h4>
+                <h4><a href="/static/{{asset.url}}">{{asset.fullname}}</a> <Small>version {{asset.version}}</small>
+                    <small ng-if="asset.content_size<1024 && asset.content_size">[{{asset.content_size}} bytes]</small>
+                    <small ng-if="asset.content_size<1024*1000 && asset.content_size>=1024">[{{asset.content_size/1024 | number:2}} KB]</small>
+                    <small ng-if="asset.content_size<1024*1000*1000 && asset.content_size>=1024*1000">[{{asset.content_size/(1024*1000) | number:2}} MB]</small>
+                    <small ng-if="asset.content_size>=1024*1000*1000 && asset.content_size>=1024*1000*1000">[{{asset.content_size/(1024*1000*1000) | number:2}} GB]</small>
+                
+                </h4>
                 <div ng-if="asset.preview && asset.content_type.split('/')[0]=='video'">
                     <video id="video_{{asset.id}}" class="video-js vjs-default-skin thumbnail" controls 
                     preload="metadata" ng-attr-poster="{{'/static/'+asset.poster}}" width="600" height="400" >
@@ -129,32 +135,42 @@
                         style="cursor:pointer;width:130px;opacity:0.75" ng-src="{{'/static/uploads/'+asset.uuid+'_thmb_'+v+'.png'}}" />
                     </div>
                 </div>
-                <div ng-if="asset.content_type.split('/')[1]=='x-python; charset=utf-8'" ng-init="loadAssetData()">
+                <div ng-if="asset.content_type.split('/')[1]=='x-python; charset=utf-8' && asset.content_size<1024*16" ng-init="loadAssetData()">
                     <pre><code class="lang-py">{{asset.data}}</code></pre>
                 </div>
-                <div ng-if="asset.content_type.split('/')[1]=='css; charset=utf-8'" ng-init="loadAssetData()">
+                <div ng-if="asset.content_type.split('/')[1]=='css; charset=utf-8' && asset.content_size<1024*16" ng-init="loadAssetData()">
                     <pre><code class="lang-css">{{asset.data}}</code></pre>
                 </div>
-                <div ng-if="asset.content_type.split('/')[1]=='javascript'" ng-init="loadAssetData()">
+                <div ng-if="asset.content_type.split('/')[1]=='javascript' && asset.content_size<1024*16" ng-init="loadAssetData()">
                     <pre><code class="lang-js">{{asset.data}}</code></pre>
                 </div>
-                <div ng-if="asset.content_type.split('/')[1]=='x-markdown; charset=utf-8'" ng-init="loadAssetData()">
+                <div ng-if="asset.content_type.split('/')[1]=='x-markdown; charset=utf-8' && asset.content_size<1024*16" ng-init="loadAssetData()">
                     <div style="word-break: break-word" ng-bind-html="marked(asset.data)"></div>
                 </div>
-                <div ng-if="asset.content_type.split('/')[1]=='plain; charset=utf-8'" ng-init="loadAssetData()">
+                <div ng-if="asset.content_type.split('/')[1]=='plain; charset=utf-8' && asset.content_size<1024*16" ng-init="loadAssetData()">
                     <pre><code class="lang-text">{{asset.data}}</code></pre>
                 </div>
-                <div ng-if="asset.content_type.split('/')[1]=='x-csrc; charset=utf-8'" ng-init="loadAssetData()">
+                <div ng-if="asset.content_type.split('/')[1]=='x-csrc; charset=utf-8' && asset.content_size<1024*16" ng-init="loadAssetData()">
                     <pre><code class="lang-c">{{asset.data}}</code></pre>
                 </div>
-                <div ng-if="asset.content_type.split('/')[1]=='x-chdr; charset=utf-8'" ng-init="loadAssetData()">
+                <div ng-if="asset.content_type.split('/')[1]=='x-chdr; charset=utf-8' && asset.content_size<1024*16" ng-init="loadAssetData()">
                     <pre><code class="lang-h">{{asset.data}}</code></pre>
                 </div>
-                <div ng-if="asset.content_type.split('/')[1]=='x-c++src; charset=utf-8'" ng-init="loadAssetData()">
+                <div ng-if="asset.content_type.split('/')[1]=='x-c++src; charset=utf-8' && asset.content_size<1024*16" ng-init="loadAssetData()">
                     <pre><code class="lang-cpp">{{asset.data}}</code></pre>
                 </div>
+                <div ng-if="asset.content_type.split('/')[1]=='json' && asset.content_size<1024*16" ng-init="loadAssetData()">
+                    <pre><code class="lang-js">{{asset.data}}</code></pre>
+                </div>
+                <div ng-if="asset.content_type.split('/')[1]=='x-shellscript' && asset.content_size<1024*16" ng-init="loadAssetData()">
+                    <pre><code class="lang-bash">{{asset.data}}</code></pre>
+                </div>
+                <div ng-if="asset.content_type.split('/')[1]=='html; charset=utf-8' && asset.content_size<1024*16" ng-init="loadAssetData()">
+                    <pre><code class="lang-html">{{asset.data}}</code></pre>
+                </div>
 
-                <div ng-if="asset.content_type.split('/')[1]=='pdf' || asset.content_type.split('/')[1]=='html; charset=utf-8'" ng-init="loadAssetData()">
+
+                <div ng-if="asset.content_type.split('/')[1]=='pdf'" ng-init="loadAssetData()">
                     <iframe class="col-md-12" height="600" src="{{'/static/'+asset.url}}" seamless="seamless" ></iframe>
                 </div>
 
