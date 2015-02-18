@@ -1,8 +1,9 @@
 
 
 import os
-from sqlalchemy import create_engine  # for database
+from sqlalchemy import create_engine, event  # for database
 from sqlalchemy.orm import scoped_session,  sessionmaker
+from sqlalchemy.exc import DisconnectionError
 
 from sqlalchemy.pool import SingletonThreadPool
 from mixin import Base
@@ -28,9 +29,27 @@ postgres = 'postgresql+psycopg2://user:password@/dbname'
 DB = msql
 
 
-#engine = create_engine(DB, echo=False, convert_unicode=True)
-engine = create_engine(DB, echo=False, convert_unicode=True, pool_recycle=3600)
+def checkout_listener(dbapi_con, con_record, con_proxy):
+    try:
+        try:
+            dbapi_con.ping(False)
+        except TypeError:
+            dbapi_con.ping()
+    except dbapi_con.OperationalError as exc:
+        if exc.args[0] in (2006, 2013, 2014, 2045, 2055):
+            raise DisconnectionError()
+        else:
+            raise
 
+
+
+#engine = create_engine(DB, echo=False, convert_unicode=True)
+engine = create_engine(DB, echo=False, 
+            convert_unicode=True, pool_recycle=3600,
+                       pool_size=100)
+
+
+event.listen(engine, 'checkout', checkout_listener)
 
 #engine = create_engine("postgresql+psycopg2://farsheed:rrferl@localhost:5432/fearless2")
 #engine.raw_connection().connection.text_factory = str
