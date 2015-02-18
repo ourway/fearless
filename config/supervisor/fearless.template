@@ -1,12 +1,14 @@
 [program:fearless-api]
-command={dir}/pyenv/bin/uwsgi --emperor config/uwsgi
+command={dir}/pyenv/bin/gunicorn -w 8 -b 127.0.0.1:5002 app:app
 autostart=true
-directory={dir}
+autorestart=true
+redirect_stderr=true
+directory={dir}/src/api
 stopsignal=TERM
 user=fearless
 environment=PATH="/opt/rubystack-2.0.0-23/ruby/bin:/usr/local/bin:%(ENV_PATH)s"
-stdout_logfile={dir}/logs/uwsgi_access.log
-stderr_logfile={dir}/logs/uwsgi_error.log
+stdout_logfile={dir}/logs/gunicorn_access.log
+stderr_logfile={dir}/logs/gunicorn_error.log
 
 
 [program:fearless-socket]

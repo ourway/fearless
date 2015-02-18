@@ -548,7 +548,7 @@ class AssetCheckout:
         thumbnail = os.path.join(
             'uploads', target.uuid + '_thmb_' + version.split('_')[1] + '.png')
         fid = target.uuid + '_preview_' + version.split('_')[1]
-        fmt = 'ogv'
+        fmt = 'mp4'
         preview = os.path.join('uploads', fid + '.' + fmt)
         resp.body = {'poster': poster, 'thumbnail': thumbnail,
                      'version': version, 'preview': preview}
