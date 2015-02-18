@@ -19,6 +19,8 @@ server {
     access_log  /var/log/nginx/fearless_acess.log;
     error_log  /var/log/nginx/fearless_error.log;
     #more_set_headers 'Server: Fearless Server';
+    client_max_body_size 8G;
+    
 
      location / {
         rewrite .*/ /app;

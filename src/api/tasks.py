@@ -69,7 +69,7 @@ Capp = Celery('tasks',
 
 def process(cmd):
     '''General external process'''
-    from gevent.subprocess import Popen, PIPE, call  # everything nedded to handle external commands
+    from subprocess import Popen, PIPE, call  # everything nedded to handle external commands
     p = Popen(cmd, shell=True, stderr=PIPE, stdout=PIPE,
               )
     # universal_newlines=True)  # process
@@ -213,6 +213,7 @@ def generateAudioThumbnail(path, assetUuid, version):
 
 @Capp.task
 def addFileToGit(path, assetUuid, version):
+
     path = path.encode("utf-8")
     directory = os.path.dirname(path)
     git_dir = os.path.join(GIT_folder, assetUuid)

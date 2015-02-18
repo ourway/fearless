@@ -1782,7 +1782,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             autoDiscover: true,
             autoProcessQueue: true,
             method:'PUT',
-            parallelUploads: 4,
+            parallelUploads: 1,
             maxFilesize: 2000,
             maxThumbnailFilesize: 10,
             uploadMultiple:false,
