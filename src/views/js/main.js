@@ -1790,9 +1790,9 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             autoDiscover: true,
             autoProcessQueue: true,
             method:'PUT',
-            parallelUploads: 1,
+            parallelUploads: 16,
             maxFilesize: 2000,
-            maxThumbnailFilesize: 10,
+            maxThumbnailFilesize: 2,
             uploadMultiple:false,
         });
         }

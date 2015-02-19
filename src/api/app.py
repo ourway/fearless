@@ -12,7 +12,6 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
-from gevent import monkey; monkey.patch_all()
 from falcon_patch import falcon
 import cgi
 # cgi.maxlen = 10 * 1024 * 1024 # 8Gb
@@ -402,4 +401,4 @@ if __name__ == '__main__':
     sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
     #from werkzeug import run_simple
     #run_simple('0.0.0.0', 5002, app, use_debugger=True, use_reloader=True)
-    wsgi.WSGIServer(('127.0.0.1', 5002), app).serve_forever()
+    #wsgi.WSGIServer(('127.0.0.1', 5002), app).serve_forever()
