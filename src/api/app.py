@@ -28,7 +28,6 @@ from utils.messages import GetMessagesList, GetMessages, GetMessage, SetMessage,
     SearchMessages, MoveMessage, DeleteMessage, UpdateMessage
 from utils.reports import Mailer, AddReport, UserReports
 
-from gevent import wsgi
 from models import __all__ as av
 from models import *
 from sqlalchemy import desc, asc
@@ -396,9 +395,7 @@ app.add_route('/api/userReports', UserReports())
 
 
 if __name__ == '__main__':
-    import sys
-    import os
-    sys.path.append(os.path.join(os.path.dirname(__file__), '../'))
-    #from werkzeug import run_simple
-    #run_simple('0.0.0.0', 5002, app, use_debugger=True, use_reloader=True)
+    pass
+    from werkzeug import run_simple
+    run_simple('0.0.0.0', 5002, app, use_debugger=True, use_reloader=True)
     #wsgi.WSGIServer(('127.0.0.1', 5002), app).serve_forever()
