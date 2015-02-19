@@ -46,7 +46,7 @@ def checkout_listener(dbapi_con, con_record, con_proxy):
 #engine = create_engine(DB, echo=False, convert_unicode=True)
 engine = create_engine(DB, echo=False, 
             convert_unicode=True, pool_recycle=3600,
-                       pool_size=100)
+                       pool_size=256, max_overflow=128)
 
 
 event.listen(engine, 'checkout', checkout_listener)
