@@ -6,7 +6,7 @@ ftfy
 gevent-websocket
 ujson
 numpy
-falcon
+falcon==0.1.10
 gunicorn
 scikits.audiolab
 moviepy
