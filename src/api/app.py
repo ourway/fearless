@@ -395,7 +395,8 @@ app.add_route('/api/userReports', UserReports())
 
 
 if __name__ == '__main__':
-    pass
-    from werkzeug import run_simple
-    run_simple('0.0.0.0', 5002, app, use_debugger=True, use_reloader=True)
-    #wsgi.WSGIServer(('127.0.0.1', 5002), app).serve_forever()
+    #pass
+    #from werkzeug import run_simple
+    #run_simple('0.0.0.0', 5002, app, use_debugger=True, use_reloader=True)
+    from gevent import wsgi
+    wsgi.WSGIServer(('127.0.0.1', 5002), app).serve_forever()

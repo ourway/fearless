@@ -80,18 +80,15 @@ def Authenticate(req, resp, params):
     ip_digest = hashlib.sha1(ip).hexdigest()
     ''' Now we need to check if session is available and it's sha1 is in redis'''
     if req.path in free_services or '/api/note' in req.path or (sid and r.get(sid_digest)):
-        ''' User can access 300 api calls per minute (for now! NOTE)'''
+        ''' User can access 1000 api calls per minute (for now! NOTE)'''
         api_count_key = ip_digest + '_access_count'
         access_count = r.get(api_count_key)
         if not access_count:
             '''probabaly acceess count expired, lets create one and let user in'''
             r.set(api_count_key, 1)
             r.expire(api_count_key, 60)
-            pass
-        elif int(access_count) <= 300:
+        elif int(access_count) <= 1000:  ## not more than 1000 requests per second!  its fair
             r.incr(api_count_key, 1)
-            pass
-
         else:
             message = 'Too many api access in short amount of time'
             raise falcon.HTTPUnauthorized('Authentication required', message)
