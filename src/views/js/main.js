@@ -1144,7 +1144,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         }
 
                     }
-                else if($scope.tasks)
+                else if($scope.tasks.length)
                     {
                     data = '<div id="planerrordiv" style="padding:20%;padding-top:5%" class="col-md-12"><h1>Something is not right! Trying to use backup data. Please reload.</h1></div>';
                     $('#projectDetailDiv').html(data);
@@ -1158,6 +1158,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                                     $scope.updateTask(_task.id, _task);
                                 }
                         }
+
+                        location.reload();
                             
 
                             
@@ -1610,6 +1612,27 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                     });
         }
 
+        $scope.editAssetContents = function(){
+            if ($scope.editMode)
+                $scope.editMode = false;
+            else
+                $scope.editMode = true;
+        }
+        $scope.updateAssetContents = function(){
+                _data = $scope.asset.data;
+                send = $http.put('/api/asset/save/'+$scope.asset.repository_id
+                        +'?collection_id='+$scope.asset.collection_id+'&name='+$scope.asset.fullname
+                        , $scope.asset.data, {transformRequest: []});
+                send.success(function(resp){
+                    $scope.editMode = false;
+                    $scope.getAssetInfo(true); //only asset versions;
+                        });
+                send.error(function(resp){
+                    $scope.getAssetInfo();
+                        });
+
+            }
+
 
 
         $scope.checkout = function(v, download){
@@ -1628,7 +1651,7 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                     
                     }) 
         }
-        $scope.getAssetInfo = function(){
+        $scope.getAssetInfo = function(versionsOnly){
             req = $http.get('/api/db/asset/'+assetId).success(function(Resp, code){
                     if (!Resp.id)
                         {
@@ -1636,7 +1659,8 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                         return null;
                         }
                     //$location.search('version', Resp.version)
-                    $scope.asset = Resp;
+                    if (!versionsOnly)
+                        $scope.asset = Resp;
 
                     getTags = $http.get('/api/db/asset/'+assetId+'?field=tgs');
                     getTags.success(function(tgs){

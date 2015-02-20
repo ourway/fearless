@@ -180,7 +180,6 @@ class Task(IDMixin, Base):
                 data = data - datetime.timedelta(hours=self.effort * 4)
 
         if isinstance(data, datetime.datetime):
-            print data
             return data
         else:
             return now()

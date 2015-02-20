@@ -54,11 +54,18 @@ This is a funtion that lets api to get a big/small file from user.
 class AssetSave:
 
     def on_put(self, req, resp, repo):
-        '''Get data based on a file object or b64 data, save and commit it'''
+        ''' Get data based on a file object or b64 data, save and commit it
+            repo can be repository name or id.
+
+        '''
         userInfo = getUserInfoFromSession(req, resp)
         uploader = userInfo.get('alias')
-        targetRepo = req.session.query(Repository).filter(
-            Repository.name == repo).first()
+
+        try:
+            repo = int(repo)
+            targetRepo = req.session.query(Repository).filter_by(id=repo).first()
+        except ValueError:
+            targetRepo = req.session.query(Repository).filter_by(name=repo).first()
 
         if not uploader:
             uploader = 'anonymous'
@@ -82,6 +89,7 @@ class AssetSave:
         _md5 = req.get_param('md5')
 
         _cid = req.get_param('collection_id')
+        collection = None
         if _cid:
             collection = req.session.query(Collection).filter_by(repository=targetRepo)\
                             .filter_by(id=_cid).first()
