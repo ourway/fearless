@@ -4,11 +4,10 @@ import os
 from mako.template import Template
 import json as json
 from models import User, Task, Expert, Project
-from models.db import Session
+from models.db import session_factory
 from uuid import uuid4  # for random guid generation
 import base64
 from collections import OrderedDict
-import datetime
 
 
 def getUUID():
@@ -190,6 +189,7 @@ def render_task(t, session, project_id, parent, prefix, title):
     task['title'] = title
     task['uuid'] = _id
     _expert = task.get('resource_expertize')
+    print [t, _expert]
     min_effort = task.get('min_effort')
     max_effort = task.get('max_effort')
     task['effort'] = effort = (max_effort + min_effort) / 2.0
@@ -201,6 +201,10 @@ def render_task(t, session, project_id, parent, prefix, title):
     eDb = session.query(Expert).filter_by(name=_expert).first()
     if eDb:
         resources = eDb.users
+        if not resources:
+            raise ValueError(
+                        'Resource not found for: "%s" that is specified in "%s" is not found in database.'\
+                            % (_expert, t))
     else:
         raise ValueError(
             'Expertise: "%s" that is specified is not found in database.' % _expert)
@@ -221,6 +225,7 @@ def render_task(t, session, project_id, parent, prefix, title):
                 if not theTask in parent_task.depends:
                     theTask.depends.append(parent_task)
                 else:
+                    print 'task is the same as parent'
                     print parent_task.title, theTask.title
             theTask.resources = [
                 i for i in resources if i.effectiveness >= minRate]
@@ -256,10 +261,10 @@ def flatten(plan):
 
 
 if __name__ == '__main__':
-    character_preproduction_template = "character_preproduction"
-    session = Session
+    character_preproduction_template = "Art_character_preproduction"
+    session = session_factory()
     plan = render_process(
-        session, character_preproduction_template, 11, 'merida_')
+        session, character_preproduction_template, 1, 'merida_')
     session.commit()
     session.close()
     flat = flatten(plan)

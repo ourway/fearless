@@ -15,7 +15,7 @@
                     "type":"url",
                     "checklist":"url_checklist"
                 },
-            "Document about parent tasks":
+            "Document about this task":
                 {
                     "type":"Markdown and pdf file of documentation",
                     "checklist":"asset_documentation_checklist"
