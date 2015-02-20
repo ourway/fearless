@@ -296,7 +296,7 @@ def generateVideoThumbnail(path, assetUuid, version, w=146, h=110, text='thmb'):
     fid = target.uuid + '_' + text + '_' + str(version)
     fmt = 'png'
     thpath = os.path.join(public_upload_folder, fid + '.' + fmt)
-    arg = '''"%s" -i "%s" -an -r 1 -vf "select=gte(n\,100)" -vframes 1 -s %sx%s -y "%s"''' \
+    arg = '''"%s" -i "%s" -an -r 1 -vf "select=gte(n\,100)" -threads 1 -vframes 1 -s %sx%s -y "%s"''' \
         % (ffmpeg, path, w, h, thpath)
     pr = process(arg)
     session.close()
@@ -316,8 +316,14 @@ def generateVideoPreview(path, version, assetUuid):
     fid = assetUuid + '_preview_' + str(version)
     fmt = 'mp4'
     previewPath = os.path.join(public_upload_folder, fid + '.' + fmt)
-    arg = '''"%s" -i "%s" -preset fast -s hd480 "%s"''' \
+    '''
+        ffmpeg -i movie.mkv -r 30 -strict -2 -async 1 -acodec aac -ac 2 -ab 160k -threads 0 -preset slower -profile:v high -level 4.1 -f mp4 -refs 4 ipadVideo.mp4
+    '''
+
+    arg = '''"%s" -i "%s" -r 24 -strict -2 -async 1 -acodec aac -ac 2 -ab 160k -threads 1 -preset slower -profile:v high -level 4.1 -f mp4 -refs 4 -s hd480 "%s"''' \
         % (ffmpeg, path, previewPath)
+
+    print arg
     pr = process(arg)
     if os.path.isfile(previewPath):
         result = os.path.join('uploads', fid + '.' + fmt)
