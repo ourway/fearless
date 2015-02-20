@@ -3,8 +3,6 @@ FearLess
 
 Fearless is a Revolutionary Animation Production Management System
 
-it's not ready yet,!
-
 
 Requirements
 ===========

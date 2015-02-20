@@ -1,8 +1,0 @@
-2014.09.12 12:43:23  created repository on github
-2014.09.12 14:15:23  todo create riak connection module
-2014.09.12 14:36:25  todo try to switch to pypy
-2014.09.12 18:35:33  trying to adpot pypy
-2014.09.12 18:37:26  pypy src/etc/ez_setup.py
-2014.09.12 18:38:54  pypy -m easy_install pip
-2014.09.12 18:43:18  pypy -m pip install virtualenv
-2014.09.21 02:44:20  inotify is better than watchdog
