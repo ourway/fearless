@@ -137,15 +137,17 @@
                 <div ng-if="asset.content_type.split('/')[1]=='javascript' && asset.content_size<1024*16" ng-init="loadAssetData()">
                     <pre><code class="lang-js">{{asset.data}}</code></pre>
                 </div>
-                <div ng-if="asset.content_type.split('/')[1]=='x-markdown; charset=utf-8' && asset.content_size<1024*16" ng-init="loadAssetData()">
+                <div ng-if="asset.content_type.split('/')[1]=='x-markdown; charset=utf-8' 
+                    && asset.content_size<1024*64" ng-init="loadAssetData()">
 
                     <button class="btn btn-primary" ng-show="!editMode"  ng-click="editAssetContents()">Edit This Document</button>
                     <button class="btn btn-warning" ng-show="editMode" ng-click="updateAssetContents()">Save Changes</button>
-                    <div ng-show="!editMode" ng-if="asset.data" style="border:1px solid #f2f2f2;padding:5px;margin-top:10px;word-break: break-word" ng-bind-html="marked(asset.data)"></div>
                     <div ng-show="editMode">
                         <br/>
-                        <textarea style="height:400px;" class="form-control" ng-model="asset.data"></textarea>
+                        <textarea style="height:250px;" class="form-control" ng-model="asset.data"></textarea>
                     </div>
+
+                    <div ng-if="asset.data" style="border:1px solid #f2f2f2;padding:5px;margin-top:10px;word-break: break-word" ng-bind-html="marked(asset.data)"></div>
                 </div>
                 <div ng-if="asset.content_type.split('/')[1]=='plain; charset=utf-8' && asset.content_size<1024*16" ng-init="loadAssetData()">
                     <pre><code class="lang-text">{{asset.data}}</code></pre>
