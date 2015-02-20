@@ -1,5 +1,6 @@
 {
-    "processes": 
+    "processes":{},
+    "tasks": 
         {
             "character research on symbols of culture and customs":
                 {
@@ -22,6 +23,5 @@
                     "template":"character_culture_research"
                 }
     
-        }, 
-    "tasks": {}
+        }
 }

@@ -45,18 +45,20 @@ def render_process(session, t, project_id, prefix):
     if plan.get('processes'):
         processes = OrderedDict(
             sorted(plan.get('processes').items(), key=sort_by_order))
+
         list_of_order_numbers = [
             processes.get(i).get('order') for i in processes.keys()]
         remainings = []
         multies = []
         plan['processes'] = processes
-        for process in processes:
+        for process in processes.keys():
 
             depends = []
             _id = getUUID()
             plan['processes'][process]['uuid'] = _id
 
-            po = int(plan['processes'][process]['order'])
+            #po = last_order + 1
+            po = processes.keys().index(process)
             old_task = session.query(Task).filter_by(
                 title=prefix + process).filter_by(project_id=project_id).first()
             if not old_task:
@@ -65,6 +67,8 @@ def render_process(session, t, project_id, prefix):
                 session.add(new)
             else:
                 old_task.uuid = _id
+
+
 
             _this = {'name': process, 'uuid': _id, 'order': po}
             if list_of_order_numbers.count(po) > 1:
@@ -83,6 +87,16 @@ def render_process(session, t, project_id, prefix):
                     plan['processes'][process]['depends_on'] = outputs
                 outputs = [_this]
             last_order = max(po, last_order)
+            last_order += 1
+            deps = plan['processes'][process].get('depends_on')
+            if deps:
+                for i in deps:
+                    dep_title = prefix+i.get('name')
+                    dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).first()
+                    assert dep != new
+                    new.depends.append(dep)
+                #dep = session.query(Task).filter_by(uuid=i.get('uuid')).first()
+                #print dep
 
             process_plan = render_process(
                 session, plan['processes'][process]['template'], project_id, prefix)
@@ -113,21 +127,23 @@ def render_process(session, t, project_id, prefix):
         remainings = []
         multies = []
         plan['tasks'] = tasks
-        for task in tasks:
+        for task in tasks.keys():
             if not task:
                 continue
             _id = getUUID()
+            plan['tasks'][task]['uuid'] = _id
+            #to = last_order+1
+            to = tasks.keys().index(task)
+            #to = int(plan['tasks'][task]['order'])
             depends = outputs
             nt = session.query(Task).filter_by(
                 title=prefix + task).filter_by(project_id=project_id).first()
             if not nt:
-                nt = Task(title=prefix + task, project_id=project_id, uuid=_id)
+                nt = Task(title=prefix + task, project_id=project_id, uuid=_id, priority=to)
                 session.add(nt)
             else:
                 nt.uuid = _id
-            plan['tasks'][task]['uuid'] = _id
 
-            to = int(plan['tasks'][task]['order'])
             _this = {'name': task, 'uuid': _id, 'order': to}
             if list_of_order_numbers.count(to) > 1:
                 multies.append(_this)
@@ -145,18 +161,20 @@ def render_process(session, t, project_id, prefix):
                 
                 outputs = [_this]
             deps = plan['tasks'][task].get('depends_on')
-            for i in deps:
-                dep_title = prefix+i.get('name')
-                dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).first()
-                assert dep != nt
-                nt.depends.append(dep)
+            if deps:
+                for i in deps:
+                    dep_title = prefix+i.get('name')
+                    dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).first()
+                    assert dep != nt
+                    nt.depends.append(dep)
 
             last_order = max(to, last_order)
+            last_order += 1
             
 
             if plan['tasks'][task].get('template'):
                 process_task = render_task(plan['tasks'][task]['template'], session,
-                                           project_id, _id, prefix, plan['tasks'][task].get('template'))
+                                           project_id, _id, prefix, plan['tasks'][task].get('template'), order=600 - to)
                 if process_task:
                     found_tasks = True
                     plan['tasks'][task]['plan'] = process_task
@@ -173,7 +191,7 @@ def render_process(session, t, project_id, prefix):
     return plan
 
 
-def render_task(t, session, project_id, parent, prefix, title):
+def render_task(t, session, project_id, parent, prefix, title, order):
     '''lets see what will happen'''
     fn = 'templates/TPlans/tasks/' + t + '.json'
     structure = {'tags': [], 'min_effort': 0, 'max_effort': 2,
@@ -189,7 +207,6 @@ def render_task(t, session, project_id, parent, prefix, title):
     task['title'] = title
     task['uuid'] = _id
     _expert = task.get('resource_expertize')
-    print [t, _expert]
     min_effort = task.get('min_effort')
     max_effort = task.get('max_effort')
     task['effort'] = effort = (max_effort + min_effort) / 2.0
@@ -217,16 +234,16 @@ def render_task(t, session, project_id, parent, prefix, title):
                 title=prefix+title+'_task').filter_by(project_id=project_id).first()
             if not theTask:
                 theTask = Task(
-                    title=prefix + title + '_task', project_id=project_id, uuid=_id, effort=effort)
+                    title=prefix + title + '_task', project_id=project_id, uuid=_id, effort=effort, priority=order)
             else:
                 theTask.uuid = _id
             if parent_task:
                 assert parent_task!=theTask
                 if not theTask in parent_task.depends:
                     theTask.depends.append(parent_task)
-                else:
-                    print 'task is the same as parent'
-                    print parent_task.title, theTask.title
+                theTask.parent.append(parent_task)
+
+
             theTask.resources = [
                 i for i in resources if i.effectiveness >= minRate]
             session.add(theTask)
@@ -267,4 +284,4 @@ if __name__ == '__main__':
         session, character_preproduction_template, 1, 'merida_')
     session.commit()
     session.close()
-    flat = flatten(plan)
+    #flat = flatten(plan)

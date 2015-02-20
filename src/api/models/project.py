@@ -207,6 +207,8 @@ class Project(IDMixin, Base):
             r.expire('fearless_tj3_lock', 15)
         else:
             return
+        if not self.tasks:
+            return
         templateFile = os.path.join(
             os.path.dirname(__file__), '../templates/masterProject.tjp')
         t = Template(filename=templateFile)
@@ -225,18 +227,30 @@ class Project(IDMixin, Base):
                              )
 
         #plan_path = '/tmp/Fearless_project.tjp'
-        plan_path = '/tmp/Fearless_project_%s.tjp' % self.uuid
-        with open(plan_path, 'wb') as f:
-            f.write(finalplan.encode('utf-8'))
+        schedule_path = '/tmp/Fearless_project_%s.tjp' % self.uuid
+
 
         tj3 = sh.Command('tj3')
-        #tj3 = sh.Command('/usr/local/bin/tj3')
+        plan_path = '/tmp/plan_%s.html' % (self.uuid)
+        guntt_path = '/tmp/guntt_%s.html' % (self.uuid)
+        resource_path = '/tmp/resource_%s.html' % (self.uuid)
+        msproject_path = '/tmp/MS-project_%s.xml' % (self.uuid)
+        profit_path = '/tmp/ProfiAndLoss_%s.html' % (self.uuid)
+        csv_path = '/tmp/csv_%s.csv' % (self.uuid)
+        trace_path = '/tmp/TraceReport_%s.csv' % (self.uuid)
+        traceSvg_path = '/tmp/TraceReport_%s.html' % (self.uuid)
+        for i in [schedule_path, plan_path, guntt_path, resource_path, msproject_path, profit_path, csv_path, trace_path, trace_path]:
+            if os.path.isfile(i):
+                os.remove(i)
+
+        with open(schedule_path, 'wb') as f:
+            f.write(finalplan.encode('utf-8'))
         try:
             print 'Start Calculating project %s' % self.id
             import time
             s = time.time()
             tj = tj3(
-                plan_path, '--silent', '--no-color', '--add-trace', o='/tmp', c='1')
+                schedule_path, '--silent', '--no-color', '--add-trace', o='/tmp', c='1')
             print 'Finished in %s seconds' % round(time.time() - s, 3)
         except Exception, e:
             print e
@@ -249,14 +263,7 @@ class Project(IDMixin, Base):
             return
         # if not tj.stderr:
         plan, guntt, resource, msproject, profit, csvfile, trace, burndown = None, None, None, None, None, None, None, None
-        plan_path = '/tmp/plan_%s.html' % (self.uuid)
-        guntt_path = '/tmp/guntt_%s.html' % (self.uuid)
-        resource_path = '/tmp/resource_%s.html' % (self.uuid)
-        msproject_path = '/tmp/MS-project_%s.xml' % (self.uuid)
-        profit_path = '/tmp/ProfiAndLoss_%s.html' % (self.uuid)
-        csv_path = '/tmp/csv_%s.csv' % (self.uuid)
-        trace_path = '/tmp/TraceReport_%s.csv' % (self.uuid)
-        traceSvg_path = '/tmp/TraceReport_%s.html' % (self.uuid)
+
 
         def saveTable(path):
             '''Read main table from these files'''
@@ -267,6 +274,8 @@ class Project(IDMixin, Base):
                     main_table = root.xpath('//table')[0]
                 except lxml.etree.XMLSyntaxError:
                     return
+                finally:
+                    os.remove(path)
 
                 tosave = etree.tostring(main_table)
                 return tosave
@@ -280,6 +289,8 @@ class Project(IDMixin, Base):
                     root = etree.parse(report)
                 except lxml.etree.XMLSyntaxError:
                     return
+                finally:
+                    os.remove(path)
                 svg = root.xpath('//svg')[0]
                 tosave = etree.tostring(svg)
                 return tosave

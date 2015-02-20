@@ -146,6 +146,9 @@ class GetProjectLatestReport:
         if not project:
             resp.status = falcon.HTTP_404
             return
+        if not project.tasks:
+            resp.body = {}
+            return
         data = project.plan()  # first let it plan
         update = True
         if not data:

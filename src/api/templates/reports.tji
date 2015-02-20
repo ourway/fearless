@@ -14,7 +14,6 @@ taskreport breakdown1_${subproject.id} "plan_${subproject.uuid}"{
     end ${subproject.end.strftime('%Y-%m-%d')}
     loadunit longauto
     columns name, start, end, gauge, pathcriticalness {title "Critical path"}, complete {title "Progress"}
-    sorttasks actual.start.up
     taskroot fearless.__${subproject.id}
 }
 taskreport breakdown2_${subproject.id} "guntt_${subproject.uuid}"{
@@ -23,7 +22,6 @@ taskreport breakdown2_${subproject.id} "guntt_${subproject.uuid}"{
     end ${subproject.end.strftime('%Y-%m-%d')}
     loadunit longauto
     columns name, chart { scale day width 400 }, complete {title "Progress"}
-    sorttasks actual.start.up
     taskroot fearless.__${subproject.id}
 }
 
@@ -37,7 +35,6 @@ resourcereport resourceGraph_${subproject.id} "resource_${subproject.uuid}" {
   # We only like to show leaf tasks for leaf resources.
   hidetask ~(isleaf() & isleaf_())
   hideresource ~(p${subproject.id})
-  sorttasks actual.start.down
   taskroot fearless.__${subproject.id}
 }
 
@@ -74,5 +71,3 @@ tracereport burn_${subproject.id} "TraceReport_${subproject.uuid}" {
   columns complete
   hidetask actual.id != "fearless.__${subproject.id}"
 }
-
-
