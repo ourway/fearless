@@ -1,0 +1,31 @@
+{
+    "processes": {}, 
+    "tasks": 
+        {
+         "character concept primary design":
+            {
+                "order":1,
+                "template":"character_concept_primary_design"
+            },
+         "character concept cloth primary form":
+            {
+                "order":2,
+                "template":"character_concept_cloth_primary_form"
+            },
+         "character concept cloth primary form":
+            {
+                "order":3,
+                "template":"character_concept_cloth_primary_form"
+            },
+         "character concept decorations":
+            {
+                "order":4,
+                "template":"character_concept_decorations"
+            },
+         "character concept color key":
+            {
+                "order":5,
+                "template":"character_concept_color_key"
+            }
+        }
+}

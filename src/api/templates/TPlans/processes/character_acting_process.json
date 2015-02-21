@@ -1,0 +1,26 @@
+{
+    "processes": {}, 
+    "tasks": 
+        {
+         "character acting gag concept":
+            {
+                "order":1,
+                "template":"character_acting_gag_concept"
+            },
+         "character acting music and choreography":
+            {
+                "order":2,
+                "template":"character_acting_music_and_choreography"
+            },
+         "character concept cloth primary form":
+            {
+                "order":3,
+                "template":"character_concept_cloth_primary_form"
+            },
+         "character acting disasters and conflicts":
+            {
+                "order":4,
+                "template":"character_acting_disasters_and_conflicts"
+            }
+        }
+}

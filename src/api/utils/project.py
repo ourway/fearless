@@ -146,9 +146,7 @@ class GetProjectLatestReport:
         if not project:
             resp.status = falcon.HTTP_404
             return
-        if not project.tasks:
-            resp.body = {}
-            return
+
         data = project.plan()  # first let it plan
         update = True
         if not data:
@@ -332,6 +330,9 @@ class GetTask:
 
     def on_get(self, req, resp, taskId):
         task = req.session.query(Task).filter(Task.id == taskId).first()
+        if not task:
+            resp.status = falcon.HTTP_404
+            return
         resp.body = {'title': task.title, 'id': task.id, 'start': task.start,
                      'end': task.end, 'effort': task.effort,
                      'depends': [{'title': i.title, 'id': i.id} for i in task.depends],

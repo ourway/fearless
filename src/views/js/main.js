@@ -1189,7 +1189,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
     }
 
     $scope.getTasksList = function(){
-        $http.get('/api/task/list/'+$scope.projId).success(function(resp){
+        gettask = $http.get('/api/task/list/'+$scope.projId);
+        gettask.success(function(resp){
                 if (!resp)
                     return null;
                 $scope.tasks = resp;
@@ -1215,6 +1216,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 //if ($scope.mode == 'cal')
                 //    $scope.prepareCal();
             });
+        gettask.error(function(resp){
+                location.reload();
+                })
     }
 
     $scope.createNewSeq = function(){
@@ -1403,7 +1407,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
         $scope.taskDetail = function(taskId) {
             //console.log(taskId);
-            $http.get('/api/task/'+taskId).success(function(resp){
+            gettask = $http.get('/api/task/'+taskId);
+            gettask.success(function(resp){
                 newBackup = [];
                 $scope.tasks.forEach(function(e){
                         if (e.id==taskId){
@@ -1440,6 +1445,9 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $('#taskDetailModal').modal('show');
 
                     });
+            gettask.error(function(resp){
+                location.reload();
+                });
             }
 
     $scope.updateProject = function(data){

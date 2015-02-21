@@ -1,10 +1,17 @@
 {
-    "tasks":
+    "processes":
         {
-           "primary design":
+           "character concept process":
                 {
-                    "template":"character_concept_primary_design",
+                    "template":"character_concept_process",
+                    "order":1
+                },
+           "character acting process":
+                {
+                    "template":"character_acting_process",
                     "order":1
                 }
+
+
         }
 }

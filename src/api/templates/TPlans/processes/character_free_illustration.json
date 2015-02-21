@@ -1,2 +1,11 @@
 {
+    "tasks":
+        {
+            "free_illustration_task":
+                {
+                    "order":1,
+                    "template":"character_free_illustration"
+                
+                }
+        }
 }

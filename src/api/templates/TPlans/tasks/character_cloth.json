@@ -1,0 +1,11 @@
+{
+    "max_effort": 2, 
+    "min_effort": 0, 
+    "outputs": {}, 
+    "resource_expertize": {
+        "character design": {
+            "minimum_rate": 0.75
+        }
+    }, 
+    "tags": []
+}

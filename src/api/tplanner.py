@@ -19,7 +19,7 @@ def sort_by_order(a):
     return a[1].get('order')
 
 
-def render_process(session, t, project_id, prefix):
+def render_process(session, t, project_id, prefix, parent=None, last_order=0):
     ''' 
         Renders a process template
         @t: mako template
@@ -29,6 +29,7 @@ def render_process(session, t, project_id, prefix):
         @desciption: string
 
     '''
+    session.commit()
     fn = 'templates/TPlans/processes/' + t + '.json'
     structure = {'processes': {}, 'tasks': {}}
     if not os.path.isfile(fn):
@@ -38,7 +39,6 @@ def render_process(session, t, project_id, prefix):
     raw_root = templ.render()
     plan = json.loads(raw_root)
     outputs = []
-    last_order = 0
     found_tasks = False
     # print plan
 
@@ -52,7 +52,6 @@ def render_process(session, t, project_id, prefix):
         multies = []
         plan['processes'] = processes
         for process in processes.keys():
-
             depends = []
             _id = getUUID()
             plan['processes'][process]['uuid'] = _id
@@ -61,12 +60,13 @@ def render_process(session, t, project_id, prefix):
             po = processes.keys().index(process)
             old_task = session.query(Task).filter_by(
                 title=prefix + process).filter_by(project_id=project_id).first()
-            if not old_task:
+            new = old_task
+            if not new:
                 new = Task(
                     title=prefix + process, project_id=project_id, priority=600 - po, uuid=_id)
                 session.add(new)
             else:
-                old_task.uuid = _id
+                new.uuid = _id
 
 
 
@@ -85,23 +85,48 @@ def render_process(session, t, project_id, prefix):
                     multies = []
                 if outputs:
                     plan['processes'][process]['depends_on'] = outputs
-                outputs = [_this]
-            last_order = max(po, last_order)
+            last_order = max(po, last_order-1)
             last_order += 1
             deps = plan['processes'][process].get('depends_on')
             if deps:
                 for i in deps:
                     dep_title = prefix+i.get('name')
-                    dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).first()
+                    dep = session.query(Task).filter_by(title=prefix+dep_title).filter_by(project_id=project_id).first()
+
                     assert dep != new
-                    new.depends.append(dep)
+                    if dep and not dep in new.parent:
+                        new.depends.append(dep)
+
+            if parent:
+                print '%s{ %s }' % (parent, process)
+                #print prefix+parent
+                pdb = session.query(Task).filter_by(title=prefix+parent).filter_by(project_id=project_id).first()
+                if pdb and not pdb in new.depends:
+                    #print pdb
+                    pdb.children.append(new)
+
+
+            if po:
+                previous = processes.keys()[po-1]
+
+                pdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).first()
+                if pdb and not new in pdb.depends:
+                    print process, '|::::::::>', previous
+                    new.depends.append(pdb)
+
+
+
+
+
+
                 #dep = session.query(Task).filter_by(uuid=i.get('uuid')).first()
                 #print dep
 
             process_plan = render_process(
-                session, plan['processes'][process]['template'], project_id, prefix)
+                session, plan['processes'][process]['template'], project_id, prefix, process, last_order)
 
             if process_plan:
+                outputs = [_this]
                 subprocesses = process_plan.get('processes')
                 subtasks = process_plan.get('tasks')
                 if subprocesses:
@@ -159,24 +184,38 @@ def render_process(session, t, project_id, prefix):
                     multies = []
                 plan['tasks'][task]['depends_on'] = outputs
                 
-                outputs = [_this]
-            deps = plan['tasks'][task].get('depends_on')
+            deps = plan['tasks'][task].get('depends_on') or []
             if deps:
                 for i in deps:
                     dep_title = prefix+i.get('name')
                     dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).first()
                     assert dep != nt
                     nt.depends.append(dep)
+            '''
+            if parent:
+                print '%s{ %s }' % (parent, task)
+                #print prefix+parent
+                tdb = session.query(Task).filter_by(title=prefix+parent).filter_by(project_id=project_id).first()
+                if tdb and not tdb in nt.depends:
+                    tdb.children.append(nt)
+            '''
 
-            last_order = max(to, last_order)
+            if to:
+                previous = tasks.keys()[to-1]
+                tdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).first()
+                if tdb and not nt in tdb.depends:
+                    nt.depends.append(tdb)
+
+            last_order = max(to, last_order-1)
             last_order += 1
             
 
             if plan['tasks'][task].get('template'):
                 process_task = render_task(plan['tasks'][task]['template'], session,
-                                           project_id, _id, prefix, plan['tasks'][task].get('template'), order=600 - to)
+                                           project_id, _id, prefix, plan['tasks'][task].get('template'), order=600 - to, depends=deps)
                 if process_task:
                     found_tasks = True
+                    outputs = [_this]
                     plan['tasks'][task]['plan'] = process_task
             else:
                 del(plan['tasks'][task])
@@ -191,11 +230,12 @@ def render_process(session, t, project_id, prefix):
     return plan
 
 
-def render_task(t, session, project_id, parent, prefix, title, order):
+def render_task(t, session, project_id, parent, prefix, title, order, depends):
     '''lets see what will happen'''
+    session.commit()
     fn = 'templates/TPlans/tasks/' + t + '.json'
     structure = {'tags': [], 'min_effort': 0, 'max_effort': 2,
-                 'resource_expertize': {}, 'outputs': {}}
+                 'resource_expertize': {"NULL":{"minimum_rate":0.75}}, 'outputs': {}}
     if not os.path.isfile(fn):
         with open(fn, 'wb') as f:
             f.write(json.dumps(structure, sort_keys=True, indent=4))
@@ -214,6 +254,8 @@ def render_task(t, session, project_id, parent, prefix, title, order):
         Rate = _expert[_expert.keys()[0]]
         minRate = Rate['minimum_rate']
         _expert = _expert.keys()[0]
+    else:
+        raise ValueError('Expertize is empty in task: %s' % t)
     resources = list()
     eDb = session.query(Expert).filter_by(name=_expert).first()
     if eDb:
@@ -224,12 +266,13 @@ def render_task(t, session, project_id, parent, prefix, title, order):
                             % (_expert, t))
     else:
         raise ValueError(
-            'Expertise: "%s" that is specified is not found in database.' % _expert)
+            'Expertise: "%s" that is specified in %s is not found in database.' % (_expert, t))
     if resources:
         Sresources = [{'name': i.fullname, 'id': i.id, 'uuid': i.uuid, 'effectiveness': i.effectiveness}
                       for i in resources if i.effectiveness >= minRate]
         if Sresources:
             parent_task = session.query(Task).filter_by(uuid=parent).first()
+
             theTask = session.query(Task).filter_by(
                 title=prefix+title+'_task').filter_by(project_id=project_id).first()
             if not theTask:
@@ -239,9 +282,16 @@ def render_task(t, session, project_id, parent, prefix, title, order):
                 theTask.uuid = _id
             if parent_task:
                 assert parent_task!=theTask
-                if not theTask in parent_task.depends:
+                if not parent_task in theTask.depends:
                     theTask.depends.append(parent_task)
-                theTask.parent.append(parent_task)
+                theTask.parent = [parent_task]
+            if depends:
+                for i in depends:
+                    dep_title = prefix+i.get('name')
+                    dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).first()
+                    assert dep != theTask
+                    if not dep in theTask.parent:
+                        theTask.depends.append(dep)
 
 
             theTask.resources = [

@@ -202,12 +202,28 @@ class Project(IDMixin, Base):
     #@property
     def plan(self):
         # lets select just one task
+        schedule_path = '/tmp/Fearless_project_%s.tjp' % self.uuid
+        plan_path = '/tmp/plan_%s.html' % (self.uuid)
+        guntt_path = '/tmp/guntt_%s.html' % (self.uuid)
+        resource_path = '/tmp/resource_%s.html' % (self.uuid)
+        msproject_path = '/tmp/MS-project_%s.xml' % (self.uuid)
+        profit_path = '/tmp/ProfiAndLoss_%s.html' % (self.uuid)
+        csv_path = '/tmp/csv_%s.csv' % (self.uuid)
+        trace_path = '/tmp/TraceReport_%s.csv' % (self.uuid)
+        traceSvg_path = '/tmp/TraceReport_%s.html' % (self.uuid)
+        
+        for i in [schedule_path, plan_path, guntt_path, resource_path, 
+                  msproject_path, profit_path, csv_path, trace_path, trace_path]:
+            if os.path.isfile(i):
+                os.remove(i)
         if not r.get('fearless_tj3_lock'):
             r.set('fearless_tj3_lock', 'OK')
             r.expire('fearless_tj3_lock', 15)
         else:
             return
+
         if not self.tasks:
+            self.reports = []
             return
         templateFile = os.path.join(
             os.path.dirname(__file__), '../templates/masterProject.tjp')
@@ -227,21 +243,10 @@ class Project(IDMixin, Base):
                              )
 
         #plan_path = '/tmp/Fearless_project.tjp'
-        schedule_path = '/tmp/Fearless_project_%s.tjp' % self.uuid
 
 
         tj3 = sh.Command('tj3')
-        plan_path = '/tmp/plan_%s.html' % (self.uuid)
-        guntt_path = '/tmp/guntt_%s.html' % (self.uuid)
-        resource_path = '/tmp/resource_%s.html' % (self.uuid)
-        msproject_path = '/tmp/MS-project_%s.xml' % (self.uuid)
-        profit_path = '/tmp/ProfiAndLoss_%s.html' % (self.uuid)
-        csv_path = '/tmp/csv_%s.csv' % (self.uuid)
-        trace_path = '/tmp/TraceReport_%s.csv' % (self.uuid)
-        traceSvg_path = '/tmp/TraceReport_%s.html' % (self.uuid)
-        for i in [schedule_path, plan_path, guntt_path, resource_path, msproject_path, profit_path, csv_path, trace_path, trace_path]:
-            if os.path.isfile(i):
-                os.remove(i)
+
 
         with open(schedule_path, 'wb') as f:
             f.write(finalplan.encode('utf-8'))
@@ -260,6 +265,7 @@ class Project(IDMixin, Base):
                     '\\x1b[31m', '<b>').replace('\\x1b[0m', '</b>').split('\\x1b[35m')
                 if len(_d) > 1:
                     self.reports.append(_d[1])
+            self.reports = []
             return
         # if not tj.stderr:
         plan, guntt, resource, msproject, profit, csvfile, trace, burndown = None, None, None, None, None, None, None, None
@@ -326,6 +332,8 @@ class Project(IDMixin, Base):
         if burndown:
             data['burndown'] = burndown
         data = dumps(data)
+
+        self.reports = []  ## clean old
         self.reports.append(data)
         return data
         # else:
