@@ -224,14 +224,12 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False):
         decode(fileobj, b)
         b.seek(0)
         fileobj = b
-
     while True:
-        chunk = fileobj.read(2 ** 20)
+        chunk = fileobj.read(2 ** 28)
         if not chunk:
             break
         md5.update(chunk)
         f.write(chunk)
-
     f.close()
     dataMd5 = md5.hexdigest()
     # check if there is an asset with same key

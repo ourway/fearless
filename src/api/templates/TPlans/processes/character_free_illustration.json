@@ -1,7 +1,7 @@
 {
     "tasks":
         {
-            "free_illustration_task":
+            "free_illustration":
                 {
                     "order":1,
                     "template":"character_free_illustration"

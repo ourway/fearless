@@ -212,7 +212,7 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
 
             if plan['tasks'][task].get('template'):
                 process_task = render_task(plan['tasks'][task]['template'], session,
-                                           project_id, _id, prefix, plan['tasks'][task].get('template'), order=600 - to, depends=deps)
+                                           project_id, task, prefix, plan['tasks'][task].get('template'), order=600 - to, depends=deps)
                 if process_task:
                     found_tasks = True
                     outputs = [_this]
@@ -271,7 +271,7 @@ def render_task(t, session, project_id, parent, prefix, title, order, depends):
         Sresources = [{'name': i.fullname, 'id': i.id, 'uuid': i.uuid, 'effectiveness': i.effectiveness}
                       for i in resources if i.effectiveness >= minRate]
         if Sresources:
-            parent_task = session.query(Task).filter_by(uuid=parent).first()
+            parent_task = session.query(Task).filter_by(title=prefix+parent).first()
 
             theTask = session.query(Task).filter_by(
                 title=prefix+title+'_task').filter_by(project_id=project_id).first()
@@ -282,8 +282,8 @@ def render_task(t, session, project_id, parent, prefix, title, order, depends):
                 theTask.uuid = _id
             if parent_task:
                 assert parent_task!=theTask
-                if not parent_task in theTask.depends:
-                    theTask.depends.append(parent_task)
+                #if not parent_task in theTask.depends:
+                    #theTask.depends.append(parent_task)
                 theTask.parent = [parent_task]
             if depends:
                 for i in depends:
@@ -331,7 +331,7 @@ if __name__ == '__main__':
     character_preproduction_template = "Art_character_preproduction"
     session = session_factory()
     plan = render_process(
-        session, character_preproduction_template, 1, 'merida_')
+        session, character_preproduction_template, 3, 'sepehr_')
     session.commit()
     session.close()
     #flat = flatten(plan)

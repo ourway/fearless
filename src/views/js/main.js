@@ -1119,16 +1119,18 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.mode=mode;
             //$('.tj_table_frame').fadeOut(2000);
             data = localStorage.getItem(getprefix +  mode);
-            if ($scope.replan || !data)
-                localStorage.clear();
+            //if ($scope.replan || !data)
+            //    localStorage.clear();
             projectReport = $http.get('/api/project/report/'+$scope.projId);
             projectReport.success(function(resp){
+                    /*
                 localStorage.setItem(getprefix + 'plan', resp.plan);
                 localStorage.setItem(getprefix + 'json', JSON.stringify(resp.json));
                 localStorage.setItem(getprefix + 'guntt', resp.guntt);
                 localStorage.setItem(getprefix + 'resource', resp.resource);
                 localStorage.setItem(getprefix + 'profit', resp.profit);
                 localStorage.setItem(getprefix + 'trace', JSON.stringify(resp.trace));
+                */
                 if (resp[mode])
                     {
                     data = resp[mode];

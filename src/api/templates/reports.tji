@@ -21,7 +21,7 @@ taskreport breakdown2_${subproject.id} "guntt_${subproject.uuid}"{
     start ${subproject.start.strftime('%Y-%m-%d')}
     end ${subproject.end.strftime('%Y-%m-%d')}
     loadunit longauto
-    columns name, chart { scale day width 400 }, complete {title "Progress"}
+    columns name, chart { scale day width 500 }, complete {title "Progress"}
     taskroot fearless.__${subproject.id}
 }
 
