@@ -216,6 +216,7 @@ class Project(IDMixin, Base):
         for i in [schedule_path, plan_path, guntt_path, resource_path, 
                   msproject_path, profit_path, csv_path, trace_path, traceSvg_path]:
             if os.path.isfile(i):
+                #pass
                 os.remove(i)
         if not r.get('fearless_tj3_lock'):
             r.set('fearless_tj3_lock', 'OK')
@@ -282,7 +283,8 @@ class Project(IDMixin, Base):
                 except lxml.etree.XMLSyntaxError:
                     return
                 finally:
-                    os.remove(path)
+                    pass
+                    #os.remove(path)
 
                 tosave = etree.tostring(main_table)
                 return tosave
@@ -297,7 +299,8 @@ class Project(IDMixin, Base):
                 except lxml.etree.XMLSyntaxError:
                     return
                 finally:
-                    os.remove(path)
+                    pass
+                    #os.remove(path)
                 svg = root.xpath('//svg')[0]
                 tosave = etree.tostring(svg)
                 return tosave

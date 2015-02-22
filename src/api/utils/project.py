@@ -154,7 +154,7 @@ class GetProjectLatestReport:
             reports = project.reports
             if reports:
                 repid = reports[-1]
-                report = req.session.query(Report).filter_by(id=repid).first()
+                report = req.session.query(Report).filter_by(id=repid).scalar()
                 if report:
                     data = report.body
         if data:

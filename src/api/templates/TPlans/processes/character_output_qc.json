@@ -4,7 +4,8 @@
 			"check me":
 				{
 
-					"order":1
+					"order":1,
+                    "template":"character_output_qc"
 
 				}
 		}

@@ -7,7 +7,7 @@ from models import User, Task, Expert, Project
 from models.db import session_factory
 from uuid import uuid4  # for random guid generation
 import base64
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 
 def getUUID():
@@ -36,193 +36,75 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
         with open(fn, 'wb') as f:
             f.write(json.dumps(structure, sort_keys=True, indent=4))
     templ = Template(filename=fn)  # create a mako template
+    print 'processing %s' % t
     raw_root = templ.render()
     plan = json.loads(raw_root)
     outputs = []
     found_tasks = False
     # print plan
     old_t = session.query(Task).filter_by(
-        title=prefix + (parent or t)).filter_by(project_id=project_id).scalar()
+        title=(prefix+(parent or t)).decode('utf-8')).filter_by(project_id=project_id).scalar()
     newt = old_t
     if not newt:
         newt = Task(
-            title= (prefix+(parent or t)).decode('utf-8'), project_id=project_id, priority=600-last_order)
+            title=(prefix+(parent or t)).decode('utf-8'), project_id=project_id, priority=600-last_order)
         session.add(newt)
+    #if parent:
+    #    callerTask = session.query(Task).filter_by(title=prefix+parent).one()
+    #    newt.parent = [callerTask]
+
+
+    everything = list()
+
+    ## lets get everything and add it to a list
+    ALL = defaultdict(list)
+    for METHOD in ['tasks', 'processes']:
+        contents = plan.get(METHOD)
+        if contents:
+            ALL[METHOD] += contents.items()
+            everything += contents.items()
+
+    ## now we need to sort it based on its order number
+    everything =  sorted(everything, key=sort_by_order)
+    ## ok, now we have all items without knowing their METHOD
+    ## let's iterate and create some tasks.  the main challenge is to 
+    ## find a tasks method for now.. We may need another search on plan.
+
+    for process in everything:
+        title, info = process
+        template = info['template']  ## an info should have a template
+        title = prefix+title
+        processTask = session.query(Task).filter_by(title=title).scalar()
+        if not processTask:
+            processTask = Task(title=title, project_id=project_id)
+            session.add(processTask)
+        process[1]['db'] = processTask
+        processTask.parent = [newt]  ## a parent is a list in architecture
+                                     ## each process depends on upper creator
+        previous = [p for p in everything if p[1]['order']==int(info['order'])-1]
+        for each in previous:                        ## for every process that in lower order
+            processTask.depends.append(each[1]['db'])    ## we are going to add that process to
+                                                     ## dependency list.
+        ## now lets also find sub processes. its recursive
+
+        
+        if process in ALL['processes']:
+            render_process(session, template, project_id, prefix, parent=process[0], last_order=0)
+        else:
+            render_task(template, session,
+                    project_id, process[0], prefix, process[0], order=600-info['order'])
+
+
+        
 
 
 
-    if plan.get('processes'):
-        processes = OrderedDict(
-            sorted(plan.get('processes').items(), key=sort_by_order))
-
-        list_of_order_numbers = [
-            processes.get(i).get('order') for i in processes.keys()]
-        remainings = []
-        multies = []
-        plan['processes'] = processes
-        for process in processes.keys():
-            depends = []
-            _id = getUUID()
-            plan['processes'][process]['uuid'] = _id
-
-            #po = last_order + 1
-            po = processes.keys().index(process)
-            old_task = session.query(Task).filter_by(
-                title=prefix + process).filter_by(project_id=project_id).scalar()
-            new = old_task
-            if not new:
-                new = Task(
-                    title=prefix + process, project_id=project_id, priority=600 - po, uuid=_id)
-                session.add(new)
-            else:
-                new.uuid = _id
-            new.parent.append(newt)
-
-
-            _this = {'name': process, 'uuid': _id, 'order': po}
-            if list_of_order_numbers.count(po) > 1:
-                multies.append(_this)
-                remainings = outputs
-                if po > last_order and outputs:
-                    plan['processes'][process]['depends_on'] = outputs
-                elif po == last_order and remainings:
-                    plan['processes'][process]['depends_on'] = remainings
-
-            else:
-                if multies:
-                    outputs = multies
-                    multies = []
-                if outputs:
-                    plan['processes'][process]['depends_on'] = outputs
-            last_order = max(po, last_order-1)
-            last_order += 1
-            deps = plan['processes'][process].get('depends_on')
-            if po:
-                previous = processes.keys()[po-1]
-                pdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).scalar()
-                new.depends.append(pdb)
-                #print 'this: %s    to: %s' % (process, previous)
+    
 
 
 
-            process_plan = render_process(
-                session, plan['processes'][process]['template'], project_id, prefix, process, last_order)
 
-            if process_plan:
-                outputs = [_this]
-                subprocesses = process_plan.get('processes')
-                subtasks = process_plan.get('tasks')
-                if subprocesses:
-                    plan['processes'][process]['processes'] = subprocesses
-                elif plan['processes'][process].get('processes'):
-                    del(plan['processes'][process]['processes'])
-
-                if subtasks:
-                    plan['processes'][process]['tasks'] = subtasks
-                elif plan['processes'][process].get('tasks'):
-                    del(plan['processes'][process]['tasks'])
-            else:
-                # print "plan for " + plan['processes'][process]['template'] +
-                # " not available"
-                del(plan['processes'][process])
-
-    if plan.get('tasks'):
-        tasks = OrderedDict(
-            sorted(plan.get('tasks').items(), key=sort_by_order))
-        list_of_order_numbers = [
-            tasks.get(i).get('order') for i in tasks.keys()]
-        remainings = []
-        multies = []
-        plan['tasks'] = tasks
-        for task in tasks.keys():
-            if not task:
-                continue
-            _id = getUUID()
-            plan['tasks'][task]['uuid'] = _id
-            #to = last_order+1
-            to = tasks.keys().index(task)
-            #to = int(plan['tasks'][task]['order'])
-            depends = outputs
-            nt = session.query(Task).filter_by(
-                title=prefix + task).filter_by(project_id=project_id).scalar()
-            if not nt:
-                nt = Task(title=prefix + task, project_id=project_id, uuid=_id, priority=to)
-                session.add(nt)
-            else:
-                nt.uuid = _id
-
-            nt.parent.append(newt)
-
-            _this = {'name': task, 'uuid': _id, 'order': to}
-            if list_of_order_numbers.count(to) > 1:
-                multies.append(_this)
-                remainings = outputs
-                if to > last_order and outputs:
-                    plan['tasks'][task]['depends_on'] = outputs
-                elif to == last_order and remainings:
-                    plan['tasks'][task]['depends_on'] = remainings
-
-            else:
-                if multies:
-                    outputs = multies
-                    multies = []
-                plan['tasks'][task]['depends_on'] = outputs
-                
-            deps = plan['tasks'][task].get('depends_on') or []
-
-
-            '''
-            if to:
-                previous = tasks.keys()[to-1]
-                tdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).scalar()
-                #print 'correct: %s' % task
-                nt.depends.append(tdb)
-
-            if deps:
-                for i in deps:
-                    dep_title = prefix+i.get('name')
-                    dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).scalar()
-                    assert dep != nt
-                    nt.depends.append(dep)
-            if parent:
-                print '%s{ %s }' % (parent, task)
-                #print prefix+parent
-                tdb = session.query(Task).filter_by(title=prefix+parent).filter_by(project_id=project_id).scalar()
-                if tdb and not tdb in nt.depends:
-                    tdb.children.append(nt)
-
-            if to:
-                previous = tasks.keys()[to-1]
-                tdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).scalar()
-                if tdb and not nt in tdb.depends:
-                    nt.depends.append(tdb)
-            '''
-
-            last_order = max(to, last_order-1)
-            last_order += 1
-            
-
-            if plan['tasks'][task].get('template'):
-                process_task = render_task(plan['tasks'][task]['template'], session,
-                    project_id, task, prefix, plan['tasks'][task].get('template'), order=600 - to, depends=deps)
-                if process_task:
-                    found_tasks = True
-                    outputs = [_this]
-                    plan['tasks'][task]['plan'] = process_task
-            else:
-                del(plan['tasks'][task])
-                print('\tWarning: task "%s -> %s" has not any template!' %
-                      (t, task))
-
-    # if not found_tasks:
-    #    return {}
-
-    with open('templates/TPlans/plan.json', 'wb') as f:
-        f.write(json.dumps(plan))
-    return plan
-
-
-def render_task(t, session, project_id, parent, prefix, title, order, depends):
+def render_task(t, session, project_id, parent, prefix, title, order):
     '''lets see what will happen'''
     session.commit()
     fn = 'templates/TPlans/tasks/' + t + '.json'
@@ -262,7 +144,8 @@ def render_task(t, session, project_id, parent, prefix, title, order, depends):
     if resources:
         Sresources = [{'name': i.fullname, 'id': i.id, 'uuid': i.uuid, 'effectiveness': i.effectiveness}
                       for i in resources if i.effectiveness >= minRate]
-        if Sresources:
+        if Sresources and parent:
+            print parent
             parent_task = session.query(Task).filter_by(title=prefix+parent).scalar()
 
             theTask = session.query(Task).filter_by(
@@ -287,34 +170,24 @@ def render_task(t, session, project_id, parent, prefix, title, order, depends):
     return task
 
 
-def flatten(plan):
-    flat = {"tasks": []}
-    if plan.get('tasks'):
-        for i in plan.get('tasks'):
-            task = plan['tasks'][i]
-            flat["tasks"].append(task)
-    prs = plan.get('processes')
-    target = prs
-    while True:
-        if not target:
-            break
-        for i in target:
-            process = target.get(i)
-            if process.get('tasks'):
-                # if target.get('tasks'):
-                flat['tasks'].append(process.get('tasks'))
-        target = target.get('processes')
-
-    with open('templates/TPlans/flat.json', 'wb') as f:
-        f.write(json.dumps(flat))
-    return flat
 
 
 if __name__ == '__main__':
     character_preproduction_template = "Art_character_preproduction"
+    PROJ = 1
     session = session_factory()
-    plan = render_process(
-        session, character_preproduction_template, 1, 'sepehr_')
+    prodb = session.query(Project).filter_by(id=PROJ).one()  ## must be present
+
+    ### for test only
+    prodb.tasks = []
     session.commit()
+
+    plan = render_process(
+        session, character_preproduction_template, PROJ, 'sepehr_')
+    session.commit()
+
+    prodb.plan()
+    session.commit()
+
     session.close()
     #flat = flatten(plan)

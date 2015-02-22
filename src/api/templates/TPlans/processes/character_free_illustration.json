@@ -4,7 +4,7 @@
             "free_illustration":
                 {
                     "order":1,
-                    "template":"character_free_illustration"
+                    "template":"character_free_illustration_task"
                 
                 }
         }
