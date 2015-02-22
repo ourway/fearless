@@ -41,6 +41,15 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
     outputs = []
     found_tasks = False
     # print plan
+    old_t = session.query(Task).filter_by(
+        title=prefix + t).filter_by(project_id=project_id).first()
+    newt = old_t
+    if not newt:
+        newt = Task(
+            title= (prefix+t).decode('utf-8'), project_id=project_id, priority=600 - last_order)
+        session.add(newt)
+
+
 
     if plan.get('processes'):
         processes = OrderedDict(
@@ -67,6 +76,8 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
                 session.add(new)
             else:
                 new.uuid = _id
+            new.parent.append(newt)
+
 
 
 
@@ -88,33 +99,14 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
             last_order = max(po, last_order-1)
             last_order += 1
             deps = plan['processes'][process].get('depends_on')
-            if deps:
-                for i in deps:
-                    dep_title = prefix+i.get('name')
-                    dep = session.query(Task).filter_by(title=prefix+dep_title).filter_by(project_id=project_id).first()
-
-                    assert dep != new
-                    if dep and not dep in new.parent:
-                        new.depends.append(dep)
-
-            if parent:
-                print '%s{ %s }' % (parent, process)
-                #print prefix+parent
-                pdb = session.query(Task).filter_by(title=prefix+parent).filter_by(project_id=project_id).first()
-                if pdb and not pdb in new.depends:
-                    #print pdb
-                    pdb.children.append(new)
 
 
-            if po:
-                previous = processes.keys()[po-1]
-
-                pdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).first()
-                if pdb and not new in pdb.depends:
-                    print process, '|::::::::>', previous
-                    new.depends.append(pdb)
 
 
+
+
+
+            
 
 
 
@@ -169,6 +161,9 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
             else:
                 nt.uuid = _id
 
+            nt.parent.append(newt)
+            print '%s is parent of %s' % (t, task)
+
             _this = {'name': task, 'uuid': _id, 'order': to}
             if list_of_order_numbers.count(to) > 1:
                 multies.append(_this)
@@ -185,13 +180,22 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
                 plan['tasks'][task]['depends_on'] = outputs
                 
             deps = plan['tasks'][task].get('depends_on') or []
+
+
+            '''
+            if to and parent:
+                #previous = processes.keys()[po-1]
+                pdb = session.query(Task).filter_by(title=prefix+parent).filter_by(project_id=project_id).first()
+                if pdb and not nt in pdb.depends:
+                    #print process, '|::::::::>', previous
+                    nt.depends.append(pdb)
+
             if deps:
                 for i in deps:
                     dep_title = prefix+i.get('name')
                     dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).first()
                     assert dep != nt
                     nt.depends.append(dep)
-            '''
             if parent:
                 print '%s{ %s }' % (parent, task)
                 #print prefix+parent
@@ -285,6 +289,7 @@ def render_task(t, session, project_id, parent, prefix, title, order, depends):
                 #if not parent_task in theTask.depends:
                     #theTask.depends.append(parent_task)
                 theTask.parent = [parent_task]
+            '''
             if depends:
                 for i in depends:
                     dep_title = prefix+i.get('name')
@@ -292,6 +297,7 @@ def render_task(t, session, project_id, parent, prefix, title, order, depends):
                     assert dep != theTask
                     if not dep in theTask.parent:
                         theTask.depends.append(dep)
+            '''
 
 
             theTask.resources = [

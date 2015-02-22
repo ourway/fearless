@@ -225,7 +225,7 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False):
         b.seek(0)
         fileobj = b
     while True:
-        chunk = fileobj.read(2 ** 28)
+        chunk = fileobj.read(2 ** 24)
         if not chunk:
             break
         md5.update(chunk)
