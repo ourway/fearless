@@ -15,6 +15,8 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
         hr = []
         hr.append(str(dependency.id))
         target = dependency
+        if task.id == 4501:
+            print task.depends
         level = 0
         while True:
             parent = target.parent
@@ -23,7 +25,7 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
             level +=1
             hr.append(str(parent[-1].id))
             target = target.parent[-1]
-        if dependency.title != target.title:
+        if (dependency.title != target.title) or not task.parent:
             depends.append('fearless.__%s._%s' % (dependency.project.id, '._'.join(hr[::-1])))
     %>
 % endfor

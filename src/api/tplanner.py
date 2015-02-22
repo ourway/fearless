@@ -98,11 +98,12 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
             last_order = max(po, last_order-1)
             last_order += 1
             deps = plan['processes'][process].get('depends_on')
+            '''
             if po:
                 previous = processes.keys()[po-1]
                 pdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).scalar()
                 new.depends.append(pdb)
-                print '%s depnds on %s' % (process, previous)
+            '''
 
 
 
@@ -192,13 +193,13 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
                 tdb = session.query(Task).filter_by(title=prefix+parent).filter_by(project_id=project_id).scalar()
                 if tdb and not tdb in nt.depends:
                     tdb.children.append(nt)
-            '''
 
             if to:
                 previous = tasks.keys()[to-1]
                 tdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).scalar()
                 if tdb and not nt in tdb.depends:
                     nt.depends.append(tdb)
+            '''
 
             last_order = max(to, last_order-1)
             last_order += 1
@@ -206,7 +207,7 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
 
             if plan['tasks'][task].get('template'):
                 process_task = render_task(plan['tasks'][task]['template'], session,
-                                           project_id, task, prefix, plan['tasks'][task].get('template'), order=600 - to, depends=deps)
+                    project_id, task, prefix, plan['tasks'][task].get('template'), order=600 - to, depends=deps)
                 if process_task:
                     found_tasks = True
                     outputs = [_this]
