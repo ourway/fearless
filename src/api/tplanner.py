@@ -19,7 +19,7 @@ def sort_by_order(a):
     return a[1].get('order')
 
 
-def render_process(session, t, project_id, prefix, parent=None, last_order=0):
+def render_process(session, t, project_id, prefix, parent=None, last_order=0, depends=[]):
     ''' 
         Renders a process template
         @t: mako template
@@ -36,7 +36,7 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
         with open(fn, 'wb') as f:
             f.write(json.dumps(structure, sort_keys=True, indent=4))
     templ = Template(filename=fn)  # create a mako template
-    print 'processing %s' % t
+    print 'processing %s' % prefix+t
     raw_root = templ.render()
     plan = json.loads(raw_root)
     outputs = []
@@ -49,7 +49,9 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
         newt = Task(
             title=(prefix+(parent or t)).decode('utf-8'), project_id=project_id, priority=600-last_order)
         session.add(newt)
-    #if parent:
+    if depends and all(depends):   ## I am using a custom force depend list for external dependency injection
+        print t, depends[0].title
+        newt.depends = depends
     #    callerTask = session.query(Task).filter_by(title=prefix+parent).one()
     #    newt.parent = [callerTask]
 
@@ -96,12 +98,7 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
 
 
         
-
-
-
-    
-
-
+    return newt
 
 
 def render_task(t, session, project_id, parent, prefix, title, order):
@@ -115,11 +112,9 @@ def render_task(t, session, project_id, parent, prefix, title, order):
             f.write(json.dumps(structure, sort_keys=True, indent=4))
     templ = Template(filename=fn)  # create a mako template
     raw_process = templ.render()
-    _id = getUUID()
     task = json.loads(raw_process)
     task['parent'] = parent
     task['title'] = title
-    task['uuid'] = _id
     _expert = task.get('resource_expertize')
     min_effort = task.get('min_effort')
     max_effort = task.get('max_effort')
@@ -144,30 +139,25 @@ def render_task(t, session, project_id, parent, prefix, title, order):
     if resources:
         Sresources = [{'name': i.fullname, 'id': i.id, 'uuid': i.uuid, 'effectiveness': i.effectiveness}
                       for i in resources if i.effectiveness >= minRate]
-        if Sresources and parent:
-            print parent
-            parent_task = session.query(Task).filter_by(title=prefix+parent).scalar()
-
+        if Sresources:  ## we need resources to allocation 
             theTask = session.query(Task).filter_by(
                 title=prefix+title+'_task').filter_by(project_id=project_id).scalar()
+
             if not theTask:
                 theTask = Task(
-                    title=prefix + title + '_task', project_id=project_id, uuid=_id, effort=effort, priority=order)
-            else:
-                theTask.uuid = _id
+                    title=prefix + title + '_task', project_id=project_id, effort=effort, priority=order)
 
-            if parent_task:
-                assert parent_task!=theTask
+            if parent:
+                parent_task = session.query(Task).filter_by(title=prefix+parent).one()
                 theTask.parent = [parent_task]
 
             theTask.resources = [
                 i for i in resources if i.effectiveness >= minRate]
             session.add(theTask)
-            task['resources'] = Sresources
         else:
             raise ValueError(
                 'Cant find any reources for expertise "%s"' % _expert)
-    return task
+    return theTask
 
 
 
@@ -182,8 +172,10 @@ if __name__ == '__main__':
     prodb.tasks = []
     session.commit()
 
-    plan = render_process(
-        session, character_preproduction_template, PROJ, 'sepehr_')
+    last = None
+    for i in ['sepehr', 'merida', 'eydan']:
+        last = render_process(
+            session, character_preproduction_template, PROJ, i+'_', depends = [last])  ## depends must be a list
     session.commit()
 
     prodb.plan()
