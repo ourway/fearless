@@ -46,9 +46,8 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
     newt = old_t
     if not newt:
         newt = Task(
-            title= (prefix+(parent or t)).decode('utf-8'), project_id=project_id, priority=600 - last_order)
+            title= (prefix+(parent or t)).decode('utf-8'), project_id=project_id, priority=600-last_order)
         session.add(newt)
-
 
 
 
@@ -98,12 +97,11 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
             last_order = max(po, last_order-1)
             last_order += 1
             deps = plan['processes'][process].get('depends_on')
-            '''
             if po:
                 previous = processes.keys()[po-1]
                 pdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).scalar()
                 new.depends.append(pdb)
-            '''
+                #print 'this: %s    to: %s' % (process, previous)
 
 
 
@@ -174,12 +172,11 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
 
 
             '''
-            if to and parent:
-                #previous = processes.keys()[po-1]
-                pdb = session.query(Task).filter_by(title=prefix+parent).filter_by(project_id=project_id).scalar()
-                if pdb and not nt in pdb.depends:
-                    #print process, '|::::::::>', previous
-                    nt.depends.append(pdb)
+            if to:
+                previous = tasks.keys()[to-1]
+                tdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).scalar()
+                #print 'correct: %s' % task
+                nt.depends.append(tdb)
 
             if deps:
                 for i in deps:
@@ -275,21 +272,10 @@ def render_task(t, session, project_id, parent, prefix, title, order, depends):
                     title=prefix + title + '_task', project_id=project_id, uuid=_id, effort=effort, priority=order)
             else:
                 theTask.uuid = _id
+
             if parent_task:
                 assert parent_task!=theTask
-                #if not parent_task in theTask.depends:
-                    #theTask.depends.append(parent_task)
                 theTask.parent = [parent_task]
-            '''
-            if depends:
-                for i in depends:
-                    dep_title = prefix+i.get('name')
-                    dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).scalar()
-                    assert dep != theTask
-                    if not dep in theTask.parent:
-                        theTask.depends.append(dep)
-            '''
-
 
             theTask.resources = [
                 i for i in resources if i.effectiveness >= minRate]
@@ -328,7 +314,7 @@ if __name__ == '__main__':
     character_preproduction_template = "Art_character_preproduction"
     session = session_factory()
     plan = render_process(
-        session, character_preproduction_template, 3, 'sepehr_')
+        session, character_preproduction_template, 1, 'sepehr_')
     session.commit()
     session.close()
     #flat = flatten(plan)

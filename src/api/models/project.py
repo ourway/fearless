@@ -24,7 +24,7 @@ from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
-from mixin import IDMixin, Base, now, convert_to_datetime
+from mixin import IDMixin, Base, now, convert_to_datetime, getUUID
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy import desc, asc
 from .task import Task
@@ -202,7 +202,8 @@ class Project(IDMixin, Base):
     #@property
     def plan(self):
         # lets select just one task
-        schedule_path = '/tmp/Fearless_project_%s.tjp' % self.uuid
+        puid = getUUID() + '_' + self.uuid
+        schedule_path = '/tmp/Fearless_project_%s.tjp' % puid
         plan_path = '/tmp/plan_%s.html' % (self.uuid)
         guntt_path = '/tmp/guntt_%s.html' % (self.uuid)
         resource_path = '/tmp/resource_%s.html' % (self.uuid)
@@ -213,7 +214,7 @@ class Project(IDMixin, Base):
         traceSvg_path = '/tmp/TraceReport_%s.html' % (self.uuid)
         
         for i in [schedule_path, plan_path, guntt_path, resource_path, 
-                  msproject_path, profit_path, csv_path, trace_path, trace_path]:
+                  msproject_path, profit_path, csv_path, trace_path, traceSvg_path]:
             if os.path.isfile(i):
                 os.remove(i)
         if not r.get('fearless_tj3_lock'):
