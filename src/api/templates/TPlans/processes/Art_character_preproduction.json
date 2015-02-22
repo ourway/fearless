@@ -1,33 +1,33 @@
 {
     "processes":
         {
-            "Character Research":
+            "Character Research field":
             {
                 "template":"character_research",
                 "description":"Research about character",
                 "order":1
             },
-            "Free Illustration For Character":
+            "Free Illustration For Character field":
             {
                 "template":"character_free_illustration",
                 "description":"Free illustrations on character",
                 "order":1,
                 "needs": "Character Research"
             },
-            "Character Concept":
+            "Character Concept field":
             {
                 "template":"character_concept",
                 "description":"Charcter concept process",
                 "order":2
             },
-            "Character Design":
+            "Character Design field":
             {
                 "template":"character_design",
                 "description":"Character Design Process",
                 "order":3,
                 "needs":"Character Research"
             },
-            "Check Points, Finilize and Quality Control":
+            "Check Points, Finilize and Quality Control field":
             {
                 "template":"character_output_qc",
                 "description":"",

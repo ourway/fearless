@@ -1,7 +1,7 @@
 {
     "tags":["asset"],
-    "min_effort":1,
-    "max_effort":8,
+    "min_effort":3,
+    "max_effort":5,
     "resource_expertize":
         {
             "character concept":

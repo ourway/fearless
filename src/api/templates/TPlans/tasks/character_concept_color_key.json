@@ -1,6 +1,6 @@
 {
-    "max_effort": 2, 
-    "min_effort": 0, 
+    "max_effort": 3, 
+    "min_effort": 5, 
     "outputs": {}, 
     "resource_expertize": {
         "character concept": {

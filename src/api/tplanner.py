@@ -42,12 +42,13 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
     found_tasks = False
     # print plan
     old_t = session.query(Task).filter_by(
-        title=prefix + t).filter_by(project_id=project_id).first()
+        title=prefix + (parent or t)).filter_by(project_id=project_id).scalar()
     newt = old_t
     if not newt:
         newt = Task(
-            title= (prefix+t).decode('utf-8'), project_id=project_id, priority=600 - last_order)
+            title= (prefix+(parent or t)).decode('utf-8'), project_id=project_id, priority=600 - last_order)
         session.add(newt)
+
 
 
 
@@ -68,7 +69,7 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
             #po = last_order + 1
             po = processes.keys().index(process)
             old_task = session.query(Task).filter_by(
-                title=prefix + process).filter_by(project_id=project_id).first()
+                title=prefix + process).filter_by(project_id=project_id).scalar()
             new = old_task
             if not new:
                 new = Task(
@@ -77,8 +78,6 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
             else:
                 new.uuid = _id
             new.parent.append(newt)
-
-
 
 
             _this = {'name': process, 'uuid': _id, 'order': po}
@@ -99,20 +98,13 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
             last_order = max(po, last_order-1)
             last_order += 1
             deps = plan['processes'][process].get('depends_on')
+            if po:
+                previous = processes.keys()[po-1]
+                pdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).scalar()
+                new.depends.append(pdb)
+                print '%s depnds on %s' % (process, previous)
 
 
-
-
-
-
-
-            
-
-
-
-
-                #dep = session.query(Task).filter_by(uuid=i.get('uuid')).first()
-                #print dep
 
             process_plan = render_process(
                 session, plan['processes'][process]['template'], project_id, prefix, process, last_order)
@@ -130,7 +122,6 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
                     plan['processes'][process]['tasks'] = subtasks
                 elif plan['processes'][process].get('tasks'):
                     del(plan['processes'][process]['tasks'])
-
             else:
                 # print "plan for " + plan['processes'][process]['template'] +
                 # " not available"
@@ -154,7 +145,7 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
             #to = int(plan['tasks'][task]['order'])
             depends = outputs
             nt = session.query(Task).filter_by(
-                title=prefix + task).filter_by(project_id=project_id).first()
+                title=prefix + task).filter_by(project_id=project_id).scalar()
             if not nt:
                 nt = Task(title=prefix + task, project_id=project_id, uuid=_id, priority=to)
                 session.add(nt)
@@ -162,7 +153,6 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
                 nt.uuid = _id
 
             nt.parent.append(newt)
-            print '%s is parent of %s' % (t, task)
 
             _this = {'name': task, 'uuid': _id, 'order': to}
             if list_of_order_numbers.count(to) > 1:
@@ -185,7 +175,7 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
             '''
             if to and parent:
                 #previous = processes.keys()[po-1]
-                pdb = session.query(Task).filter_by(title=prefix+parent).filter_by(project_id=project_id).first()
+                pdb = session.query(Task).filter_by(title=prefix+parent).filter_by(project_id=project_id).scalar()
                 if pdb and not nt in pdb.depends:
                     #print process, '|::::::::>', previous
                     nt.depends.append(pdb)
@@ -193,20 +183,20 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0):
             if deps:
                 for i in deps:
                     dep_title = prefix+i.get('name')
-                    dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).first()
+                    dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).scalar()
                     assert dep != nt
                     nt.depends.append(dep)
             if parent:
                 print '%s{ %s }' % (parent, task)
                 #print prefix+parent
-                tdb = session.query(Task).filter_by(title=prefix+parent).filter_by(project_id=project_id).first()
+                tdb = session.query(Task).filter_by(title=prefix+parent).filter_by(project_id=project_id).scalar()
                 if tdb and not tdb in nt.depends:
                     tdb.children.append(nt)
             '''
 
             if to:
                 previous = tasks.keys()[to-1]
-                tdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).first()
+                tdb = session.query(Task).filter_by(title=prefix+previous).filter_by(project_id=project_id).scalar()
                 if tdb and not nt in tdb.depends:
                     nt.depends.append(tdb)
 
@@ -261,7 +251,7 @@ def render_task(t, session, project_id, parent, prefix, title, order, depends):
     else:
         raise ValueError('Expertize is empty in task: %s' % t)
     resources = list()
-    eDb = session.query(Expert).filter_by(name=_expert).first()
+    eDb = session.query(Expert).filter_by(name=_expert).scalar()
     if eDb:
         resources = eDb.users
         if not resources:
@@ -275,10 +265,10 @@ def render_task(t, session, project_id, parent, prefix, title, order, depends):
         Sresources = [{'name': i.fullname, 'id': i.id, 'uuid': i.uuid, 'effectiveness': i.effectiveness}
                       for i in resources if i.effectiveness >= minRate]
         if Sresources:
-            parent_task = session.query(Task).filter_by(title=prefix+parent).first()
+            parent_task = session.query(Task).filter_by(title=prefix+parent).scalar()
 
             theTask = session.query(Task).filter_by(
-                title=prefix+title+'_task').filter_by(project_id=project_id).first()
+                title=prefix+title+'_task').filter_by(project_id=project_id).scalar()
             if not theTask:
                 theTask = Task(
                     title=prefix + title + '_task', project_id=project_id, uuid=_id, effort=effort, priority=order)
@@ -293,7 +283,7 @@ def render_task(t, session, project_id, parent, prefix, title, order, depends):
             if depends:
                 for i in depends:
                     dep_title = prefix+i.get('name')
-                    dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).first()
+                    dep = session.query(Task).filter_by(title=dep_title).filter_by(project_id=project_id).scalar()
                     assert dep != theTask
                     if not dep in theTask.parent:
                         theTask.depends.append(dep)

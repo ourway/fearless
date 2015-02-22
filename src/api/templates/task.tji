@@ -21,9 +21,9 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
             if not parent:
                 break
             level +=1
-            hr.append(str(parent[0].id))
-            target = target.parent[0]
-        if (dependency.title != target.title) or not task.parent:
+            hr.append(str(parent[-1].id))
+            target = target.parent[-1]
+        if dependency.title != target.title:
             depends.append('fearless.__%s._%s' % (dependency.project.id, '._'.join(hr[::-1])))
     %>
 % endfor
@@ -66,8 +66,10 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
     % if not task.effort and not isMilestone and not task.parent:
         start ${task.start.strftime('%Y-%m-%d')}
         actual:start ${task.start.strftime('%Y-%m-%d')}
-        end ${task.end.strftime('%Y-%m-%d')}
-        actual:end ${task.end.strftime('%Y-%m-%d')}
+        % if not task.children:
+            end ${task.end.strftime('%Y-%m-%d')}
+            actual:end ${task.end.strftime('%Y-%m-%d')}
+        % endif
     % elif task.effort and not task.depends and not task.parent:
         start ${task.start.strftime('%Y-%m-%d')}
         actual:start ${task.start.strftime('%Y-%m-%d')}
