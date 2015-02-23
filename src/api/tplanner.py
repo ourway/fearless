@@ -164,7 +164,7 @@ def render_task(t, session, project_id, parent, prefix, title, order):
 
 if __name__ == '__main__':
     character_preproduction_template = "Art_character_preproduction"
-    PROJ = 1
+    PROJ = 3
     session = session_factory()
     prodb = session.query(Project).filter_by(id=PROJ).one()  ## must be present
 
@@ -172,10 +172,8 @@ if __name__ == '__main__':
     prodb.tasks = []
     session.commit()
 
-    last = None
-    for i in ['sepehr', 'merida', 'eydan']:
-        last = render_process(
-            session, character_preproduction_template, PROJ, i+'_', depends = [last])  ## depends must be a list
+    render_process(
+            session, character_preproduction_template, PROJ, 'sepehr_')  ## depends must be a list
     session.commit()
 
     prodb.plan()

@@ -18,6 +18,7 @@ lxml
 readline
 ipython
 sh
+fabric
 envelopes
 pyftpdlib
 pysendfile
