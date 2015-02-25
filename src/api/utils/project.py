@@ -141,13 +141,41 @@ class AddProject:
 
 class GetProjectLatestReport:
 
-    def on_get(self, req, resp, id):
+    def on_get(self, req, resp, id, action):
+
+        ## defaults
+        do_plan=True
+        do_guntt=True
+        do_resource=True
+        do_msproject=False,
+        do_profit=False
+        do_trace=True
+        do_traceSvg=False
+
+
+        if action != 'plan':
+            do_plan=False
+        elif action == 'guntt':
+            do_guntt=True
+        elif action == 'resource':
+            do_resource=True
+        elif action == 'msproject':
+            do_msproject=True
+        elif action == 'profit':
+            do_profit=True
+        elif action == 'trace':
+            do_trace=True
+        elif action == 'traceSvg':
+            do_traceSvg=True
+
         project = req.session.query(Project).filter(Project.id == id).first()
         if not project:
             resp.status = falcon.HTTP_404
             return
 
-        data = project.plan()  # first let it plan
+        data = project.plan(do_plan=do_plan, do_guntt=do_guntt, do_resource=do_resource, 
+                             do_msproject=do_msproject, do_profit=do_profit,
+                             do_trace=do_trace, do_traceSvg=do_traceSvg)
         update = True
         if not data:
             update = False

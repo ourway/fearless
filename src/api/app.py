@@ -66,6 +66,7 @@ def closeSession(req, resp):
         req.session.rollback()
     finally:
         # pass
+        req.session.rollback()
         req.session.close()
         Session.remove()
 
@@ -362,7 +363,7 @@ app.add_route('/api/project', ListProjects())
 app.add_route('/api/project/add', AddProject())
 app.add_route('/api/project/update/{projId}', UpdateProject())
 app.add_route('/api/project/get/{id}', GetProjectDetails())
-app.add_route('/api/project/report/{id}', GetProjectLatestReport())
+app.add_route('/api/project/report/{id}/{action}', GetProjectLatestReport())
 app.add_route('/api/collection/{collectionId}', CollectionInfo())
 app.add_route('/api/collection/add', AddCollection())
 app.add_route('/api/task/add/{projId}', AddTask())
@@ -398,5 +399,7 @@ if __name__ == '__main__':
     #pass
     #from werkzeug import run_simple
     #run_simple('0.0.0.0', 5002, app, use_debugger=True, use_reloader=True)
+
     from gevent import wsgi
+    from gevent import monkey;monkey.patch_all()
     wsgi.WSGIServer(('127.0.0.1', 5002), app).serve_forever()

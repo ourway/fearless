@@ -1,4 +1,5 @@
 redis
+
 celery
 gevent
 wsaccel
@@ -6,6 +7,7 @@ ftfy
 gevent-websocket
 ujson
 numpy
+pyseq
 falcon==0.1.10
 scikits.audiolab
 moviepy
