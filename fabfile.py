@@ -8,6 +8,7 @@ from mako.template import Template
 
 nginx_version = '1.6.2'
 redis_version = '2.8.19'
+ruby_version = '2.2.0'
 
 #env.hosts = ['fearless@192.168.20.159', 'fearless@192.168.20.151']
 
@@ -84,6 +85,22 @@ def _download_ffmpeg():
         print('Using cached ffmpeg')
     return ffmpeg_file
 
+def _download_ruby():
+    '''Download ruby'''
+    print('Getting ruby ...')
+    dfolder = _make_downloads_folder()
+    ruby_file = '%s/ruby-%s.tar.gz' % (dfolder, ruby_version)
+    if not os.path.isfile(ruby_file):
+        with cd(dfolder):
+            ruby_download_link = 'http://cache.ruby-lang.org/pub/ruby/2.2/ruby-%s.tar.gz' % ruby_version
+            download_cmd = 'wget %s' % ruby_download_link
+            run(download_cmd)
+            print('Finished downloading ruby')
+    else:
+        print('Using cached ruby')
+    return ruby_file
+
+
 def _get_nginx_config():
     temp = Template(filename='%s/config/nginx/nginx.conf.tml' % _get_pwd())
     conf = temp.render(dir=_get_pwd())
@@ -153,15 +170,51 @@ def _install_ffmpeg():
             with cd('ffmpeg*'):
                 run('cp -rf * %s'%ffmpeg_install_folder)
         assert os.path.isfile('%s/bin/ffmpeg/ffmpeg' % _get_pwd())
-            
 
 
+def _install_ruby():
+    '''install ruby'''
+    ruby_file = _download_ruby()
+    if os.path.isfile('%s/bin/ruby/bin/ruby' % _get_pwd()):
+        print 'ruby Already installed.'
+    else:
+        with cd(os.path.dirname(ruby_file)):
+            run('tar xf %s'%os.path.basename(ruby_file))
+            with cd('ruby-%s'%ruby_version):
+                ruby_install_folder = '%s/bin/ruby' % _get_pwd()
+                if not os.path.isdir(ruby_install_folder):
+                    os.makedirs(ruby_install_folder)
+                run('./configure --prefix="%s"' % ruby_install_folder)
+                run('make')
+                run('make install')
+                run('make clean')
+        assert os.path.isfile('%s/bin/ruby/bin/ruby' % _get_pwd())
+
+    ## now lets install task juggler
+    print 'Installing taskjuggler'
+    if os.path.isfile('%s/bin/ruby/bin/tj3' % _get_pwd()):
+        print 'taskjuggler Already installed.'
+    else:
+        run('%s/bin/ruby/bin/gem install taskjuggler' % _get_pwd())
+        assert os.path.isfile('%s/bin/ruby/bin/tj3'%_get_pwd())
+
+
+    
 @task
 def install():
     _install_nginx()
     _install_redis()
     _install_ffmpeg()
+    _install_ruby()
     _get_supervisord_config()
+
+@task
+def update():
+    with cd(_get_pwd()):
+        run('ls -l')
+    #run('{d}/pyenv/bin/pip install -U -r {d}/requirements'.format(d=_get_pwd()))
+
+
 
 
 
