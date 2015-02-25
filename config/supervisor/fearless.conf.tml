@@ -1,0 +1,58 @@
+
+<%
+import multiprocessing
+import os
+HOME = os.getenv('HOME')
+cpuc = multiprocessing.cpu_count()
+import getpass
+user = getpass.getuser()
+%>
+
+[program:fearless-api]
+#command=/home/fearless/Documents/fearless/pyenv/bin/uwsgi --emperor config/uwsgi
+command=${dir}/pyenv/bin/gunicorn -w ${cpuc*2 + 1} -k gevent --worker-connections 1000 --max-requests 128 -b 127.0.0.1:5006 -b 127.0.0.1:5005 -b 127.0.0.1:5007 -b 127.0.0.1:5008 -t 300 --limit-request-line 32768 app:app
+#command={dir}/pyenv/bin/python -O app.py
+autostart=true
+directory=${dir}/src/api
+stopsignal=TERM
+user=${user}
+redirect_stderr=true
+environment=PATH="/opt/rubystack-2.0.0-23/ruby/bin:/usr/local/bin:%(ENV_PATH)s"
+stdout_logfile=${dir}/logs/api_access.log
+stderr_logfile=${dir}/logs/api_error.log
+
+
+[program:fearless-socket]
+command=${dir}/pyenv/bin/python -OO src/api/socket_api.py
+autostart=true
+directory=${dir}
+stopsignal=TERM
+user=${user}
+stdout_logfile=${dir}/logs/socket_access.log
+stderr_logfile=${dir}/logs/socket_error.log
+
+
+[program:fearless-celery]
+command=${dir}/pyenv/bin/celery -A tasks worker -c 1 -l info
+autostart=true
+directory=${dir}/src/api
+stopsignal=TERM
+user=${user}
+stdout_logfile=${dir}/logs/celery.log
+stderr_logfile=${dir}/logs/celery_error.log
+
+[program:fearless-redis]
+command=${dir}/bin/redis/redis-server
+autostart=true
+directory=${dir}/bin/redis
+stopsignal=TERM
+stdout_logfile=${dir}/logs/redis.log
+stderr_logfile=${dir}/logs/redis_error.log
+
+[program:fearless-nginx]
+command=${dir}/bin/nginx/sbin/nginx
+autostart=true
+directory=${dir}/bin/nginx
+stopsignal=TERM
+stdout_logfile=${dir}/logs/redis.log
+stderr_logfile=${dir}/logs/redis_error.log

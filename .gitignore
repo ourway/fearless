@@ -74,4 +74,5 @@ logs/
 .ropeproject/
 .idea
 .hidden
+.downloads/
 src/api/database/files/

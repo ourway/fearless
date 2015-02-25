@@ -1,0 +1,139 @@
+# This is example contains the bare minimum to get nginx going with
+# Gunicornservers.
+
+<%
+import multiprocessing
+import os
+HOME = os.getenv('HOME')
+cpuc = multiprocessing.cpu_count()
+%>
+
+worker_processes ${cpuc*2 + 1};
+daemon off;
+
+# # drop privileges, root is needed on most systems for binding to port 80
+# # (or anything < 1024).  Capability-based security may be available for
+# # your system and worth checking out so you won't need to be root to
+# # start nginx to bind on 80
+user root; # for systems with a "nogroup"
+# user nobody nobody; # for systems with "nobody" as a group instead
+
+# Feel free to change all paths to suit your needs here, of course
+pid ${dir}/bin/nginx/sbin/nginx.pid;
+error_log ${dir}/logs/nginx.error.log;
+
+events {
+  worker_connections 99999; # increase if you have lots of clients
+  accept_mutex on; # "on" if nginx worker_processes > 1
+  # use epoll; # enable for Linux 2.6+
+  # use kqueue; # enable for FreeBSD, OSX
+}
+
+http {
+  # nginx will find this file in the config directory set at nginx build time
+  include mime.types;
+
+  # fallback in case we can't determine a type
+  default_type application/octet-stream;
+
+  # click tracking!
+    access_log ${dir}/logs/nginx.access.log;
+  #access_log /tmp/nginx.access.log combined;
+
+  # you generally want to serve static files with nginx since neither
+  # Unicorn nor Rainbows! is optimized for it at the moment
+  sendfile on;
+
+  tcp_nopush off; # off may be better for *some* Comet/long-poll stuff
+  tcp_nodelay on; # on may be better for some Comet/long-poll stuff
+
+  # we haven't checked to see if Rack::Deflate on the app server is
+  # faster or not than doing compression via nginx.  It's easier
+  # to configure it all in one place here for static files and also
+  # to disable gzip for clients who don't get gzip/deflate right.
+  # There are other other gzip settings that may be needed used to deal with
+  # bad clients out there, see http://wiki.nginx.org/NginxHttpGzipModule
+  gzip on;
+  gzip_http_version 1.0;
+  gzip_proxied any;
+  gzip_min_length 500;
+  gzip_disable "MSIE [1-6]\.";
+  gzip_types text/plain text/xml text/css
+             text/comma-separated-values
+             text/javascript application/x-javascript
+             application/atom+xml;
+
+
+
+########################################
+#
+   upstream api {
+        % for i in xrange(5005, 5009):
+            server localhost:${i};
+        % endfor
+    }
+
+
+
+server {
+    listen 80;
+    server_name fearless;
+    server_tokens off;
+    large_client_header_buffers 40 1M;
+    access_log  ${dir}/logs/fearless_access.log;
+    error_log  ${dir}/logs/fearless_error.log;
+    #more_set_headers 'Server: Fearless Server';
+    client_max_body_size 8G;
+    
+
+     location / {
+        rewrite .*/ /app;
+     }
+
+     location /app {
+        alias ${dir}/src/views;    # your cache path
+        gzip_vary on;
+        gzip_http_version 1.1;
+        gzip_comp_level 4;
+        gzip_types text/plain image/png image/jpeg image/gif text/css application/x-javascript;
+        expires 1h;
+        gzip on;
+        #expires max;
+        add_header Cache-Control public;
+        #error_page 404 /404;
+        #error_page 403 /403;
+    }
+
+     location /static {
+        alias ${HOME}/.fearlessrepo;    # your cache path
+        gzip_vary on;
+        gzip_http_version 1.1;
+        gzip_comp_level 4;
+        gzip_types text/plain image/png image/jpeg image/gif text/css application/x-javascript;
+        expires off;
+        gzip on;
+        add_header Cache-Control public;
+        #error_page 404 /404;
+        #error_page 403 /403;
+    }
+
+     location /api {
+        proxy_pass http://api;
+        client_max_body_size 8G;
+        proxy_ignore_client_abort off;
+        proxy_buffering off;
+        proxy_redirect off;
+        proxy_connect_timeout       10;
+        proxy_send_timeout          600;
+        proxy_read_timeout          600;
+        send_timeout                600;
+    }
+
+}
+
+#####################################
+#
+#
+
+
+}
