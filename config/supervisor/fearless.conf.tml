@@ -42,7 +42,7 @@ stdout_logfile=${dir}/logs/celery.log
 stderr_logfile=${dir}/logs/celery_error.log
 
 [program:fearless-redis]
-command=${dir}/bin/redis/redis-server
+command=${dir}/bin/redis/bin/redis-server
 autostart=true
 directory=${dir}/bin/redis
 stopsignal=TERM
