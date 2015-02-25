@@ -93,8 +93,11 @@ task fearless "Fearless Projects" {
   ${report}
 % endfor
 
-tracereport burn "TraceReport" {
-  formats html
-  columns complete
-  hidetask plan.id != "fearless"
-}
+% if do_traceSvg:
+
+  tracereport burn "TraceReport" {
+    formats html
+    columns complete
+    hidetask plan.id != "fearless"
+  }
+% endif

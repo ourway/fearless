@@ -8,66 +8,76 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
     taskroot fearless.__${subproject.id}
 }
 
-taskreport breakdown1_${subproject.id} "plan_${subproject.uuid}"{
+% if do_plan:
+  taskreport breakdown1_${subproject.id} "plan_${subproject.uuid}"{
+      formats html
+      start ${subproject.start.strftime('%Y-%m-%d')}
+      end ${subproject.end.strftime('%Y-%m-%d')}
+      loadunit longauto
+      columns name, start, end, gauge, pathcriticalness {title "Critical path"}, complete {title "Progress"}
+      taskroot fearless.__${subproject.id}
+  }
+% endif
+% if do_guntt:
+  taskreport breakdown2_${subproject.id} "guntt_${subproject.uuid}"{
+      formats html
+      start ${subproject.start.strftime('%Y-%m-%d')}
+      end ${subproject.end.strftime('%Y-%m-%d')}
+      loadunit longauto
+      columns bsi, name, chart { scale day width 2000 }, complete {title "Progress"}
+      taskroot fearless.__${subproject.id}
+  }
+% endif
+% if do_resource:
+  resourcereport resourceGraph_${subproject.id} "resource_${subproject.uuid}" {
+    scenarios actual
+    start ${subproject.start.strftime('%Y-%m-%d')}
+    end ${subproject.end.strftime('%Y-%m-%d')}
+    formats html
+    columns name, effort, chart {scale day width 2000}
+    loadunit hours
+    # We only like to show leaf tasks for leaf resources.
+    hidetask ~(isleaf() & isleaf_())
+    hideresource ~(p${subproject.id})
+    taskroot fearless.__${subproject.id}
+  }
+% endif
+% if do_msproject:
+  export "MS-project_${subproject.uuid}" {
+    formats mspxml
+    start ${subproject.start.strftime('%Y-%m-%d')}
+    end ${subproject.end.strftime('%Y-%m-%d')}
+    loadunit days
+    taskroot fearless.__${subproject.id}
+  }
+% endif
+% if do_profit:
+  accountreport "ProfiAndLoss_${subproject.uuid}" {
+    formats html
+    start ${subproject.start.strftime('%Y-%m-%d')}
+    end ${"${now}"}
+    balance -
+    columns no, name, weekly
+    accountroot resourceCost
+  }
+  accountreport "ProfiAndLossCsv_${subproject.uuid}" {
+    formats csv
+    start ${subproject.start.strftime('%Y-%m-%d')}
+    end ${"${now}"}
+    currencyformat "(" ")" "" "." 0
+    columns no, name, yearly
+    accountroot resourceCost
+  }
+% endif
+% if do_trace:
+  <%
+    print do_trace
+  %>
+  tracereport burn_${subproject.id} "TraceReport_${subproject.uuid}" {
     formats html
     start ${subproject.start.strftime('%Y-%m-%d')}
     end ${subproject.end.strftime('%Y-%m-%d')}
-    loadunit longauto
-    columns name, start, end, gauge, pathcriticalness {title "Critical path"}, complete {title "Progress"}
-    taskroot fearless.__${subproject.id}
-}
-taskreport breakdown2_${subproject.id} "guntt_${subproject.uuid}"{
-    formats html
-    start ${subproject.start.strftime('%Y-%m-%d')}
-    end ${subproject.end.strftime('%Y-%m-%d')}
-    loadunit longauto
-    columns bsi, name, chart { scale day width 2000 }, complete {title "Progress"}
-    taskroot fearless.__${subproject.id}
-}
-
-resourcereport resourceGraph_${subproject.id} "resource_${subproject.uuid}" {
-  scenarios actual
-  start ${subproject.start.strftime('%Y-%m-%d')}
-  end ${subproject.end.strftime('%Y-%m-%d')}
-  formats html
-  columns name, effort, chart {scale day width 2000}
-  loadunit hours
-  # We only like to show leaf tasks for leaf resources.
-  hidetask ~(isleaf() & isleaf_())
-  hideresource ~(p${subproject.id})
-  taskroot fearless.__${subproject.id}
-}
-
-export "MS-project_${subproject.uuid}" {
-  formats mspxml
-  start ${subproject.start.strftime('%Y-%m-%d')}
-  end ${subproject.end.strftime('%Y-%m-%d')}
-  loadunit days
-  taskroot fearless.__${subproject.id}
-}
-
-accountreport "ProfiAndLoss_${subproject.uuid}" {
-  formats html
-  start ${subproject.start.strftime('%Y-%m-%d')}
-  end ${"${now}"}
-  balance -
-  columns no, name, weekly
-  accountroot resourceCost
-}
-
-accountreport "ProfiAndLossCsv_${subproject.uuid}" {
-  formats csv
-  start ${subproject.start.strftime('%Y-%m-%d')}
-  end ${"${now}"}
-  currencyformat "(" ")" "" "." 0
-  columns no, name, yearly
-  accountroot resourceCost
-}
-
-tracereport burn_${subproject.id} "TraceReport_${subproject.uuid}" {
-  formats html
-  start ${subproject.start.strftime('%Y-%m-%d')}
-  end ${subproject.end.strftime('%Y-%m-%d')}
-  columns complete
-  hidetask actual.id != "fearless.__${subproject.id}"
-}
+    columns complete
+    hidetask actual.id != "fearless.__${subproject.id}"
+  }
+% endif

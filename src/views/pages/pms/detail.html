@@ -285,24 +285,23 @@ background-color: #FFEDA5;
 <div class="col-md-12 column">
 <div class="panel panel-info">
     <div class="panel-heading">
+            <div class="col-md-2 column"></div>
 			<div class="btn-group">
                 <button ng-show="$parent.isAdmin || $parent.userInfo.userid==project.leader.id || $parent.userInfo.userid==project.creater.id" 
                     id="taskAddButton" class="btn btn-success" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
                 <button ng-show="$parent.isAdmin || $parent.userInfo.userid==project.leader.id || $parent.userInfo.userid==project.creater.id" 
                     id="taskTemplatePlanButton" class="btn btn-success" type="button"><em class="glyphicon glyphicon-plus"></em> Template Planing</button>
             </div>
-            &nbsp;
-            &nbsp;
-            &nbsp;
-			<div class="btn-group hidden-sm hidden-xs">
+            
+            <div class="btn-group hidden-sm hidden-xs">
                 <button ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='cal', 'btn-success':mode=='cal'}" 
                         ng-class="{'active':mode=='cal'}" ng-click="showCal();prepareCal();" type="button"><em class="glyphicon glyphicon-calendar"></em> Calendar</button>
-                <button ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
-                        ng-class="{'active':mode=='plan'}" ng-click="generateReport('plan')" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</button>
-                <button ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" 
-                        ng-click="generateReport('guntt')" type="button"><em class="glyphicon glyphicon-tasks"></em> Gantt</button>
-                <button ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}"
-                        ng-click="generateReport('resource')" type="button"><em class="glyphicon glyphicon-list-alt"></em> Resources</button>
+                <a ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
+                    ng-class="{'active':mode=='plan'}" target='_new' href="/static/uploads/plan_{{project.uuid}}.html" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</a>
+                <a ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" 
+                        target='_new' href="/static/uploads/guntt_{{project.uuid}}.html" type="button"><em class="glyphicon glyphicon-tasks"></em> Gantt</a>
+                <a ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}"
+                        target='_new' href="/static/uploads/resource_{{project.uuid}}.html" type="button"><em class="glyphicon glyphicon-list-alt"></em> Resources</a>
                 <button ng-show="tasks.length>0 && $parent.isAmin" class="btn btn-info" ng-class="{'active':mode=='profit', 'btn-success':mode=='profit'}" 
                         ng-click="generateReport('profit')" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
                 <button  ng-show="tasks.length>0" class="btn btn-info" ng-click="print()" type="button"><em class="glyphicon glyphicon-print"></em> </button>
@@ -311,8 +310,8 @@ background-color: #FFEDA5;
 	</div>
 
     <div class="panel-body" style="background: #FAFAFA;"  ng-show="tasks.length>0">
-        <div id="taskList" class="col-md-3 column" ng-include="'pages/pms/tasksListTemplate.html'"></div>
-        <div class="col-md-9 column">
+        <div id="taskList" class="col-md-5 column" ng-include="'pages/pms/tasksListTemplate.html'"></div>
+        <div class="col-md-7 column">
             <div id="projectDetailContainer">
                 <div class="hidden-sm hidden-xs" id="projectDetailDiv"></div>
             </div>

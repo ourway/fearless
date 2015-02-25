@@ -27,6 +27,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from mixin import IDMixin, Base, now, convert_to_datetime, getUUID
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy import desc, asc
+from utils.defaults import public_upload_folder, public_repository_path, GIT_folder, ASSETS
 from .task import Task
 from .user import User
 from . import r
@@ -181,7 +182,9 @@ class Project(IDMixin, Base):
     def compress_report(self, key, data):
         return data
 
-    def tjp_subproject(self):
+    def tjp_subproject(self, do_plan=True, do_guntt=False, do_resource=False,
+                       do_msproject=False, do_profit=False, do_trace=True, 
+                       do_traceSvg=False):
         subProjectTemplateFile = os.path.join(
             os.path.dirname(__file__), '../templates/subProject.tji')
         subProjectReportFile = os.path.join(
@@ -196,22 +199,26 @@ class Project(IDMixin, Base):
             #_resources.extend(task.resources)
         # send tasks in reverse order
         subProjectTasks = sp.render(tasks=_tasks, subproject=self)
-        report = sr.render(subproject=self)
+        report = sr.render(subproject=self, do_plan=do_plan,
+                      do_guntt=do_guntt, do_resource=do_resource,
+                      do_msproject=do_msproject, do_profit=do_profit,
+                      do_trace=do_trace, do_traceSvg=do_traceSvg)
         return {'report': report, 'subProjectTasks': subProjectTasks}
 
     #@property
-    def plan(self):
+    def plan(self, do_plan=True, do_guntt=False, do_resource=False, do_msproject=False,
+             do_profit=False, do_trace=True, do_traceSvg=False):
         # lets select just one task
         puid = getUUID() + '_' + self.uuid
-        schedule_path = '/tmp/Fearless_project_%s.tjp' % puid
-        plan_path = '/tmp/plan_%s.html' % (self.uuid)
-        guntt_path = '/tmp/guntt_%s.html' % (self.uuid)
-        resource_path = '/tmp/resource_%s.html' % (self.uuid)
-        msproject_path = '/tmp/MS-project_%s.xml' % (self.uuid)
-        profit_path = '/tmp/ProfiAndLoss_%s.html' % (self.uuid)
-        csv_path = '/tmp/csv_%s.csv' % (self.uuid)
-        trace_path = '/tmp/TraceReport_%s.csv' % (self.uuid)
-        traceSvg_path = '/tmp/TraceReport_%s.html' % (self.uuid)
+        schedule_path = os.path.join(public_upload_folder, 'Fearless_project_%s.tjp' % puid)
+        plan_path = os.path.join(public_upload_folder, 'plan_%s.html' % (self.uuid))
+        guntt_path = os.path.join(public_upload_folder, 'guntt_%s.html' % (self.uuid))
+        resource_path = os.path.join(public_upload_folder, 'resource_%s.html' % (self.uuid))
+        msproject_path = os.path.join(public_upload_folder, 'MS-project_%s.xml' % (self.uuid))
+        profit_path = os.path.join(public_upload_folder, 'ProfiAndLoss_%s.html' % (self.uuid))
+        csv_path = os.path.join(public_upload_folder, 'csv_%s.csv' % (self.uuid))
+        trace_path = os.path.join(public_upload_folder, 'TraceReport_%s.csv' % (self.uuid))
+        traceSvg_path = os.path.join(public_upload_folder, 'TraceReport_%s.html' % (self.uuid))
         
         for i in [schedule_path, plan_path, guntt_path, resource_path, 
                   msproject_path, profit_path, csv_path, trace_path, traceSvg_path]:
@@ -236,13 +243,15 @@ class Project(IDMixin, Base):
         reports = []
         for p in projects:
             if p.tasks:
-                planData = p.tjp_subproject()
+                planData = p.tjp_subproject(do_plan=do_plan, do_guntt=do_guntt, 
+                            do_resource=do_resource, do_msproject=do_msproject,
+                            do_profit=do_profit, do_trace=do_trace, 
+                            do_traceSvg=do_traceSvg)
                 subProjectTasks.append(planData.get('subProjectTasks'))
                 reports.append(planData.get('report'))
 
         finalplan = t.render(reports=reports, subProjectTasks=subProjectTasks,
-                             now=now(), subprojects=projects, resources=resources
-                             )
+                             now=now(), subprojects=projects, resources=resources)
 
         #plan_path = '/tmp/Fearless_project.tjp'
 
@@ -257,7 +266,7 @@ class Project(IDMixin, Base):
             import time
             s = time.time()
             tj = tj3(
-                schedule_path, '--silent', '--no-color', '--add-trace', o='/tmp', c='1')
+                schedule_path, '--silent', '--no-color', '--add-trace', o=public_upload_folder, c='1')
             print 'Finished in %s seconds' % round(time.time() - s, 3)
         except Exception, e:
             print e
@@ -270,39 +279,43 @@ class Project(IDMixin, Base):
             self.reports = []
             return
         # if not tj.stderr:
-        plan, guntt, resource, msproject, profit, csvfile, trace, burndown = None, None, None, None, None, None, None, None
+        plan, guntt, resource, msproject, profit = None, None, None, None, None 
+        csvfile, trace, burndown = None, None, None
 
 
         def saveTable(path):
             '''Read main table from these files'''
             if os.path.isfile(path):
-                report = open(path)
-                root = etree.parse(report)
-                try:
-                    main_table = root.xpath('//table')[0]
-                except lxml.etree.XMLSyntaxError:
-                    return
-                finally:
-                    pass
-                    #os.remove(path)
+                #report = open(path)
+                #root = etree.parse(report)
+                #try:
+                #    main_table = root.xpath('//table')[0]
+                #    tosave = etree.tostring(main_table)
+                #except lxml.etree.XMLSyntaxError:
+                #    return
+                #finally:
+                #    pass
+                    #with open(path, 'wb') as f:
+                    #    f.write(tosave)
+                    
 
-                tosave = etree.tostring(main_table)
-                return tosave
+                return path
                 # self.reports.append(tosave)
 
         def getSvg(path):
             '''extract svg element of report'''
             if os.path.isfile(path):
-                report = open(path)
-                try:
-                    root = etree.parse(report)
-                except lxml.etree.XMLSyntaxError:
-                    return
-                finally:
-                    pass
+                tosave = None
+                #report = open(path)
+                #try:
+                #    root = etree.parse(report)
+                #except lxml.etree.XMLSyntaxError:
+                #    return
+                #finally:
+                #    pass
                     #os.remove(path)
-                svg = root.xpath('//svg')[0]
-                tosave = etree.tostring(svg)
+                #svg = root.xpath('//svg')[0]
+                #tosave = etree.tostring(svg)
                 return tosave
 
         if os.path.isfile(msproject_path):

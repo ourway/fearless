@@ -1,5 +1,8 @@
    upstream api {
-        server localhost:5002;
+        server localhost:5005;
+        server localhost:5006;
+        server localhost:5007;
+        server localhost:5008;
     }
 
 
