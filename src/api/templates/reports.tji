@@ -24,7 +24,7 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
       start ${subproject.start.strftime('%Y-%m-%d')}
       end ${subproject.end.strftime('%Y-%m-%d')}
       loadunit longauto
-      columns bsi, name, chart { scale day width 2000 }, complete {title "Progress"}
+      columns bsi, name, chart { scale day width ${report_width} }, complete {title "Progress"}
       taskroot fearless.__${subproject.id}
   }
 % endif
@@ -34,7 +34,7 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
     start ${subproject.start.strftime('%Y-%m-%d')}
     end ${subproject.end.strftime('%Y-%m-%d')}
     formats html
-    columns name, effort, chart {scale day width 2000}
+    columns name, effort, chart {scale day width ${report_width}}
     loadunit hours
     # We only like to show leaf tasks for leaf resources.
     hidetask ~(isleaf() & isleaf_())

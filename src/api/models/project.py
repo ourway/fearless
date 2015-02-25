@@ -184,7 +184,7 @@ class Project(IDMixin, Base):
 
     def tjp_subproject(self, do_plan=True, do_guntt=False, do_resource=False,
                        do_msproject=False, do_profit=False, do_trace=True, 
-                       do_traceSvg=False):
+                       do_traceSvg=False, report_width=2000):
         subProjectTemplateFile = os.path.join(
             os.path.dirname(__file__), '../templates/subProject.tji')
         subProjectReportFile = os.path.join(
@@ -202,12 +202,12 @@ class Project(IDMixin, Base):
         report = sr.render(subproject=self, do_plan=do_plan,
                       do_guntt=do_guntt, do_resource=do_resource,
                       do_msproject=do_msproject, do_profit=do_profit,
-                      do_trace=do_trace, do_traceSvg=do_traceSvg)
+                      do_trace=do_trace, do_traceSvg=do_traceSvg, report_width=report_width)
         return {'report': report, 'subProjectTasks': subProjectTasks}
 
     #@property
     def plan(self, do_plan=True, do_guntt=False, do_resource=False, do_msproject=False,
-             do_profit=False, do_trace=True, do_traceSvg=False):
+             do_profit=False, do_trace=True, do_traceSvg=False, report_width=2000):
         # lets select just one task
         puid = getUUID() + '_' + self.uuid
         schedule_path = os.path.join(public_upload_folder, 'Fearless_project_%s.tjp' % puid)
@@ -246,7 +246,7 @@ class Project(IDMixin, Base):
                 planData = p.tjp_subproject(do_plan=do_plan, do_guntt=do_guntt, 
                             do_resource=do_resource, do_msproject=do_msproject,
                             do_profit=do_profit, do_trace=do_trace, 
-                            do_traceSvg=do_traceSvg)
+                            do_traceSvg=do_traceSvg, report_width=report_width)
                 subProjectTasks.append(planData.get('subProjectTasks'))
                 reports.append(planData.get('report'))
 

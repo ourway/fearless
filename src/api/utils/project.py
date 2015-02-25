@@ -151,6 +151,8 @@ class GetProjectLatestReport:
         do_profit=False
         do_trace=True
         do_traceSvg=False
+        report_width = req.get_param('report_width') or 2000;
+        report_width = int(report_width)
 
 
         if action != 'plan':

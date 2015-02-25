@@ -39,6 +39,9 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0, de
     print 'processing %s' % prefix+t
     raw_root = templ.render()
     plan = json.loads(raw_root)
+    if plan.get('active') and plan.get('active') == True:
+        print 'bypassing inactive process/task "%s"' % t
+        return
     outputs = []
     found_tasks = False
     # print plan
@@ -172,11 +175,11 @@ if __name__ == '__main__':
     prodb.tasks = []
     session.commit()
 
-    render_process(
-            session, character_preproduction_template, PROJ, 'sepehr_')  ## depends must be a list
+    render_process( session, character_preproduction_template, PROJ, 'Sepehr_')  ## depends must be a list
+    render_process( session, character_preproduction_template, PROJ, 'Tiger_')  ## depends must be a list
     session.commit()
 
-    prodb.plan()
+    prodb.plan(do_plan=True, do_guntt=True, do_resource=True, report_width=1700)
     session.commit()
 
     session.close()

@@ -1,6 +1,6 @@
 {
-    "max_effort": 6, 
-    "min_effort": 10, 
+    "max_effort": 18, 
+    "min_effort": 28, 
     "outputs": {}, 
     "resource_expertize":
         {

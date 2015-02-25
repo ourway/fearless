@@ -23,5 +23,6 @@
                     "template":"character_culture_research"
                 }
     
-        }
+        },
+    "active":true
 }

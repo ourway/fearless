@@ -37,10 +37,10 @@
                     "template":"character_texture_ref"
                 
                 },
-            "Color key":
+            "digital paint":
                 {
                     "order":7,
-                    "template":"character_color_key"
+                    "template":"character_digital_paint"
                 
                 },
             "Character Cloth Design":
