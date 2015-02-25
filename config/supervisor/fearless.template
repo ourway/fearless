@@ -1,6 +1,6 @@
 [program:fearless-api]
 #command=/home/fearless/Documents/fearless/pyenv/bin/uwsgi --emperor config/uwsgi
-command={dir}/pyenv/bin/gunicorn -w 4 --threads 4 -k gevent --worker-connections 1000 --max-requests 128 -b 127.0.0.1:5006 -b 127.0.0.1:5005 -b 127.0.0.1:5007 -b 127.0.0.1:5008 app:app
+command={dir}/pyenv/bin/gunicorn -w 4 --threads 4 -k gevent --worker-connections 1000 --max-requests 128 -b 127.0.0.1:5006 -b 127.0.0.1:5005 -b 127.0.0.1:5007 -b 127.0.0.1:5008 -t 300 --limit-request-line 32768 app:app
 #command={dir}/pyenv/bin/python -O app.py
 autostart=true
 directory={dir}/src/api
