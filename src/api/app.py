@@ -74,12 +74,22 @@ def closeSession(req, resp):
 class ThingsResource:
     #@Authorize('create_collection')
 
-    def on_get(self, req, resp):
+    def on_get(self, req, resp, **kw):
         """Handles GET requests"""
         req.env['hooooooo'] = 'gooooooooo'
         # resp.set_header('Set-Cookie','fig=newton; Max-Age=200')
         # print req.get_header('Cookie')
         resp.body = "okokokoko"
+
+
+
+class GetUserAssetTags:
+
+    def on_get(self, req, resp):
+        user = getUserInfoFromSession(req, resp)
+        #resp.body = user
+        resp.body = req.session.query(Tag).join(Asset.tgs).join(User).filter_by(id=user.get('id')).all()
+
 
 
 class UpdateAssetTags:
@@ -130,6 +140,8 @@ class DB:
         end = req.get_param('e')
 
         filters_raw = req.get_param('filters')
+        tags = req.get_param_as_list('tags') or []
+        appendix = req.get_param_as_list('appendix') or []
         filters = []
         if filters_raw:
 
@@ -185,13 +197,22 @@ class DB:
                         if isinstance(filter, dict):
                             eq = filter.pop('_')
                             query += '.filter({t}.{k}{eq}"{v}")'.format(t=table, eq=eq,
-                                                                        k=filter.keys()[0], v=filter[filter.keys()[0]])
+                                                k=filter.keys()[0], v=filter[filter.keys()[0]])
+
+
+                for tag in tags:
+                    query += '.filter({t}.tgs.any(name="{tag}"))'.format(t=table, tag=tag)
+
                 if get_count:
                     data = eval(query).count()
                     resp.body = {'count': data}
                     return
+
+
+
                 query += '.order_by({sort}({t}.{order}))'.format(sort=sort,
                                                                  order=order_by, t=table)
+
                 if start != None and end != None:
                     query += '.slice(start, end)'
                 data = eval(query).all()
@@ -358,6 +379,7 @@ app.add_route('/api/asset', ListAssets())
 app.add_route('/api/asset/{key}', GetAsset())
 app.add_route('/api/asset/delete/{id}', DeleteAsset())
 app.add_route('/api/asset/checkout/{assetId}', AssetCheckout())
+app.add_route('/api/asset/get_user_tags', GetUserAssetTags())
 app.add_route('/api/showtime/{userid}', GetUserShows())
 app.add_route('/api/project', ListProjects())
 app.add_route('/api/project/add', AddProject())

@@ -249,7 +249,7 @@ var TITLE = 'TITLE';
              .when('/ams', {
                 templateUrl: 'pages/ams/index.html',
                 controller: 'assetsIndexCtrl',
-                 reloadOnSearch: false // dont reload the page on $location.search
+                 reloadOnSearch: true // dont reload the page on $location.search
             })
              .when('/pms/t/:taskId', {
                 templateUrl: 'pages/pms/task.html',
@@ -2186,130 +2186,171 @@ fearlessApp.controller('taggerCtrl',  function($scope, $rootScope, $routeParams,
 
 fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
 
-$rootScope.title = 'User Assets - Fearless'
-$scope.assetOptions = {};
-        // main assets index page
-var assets = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('fullname'),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  limit: 5,
-  prefetch: {
-    // url points to a json file that contains an array of country names, see
-    // https://github.com/twitter/typeahead.js/blob/gh-pages/data/countries.json
-    url: '/api/db/asset?field=fullname&filters=owner_id='+$scope.$parent.userInfo.userid,
-    // the json file contains an array of strings, but the Bloodhound
-    // suggestion engine expects JavaScript objects so this converts all of
-    // those strings
-    filter: function(list) {
-      return $.map(list, function(asset) { return { fullname: asset }; });
-    }
-            
-  }
-});
-// kicks off the loading/processing of `local` and `prefetch`
-assets.initialize();
+        $rootScope.title = 'User Assets - Fearless';
 
-$scope.assetOptions =  {
-    highlight: true
-  };
-// passing in `null` for the `options` arguments will result in the default
-// options being used
-$scope.completeData = {
-  name: 'assets',
-  displayKey: 'fullname',
-  // `ttAdapter` wraps the suggestion engine in an adapter that
-  // is compatible with the typeahead jQuery plugin
-  source: assets.ttAdapter(),
-//templates: {
-//    empty: [
-//      '<div style="padding:10px">',
-//      'unable to find any assets.',
-//      '</div>'
-//    ].join('\n'),
-//    suggestion: Handlebars.compile('<p><strong>{{fullname}}</strong> – {{content_type}}</p>')
-//  }
-};
-
-$scope.search = function(){
-    old = false;
-    q = $scope.assetOptions.userAssetsFilter.fullname;
-    if (q && old!=q)
-    {
-        $scope.page = 1;
-        $location.search('page', 1);
-        $scope.getUserAssets(false, false, q);
-        $location.search('q', q);
-        old = q;
-    }
-    else if (!q && !$scope.assetOptions.userAssetsFilter)
-    {
-        $scope.getUserAssets();
-        $location.search('q', null);
-    }
-}
-
-
-
-
-
-$scope.gotoPage = function(page){
-    if (page<1)
-        return null;
-
-    $scope.page = page;
-    $location.search('page', page);
-    $scope.getUserAssets();
-    //here
-}
-
-
-
-$scope.getUserAssets = function(order_by, sort, search_for){
-    if (!$scope.page)
-        $scope.page = 1;
-    if (!order_by)
-        order_by = $scope.orderMode || 'created_on';
-    if (!sort || sort==0)
-        sort = 'desc';
-    else
-        sort = 'asc';
-    s = ($scope.page-1)*50;
-    e = s+50;
-    query = '/api/db/asset?sort='+sort+'&s='+s+'&e='+e+'&order_by='+ order_by + '&filters=owner_id='+
-            $scope.$parent.userInfo.userid;
-
-    if (search_for)
-        query += ',fullname=' + search_for;
-
-    req = $http.get(query);
-    req.success(function(resp){
-            $scope.userAssets = resp;
-            
-            })
-    query = '/api/db/asset?filters=owner_id='+$scope.$parent.userInfo.userid+'&count=true';
-    if (search_for)
-        query += '&filters=fullname=' + search_for;
-    creq = $http.get(query);
-    creq.success(function(cresp){
-            $scope.assetsCount = cresp.count;
-            
-            })
-}
-
-
- $scope.$watch($routeParams.page, function(){
-            $scope.page = parseInt($routeParams.page);
-            $scope.assetOptions.userAssetsFilter = {};
-            $scope.assetOptions.userAssetsFilter.fullname = $routeParams.q;
-            if ($routeParams.q)
-                {
-                $scope.search();
-                }
-            else
-                {
-                $scope.getUserAssets();
-                }
+        $scope.assetOptions = {};
+                // main assets index page
+        var assets = new Bloodhound({
+          datumTokenizer: Bloodhound.tokenizers.obj.whitespace('fullname'),
+          queryTokenizer: Bloodhound.tokenizers.whitespace,
+          limit: 5,
+          prefetch: {
+            // url points to a json file that contains an array of country names, see
+            // https://github.com/twitter/typeahead.js/blob/gh-pages/data/countries.json
+            url: '/api/db/asset?field=fullname&filters=owner_id='+$scope.$parent.userInfo.userid,
+            // the json file contains an array of strings, but the Bloodhound
+            // suggestion engine expects JavaScript objects so this converts all of
+            // those strings
+            filter: function(list) {
+              return $.map(list, function(asset) { return { fullname: asset }; });
+            }
+                    
+          }
         });
+        // kicks off the loading/processing of `local` and `prefetch`
+        assets.initialize();
+
+        $scope.assetOptions =  {
+            highlight: true
+          };
+        // passing in `null` for the `options` arguments will result in the default
+        // options being used
+        $scope.completeData = {
+          name: 'assets',
+          displayKey: 'fullname',
+          // `ttAdapter` wraps the suggestion engine in an adapter that
+          // is compatible with the typeahead jQuery plugin
+          source: assets.ttAdapter(),
+        //templates: {
+        //    empty: [
+        //      '<div style="padding:10px">',
+        //      'unable to find any assets.',
+        //      '</div>'
+        //    ].join('\n'),
+        //    suggestion: Handlebars.compile('<p><strong>{{fullname}}</strong> – {{content_type}}</p>')
+        //  }
+        };
+
+        $scope.search = function(){
+            old = false;
+            q = $scope.assetOptions.userAssetsFilter.fullname;
+            if (q && old!=q)
+            {
+                $scope.page = 1;
+                $location.search('page', 1);
+                $scope.getUserAssets(false, false, q);
+                $location.search('q', q);
+                old = q;
+            }
+            else if (!q && !$scope.assetOptions.userAssetsFilter)
+            {
+                $scope.getUserAssets();
+                $location.search('q', null);
+            }
+        }
+
+
+
+
+
+        $scope.gotoPage = function(page){
+            if (page<1)
+                return null;
+
+            $scope.page = page;
+            $location.search('page', page);
+            $scope.getUserAssets();
+            //here
+        }
+
+
+        $scope.tagSelection = function(tag){
+            if (tag.selected)
+                tag.selected=false;
+            else
+                tag.selected=true;
+            
+            tags = [];
+            for (i in $scope.assetTags){
+                _t = $scope.assetTags[i];
+                if (_t.selected)
+                    tags.push(_t.name)
+                $location.search('tags', tags.join(','));
+            }
+        }
+
+        $scope.getUserAssets = function(order_by, sort, search_for){
+            if (!$scope.page)
+                $scope.page = 1;
+            if (!order_by)
+                order_by = $scope.orderMode || 'created_on';
+            if (!sort || sort==0)
+                sort = 'desc';
+            else
+                sort = 'asc';
+            s = ($scope.page-1)*50;
+            e = s+50;
+            query = '/api/db/asset?sort='+sort+'&s='+s+'&e='+e+'&order_by='+ order_by + '&filters=owner_id='+
+                    $scope.$parent.userInfo.userid;
+            if ($routeParams.tags)
+                query += '&tags='+$routeParams.tags;
+
+            tag_query = '/api/asset/get_user_tags';
+            tagReq = $http.get(tag_query); 
+            tagReq.success(function(resp){
+                $scope.assetTags = resp;
+                if ($routeParams.tags)
+                    {
+                        _tags = $routeParams.tags.split(',');
+                        for (j in _tags){
+                            tag = _tags[j];
+                            for (i in resp){
+                                each = $scope.assetTags[i];
+                                if (each.name == tag)
+                                    each.selected=true;
+
+
+                            }
+                        }
+                    }
+                })
+
+
+
+            if (search_for)
+                query += ',fullname=' + search_for;
+
+            req = $http.get(query);
+            req.success(function(resp){
+                    $scope.userAssets = resp;
+                    
+                    })
+            query = '/api/db/asset?filters=owner_id='+$scope.$parent.userInfo.userid+'&count=true';
+            if (search_for)
+                query += '&filters=fullname=' + search_for;
+            if ($routeParams.tags)
+                query += '&tags='+$routeParams.tags;
+            creq = $http.get(query);
+            creq.success(function(cresp){
+                    $scope.assetsCount = cresp.count;
+                    
+                    })
+        }
+
+
+         $scope.$watch($routeParams.page, function(){
+                    $scope.page = parseInt($routeParams.page);
+                    $scope.assetOptions.userAssetsFilter = {};
+                    $scope.assetOptions.userAssetsFilter.fullname = $routeParams.q;
+                    if ($routeParams.q)
+                        {
+                        $scope.search();
+                        }
+                    else
+                        {
+                        $scope.getUserAssets();
+                        }
+                });
 
     
 });// end messageCtrl

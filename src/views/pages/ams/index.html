@@ -5,8 +5,21 @@
 
 
     <div class="col-md-12">
-        <div class="col-md-2">
-        </div>
+        <aside class="col-md-2">
+        <h4>Tags</h4>
+        <ul class="nav nav-pills nav-stacked hidden-print">
+            <li class="hidden-sm hidden-xs" style="cursor:pointer" ng-repeat="tag in assetTags | orderBy:'name'"
+            ng-click="tagSelection(tag)"
+            ng-class={'active':tag.selected}>
+                <a style="font-size:11px;"  
+                    ng-click="btn-sm" >
+                    <span class="fa fa-tag"> {{tag.name}}</span>
+                  </a>  
+                  </li>
+            </ul>
+
+        
+        </aside>
         <div class="col-md-10">
             <div id="from-group">
                 <input type="search" id="assetsSearchInput" class="typeahead form-control" 
@@ -39,7 +52,7 @@
 
                     <tr ng-repeat="asset in userAssets | filter:assetOptions.userAssetsFilter.fullname track by $index">
                             <td class="hidden-xs">{{asset.id}}</td>
-                            <td><a href="#/ams/a/{{asset.id}}">{{asset.fullname}}</a></td>
+                            <td><a href="#/ams/a/{{asset.id}}">{{asset.fullname.slice(0, 48)}}</a></td>
                             <td class="hidden-xs">{{$parent.prettyDate(asset.created_on)}} ago</td>
                             <td >{{$parent.getReadableFileSizeString(asset.content_size)}}</td>
                             <td class="hidden-sm hidden-xs">{{asset.collection_id}}</td>
