@@ -1621,8 +1621,9 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
 
                         ureq = $http.get('/api/db/user/'+Resp.owner_id).success(function(resp){
                                 $scope.asset.owner = resp;
-                                if (Resp.content_type.split('/')[0]=='video')
-                                    videojs('video_'+$scope.asset.id);
+                                if (Resp.content_type.split('/')[0]=='video' && $scope.asset.id &&
+                                    document.getElementById('video_'+$scope.asset.id))
+                                        videojs('video_'+$scope.asset.id);
                             })
 
                         creq = $http.get('/api/db/collection/'+Resp.collection_id).success(function(resp){
@@ -1747,11 +1748,13 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     $scope.collection.page = (page||0)+1;
                     $location.search('page', (page||0)+1);
                     $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+'&multipart=true';
+                    // i used multipart cause i need filename
                     $scope.uploadOptions = {
                         url:$scope.attachurl,
                         type:'PUT',
                         singleFileUploads:true,
-                        maxChunkSize: 8388608, // 8Mb
+                        maxChunkSize: 1024*1024*4, // 1Mb
+                        //maxChunkSize: 1024, // 1kb
                         sequentialUploads:true,
                         done: function(e, data) {
                             $scope.getCollectionDetails();

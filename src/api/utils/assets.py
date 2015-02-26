@@ -154,6 +154,12 @@ class AssetSave:
                 bodyMd5 = safeCopyAndMd5(
                     req, body, tempraryStoragePath, targetRepo.id, targetUser, b64=b64, content_range=cr)
 
+                if bodyMd5 in ['IN_PROGRESS', 'IN_PROGRESS_NEW']:  ## in uploading progress
+                    resp.body = {'info':bodyMd5}
+                    return
+
+
+
             fullname = name
             name = (name[:10] + '..') if len(name) > 10 else name
             asset = req.session.query(Asset).filter(
@@ -220,12 +226,16 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False, c
     ''' if available asset, then we need to symblink it if asset uuid if different than available one!'''
     
     start_byte = 0
+    in_progress = False
     if content_range:
+        in_progress = True
         _bp = content_range.split()
         if len(_bp)==2 and len(_bp[1].split('/'))==2:  ## a simple validation:
             _bd = _bp[1].split('/')
             start_byte, eb = map(int, _bd[0].split('-'))
             tb = int(_bd[-1])
+            if tb==eb+1:
+                in_progress = False
 
 
 
@@ -244,11 +254,18 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False, c
             b.seek(0)
             fileobj = b
         while True:
-            chunk = fileobj.read(2 ** 23) ## 8 megs
+            chunk = fileobj.read(2 ** 22) ## 4 megs
+            #chunk = fileobj.read(1024) ## 1Kb
             if not chunk:
                 break
             md5.update(chunk)
             f.write(chunk)
+    if in_progress and not start_byte:
+        return 'IN_PROGRESS_NEW'
+
+    if in_progress:
+        return 'IN_PROGRESS'
+
     dataMd5 = md5.hexdigest()
     # check if there is an asset with same key
     if not repoId:
