@@ -58,6 +58,7 @@ class AssetSave:
             repo can be repository name or id.
 
         '''
+        cr = req.headers.get('CONTENT-RANGE')
         userInfo = getUserInfoFromSession(req, resp)
         uploader = userInfo.get('alias')
 
@@ -151,7 +152,7 @@ class AssetSave:
                     return
             else:
                 bodyMd5 = safeCopyAndMd5(
-                    req, body, tempraryStoragePath, targetRepo.id, targetUser, b64=b64)
+                    req, body, tempraryStoragePath, targetRepo.id, targetUser, b64=b64, content_range=cr)
 
             fullname = name
             name = (name[:10] + '..') if len(name) > 10 else name
@@ -205,7 +206,7 @@ class AssetSave:
             resp.body = {'message': 'Something Wrong!'}
 
 
-def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False):
+def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False, content_range=False):
     '''copy a file in chunked mode safely'''
 
     destDir = path.dirname(destinationPath)
@@ -217,9 +218,25 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False):
     checkPath(destDir)
 
     ''' if available asset, then we need to symblink it if asset uuid if different than available one!'''
+    
+    start_byte = 0
+    if content_range:
+        _bp = content_range.split()
+        if len(_bp)==2 and len(_bp[1].split('/'))==2:  ## a simple validation:
+            _bd = _bp[1].split('/')
+            start_byte, eb = map(int, _bd[0].split('-'))
+            tb = int(_bd[-1])
+
+
+
     if os.path.islink(destinationPath):
         os.remove(destinationPath)
-    with open(destinationPath, 'wb') as f:
+
+    if not start_byte:  ## if its a new file
+        if os.path.isfile(destinationPath):
+            os.remove(destinationPath)
+
+    with open(destinationPath, 'a+') as f:
         md5 = hashlib.md5()
         if b64:
             b = StringIO()
@@ -227,7 +244,7 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False):
             b.seek(0)
             fileobj = b
         while True:
-            chunk = fileobj.read(2 ** 28)
+            chunk = fileobj.read(2 ** 23) ## 8 megs
             if not chunk:
                 break
             md5.update(chunk)

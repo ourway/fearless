@@ -1712,6 +1712,8 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         ci = $routeParams.collectionId;
 
         $scope.getCollectionDetails = function(page, fromDropzone){
+            if ($('#fileupload'))
+            //$('#fileupload').fileupload('destroy');
             if (page==undefined)
             {
                 if ($routeParams.page>0)
@@ -1749,11 +1751,10 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                         url:$scope.attachurl,
                         type:'PUT',
                         singleFileUploads:true,
+                        maxChunkSize: 8388608, // 8Mb
                         sequentialUploads:true,
                         done: function(e, data) {
-                            console.log(data.files, e);
                             $scope.getCollectionDetails();
-        //hide completed upload element in queue
                         //$(data.context['0']).fadeOut(700);
                         //limitMultiFileUploads:1,
                         
