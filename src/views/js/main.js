@@ -1,6 +1,6 @@
 var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular',
-        'ui.grid', 'ngSanitize', 'ui.bootstrap', 'checklist-model', 
-        'siyfion.sfTypeahead', 'bootstrap-tagsinput', 'ngAnimate']);
+        'ui.grid', 'ngSanitize', 'ui.bootstrap', 'checklist-model', 'blueimp.fileupload', 
+        'siyfion.sfTypeahead', 'bootstrap-tagsinput', 'ngAnimate', 'flow']);
 
 /*
 fearlessApp.factory('$exceptionHandler', function () {
@@ -18,6 +18,8 @@ fearlessApp.config(function($sceDelegateProvider) {
   $sceDelegateProvider.resourceUrlBlacklist([
   ]);
 });
+
+
 
 
 fearlessApp.factory('messageService', function() {
@@ -1644,7 +1646,8 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
         });
 
 
-fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
+fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routeParams, 
+            $http, $location, Restangular, $timeout, $filter, $window){
 
 
         $scope.activateVideo = function(vid){
@@ -1707,62 +1710,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         $scope.collection.assets = [];
         $scope.newSubCollection = {};
         ci = $routeParams.collectionId;
-        Dropzone.autoDiscover = true;
 
-        $scope.getDropzone = function(url){
-
-
-        return new Dropzone("#my-awesome-dropzone", {
-            init: function() {
-                this.on("addedfile", function(file) {
-                    _t = file.type.split('/')[0];
-                    if (_t=='image' || _t=='video'){
-                        }
-                    });
-                this.on("complete", function(file) {
-                    $timeout(function(){
-                        Dropzone.instances[0].removeFile(file);
-                        }, 1000);
-                    });
-                this.on("success", function(file, resp) {
-                    $scope.collection.assets.push(resp);
-                    $scope.$apply();
-
-                    });
-                this.on("queuecomplete", function(file, resp) {
-                        $scope.getCollectionDetails(undefined, true);
-                        $scope.$apply();
-                    });
-                this.on("thumbnail", function(file, dataUrl) {
-                        //file.thumbnail = dataUrl;
-                        //file.generateThumbnailFinished();
-
-                    });
-                this.on("sending", function(file, b, c) {
-                        //if (file.thumbnail)
-                        //    c.append('thumbnail', file.thumbnail);
-
-                    });
-            },
-            //accept: function(file, done){
-                    // this will be called before thumbnails
-                   // _t = file.type.split('/')[0];
-                    //if (_t=='image')
-                    //    file.generateThumbnailFinished = done;
-                    //else
-                    //    done();
-                //},
-
-            url: url,
-            autoDiscover: true,
-            autoProcessQueue: true,
-            method:'PUT',
-            parallelUploads: 16,
-            maxFilesize: 2000,
-            maxThumbnailFilesize: 2,
-            uploadMultiple:false,
-        });
-        }
         $scope.getCollectionDetails = function(page, fromDropzone){
             if (page==undefined)
             {
@@ -1796,9 +1744,29 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     $rootScope.title = 'Collection: ' + resp.name + ' - ' + 'Fearless'
                     $scope.collection.page = (page||0)+1;
                     $location.search('page', (page||0)+1);
-                    $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+"&multipart=true";
-                    if (!fromDropzone)
-                        $scope.getDropzone( $scope.attachurl);
+                    $scope.attachurl = "/api/asset/save/"+resp.repository.name+"?collection_id="+resp.id+'&multipart=true';
+                    $scope.uploadOptions = {
+                        url:$scope.attachurl,
+                        type:'PUT',
+                        singleFileUploads:true,
+                        sequentialUploads:true,
+                        done: function(e, data) {
+                            console.log(data.files, e);
+                            $scope.getCollectionDetails();
+        //hide completed upload element in queue
+                        //$(data.context['0']).fadeOut(700);
+                        //limitMultiFileUploads:1,
+                        
+                    }
+                    }
+                    //$('#fileupload').bind('fileuploaddone', function (e, data) {
+                   //         $scope.getCollectionDetails();
+                   //         })
+
+
+
+
+
                     if ($scope.$parent){
                         $scope.$parent.comment_id = resp.uuid;
                         $scope.$parent.getComments();
@@ -2366,6 +2334,38 @@ fearlessApp.controller('userReportsCtrl',  function($scope, $rootScope, $routePa
             });
 
         });
+
+
+fearlessApp.controller('FileDestroyController',  function($scope, $http){
+    var file = $scope.file,
+        state;
+    if (file.url) {
+        file.$state = function () {
+            return state;
+        };
+        file.$destroy = function () {
+            state = 'pending';
+            return $http({
+                url: file.deleteUrl,
+                method: file.deleteType
+            }).then(
+                function () {
+                    state = 'resolved';
+                    $scope.clear(file);
+                },
+                function () {
+                    state = 'rejected';
+                }
+            );
+        };
+    } else if (!file.$cancel && !file._index) {
+        file.$cancel = function () {
+            $scope.clear(file);
+        };
+    }
+
+        });
+
 
 
 //////////////////////////////////////////////////////

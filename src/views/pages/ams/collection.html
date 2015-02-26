@@ -78,7 +78,7 @@
 
 			</ul>
 
-        <div class="col-md-6 column">
+        <div class="col-md-8 column">
 			<div class="btn-group" ng-show="collection.container">
                 <button id="collectionAddButton" class="btn btn-success btn-sm" type="button" data-toggle="modal" data-target="#collectionAddModal">
                     <em class="glyphicon glyphicon-plus"></em>
@@ -86,7 +86,7 @@
                 </button>
 			</div>
             <h3>{{collection.name | uppercase}}</h3>
-                <div class="col-md-4" ng-repeat="subcol in collection.children track by $index">
+                <div class="col-md-2" ng-repeat="subcol in collection.children track by $index">
 					<div class="thumbnail asm_thumb">
                         <a href="#ams/c/{{subcol.id}}?page=1" title="{{subcol.description}}"
                         ><img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
@@ -102,9 +102,92 @@
 					</div>
                 </div>
 		</div>
-        <div class="col-md-6 column" ng-show="collection.holdAssets">
-            <form id="my-awesome-dropzone" style="min-height: 130px;" class="dropzone">
-            </form>
+        <div class="col-md-12 column" ng-show="collection.holdAssets">
+        <hr/>
+
+            <form id="fileupload" method="PUT" enctype="multipart/form-data" 
+                data-file-upload="uploadOptions" 
+                data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
+        <!-- Redirect browsers with JavaScript disabled to the origin page -->
+        <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
+        <div class="row fileupload-buttonbar">
+            <div class="col-md-7">
+                <!-- The fileinput-button span is used to style the file input field as button -->
+                <span class="btn btn-success fileinput-button" ng-class="{disabled: disabled}">
+                    <i class="glyphicon glyphicon-plus"></i>
+                    <span>Add files...</span>
+                    <input type="file" name="files[]" multiple ng-disabled="disabled">
+                </span>
+                <br/>
+                <div ng-show='queue.length'>
+                <button type="button" class="btn btn-primary start" data-ng-click="submit()">
+                    <i class="glyphicon glyphicon-upload"></i>
+                    <span>Start upload</span>
+                </button>
+                <button type="button" class="btn btn-warning cancel" data-ng-click="cancel()">
+                    <i class="glyphicon glyphicon-ban-circle"></i>
+                    <span>Cancel upload</span>
+                </button>
+            </div>
+                <!-- The global file processing state -->
+                <br/>
+                <br/>
+                <span class="fileupload-process"></span>
+            </div>
+            <!-- The global progress state -->
+            <div class="col-md-5 fade" data-ng-class="{in: active()}">
+                <!-- The global progress bar -->
+                <div class="progress progress-striped active" data-file-upload-progress="progress()"><div 
+                        class="progress-bar progress-bar-success" data-ng-style="{width: num + '%'}"></div></div>
+                <!-- The extended global progress state -->
+                <div class="progress-extended">&nbsp;</div>
+            </div>
+        </div>
+        <!-- The table listing the files available for upload/download -->
+        <table class="table table-striped files ng-cloak">
+            <tr data-ng-repeat="file in queue" data-ng-class="{'processing': file.$processing()}">
+                <td data-ng-switch data-on="!!file.thumbnailUrl">
+                    <div class="preview" data-ng-switch-when="true">
+                        <a data-ng-href="{{file.url}}" title="{{file.name}}" download="{{file.name}}"
+                            data-gallery><img data-ng-src="{{file.thumbnailUrl}}" alt=""></a>
+                    </div>
+                    <div class="preview" data-ng-switch-default data-file-upload-preview="file"></div>
+                </td>
+                <td>
+                    <p class="name" data-ng-switch data-on="!!file.url">
+                        <span data-ng-switch-when="true" data-ng-switch data-on="!!file.thumbnailUrl">
+                            <a data-ng-switch-when="true" data-ng-href="{{file.url}}" title="{{file.name}}" 
+                                download="{{file.name}}" data-gallery>{{file.name}}</a>
+                            <a data-ng-switch-default data-ng-href="{{file.url}}" title="{{file.name}}" download="{{file.name}}">{{file.name}}</a>
+                        </span>
+                        <span data-ng-switch-default>{{file.name}}</span>
+                    </p>
+                    <strong data-ng-show="file.error" class="error text-danger">{{file.error}}</strong>
+                </td>
+                <td>
+                    <p class="size">{{$parent.getReadableFileSizeString(file.size)}}</p>
+                    <div class="progress progress-striped active fade" data-ng-class="{pending: 'in'}[file.$state()]" data-file-upload-progress="file.$progress()"><div class="progress-bar progress-bar-success" data-ng-style="{width: num + '%'}"></div></div>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-primary start" data-ng-click="file.$submit()" data-ng-hide="!file.$submit || options.autoUpload" data-ng-disabled="file.$state() == 'pending' || file.$state() == 'rejected'">
+                        <i class="glyphicon glyphicon-upload"></i>
+                        <span>Start</span>
+                    </button>
+                    <button type="button" class="btn btn-warning cancel" data-ng-click="file.$cancel()" data-ng-hide="!file.$cancel">
+                        <i class="glyphicon glyphicon-ban-circle"></i>
+                        <span>Cancel</span>
+                    </button>
+                    <button data-ng-controller="FileDestroyController" type="button" class="btn btn-danger destroy" data-ng-click="file.$destroy()" data-ng-hide="!file.$destroy">
+                        <i class="glyphicon glyphicon-trash"></i>
+                        <span>Delete</span>
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </form>
+    <br>
+ 
+
         </div>
 
         <div class="col-md-12" ng-show="collection.assets.length>0">
@@ -119,7 +202,8 @@
             </small></h3>
 				<div class="form-group">
 					<div class="col-md-6">
-                        <input type="text" class="form-control" placeholder="Search for {{collection.name}} Assets here" ng-model="collection.CollectionAssetFilter" />
+                        <input type="text" class="form-control" placeholder="Search for {{collection.name}} Assets here" 
+                        ng-model="collection.CollectionAssetFilter" />
                     </div>
                             <div class="form-group hidden-sm hidden-xs col-md-4">
                             <label class="checkbox-inline" ng-init="initToggle();">
@@ -195,4 +279,18 @@
     <div ng-include="'pages/comment/index.html'"></div>
 
 </div>
+
+
+
+<script>
+/*jslint unparam: true */
+/*global window, $ */
+$(function () {
+    'use strict';
+    // Change this to the location of your server-side upload handler:
+    var url ='http://127.0.0.1/api/test_upload?multipart=true';
+
+});
+</script>
+
 

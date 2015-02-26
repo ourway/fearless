@@ -112,12 +112,14 @@ class AssetSave:
                 resp.status = falcon.HTTP_400
                 resp.body = {'message': 'error'}
                 return
-            body = fs['file'].file
+            _cgi_data = fs['files[]']
+            body = _cgi_data.file
+
             if fs.has_key('thumbnail'):  # thumbnails are dataURLs
                 # thumbs are mostly small
                 thumbnail = fs['thumbnail'].file.read()
 
-            mtname = fs['file'].filename
+            mtname = _cgi_data.filename
         attach_to = req.get_param('attach_to')
         if targetRepo and (body or _md5):
             if not mtname:
@@ -196,7 +198,7 @@ class AssetSave:
             #resp.body = "I am working"
         else:  # lets consume the stream!
             while True:
-                chunk = req.stream.read(2 ** 20)
+                chunk = req.stream.read(2 ** 28)
                 if not chunk:
                     break
 
@@ -217,20 +219,19 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False):
     ''' if available asset, then we need to symblink it if asset uuid if different than available one!'''
     if os.path.islink(destinationPath):
         os.remove(destinationPath)
-    f = open(destinationPath, 'wb')
-    md5 = hashlib.md5()
-    if b64:
-        b = StringIO()
-        decode(fileobj, b)
-        b.seek(0)
-        fileobj = b
-    while True:
-        chunk = fileobj.read(2 ** 24)
-        if not chunk:
-            break
-        md5.update(chunk)
-        f.write(chunk)
-    f.close()
+    with open(destinationPath, 'wb') as f:
+        md5 = hashlib.md5()
+        if b64:
+            b = StringIO()
+            decode(fileobj, b)
+            b.seek(0)
+            fileobj = b
+        while True:
+            chunk = fileobj.read(2 ** 28)
+            if not chunk:
+                break
+            md5.update(chunk)
+            f.write(chunk)
     dataMd5 = md5.hexdigest()
     # check if there is an asset with same key
     if not repoId:
@@ -558,3 +559,25 @@ class AssetCheckout:
         preview = os.path.join('uploads', fid + '.' + fmt)
         resp.body = {'poster': poster, 'thumbnail': thumbnail,
                      'version': version, 'preview': preview}
+
+
+class TestUpload:
+    def on_put(self, req, resp):
+        print 'uploading'
+        obj = req.stream
+        print 'got stream'
+
+           
+
+
+        with open('/home/fearless/Desktop/upload', 'a+') as f:
+            while True:
+                chunk = obj.read(1024)
+                if not chunk: break
+                f.write(chunk)
+                print 'chunk'
+    
+        resp.status = falcon.HTTP_201
+
+
+        

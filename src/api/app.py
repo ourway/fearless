@@ -23,7 +23,7 @@ from urllib import unquote
 from string import ascii_uppercase
 from sqlalchemy.ext.serializer import loads, dumps
 import simplejson as json
-from utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection
+from utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection, TestUpload
 from utils.messages import GetMessagesList, GetMessages, GetMessage, SetMessage, \
     SearchMessages, MoveMessage, DeleteMessage, UpdateMessage
 from utils.reports import Mailer, AddReport, UserReports
@@ -415,12 +415,13 @@ app.add_route('/api/setTags/asset/{key}', UpdateAssetTags())
 app.add_route('/api/setTags/collection/{key}', UpdateCollectionTags())
 app.add_route('/api/setTags/project/{key}', UpdateProjectTags())
 app.add_route('/api/userReports', UserReports())
+app.add_route('/api/test_upload', TestUpload())
 
 
 if __name__ == '__main__':
     #pass
     from werkzeug import run_simple
-    run_simple('127.0.0.1', 5005, app, use_debugger=True, use_reloader=True)
+    run_simple('127.0.0.1', 5005, app, use_debugger=False, use_reloader=True)
 
     #from gevent import wsgi
     #from gevent import monkey;monkey.patch_all()
