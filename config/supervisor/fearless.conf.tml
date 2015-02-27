@@ -10,7 +10,7 @@ user = getpass.getuser()
 
 [program:fearless-api]
 #command=/home/fearless/Documents/fearless/pyenv/bin/uwsgi --emperor config/uwsgi
-command=${dir}/pyenv/bin/gunicorn -w ${cpuc*2 + 1} -k gevent --worker-connections 1000 --max-requests 128 -b 127.0.0.1:5006 -b 127.0.0.1:5005 -b 127.0.0.1:5007 -b 127.0.0.1:5008 -t 300 --limit-request-line 32768 app:app
+command=${dir}/pyenv/bin/gunicorn -w ${cpuc*2 + 1} -k gevent --worker-connections 1000 --max-requests 128 -b 127.0.0.1:5006 -b 127.0.0.1:5005 -b 127.0.0.1:5007 -b 127.0.0.1:5008 -t 300 --limit-request-line 32768 flib.app:app
 #command={dir}/pyenv/bin/python -O app.py
 autostart=true
 directory=${dir}/src/api
@@ -23,9 +23,9 @@ stderr_logfile=${dir}/logs/api_error.log
 
 
 [program:fearless-socket]
-command=${dir}/pyenv/bin/python -OO src/api/socket_api.py
+command=${dir}/pyenv/bin/python -OO flib/socket_api.py
 autostart=true
-directory=${dir}
+directory=${dir}/src/api
 stopsignal=TERM
 user=${user}
 stdout_logfile=${dir}/logs/socket_access.log
@@ -33,7 +33,7 @@ stderr_logfile=${dir}/logs/socket_error.log
 
 
 [program:fearless-celery]
-command=${dir}/pyenv/bin/celery -A tasks worker -c 1 -l info
+command=${dir}/pyenv/bin/celery -A flib.tasks worker -c 1 -l info
 autostart=true
 directory=${dir}/src/api
 stopsignal=TERM

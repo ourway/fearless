@@ -18,6 +18,7 @@ riak
 pyinotify
 werkzeug
 pyCalverter
+nose
 MySQL-Python
 lxml
 readline
