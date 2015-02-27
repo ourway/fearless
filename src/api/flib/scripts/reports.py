@@ -12,9 +12,16 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
-from models import Session, Task, User, Report, r, fdb
+import sys, os
+current_path = os.path.dirname(__file__)
+pta = os.path.abspath(os.path.join(current_path, '../../'))
+#print pta
+sys.path.append(pta)
+
+from flib.models import Task, User, Report, r, fdb
+from flib.models.db import session_factory
 import arrow
-from tasks import send_envelope  # send emails
+from flib.tasks import send_envelope  # send emails
 from mako.template import Template
 import os
 from collections import defaultdict
@@ -23,7 +30,7 @@ from calverter import Calverter
 cal = Calverter()
 
 
-templates_folder = os.path.join(os.path.dirname(__file__), 'templates')
+templates_folder = os.path.join(os.path.dirname(__file__), '../templates')
 
 
 cc = []
@@ -37,7 +44,7 @@ jtoday = '/'.join(map(str, cal.jd_to_jalali(jd)))
 today = now.format('YYYY-MM-DD')
 
 ################################################################
-session = Session()
+session = session_factory()
 
 '''On going tasks:  Tasks that started and are not finished'''
 
@@ -48,7 +55,7 @@ ongoing_tasks = session.query(Task).filter(Task.start < now.date())\
 behind_tasks = session.query(Task).filter(Task.end < now.date())\
     .filter(Task.complete < 100).order_by(asc(Task.end)).all()
 
-session.close()
+
 
 #################################################################
 
@@ -63,8 +70,11 @@ def dailyTasksReportForClients():
     message =  getTemplate('email_daily_tasks_for_clients.html')\
         .render(ongoing_tasks=ongoing_tasks, behind_tasks=behind_tasks, today=today,
                 jtoday=jtoday, arrow=arrow, recipient='product owner', responsibility='managing')
-    to = ['hamid2177@gmail.com']
-    #to = ['farsheed.ashouri@gmail.com']
+
+    #print message
+    #return
+    #to = ['hamid2177@gmail.com']
+    to = ['farsheed.ashouri@gmail.com']
     subject = 'Studio Reports - Daily Tasks - %s' % jtoday
     #intro = "Good morning, Here is a basic simple (alpha version) report about studio's daily tasks for %s<br/>." % today
     #message = '<hr/>'.join(tasks)
@@ -143,4 +153,5 @@ if __name__ == '__main__':
         sys.exit()
     command = sys.argv[1] + '()'
     print eval(command)
+    session.close()
     sys.exit()
