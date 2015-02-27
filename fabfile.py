@@ -209,6 +209,10 @@ def install():
     _get_supervisord_config()
 
 @task
+def test():
+    pass
+
+@task
 def update():
     with cd(_get_pwd()):
         run('ls -l')

@@ -12,6 +12,8 @@ falcon==0.1.10
 scikits.audiolab
 moviepy
 weasyprint
+pdoc
+tox
 riak
 pyinotify
 werkzeug
