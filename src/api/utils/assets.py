@@ -60,7 +60,7 @@ class AssetSave:
         '''
         cr = req.headers.get('CONTENT-RANGE')
         userInfo = getUserInfoFromSession(req, resp)
-        uploader = userInfo.get('alias')
+        uploader = userInfo.get('id')
 
         try:
             repo = int(repo)
@@ -69,22 +69,18 @@ class AssetSave:
             targetRepo = req.session.query(Repository).filter_by(name=repo).first()
 
         if not uploader:
-            uploader = 'anonymous'
+            uploader = -1
             targetRepo = req.session.query(Repository).filter(
                 Repository.name == 'public').first()
 
-        targetUser = req.session.query(User).filter(
-            User.alias == uploader).first()
+        targetUser = req.session.query(User).filter_by(id=uploader).first()
 
         if not targetRepo:
-            pr = req.session.query(Repository).filter(
-                Repository.name == repo).first()
-            if not pr:
-                targetRepo = Repository(name=repo,
-                                        path=os.path.join(public_repository_path, repo))
+            targetRepo = req.session.query(Repository).filter_by(name=repo).first()
+            if not targetRepo:
+                targetRepo = Repository(name=repo, path=os.path.join(public_repository_path, repo))
                 req.session.add(targetRepo)
-            else:
-                targetRepo = pr
+
         ''' When client sends md5, it means that there is probabaly an exsisting file with that md5
             So we server doesnt need file data.  Just need to link old data '''
         _md5 = req.get_param('md5')
@@ -101,6 +97,8 @@ class AssetSave:
         if not collection:
             collection = Collection(path='danger', repository=targetRepo)
             req.session.add(collection)
+
+
         body = req.stream
         b64 = req.get_param('b64')
         thumbnail = req.get_param('thmb')
@@ -111,13 +109,12 @@ class AssetSave:
                 fs = cgi.FieldStorage(fp=req.stream, environ=req.env)
             except (ValueError, IOError):
                 resp.status = falcon.HTTP_400
-                resp.body = {'message': 'error'}
+                resp.body = {'message': 'Error in myltipart data'}
                 return
             _cgi_data = fs['files[]']
             body = _cgi_data.file
 
             if fs.has_key('thumbnail'):  # thumbnails are dataURLs
-                # thumbs are mostly small
                 thumbnail = fs['thumbnail'].file.read()
 
             mtname = _cgi_data.filename
@@ -151,26 +148,31 @@ class AssetSave:
                     resp.status = falcon.HTTP_404
                     return
             else:
-                bodyMd5 = safeCopyAndMd5(
-                    req, body, tempraryStoragePath, targetRepo.id, targetUser, b64=b64, content_range=cr)
+                if body:
+                    bodyMd5 = safeCopyAndMd5(
+                        req, body, tempraryStoragePath, targetRepo.id, targetUser, b64=b64, content_range=cr)
 
-                if bodyMd5 in ['IN_PROGRESS', 'IN_PROGRESS_NEW']:  ## in uploading progress
-                    resp.body = {'info':bodyMd5}
+                    if bodyMd5 in ['IN_PROGRESS', 'IN_PROGRESS_NEW']:  ## in uploading progress
+                        resp.body = {'info':bodyMd5}
+                        resp.status = falcon.HTTP_206
+                        return
+                else:
+                    resp.status = falcon.HTTP_204
                     return
-
-
 
             fullname = name
             name = (name[:10] + '..') if len(name) > 10 else name
             asset = req.session.query(Asset).filter(
                 Asset.repository == targetRepo).filter_by(collection=collection)\
                 .filter_by(fullname=fullname).first()
+            resp.status = falcon.HTTP_200
             if not asset:
                 _uid = getUUID()
                 asset = Asset(key=bodyMd5, version=1, repository=targetRepo, uuid=_uid,
                               collection=collection, name=name, fullname=fullname,
                               path=assetPath, ext=assetExt, owner_id=targetUser.id)
                 req.session.add(asset)
+                resp.status = falcon.HTTP_201
             else:
                 if not bodyMd5 == asset.key:
                     asset.version += 1
@@ -193,11 +195,8 @@ class AssetSave:
                     f.write(thmb_data)
             if attach_to:
                 parent_id = int(attach_to)
-                parent = req.session.query(Asset).filter(
-                    Asset.id == parent_id).first()
+                parent = req.session.query(Asset).filter_by(id=parent_id).first()
                 asset.attached_to.append(parent)
-                #newAsset = add_asset.delay(bodyMd5, tempraryStoragePath)
-                #asset.task_id = newAsset.task_id
             resp.body = {'message': 'Asset created|updated', 'key': asset.key,
                          'url': asset.url, 'fullname': asset.fullname, 'uuid': asset.uuid,
                          'name': asset.name, 'content_type': asset.content_type.split('/')[0],
@@ -205,10 +204,11 @@ class AssetSave:
             #resp.body = "I am working"
         else:  # lets consume the stream!
             while True:
-                chunk = req.stream.read(2 ** 28)
+                chunk = req.stream.read(2 ** 22)
                 if not chunk:
                     break
-
+            
+            resp.status = falcon.HTTP_400
             resp.body = {'message': 'Something Wrong!'}
 
 
@@ -574,7 +574,7 @@ class AssetCheckout:
         from utils.defaults import ASSETS
         asset_folder = os.path.join(ASSETS, target.uuid)
         if not os.path.isdir(asset_folder):
-            resp.status = falcon.HTTP_404
+            resp.status = falcon.HTTP_204  ## empty content
             return
 
         version = req.get_param('version')

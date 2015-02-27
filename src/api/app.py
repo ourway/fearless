@@ -177,6 +177,8 @@ class DB:
                 t=table, id=id, key=key)
             if get_count:
                 data = eval(query).count()
+                if not data:
+                    resp.status = falcon.HTTP_204
                 resp.body = {'count': data}
                 return
             query += '.order_by({sort}({t}.{order}))'.format(sort=sort,
@@ -185,6 +187,8 @@ class DB:
                 query += '.slice(start, end)'
             data = eval(query).all()
             resp.body = data
+            if not data:
+                resp.status = falcon.HTTP_204
 
         else:
             if not show:
@@ -206,6 +210,8 @@ class DB:
                 if get_count:
                     data = eval(query).count()
                     resp.body = {'count': data}
+                    if not data:
+                        resp.status = falcon.HTTP_204
                     return
 
 
@@ -257,6 +263,8 @@ class DB:
                     'Bad Request', 'The requested field is not available for database')
 
             resp.body = data
+            if not data:
+                resp.status = falcon.HTTP_204
             return
 
         if len(args) == 5 and len(data) == 1 and not listMe:
@@ -271,6 +279,8 @@ class DB:
                     #    table = i.split('_')[0]
 
             resp.body = _d
+            if not _d:
+                resp.status = falcon.HTTP_204
         # Ok, We have an id
 
     def on_put(self, req, resp, **kw):
@@ -320,7 +330,6 @@ class DB:
                     continue
 
         # if result.update(query_params):
-        resp.status = falcon.HTTP_202
         resp.body = {'message': 'updated', 'info': updated_values}
         #query = 'result({q})'.format(q=query_params)
         # print eval(query)

@@ -27,7 +27,7 @@ import base64
 now = datetime.datetime.utcnow
 
 Base = declarative_base()
-logger = setup_logger('model', 'model.log')
+logger = setup_logger('database', 'database.log')
 db_files_path = os.path.join(os.path.dirname(__file__), '../database/files')
 if not os.path.isdir(db_files_path):
     os.makedirs(db_files_path)
@@ -117,7 +117,7 @@ class UniqueMixin(object):
 
 
 class IDMixin(object):
-    session = None
+
 
     @declared_attr
     def __tablename__(cls):
