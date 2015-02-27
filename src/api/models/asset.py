@@ -110,6 +110,16 @@ class Asset(IDMixin, Base):
     def check_name(self, key, name):
         return name
 
+    @validates('content_type')
+    def add_a_tag_based_on_contenttpye(self, key, ct):
+        if ct:
+            self.tags.append(ct.split('/')[0])
+            self.tags.append(ct.split('/')[-1].split(';')[0])
+            if 'x-markdown' in self.tags:
+                self.tags.append('document')
+
+        return ct
+
     @validates('fullname')
     def find_type(self, key, fullname):
         self.content_type = contenttype(fullname)
