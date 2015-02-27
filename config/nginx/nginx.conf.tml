@@ -98,6 +98,7 @@ server {
         gzip_types text/plain image/png image/jpeg image/gif text/css application/x-javascript;
         expires 1h;
         gzip on;
+        gzip_static on;
         #expires max;
         add_header Cache-Control public;
         #error_page 404 /404;
@@ -112,6 +113,7 @@ server {
         gzip_types text/plain image/png image/jpeg image/gif text/css application/x-javascript;
         expires off;
         gzip on;
+        gzip_static on;
         add_header Cache-Control public;
         #error_page 404 /404;
         #error_page 403 /403;

@@ -128,7 +128,7 @@ def _install_nginx():
                 nginx_install_folder = '%s/bin/nginx' % _get_pwd()
                 if not os.path.isdir(nginx_install_folder):
                     os.makedirs(nginx_install_folder)
-                run('./configure --prefix="%s"' % nginx_install_folder)
+                run('./configure --prefix="%s" --with-http_gzip_static_module' % nginx_install_folder)
                 run('make')
                 run('make install')
                 run('make clean')
