@@ -3,13 +3,13 @@ nltk
 celery
 gevent
 wsaccel
+greenlet
 ftfy
 gevent-websocket
 ujson
 numpy
 pyseq
 falcon==0.1.10
-scikits.audiolab
 moviepy
 weasyprint
 pdoc
@@ -27,8 +27,6 @@ sh
 fabric
 envelopes
 pyftpdlib
-pysendfile
-elasticsearch
 sqlalchemy
 sqlalchemy-utils
 passlib

@@ -8,10 +8,10 @@ Requirements
 ===========
 Fearless needs this requirements:
 
-centos 6.6
+centos 6.6 / ubuntu 14.04
 python 2.7.8.10	
-riak 2.0.4
-mysql-server
+riak 2.0.5
+mysql-server and mysql-client and development packages
 jdk 7u25
 ruby 2.0.0
 

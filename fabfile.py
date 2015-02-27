@@ -6,7 +6,7 @@ import shutil
 from mako.template import Template
 
 
-nginx_version = '1.6.2'
+nginx_version = '1.7.10'
 redis_version = '2.8.19'
 ruby_version = '2.2.0'
 
@@ -166,6 +166,8 @@ def _install_ffmpeg():
 
         with cd(os.path.dirname(ffmpeg_file)):
             ffmpeg_install_folder = '%s/bin/ffmpeg' % _get_pwd()
+            if not os.path.isdir(ffmpeg_install_folder):
+                os.makedirs(ffmpeg_install_folder)
             run('tar xvfJ %s' % ffmpeg_file)
             with cd('ffmpeg*'):
                 run('cp -rf * %s'%ffmpeg_install_folder)
@@ -199,7 +201,7 @@ def _install_ruby():
         assert os.path.isfile('%s/bin/ruby/bin/tj3'%_get_pwd())
 
 
-    
+
 @task
 def install():
     _install_nginx()
