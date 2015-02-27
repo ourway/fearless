@@ -23,7 +23,7 @@ usage:
 __all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
            'Repository', 'Project', 'now', 'Ticket', 'Session',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
-           'Document', 'Account', 'Date', 'Collection', 'r', 'es', 'Departement',
+           'Document', 'Account', 'Date', 'Collection', 'r', 'Departement',
            'Comment', 'fdb', 'vdb', 'adb', 'rdb', 'ddb', 'mdb', 'riakClient', 'Expert']
 
 import os
@@ -33,8 +33,6 @@ from flib.models.mixin import now
 from sqlalchemy.exc import IntegrityError  # for exception handeling
 from sqlalchemy.sql import between
 import redis
-from elasticsearch import Elasticsearch
-es = Elasticsearch()
 # db number 1 and 2 are for celery
 r = redis.StrictRedis(host='localhost', port=6379, db=3)
 

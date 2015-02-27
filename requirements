@@ -11,9 +11,11 @@ numpy
 pyseq
 falcon==0.1.10
 moviepy
+gunicorn
 weasyprint
 pdoc
 tox
+requests
 riak
 pyinotify
 werkzeug

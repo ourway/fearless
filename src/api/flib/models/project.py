@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 _author = 'Farsheed Ashouri'
 '''
-   ___              _                   _ 
+   ___              _                   _
   / __\_ _ _ __ ___| |__   ___  ___  __| |
  / _\/ _` | '__/ __| '_ \ / _ \/ _ \/ _` |
 / / | (_| | |  \__ \ | | |  __/  __/ (_| |
 \/   \__,_|_|  |___/_| |_|\___|\___|\__,_|
 
-Just remember: Each comment is like an appology! 
+Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
@@ -17,8 +17,8 @@ import sh
 import lxml
 from lxml import etree
 import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
-    Float, Boolean, event, func
+from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, \
+    Table, Float, Boolean, event, func
 
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
@@ -27,7 +27,8 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from flib.models.mixin import IDMixin, Base, now, convert_to_datetime, getUUID
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy import desc, asc
-from flib.utils.defaults import public_upload_folder, public_repository_path, GIT_folder, ASSETS
+from flib.utils.defaults import public_upload_folder, public_repository_path, \
+    GIT_folder, ASSETS
 from flib.models.task import Task
 from flib.models.user import User
 from flib.models import r
@@ -63,17 +64,21 @@ project_reports = Table('project_reports', Base.metadata,
 projects_accounts = Table("projects_accounts", Base.metadata,
                           Column('id', Integer, primary_key=True),
                           Column(
-                              "project_id", Integer, ForeignKey("project.id"), primary_key=True),
+                              "project_id", Integer, ForeignKey("project.id"),
+                              primary_key=True),
                           Column(
-                              "account_id", Integer, ForeignKey("account.id"), primary_key=True)
+                              "account_id", Integer, ForeignKey("account.id"),
+                              primary_key=True)
                           )
 
 projects_tags = Table("projects_tags", Base.metadata,
                       Column('id', Integer, primary_key=True),
                       Column(
-                          "project_id", Integer, ForeignKey("project.id"), primary_key=True),
+                          "project_id", Integer, ForeignKey("project.id"),
+                          primary_key=True),
                       Column(
-                          "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                          "tag_id", Integer, ForeignKey("tag.id"),
+                          primary_key=True)
                       )
 
 
@@ -184,7 +189,7 @@ class Project(IDMixin, Base):
         return data
 
     def tjp_subproject(self, do_plan=True, do_guntt=False, do_resource=False,
-                       do_msproject=False, do_profit=False, do_trace=True, 
+                       do_msproject=False, do_profit=False, do_trace=True,
                        do_traceSvg=False, report_width=2000):
         subProjectTemplateFile = os.path.join(
             os.path.dirname(__file__), '../templates/subProject.tji')
@@ -203,26 +208,38 @@ class Project(IDMixin, Base):
         report = sr.render(subproject=self, do_plan=do_plan,
                       do_guntt=do_guntt, do_resource=do_resource,
                       do_msproject=do_msproject, do_profit=do_profit,
-                      do_trace=do_trace, do_traceSvg=do_traceSvg, report_width=report_width)
+                      do_trace=do_trace, do_traceSvg=do_traceSvg,
+                           report_width=report_width)
         return {'report': report, 'subProjectTasks': subProjectTasks}
 
     #@property
-    def plan(self, do_plan=True, do_guntt=False, do_resource=False, do_msproject=False,
-             do_profit=False, do_trace=True, do_traceSvg=False, report_width=2000):
+    def plan(self, do_plan=True, do_guntt=False, do_resource=False,
+             do_msproject=False, do_profit=False, do_trace=True,
+             do_traceSvg=False, report_width=2000):
         # lets select just one task
         puid = getUUID() + '_' + self.uuid
-        schedule_path = os.path.join(public_upload_folder, 'Fearless_project_%s.tjp' % puid)
-        plan_path = os.path.join(public_upload_folder, 'plan_%s.html' % (self.uuid))
-        guntt_path = os.path.join(public_upload_folder, 'guntt_%s.html' % (self.uuid))
-        resource_path = os.path.join(public_upload_folder, 'resource_%s.html' % (self.uuid))
-        msproject_path = os.path.join(public_upload_folder, 'MS-project_%s.xml' % (self.uuid))
-        profit_path = os.path.join(public_upload_folder, 'ProfiAndLoss_%s.html' % (self.uuid))
-        csv_path = os.path.join(public_upload_folder, 'csv_%s.csv' % (self.uuid))
-        trace_path = os.path.join(public_upload_folder, 'TraceReport_%s.csv' % (self.uuid))
-        traceSvg_path = os.path.join(public_upload_folder, 'TraceReport_%s.html' % (self.uuid))
-        
-        for i in [schedule_path, plan_path, guntt_path, resource_path, 
-                  msproject_path, profit_path, csv_path, trace_path, traceSvg_path]:
+        schedule_path = os.path.join(public_upload_folder,
+                            'Fearless_project_%s.tjp' % puid)
+        plan_path = os.path.join(public_upload_folder,
+                                 'plan_%s.html' % (self.uuid))
+        guntt_path = os.path.join(public_upload_folder,
+                                  'guntt_%s.html' % (self.uuid))
+        resource_path = os.path.join(public_upload_folder,
+                                     'resource_%s.html' % (self.uuid))
+        msproject_path = os.path.join(public_upload_folder,
+                                      'MS-project_%s.xml' % (self.uuid))
+        profit_path = os.path.join(public_upload_folder,
+                                   'ProfiAndLoss_%s.html' % (self.uuid))
+        csv_path = os.path.join(public_upload_folder,
+                                'csv_%s.csv' % (self.uuid))
+        trace_path = os.path.join(public_upload_folder,
+                                  'TraceReport_%s.csv' % (self.uuid))
+        traceSvg_path = os.path.join(public_upload_folder,
+                                     'TraceReport_%s.html' % (self.uuid))
+
+        for i in [schedule_path, plan_path, guntt_path, resource_path,
+                  msproject_path, profit_path, csv_path, trace_path,
+                  traceSvg_path]:
             if os.path.isfile(i):
                 #pass
                 os.remove(i)
@@ -244,20 +261,21 @@ class Project(IDMixin, Base):
         reports = []
         for p in projects:
             if p.tasks:
-                planData = p.tjp_subproject(do_plan=do_plan, do_guntt=do_guntt, 
+                planData = p.tjp_subproject(do_plan=do_plan, do_guntt=do_guntt,
                             do_resource=do_resource, do_msproject=do_msproject,
-                            do_profit=do_profit, do_trace=do_trace, 
+                            do_profit=do_profit, do_trace=do_trace,
                             do_traceSvg=do_traceSvg, report_width=report_width)
                 subProjectTasks.append(planData.get('subProjectTasks'))
                 reports.append(planData.get('report'))
 
         finalplan = t.render(reports=reports, subProjectTasks=subProjectTasks,
-                             now=now(), subprojects=projects, resources=resources)
+                             now=now(), subprojects=projects,
+                             resources=resources)
 
         #plan_path = '/tmp/Fearless_project.tjp'
 
 
-        tj3 = sh.Command('tj3')
+        tj3 = sh.Command('../../bin/ruby/bin/tj3')
 
 
         with open(schedule_path, 'wb') as f:
@@ -266,8 +284,8 @@ class Project(IDMixin, Base):
             print 'Start Calculating project %s' % self.id
             import time
             s = time.time()
-            tj = tj3(
-                schedule_path, '--silent', '--no-color', '--add-trace', o=public_upload_folder, c='1')
+            tj = tj3( schedule_path, '--silent', '--no-color', '--add-trace',
+                    o=public_upload_folder, c='1')
             print 'Finished in %s seconds' % round(time.time() - s, 3)
         except Exception, e:
             print e
@@ -280,7 +298,7 @@ class Project(IDMixin, Base):
             self.reports = []
             return
         # if not tj.stderr:
-        plan, guntt, resource, msproject, profit = None, None, None, None, None 
+        plan, guntt, resource, msproject, profit = None, None, None, None, None
         csvfile, trace, burndown = None, None, None
 
 
@@ -298,7 +316,7 @@ class Project(IDMixin, Base):
                 #    pass
                     #with open(path, 'wb') as f:
                     #    f.write(tosave)
-                    
+
 
                 return path
                 # self.reports.append(tosave)

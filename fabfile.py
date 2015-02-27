@@ -1,14 +1,15 @@
-from fabric.api import run, env, hosts, local, task
-from fabric.context_managers import cd
+from fabric.api import run, env, hosts, local, task, cd, settings, prompt, sudo
 
 import os
 import shutil
 from mako.template import Template
 
-
 nginx_version = '1.7.10'
 redis_version = '2.8.19'
 ruby_version = '2.2.0'
+
+dataname = 'fearless1'
+
 
 #env.hosts = ['fearless@192.168.20.159', 'fearless@192.168.20.151']
 
@@ -16,6 +17,7 @@ ruby_version = '2.2.0'
 
 @task
 def localhost():
+
     env.run = local
     env.hosts = ['localhost']
 
@@ -47,7 +49,7 @@ def _download_nginx():
         with cd(dfolder):
             nginx_download_link = 'http://nginx.org/download/nginx-%s.tar.gz' % nginx_version
             download_cmd = 'wget %s' % nginx_download_link
-            run(download_cmd)
+            env.run(download_cmd)
             print('Finished downloading nginx')
     else:
         print('Using cached nginx')
@@ -63,7 +65,7 @@ def _download_redis():
         with cd(dfolder):
             redis_download_link = 'http://download.redis.io/releases/redis-%s.tar.gz' % redis_version
             download_cmd = 'wget %s' % redis_download_link
-            run(download_cmd)
+            env.run(download_cmd)
             print('Finished downloading redis')
     else:
         print('Using cached redis')
@@ -79,7 +81,7 @@ def _download_ffmpeg():
         with cd(dfolder):
             ffmpeg_download_link = 'http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz'
             download_cmd = 'wget %s' % ffmpeg_download_link
-            run(download_cmd)
+            env.run(download_cmd)
             print('Finished downloading ffmpeg')
     else:
         print('Using cached ffmpeg')
@@ -94,7 +96,7 @@ def _download_ruby():
         with cd(dfolder):
             ruby_download_link = 'http://cache.ruby-lang.org/pub/ruby/2.2/ruby-%s.tar.gz' % ruby_version
             download_cmd = 'wget %s' % ruby_download_link
-            run(download_cmd)
+            env.run(download_cmd)
             print('Finished downloading ruby')
     else:
         print('Using cached ruby')
@@ -115,6 +117,12 @@ def _get_supervisord_config():
     with open('%s/config/supervisor/fearless.conf' % _get_pwd(), 'wb') as f:
         f.write(conf)
 
+    output = env.run('echo_supervisord_conf', capture=True)
+    with open('/home/farsheed/Desktop/testC.txt', 'wb') as f:
+        f.write(output + conf)
+    sudo('rm /etc/supervisord.conf')
+    sudo('ln -s /home/farsheed/Desktop/testC.txt /etc/supervisord.conf')
+
 
 def _install_nginx():
     '''install nginx'''
@@ -123,15 +131,15 @@ def _install_nginx():
         print 'nginx Already installed.'
     else:
         with cd(os.path.dirname(nginx_file)):
-            run('tar xf %s'%os.path.basename(nginx_file))
+            env.run('tar xf %s'%os.path.basename(nginx_file))
             with cd('nginx-%s'%nginx_version):
                 nginx_install_folder = '%s/bin/nginx' % _get_pwd()
                 if not os.path.isdir(nginx_install_folder):
                     os.makedirs(nginx_install_folder)
-                run('./configure --prefix="%s" --with-http_gzip_static_module' % nginx_install_folder)
-                run('make')
-                run('make install')
-                run('make clean')
+                env.run('./configure --prefix="%s" --with-http_gzip_static_module' % nginx_install_folder)
+                env.run('make')
+                env.run('make install')
+                env.run('make clean')
         assert os.path.isfile('%s/bin/nginx/sbin/nginx' % _get_pwd())
 
             #shutil.rmtree('redis-%s'%redis_version)
@@ -145,14 +153,14 @@ def _install_redis():
         print 'redis Already installed.'
     else:
         with cd(os.path.dirname(redis_file)):
-            run('tar xf %s'%os.path.basename(redis_file))
+            env.run('tar xf %s'%os.path.basename(redis_file))
             with cd('redis-%s'%redis_version):
                 redis_install_folder = '%s/bin/redis' % _get_pwd()
                 if not os.path.isdir(redis_install_folder):
                     os.makedirs(redis_install_folder)
-                run('make')
-                run('make PREFIX="%s" install' % redis_install_folder)
-                run('make clean')
+                env.run('make')
+                env.run('make PREFIX="%s" install' % redis_install_folder)
+                env.run('make clean')
         assert os.path.isfile('%s/bin/redis/bin/redis-server' % _get_pwd())
             #shutil.rmtree('redis-%s'%redis_version)
 
@@ -168,9 +176,9 @@ def _install_ffmpeg():
             ffmpeg_install_folder = '%s/bin/ffmpeg' % _get_pwd()
             if not os.path.isdir(ffmpeg_install_folder):
                 os.makedirs(ffmpeg_install_folder)
-            run('tar xvfJ %s' % ffmpeg_file)
+            env.run('tar xvfJ %s' % ffmpeg_file)
             with cd('ffmpeg*'):
-                run('cp -rf * %s'%ffmpeg_install_folder)
+                env.run('cp -rf * %s'%ffmpeg_install_folder)
         assert os.path.isfile('%s/bin/ffmpeg/ffmpeg' % _get_pwd())
 
 
@@ -181,15 +189,15 @@ def _install_ruby():
         print 'ruby Already installed.'
     else:
         with cd(os.path.dirname(ruby_file)):
-            run('tar xf %s'%os.path.basename(ruby_file))
+            env.run('tar xf %s'%os.path.basename(ruby_file))
             with cd('ruby-%s'%ruby_version):
                 ruby_install_folder = '%s/bin/ruby' % _get_pwd()
                 if not os.path.isdir(ruby_install_folder):
                     os.makedirs(ruby_install_folder)
-                run('./configure --prefix="%s"' % ruby_install_folder)
-                run('make')
-                run('make install')
-                run('make clean')
+                env.run('./configure --prefix="%s"' % ruby_install_folder)
+                env.run('make')
+                env.run('make install')
+                env.run('make clean')
         assert os.path.isfile('%s/bin/ruby/bin/ruby' % _get_pwd())
 
     ## now lets install task juggler
@@ -197,10 +205,26 @@ def _install_ruby():
     if os.path.isfile('%s/bin/ruby/bin/tj3' % _get_pwd()):
         print 'taskjuggler Already installed.'
     else:
-        run('%s/bin/ruby/bin/gem install taskjuggler' % _get_pwd())
+        env.run('%s/bin/ruby/bin/gem install taskjuggler' % _get_pwd())
         assert os.path.isfile('%s/bin/ruby/bin/tj3'%_get_pwd())
 
+def _createMysqlDb():
+    #print env
+    with settings(warn_only=True):
+        env.run('echo "CREATE DATABASE %s;"|mysql --batch --user=%s --password=%s --host=%s'\
+            % (dataname, env.mysqluser, env.mysqlpassword, env.host))
 
+def _dropMysqlDb():
+    #print env
+    with settings(warn_only=True):
+        env.run('echo "DROP DATABASE %s;"|mysql --batch --user=%s --password=%s --host=%s'\
+            % (dataname, env.mysqluser, env.mysqlpassword, env.host))
+
+def _prepareDatabase():
+    env.mysqluser = prompt('What is your MySQL user?', default='root')
+    env.mysqlpassword = prompt('What is your MySQL password?')
+    _dropMysqlDb()
+    _createMysqlDb()
 
 @task
 def install():
@@ -209,16 +233,14 @@ def install():
     _install_ffmpeg()
     _install_ruby()
     _get_supervisord_config()
+    _prepareDatabase()
 
-@task
-def test():
-    pass
+
 
 @task
 def update():
     with cd(_get_pwd()):
-        run('ls -l')
-    #run('{d}/pyenv/bin/pip install -U -r {d}/requirements'.format(d=_get_pwd()))
+        env.run('{d}/pyenv/bin/pip install -U -r {d}/requirements'.format(d=_get_pwd()))
 
 
 

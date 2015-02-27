@@ -26,7 +26,6 @@ import base64
 import shutil
 from datetime import datetime
 
-import elasticsearch
 import requests
 import os
 import uuid
@@ -96,60 +95,6 @@ class mydatatype(object):
     pass
 
 
-@Capp.task
-def add_asset(dataMD5, uploadedFilePath):
-    ''' Add asset to database
-        Why I provide the md5? Cause we can get md5 in uploading process before.
-    '''
-    session = Session()
-    if not uploadedFilePath:
-        return 'Not any path'
-
-    targetAsset = session.query(Asset).filter(Asset.key == dataMD5).first()
-    if not targetAsset:
-        print 'Target asset is not available!'
-        return
-    task_id = add_asset.request.id
-    originalName = os.path.basename(uploadedFilePath)
-    targetAsset.ext = originalName.split('.')[-1]
-    targetAsset.content_type = contenttype(uploadedFilePath)
-    targetAsset.path = os.path.join(os.path.relpath(os.path.dirname(uploadedFilePath),
-                                                    targetAsset.repository.path) or '', dataMD5 + '.' + targetAsset.ext)
-    print '*' * 80
-    print targetAsset.path
-    print '*' * 80
-    obj = mydatatype()
-    obj.content_type = 'application/json'
-    data = {'path': uploadedFilePath,
-            'content_type': targetAsset.content_type,
-            'ext': targetAsset.ext,
-            'originalName': targetAsset.name,
-            'md5': targetAsset.key,
-            'key': task_id,
-            'asset': targetAsset.id,
-            'repository': targetAsset.repository.id,
-            'datetime': datetime.utcnow()}
-    obj.data = json.dumps(data)
-    try:
-        es.create(
-            index='assets2', doc_type='info', body=obj.data)
-    except elasticsearch.ConflictError:
-        pass
-
-    # repo = GIT(uploadedFilePath)  ## do git operations
-        # repo.add('{user}->{repo}->{originalName}' \
-        #         .format(user=userName,
-        #                 repo=repositoryName,
-        #                 originalName=originalName))
-
-    try:
-        session.commit()
-        session.close()
-        return targetAsset.key
-    except IntegrityError:
-        session.rollback()
-        session.close()
-        return 'Error'
 
 
 @Capp.task

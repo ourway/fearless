@@ -30,7 +30,7 @@ from base64 import encode, decode, decodestring
 from sqlalchemy import desc
 
 # from celery.result import AsyncResult
-from flib.models import Asset, Repository, Collection, es, User, fdb
+from flib.models import Asset, Repository, Collection, User, fdb
 from flib.utils.AAA import getUserInfoFromSession
 from flib.utils.defaults import public_upload_folder, public_repository_path, GIT_folder, ASSETS
 from flib.models.mixin import getUUID
@@ -287,9 +287,9 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False, c
 
     return dataMd5
 
-
+'''
 def getAssetInfo(key):
-    '''Get asset Info based on key or md5'''
+    'Get asset Info based on key or md5'
 
     assetInfo = None
     if not '-' in key:  # it might not be a MD5!! Lets find:
@@ -337,6 +337,8 @@ def getAssetInfo(key):
                     assetInfo[key] = keydata[0]
 
     return assetInfo
+
+'''
 
 
 class GetAsset:
