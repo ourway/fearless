@@ -18,13 +18,9 @@ ruby 2.0.0
 
 Installaion
 ===========
+You need centos 6.5+ with a user named fearless with sudo
+you can add a sudo user by `visudo` command.
 
-Use the following commands:
-
-```bash
-sudo make prepare
-make
-sudo make install
-```
+now you can install with `./install`
 
 Now you can visit [Home page](http://127.0.0.1/app)

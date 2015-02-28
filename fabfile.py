@@ -76,8 +76,8 @@ def _download_java():
         print('Using cached nginx')
     return nginx_file
 
-@task
-def install_basho_repo():
+
+def _install_basho_repo():
     #!/bin/bash
 
     HOSTNAME='basho_riak'
@@ -88,6 +88,7 @@ def install_basho_repo():
     cmd = '''curl "%s/config_file.repo?os=%s&dist=%s&name=%s" > %s''' %\
         (PACKAGE_CLOUD_RIAK_DIR, OS, DIST, HOSTNAME, FILENAME)
     po_info = sudo(cmd)
+    sudo('yum install riak -y')
     
 
 def _download_openssl():
@@ -282,6 +283,7 @@ def install():
     _install_redis()
     _install_ffmpeg()
     _install_ruby()
+    _install_basho_repo()
     _get_supervisord_config()
     _prepareDatabase()
 

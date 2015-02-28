@@ -4,8 +4,8 @@
 wget --no-check-certificate https://www.python.org/ftp/python/2.7.8/Python-2.7.8.tar.xz
 
 ## install some packages to compile python
-yum groupinstall "Development tools" -y
-yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel -y
+sudo yum groupinstall "Development tools" -y
+sudo yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel -y
 
 ## extract and cinfigure 
 tar xf Python-2.7.8.tar.xz
@@ -13,9 +13,9 @@ cd Python-2.7.8
 ./configure --prefix=/usr/local
 
 ## make and install
-make && make altinstall
+make
+sudo make altinstall
 
-Python-2.7.8.tar.xz
 
 
 
@@ -29,13 +29,23 @@ rm -f Python-2.7.8.tar.xz
 wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
 
 ## install pip
-python2.7 get-pip.py
+sudo python2.7 get-pip.py
 
 ## clean mess
 rm -f get-pip.py
 
 ## install virtualenv
-pip install -U virtualenv
+sudo pip install -U virtualenv
+
+## prepare a pyenv
+python2.7 -m virtualenv --always-copy pyenv
+python2.7 -m virtualenv --relocatable pyenv/
+
+source pyenv/bin/activate
+pip install fabric mako
+fab -l
+
+
 
 
 
