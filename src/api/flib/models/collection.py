@@ -85,9 +85,8 @@ class Collection(IDMixin, Base):
 
     @validates('repository_id')
     def updateUrl(self, key, data):
-        repo = session.query(Repository).filter_by(id=data).first()
-        if self.path:
-            self.url = os.path.join(repo.path, self.path)
+        #if self.path:
+        #    self.url = os.path.join(repo.path, self.path)
         return data
 
     @validates('schema')

@@ -1,4 +1,4 @@
-from fabric.api import run, env, hosts, local, task, cd, settings, prompt, sudo
+from fabric.api import run, env, hosts, local, task, cd, lcd, settings, prompt, sudo
 
 import os
 import shutil
@@ -21,11 +21,13 @@ dataname = 'fearless1'
 
 env.run = local
 env.hosts = ['localhost']
+env.cd = lcd
 
 @task
 def remote():
     env.run = run
     env.hosts = ['some.remote.host']
+    env.cd = cd
     'Not Implemented'
 
 
@@ -47,7 +49,8 @@ def _download_nginx():
     dfolder = _make_downloads_folder()
     nginx_file = '%s/nginx-%s.tar.gz' % (dfolder, nginx_version)
     if not os.path.isfile(nginx_file):
-        with cd(dfolder):
+        with env.cd(dfolder):
+            print env.run('ls -l')
             nginx_download_link = 'http://nginx.org/download/nginx-%s.tar.gz' % nginx_version
             download_cmd = 'wget %s' % nginx_download_link
             env.run(download_cmd)
@@ -62,7 +65,7 @@ def _download_openssl():
     dfolder = _make_downloads_folder()
     openssl_file = '%s/openssl-%s.tar.gz' % (dfolder, openssl_version)
     if not os.path.isfile(openssl_file):
-        with cd(dfolder):
+        with env.cd(dfolder):
             openssl_download_link = 'https://www.openssl.org/source/openssl-%s.tar.gz' % openssl_version
             download_cmd = 'wget %s' % openssl_download_link
             env.run(download_cmd)
@@ -78,7 +81,7 @@ def _download_redis():
     dfolder = _make_downloads_folder()
     redis_file = '%s/redis-%s.tar.gz' % (dfolder, redis_version)
     if not os.path.isfile(redis_file):
-        with cd(dfolder):
+        with env.cd(dfolder):
             redis_download_link = 'http://download.redis.io/releases/redis-%s.tar.gz' % redis_version
             download_cmd = 'wget %s' % redis_download_link
             env.run(download_cmd)
@@ -94,7 +97,7 @@ def _download_ffmpeg():
     dfolder = _make_downloads_folder()
     ffmpeg_file = '%s/ffmpeg-release-64bit-static.tar.xz' % (dfolder)
     if not os.path.isfile(ffmpeg_file):
-        with cd(dfolder):
+        with env.cd(dfolder):
             ffmpeg_download_link = 'http://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz'
             download_cmd = 'wget %s' % ffmpeg_download_link
             env.run(download_cmd)
@@ -109,7 +112,7 @@ def _download_ruby():
     dfolder = _make_downloads_folder()
     ruby_file = '%s/ruby-%s.tar.gz' % (dfolder, ruby_version)
     if not os.path.isfile(ruby_file):
-        with cd(dfolder):
+        with env.cd(dfolder):
             ruby_download_link = 'http://cache.ruby-lang.org/pub/ruby/2.2/ruby-%s.tar.gz' % ruby_version
             download_cmd = 'wget %s' % ruby_download_link
             env.run(download_cmd)
@@ -146,9 +149,9 @@ def _install_nginx():
     if os.path.isfile('%s/bin/nginx/sbin/nginx' % _get_pwd()):
         print 'nginx Already installed.'
     else:
-        with cd(os.path.dirname(nginx_file)):
+        with env.cd(os.path.dirname(nginx_file)):
             env.run('tar xf %s'%os.path.basename(nginx_file))
-            with cd('nginx-%s'%nginx_version):
+            with env.cd('nginx-%s'%nginx_version):
                 nginx_install_folder = '%s/bin/nginx' % _get_pwd()
                 if not os.path.isdir(nginx_install_folder):
                     os.makedirs(nginx_install_folder)
@@ -168,9 +171,9 @@ def _install_redis():
     if os.path.isfile('%s/bin/redis/bin/redis-server' % _get_pwd()):
         print 'redis Already installed.'
     else:
-        with cd(os.path.dirname(redis_file)):
+        with env.cd(os.path.dirname(redis_file)):
             env.run('tar xf %s'%os.path.basename(redis_file))
-            with cd('redis-%s'%redis_version):
+            with env.cd('redis-%s'%redis_version):
                 redis_install_folder = '%s/bin/redis' % _get_pwd()
                 if not os.path.isdir(redis_install_folder):
                     os.makedirs(redis_install_folder)
@@ -188,12 +191,12 @@ def _install_ffmpeg():
         print 'ffmpeg Already installed.'
     else:
 
-        with cd(os.path.dirname(ffmpeg_file)):
+        with env.cd(os.path.dirname(ffmpeg_file)):
             ffmpeg_install_folder = '%s/bin/ffmpeg' % _get_pwd()
             if not os.path.isdir(ffmpeg_install_folder):
                 os.makedirs(ffmpeg_install_folder)
             env.run('tar xvfJ %s' % ffmpeg_file)
-            with cd('ffmpeg*'):
+            with env.cd('ffmpeg*'):
                 env.run('cp -rf * %s'%ffmpeg_install_folder)
         assert os.path.isfile('%s/bin/ffmpeg/ffmpeg' % _get_pwd())
 
@@ -204,9 +207,9 @@ def _install_ruby():
     if os.path.isfile('%s/bin/ruby/bin/ruby' % _get_pwd()):
         print 'ruby Already installed.'
     else:
-        with cd(os.path.dirname(ruby_file)):
+        with env.cd(os.path.dirname(ruby_file)):
             env.run('tar xf %s'%os.path.basename(ruby_file))
-            with cd('ruby-%s'%ruby_version):
+            with env.cd('ruby-%s'%ruby_version):
                 ruby_install_folder = '%s/bin/ruby' % _get_pwd()
                 if not os.path.isdir(ruby_install_folder):
                     os.makedirs(ruby_install_folder)
@@ -255,7 +258,7 @@ def install():
 
 @task
 def update():
-    with cd(_get_pwd()):
+    with env.cd(_get_pwd()):
         env.run('{d}/pyenv/bin/pip install -U -r {d}/requirements'.format(d=_get_pwd()))
 
 
