@@ -59,6 +59,37 @@ def _download_nginx():
         print('Using cached nginx')
     return nginx_file
 
+
+def _download_java():
+    '''Download java'''
+    print('Getting java ...')
+    dfolder = _make_downloads_folder()
+    nginx_file = '%s/nginx-%s.tar.gz' % (dfolder, nginx_version)
+    if not os.path.isfile(nginx_file):
+        with env.cd(dfolder):
+            print env.run('ls -l')
+            nginx_download_link = 'http://nginx.org/download/nginx-%s.tar.gz' % nginx_version
+            download_cmd = 'wget %s' % nginx_download_link
+            env.run(download_cmd)
+            print('Finished downloading nginx')
+    else:
+        print('Using cached nginx')
+    return nginx_file
+
+@task
+def install_basho_repo():
+    #!/bin/bash
+
+    HOSTNAME='basho_riak'
+    FILENAME='/etc/yum.repos.d/basho.repo'
+    OS='el'
+    DIST='5'
+    PACKAGE_CLOUD_RIAK_DIR='https://packagecloud.io/install/repositories/basho/riak'
+    cmd = '''curl "%s/config_file.repo?os=%s&dist=%s&name=%s" > %s''' %\
+        (PACKAGE_CLOUD_RIAK_DIR, OS, DIST, HOSTNAME, FILENAME)
+    po_info = sudo(cmd)
+    
+
 def _download_openssl():
     '''Download openssl'''
     print('Getting openssl ...')
