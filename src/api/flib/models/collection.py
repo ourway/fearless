@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 _author = 'Farsheed Ashouri'
 '''
-   ___              _                   _ 
+   ___              _                   _
   / __\_ _ _ __ ___| |__   ___  ___  __| |
  / _\/ _` | '__/ __| '_ \ / _ \/ _ \/ _` |
 / / | (_| | |  \__ \ | | |  __/  __/ (_| |
 \/   \__,_|_|  |___/_| |_|\___|\___|\__,_|
 
-Just remember: Each comment is like an appology! 
+Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
@@ -59,7 +59,7 @@ class Collection(IDMixin, Base):
     template = Column(String(64))
     owner_id = Column(Integer, ForeignKey('user.id'))
     parent_id = Column(Integer, ForeignKey('collection.id'))
-    parent = relationship("Collection", backref=backref("children", cascade="all, delete, delete-orphan"), 
+    parent = relationship("Collection", backref=backref("children", cascade="all, delete, delete-orphan"),
                           remote_side=[id])
     owner = relationship("User", backref="ownes_collections")
     path = Column(String(512), nullable=False)  # relative to repo path path
@@ -83,6 +83,13 @@ class Collection(IDMixin, Base):
         return func.sum(Asset.content_size)
 
 
+    @validates('repository_id')
+    def updateUrl(self, key, data):
+        repo = session.query(Repository).filter_by(id=data).first()
+        if self.path:
+            self.url = os.path.join(repo.path, self.path)
+        return data
+
     @validates('schema')
     def load_json(self, key, schema):
         try:
@@ -99,18 +106,12 @@ class Collection(IDMixin, Base):
             self.path = newpath
         return data
 
-    @validates('repository_id')
-    def update_url(self, key, data):
-        self.url = os.path.join(self.repository.path, self.path)
-        return data
 
     @validates('path')
     def check_path(self, key, data):
         self.name = os.path.basename(data).title()
-        if self.repository_id:
-            repository = session.query(Repository).filter(
-                Repository.id == self.repository_id).first()
-            self.url = os.path.join(repository.path, data)
+        if self.repository:
+            self.url = os.path.join(self.repository.path, data)
         return data
 
     @hybrid_property
@@ -131,7 +132,10 @@ class Collection(IDMixin, Base):
     @staticmethod
     def AfterUserCreationFuncs(mapper, connection, target):
         '''Some operations after getting ID'''
-        repository = target.repository
+        repository = session.query(Repository).\
+            filter_by(id=target.repository_id).first()
+
+
         if target.path:
             collection_path = os.path.join(repository.path, target.path)
             if not os.path.isdir(collection_path):
