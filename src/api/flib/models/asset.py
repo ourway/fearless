@@ -135,8 +135,8 @@ class Asset(IDMixin, Base):
 
     @validates('version')
     def commit(self, key, data):
-        from tasks import addFileToGit
-        from tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
+        from flib.tasks import addFileToGit
+        from flib.tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
         if self.uuid:
             addFileToGit.delay(self.full_path, self.uuid, data)
         if self.id and self.uuid:
@@ -168,7 +168,7 @@ class Asset(IDMixin, Base):
 
     @hybrid_property
     def git_tags(self):
-        from tasks import getTags
+        from flib.tasks import getTags
         if self.uuid and self.full_path:
             result = getTags(self.full_path, self.uuid)
         return result
@@ -215,8 +215,8 @@ class Asset(IDMixin, Base):
     @staticmethod
     def AfterAssetCreationFuncs(mapper, connection, target):
         '''Some operations after getting ID'''
-        from tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
-        from tasks import addFileToGit
+        from flib.tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
+        from flib.tasks import addFileToGit
         addFileToGit.delay(target.full_path, target.uuid, target.version)
         identify.delay(target.full_path, target.id)
 

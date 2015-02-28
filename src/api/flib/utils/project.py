@@ -306,7 +306,8 @@ class AddTask:
             start = str(start)
 
         newTask = Task(
-            title=title, effort=effort, project=project, start=start)
+            title=title, effort=effort, project_id=project.id, start=start)
+
         newTask.priority = priority
         if end:
             newTask.end = str(end)

@@ -335,7 +335,7 @@ class DB:
                 try:
                     setattr(result, key, value)
                     updated_values.append(key)
-                except AttributeError:
+                except (AttributeError, TypeError):
                     continue
 
         # if result.update(query_params):
