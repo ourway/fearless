@@ -21,7 +21,7 @@ usage:
 '''
 
 __all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
-           'Repository', 'Project', 'now', 'Ticket', 'Session',
+           'Repository', 'Project', 'now', 'Ticket',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
            'Document', 'Account', 'Date', 'Collection', 'r', 'Departement',
            'Comment', 'fdb', 'vdb', 'adb', 'rdb', 'ddb', 'mdb', 'riakClient', 'Expert']
@@ -54,8 +54,8 @@ mdb.set_properties({'search_index': 'fearless_messages_database'})
 mdb.enable_search()
 # r.flushdb()
 
-from flib.models.db import Session, engine, Base
-session = Session()
+from flib.models.db import session_factory, engine, Base
+session = session_factory()
 
 
 from flib.models.group import Group

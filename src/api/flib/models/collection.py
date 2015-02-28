@@ -105,6 +105,11 @@ class Collection(IDMixin, Base):
             self.path = newpath
         return data
 
+    @validates('repository')
+    def validate_repo(self, key, data):
+        print data
+        return data
+
 
     @validates('path')
     def check_path(self, key, data):
@@ -133,6 +138,7 @@ class Collection(IDMixin, Base):
         '''Some operations after getting ID'''
         repository = session.query(Repository).\
             filter_by(id=target.repository_id).first()
+
 
 
         if target.path:
@@ -220,3 +226,11 @@ class Collection(IDMixin, Base):
     def __declare_last__(cls):
         event.listen(cls, 'after_insert', cls.AfterUserCreationFuncs)
         event.listen(cls, 'before_delete', cls.BeforeUserDeleteFuncs)
+
+
+
+'''
+@event.listens_for(session, 'before_flush')
+def receive_before_flush(session, flush_context, instances):
+    pass
+'''
