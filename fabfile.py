@@ -168,6 +168,7 @@ def get_needed_softwares():
     sudo('service riak start')
     sudo('service mysqld start')
 
+
 def _get_supervisord_config():
     temp = Template(filename='%s/config/supervisor/fearless.conf.tml' % _get_pwd())
     conf = temp.render(dir=_get_pwd())
@@ -180,6 +181,7 @@ def _get_supervisord_config():
         f.write(output + conf)
     sudo('rm -f /etc/supervisord.conf')
     sudo('ln -s %s/config/supervisor/supervisord.conf /etc/supervisord.conf'%_get_pwd())
+
 
 
 def _install_nginx():
