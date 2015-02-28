@@ -31,6 +31,10 @@ wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
 ## install pip
 sudo python2.7 get-pip.py
 
+# install pip on main system python
+sudo python get-pip.py
+pip install supervisor
+
 ## clean mess
 rm -f get-pip.py
 
@@ -41,8 +45,9 @@ sudo pip install -U virtualenv
 python2.7 -m virtualenv --always-copy pyenv
 python2.7 -m virtualenv --relocatable pyenv/
 
+
 source pyenv/bin/activate
-pip install fabric mako
+pip install fabric mako cython numpy
 fab -l
 
 

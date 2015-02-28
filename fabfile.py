@@ -88,7 +88,7 @@ def _install_basho_repo():
     cmd = '''curl "%s/config_file.repo?os=%s&dist=%s&name=%s" > %s''' %\
         (PACKAGE_CLOUD_RIAK_DIR, OS, DIST, HOSTNAME, FILENAME)
     po_info = sudo(cmd)
-    sudo('yum install riak -y')
+
     
 
 def _download_openssl():
@@ -160,6 +160,26 @@ def _get_nginx_config():
     with open('%s/bin/nginx/conf/nginx.conf' % _get_pwd(), 'wb') as f:
         f.write(conf)
 
+@task
+def prepare_supervisor():
+    conf = '%s/config/supervisord' % _get_pwd()
+    sudo('rm -r /etc/init.d/supervisord')
+    sudo('ln -s %s /etc/init.d/supervisord'%conf)
+    sudo('service supervisord start')
+    sudo('chkconfig supervisord on')
+
+@task
+def get_needed_softwares():
+    #sudo('yum install epel-release -y')
+    sudo('yum install pcre-devel -y')
+    sudo('yum install mysql-server -y')
+    sudo('yum install mysql-devel -y')
+    sudo('yum install libxslt-devel littlecms libxml2-devel libffi-devel -y')
+    sudo('yum install riak -y')
+    sudo('chkconfig riak on')
+    sudo('chkconfig mysqld on')
+    sudo('service riak start')
+    sudo('service mysqld start')
 
 def _get_supervisord_config():
     temp = Template(filename='%s/config/supervisor/fearless.conf.tml' % _get_pwd())
@@ -169,10 +189,10 @@ def _get_supervisord_config():
         f.write(conf)
 
     output = env.run('echo_supervisord_conf', capture=True)
-    with open('/home/farsheed/Desktop/testC.txt', 'wb') as f:
+    with open('%s/config/supervisor/supervisord_conf'%_get_pwd(), 'wb') as f:
         f.write(output + conf)
-    sudo('rm /etc/supervisord.conf')
-    sudo('ln -s /home/farsheed/Desktop/testC.txt /etc/supervisord.conf')
+    sudo('rm -f /etc/supervisord.conf')
+    sudo('ln -s %s/config/supervisor/supervisord_conf /etc/supervisord.conf'%_get_pwd())
 
 
 def _install_nginx():
@@ -278,21 +298,33 @@ def _prepareDatabase():
     _createMysqlDb()
 
 @task
+def update_modules():
+    with env.cd(_get_pwd()):
+        env.run('{d}/pyenv/bin/pip install -U -r {d}/requirements'.format(d=_get_pwd()))
+
+@task
+def initilize_to_defaults():
+    _prepareDatabase()
+    with env.cd(os.path.join(_get_pwd(), 'src/api')):
+        #env.run('ls -la')
+        env.run('pyenv/bin/python flib/scripts/apply_basic_settings.py')
+
+
+@task
 def install():
     _install_nginx()
     _install_redis()
     _install_ffmpeg()
     _install_ruby()
+    update_modules()
     _install_basho_repo()
     _get_supervisord_config()
     _prepareDatabase()
+    
 
 
 
-@task
-def update():
-    with env.cd(_get_pwd()):
-        env.run('{d}/pyenv/bin/pip install -U -r {d}/requirements'.format(d=_get_pwd()))
+
 
 
 

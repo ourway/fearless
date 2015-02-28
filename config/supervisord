@@ -18,7 +18,7 @@ prog="supervisord"
 
 prefix="/usr/"
 exec_prefix="${prefix}"
-prog_bin="${exec_prefix}/bin/supervisord"
+prog_bin="python /usr/lib/python2.6/site-packages/supervisor/supervisord.py"
 PIDFILE="/var/run/$prog.pid"
 
 start()
