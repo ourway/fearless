@@ -60,21 +60,6 @@ def _download_nginx():
     return nginx_file
 
 
-def _download_java():
-    '''Download java'''
-    print('Getting java ...')
-    dfolder = _make_downloads_folder()
-    nginx_file = '%s/nginx-%s.tar.gz' % (dfolder, nginx_version)
-    if not os.path.isfile(nginx_file):
-        with env.cd(dfolder):
-            print env.run('ls -l')
-            nginx_download_link = 'http://nginx.org/download/nginx-%s.tar.gz' % nginx_version
-            download_cmd = 'wget %s' % nginx_download_link
-            env.run(download_cmd)
-            print('Finished downloading nginx')
-    else:
-        print('Using cached nginx')
-    return nginx_file
 
 
 def _install_basho_repo():
@@ -175,6 +160,8 @@ def get_needed_softwares():
     sudo('yum install mysql-server -y')
     sudo('yum install mysql-devel -y')
     sudo('yum install libxslt-devel littlecms libxml2-devel libffi-devel -y')
+    sudo('yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u25-linux-x64.rpm -y')
+    sudo("ln -s -f /usr/java/default/bin/java /usr/bin/java")
     sudo('yum install riak -y')
     sudo('chkconfig riak on')
     sudo('chkconfig mysqld on')
@@ -189,10 +176,10 @@ def _get_supervisord_config():
         f.write(conf)
 
     output = env.run('echo_supervisord_conf', capture=True)
-    with open('%s/config/supervisor/supervisord_conf'%_get_pwd(), 'wb') as f:
+    with open('%s/config/supervisor/supervisord.conf'%_get_pwd(), 'wb') as f:
         f.write(output + conf)
     sudo('rm -f /etc/supervisord.conf')
-    sudo('ln -s %s/config/supervisor/supervisord_conf /etc/supervisord.conf'%_get_pwd())
+    sudo('ln -s %s/config/supervisor/supervisord.conf /etc/supervisord.conf'%_get_pwd())
 
 
 def _install_nginx():
@@ -319,7 +306,8 @@ def install():
     update_modules()
     _install_basho_repo()
     _get_supervisord_config()
-    _prepareDatabase()
+    #_prepareDatabase()
+    initilize_to_defaults()
     
 
 
