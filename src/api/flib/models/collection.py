@@ -136,8 +136,9 @@ class Collection(IDMixin, Base):
     @staticmethod
     def AfterUserCreationFuncs(mapper, connection, target):
         '''Some operations after getting ID'''
-        repository = session.query(Repository).\
-            filter_by(id=target.repository_id).first()
+
+        repository = target.repository
+        
 
 
 

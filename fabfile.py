@@ -296,7 +296,7 @@ def initilize_to_defaults():
     _prepareDatabase()
     with env.cd(os.path.join(_get_pwd(), 'src/api')):
         #env.run('ls -la')
-        env.run('pyenv/bin/python flib/scripts/apply_basic_settings.py')
+        env.run('../../pyenv/bin/python flib/scripts/apply_basic_settings.py')
 
 
 @task

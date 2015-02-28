@@ -56,12 +56,16 @@ tables = [i for i in av if i[0] in ascii_uppercase]
 
 
 def getSession(req, resp, params):
+
     from flib.utils import helpers
     req.session = Session()  # imported from models.db
-    req.session.rollback()  ## rollback at first
+    #print >> sys.stderr, len(req.session.dirty)
+    #req.session.rollback()  ## rollback at first
 
 
 def closeSession(req, resp):
+
+    
     req.session.commit()
     req.session.close()
     Session.remove()

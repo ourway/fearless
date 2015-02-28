@@ -115,14 +115,20 @@ class AddProject:
                 Repository.name == repoName).first()
             if not new_repository:
                 new_repository = Repository(name=repoName, path=newRepoFolder)
+                #
 
 
             chars_section = Collection(name='Characters', path='chars')
+
+            
+            
             props_section = Collection(name='Props', path='props')
             sets_section = Collection(name='Sets', path='sets')
             sequences_section = Collection(name='Sequences', path='sequences')
             editorial_section = Collection(name='Editorial', path='editorial')
             resources_section = Collection(name='Resources', path='resources')
+            
+            
 
             new_repository.collections.append(chars_section)
             new_repository.collections.append(props_section)
@@ -130,6 +136,7 @@ class AddProject:
             new_repository.collections.append(sequences_section)
             new_repository.collections.append(editorial_section)
             new_repository.collections.append(resources_section)
+            
 
 
             new.repositories.append(new_repository)
