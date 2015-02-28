@@ -61,6 +61,10 @@ def getSession(req, resp, params):
 
 
 def closeSession(req, resp):
+    req.session.commit()
+    req.session.close()
+    Session.remove()
+    '''
     try:
         req.session.commit()
     except Exception, e:
@@ -73,6 +77,7 @@ def closeSession(req, resp):
         req.session.rollback()
         req.session.close()
         Session.remove()
+    '''
 
 
 class ThingsResource:

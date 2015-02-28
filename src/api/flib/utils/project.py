@@ -116,6 +116,7 @@ class AddProject:
             if not new_repository:
                 new_repository = Repository(name=repoName, path=newRepoFolder)
 
+
             chars_section = Collection(name='Characters', path='chars')
             props_section = Collection(name='Props', path='props')
             sets_section = Collection(name='Sets', path='sets')
@@ -130,9 +131,10 @@ class AddProject:
             new_repository.collections.append(editorial_section)
             new_repository.collections.append(resources_section)
 
+
             new.repositories.append(new_repository)
             req.session.add(new)
-            resp.body = falcon.HTTP_202
+            resp.status = falcon.HTTP_201
             resp.body = {'message': 'OK'}
 
         #project = session.query(Project).filter(Project.lead_id==user.get('id')).all()

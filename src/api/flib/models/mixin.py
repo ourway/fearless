@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 _author = 'Farsheed Ashouri'
 '''
-   ___              _                   _ 
+   ___              _                   _
   / __\_ _ _ __ ___| |__   ___  ___  __| |
  / _\/ _` | '__/ __| '_ \ / _ \/ _ \/ _` |
 / / | (_| | |  \__ \ | | |  __/  __/ (_| |
 \/   \__,_|_|  |___/_| |_|\___|\___|\__,_|
 
-Just remember: Each comment is like an appology! 
+Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
@@ -72,7 +72,7 @@ def convert_to_datetime(inp):
 
 
 def _unique(cls, hashfunc, queryfunc, constructor, arg, kw):
-    from models.db import Session
+    from flib.models.db import Session
     session = Session()
     cache = getattr(session, '_unique_cache', None)
     if cache is None:
@@ -122,8 +122,8 @@ class IDMixin(object):
     def __tablename__(cls):
         return cls.__name__.lower()
 
-    #__table_args__ = {'mysql_engine': 'InnoDB'}
-    #__mapper_args__= {'always_refresh': True}
+    __table_args__ = {'mysql_engine': 'InnoDB'}
+    __mapper_args__= {'always_refresh': True}
     id = Column(Integer, primary_key=True)
     uuid = Column(String(64), default=getUUID)
     created_on = Column(DateTime, default=now)

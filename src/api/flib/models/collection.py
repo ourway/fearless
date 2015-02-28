@@ -101,10 +101,7 @@ class Collection(IDMixin, Base):
 
     @validates('repository_id')
     def update_url(self, key, data):
-        if self.path:
-            repository = session.query(Repository).filter(
-                Repository.id == data).first()
-            self.url = os.path.join(repository.path, self.path)
+        self.url = os.path.join(self.repository.path, self.path)
         return data
 
     @validates('path')
@@ -134,8 +131,7 @@ class Collection(IDMixin, Base):
     @staticmethod
     def AfterUserCreationFuncs(mapper, connection, target):
         '''Some operations after getting ID'''
-        repository = session.query(Repository).filter_by(
-            id=target.repository_id).first()
+        repository = target.repository
         if target.path:
             collection_path = os.path.join(repository.path, target.path)
             if not os.path.isdir(collection_path):
