@@ -15,11 +15,11 @@ dataname = 'fearless1'
 
 #@hosts('fearless@192.168.20.159')
 
-@task
-def localhost():
+#@task
+#def localhost():
 
-    env.run = local
-    env.hosts = ['localhost']
+env.run = local
+env.hosts = ['localhost']
 
 @task
 def remote():
