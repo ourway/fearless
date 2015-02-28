@@ -15,10 +15,29 @@ cd Python-2.7.8
 ## make and install
 make && make altinstall
 
+Python-2.7.8.tar.xz
+
+
+
 
 ## clean the mess
 cd ..
 rm -rf Python-2.7.8/
 rm -f Python-2.7.8.tar.xz
+
+## download get_pip
+wget --no-check-certificate https://bootstrap.pypa.io/get-pip.py
+
+## install pip
+python2.7 get-pip.py
+
+## clean mess
+rm -f get-pip.py
+
+## install virtualenv
+pip install -U virtualenv
+
+
+
 
 
