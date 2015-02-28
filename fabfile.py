@@ -7,6 +7,7 @@ from mako.template import Template
 nginx_version = '1.7.10'
 redis_version = '2.8.19'
 ruby_version = '2.2.0'
+openssl_version = '1.0.2'
 
 dataname = 'fearless1'
 
@@ -54,6 +55,21 @@ def _download_nginx():
     else:
         print('Using cached nginx')
     return nginx_file
+
+def _download_openssl():
+    '''Download openssl'''
+    print('Getting openssl ...')
+    dfolder = _make_downloads_folder()
+    openssl_file = '%s/openssl-%s.tar.gz' % (dfolder, openssl_version)
+    if not os.path.isfile(openssl_file):
+        with cd(dfolder):
+            openssl_download_link = 'https://www.openssl.org/source/openssl-%s.tar.gz' % openssl_version
+            download_cmd = 'wget %s' % openssl_download_link
+            env.run(download_cmd)
+            print('Finished downloading openssl')
+    else:
+        print('Using cached openssl')
+    return openssl_file
 
 
 def _download_redis():

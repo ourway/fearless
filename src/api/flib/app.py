@@ -58,13 +58,11 @@ tables = [i for i in av if i[0] in ascii_uppercase]
 def getSession(req, resp, params):
     from flib.utils import helpers
     req.session = Session()  # imported from models.db
+    req.session.rollback()  ## rollback at first
 
 
 def closeSession(req, resp):
-    req.session.commit()
-    req.session.close()
-    Session.remove()
-    '''
+
     try:
         req.session.commit()
     except Exception, e:
@@ -77,7 +75,6 @@ def closeSession(req, resp):
         req.session.rollback()
         req.session.close()
         Session.remove()
-    '''
 
 
 class ThingsResource:
@@ -438,9 +435,9 @@ app.add_route('/api/test_upload', TestUpload())
 
 if __name__ == '__main__':
     #pass
-    from werkzeug import run_simple
-    run_simple('127.0.0.1', 5005, app, use_debugger=False, use_reloader=True)
+    #from werkzeug import run_simple
+    #run_simple('127.0.0.1', 5005, app, use_debugger=False, use_reloader=True)
 
-    #from gevent import wsgi
+    from gevent import wsgi
     #from gevent import monkey;monkey.patch_all()
-    #wsgi.WSGIServer(('127.0.0.1', 5002), app).serve_forever()
+    wsgi.WSGIServer(('127.0.0.1', 5005), app).serve_forever()
