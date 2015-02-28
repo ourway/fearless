@@ -2252,6 +2252,8 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
         }
 
         $scope.getUserAssets = function(order_by, sort, search_for){
+
+            $scope.tagMode = false;
             if (!$scope.page)
                 $scope.page = 1;
             if (!order_by)
@@ -2265,7 +2267,11 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
             query = '/api/db/asset?sort='+sort+'&s='+s+'&e='+e+'&order_by='+ order_by + '&filters=owner_id='+
                     $scope.$parent.userInfo.userid;
             if ($routeParams.tags)
+                {
+                $scope.tagMode = true;
+                $scope.selectedTags = $routeParams.tags.split(',').join(', ');
                 query += '&tags='+$routeParams.tags;
+                }
 
             tag_query = '/api/asset/get_user_tags';
             tagReq = $http.get(tag_query); 

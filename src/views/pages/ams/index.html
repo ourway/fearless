@@ -37,8 +37,25 @@
             </div>
             </div>
             <br/>
+        <div ng-if="tagMode && userAssets.length" class="alert alert-info alert-dismissable">
+           <button type="button" class="close" data-dismiss="alert" 
+              aria-hidden="true">
+              &times;
+           </button>
+           Showing results for: <Strong>{{selectedTags}}</strong>
+        </div>
 
-        <div class="panel panel-default" id="" style="min-height: 300px;">
+        <div ng-if="!userAssets.length" class="alert alert-warning alert-dismissable">
+           <button type="button" class="close" data-dismiss="alert" 
+              aria-hidden="true">
+              &times;
+           </button>
+           <span>Can not find any assets</span> <span ng-if="tagMode">
+               for <strong> {{selectedTags}}</strong> tag<span ng-if="selectedTags.split(',').length>1">s</span></span>
+        </div>
+
+   
+   <div ng-if="userAssets.length" class="panel panel-default" id="" style="min-height: 300px;">
             <table class="table table-striped table-hover refresh-container pull-down" 
                 ng-show="userAssets.length">
                 <thead class="hidden-xs">
