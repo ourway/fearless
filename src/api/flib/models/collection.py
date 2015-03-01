@@ -19,6 +19,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 
 #from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
+from sqlalchemy.orm.session import Session as SessionBase
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -133,115 +134,135 @@ class Collection(IDMixin, Base):
         except Exception, e:
             print e
 
-    @staticmethod
-    def AfterUserCreationFuncs(mapper, connection, target):
-        '''Some operations after getting ID'''
-
-        extraSession = session_factory()
-        repository = extraSession.query(Repository).filter_by(id=target.repository_id).first()
-        Target = extraSession.query(Collection).filter_by(id=target.id).first()
-
-        if not repository:
-            return
-
-        
-
-
-
-        if Target.path:
-            collection_path = os.path.join(repository.path, Target.path)
-            if not os.path.isdir(collection_path):
-                os.makedirs(collection_path)
-            thmb = os.path.join(
-                os.path.dirname(__file__), '../templates/icons/asset_thumb.png')
-            dest = os.path.join(collection_path, 'thumb.png')
-            if not os.path.isfile(dest):
-                shutil.copyfile(thmb, dest)
-
-        collection = defaultdict(list)
-        if Target.schema:
-            collection = json.loads(Target.schema)
-        elif Target.template:
-            templateFile = os.path.join(
-                os.path.dirname(__file__), '../templates/collection_templates.json')
-            collection = json.loads(
-                open(templateFile).read()).get(Target.template)
-
-        if collection:
-
-            # print collection.get('folders')
-            if collection.get('folders'):
-                generated = {}
-                Target.container = False
-                Target.holdAssets = False
-
-                for folder in collection.get('folders'):
-                    newFolder = os.path.join(
-                        repository.path, Target.path or repository.path, folder)
-                    if not os.path.isdir(newFolder):
-                        try:
-                            os.makedirs(newFolder)
-                        except OSError:
-                            pass
-                    newCollectionName = os.path.basename(folder).title()
-                    for part in folder.split('/'):
-                        container = False
-                        holdAssets = False
-                        index = folder.split('/').index(part)
-                        if index == len(folder.split('/')) - 1:
-                            container = False
-                            holdAssets = True
-                        if len(folder.split('/')) == 1:
-                            container = True
-                            holdAssets = False
-
-                        part = part.strip()
-                        tn = folder.split('/').index(part)
-                        tc = '@@'.join(folder.split('/')[:tn + 1])
-                        partPath = os.path.join(
-                            repository.path, Target.path,  tc.replace('@@', '/'))
-
-                        if not generated.get(tc):
-                            newCollection = Collection(name=newCollectionName, path=part,
-                                                       repository_id=repository.id,
-                                                       container=container, holdAssets=holdAssets)
-                            if tn:
-                                tcm = '@@'.join(folder.split('/')[:tn])
-                                newCollection.parent = generated.get(tcm)
-                                #session.add(newCollection)
-                            else:
-                                newCollection.parent = Target
-                            generated[tc] = newCollection
-                            if 'seq_' in part.lower():
-                                part = 'sequence'
-                            tdest = os.path.join(partPath, 'thumb.png')
-                            tsrc = os.path.join(
-                                os.path.dirname(__file__), '../templates/icons/%s.png' % part.lower())
-                            if os.path.isfile(tsrc):
-                                shutil.copyfile(tsrc, tdest)
-
-            if collection.get('copy'):
-                for c in collection.get('copy'):
-                    src = os.path.join(
-                        os.path.dirname(__file__), '../templates/%s' % collection.get('copy')[c])
-                    dest = os.path.join(
-                        repository.path, Target.path or repository.path, c)
-
-                    if os.path.isfile(src):
-                        shutil.copyfile(src, dest)
-        extraSession.commit()
-        extraSession.close()
 
     @classmethod
     def __declare_last__(cls):
         pass
-        event.listen(cls, 'after_insert', cls.AfterUserCreationFuncs)
+        #event.listen(cls, 'after_insert', cls.AfterUserCreationFuncs)
         event.listen(cls, 'before_delete', cls.BeforeUserDeleteFuncs)
 
 
 
-@event.listens_for(session, 'before_flush')
-def receive_before_flush(session, flush_context, instances):
-    pass
-    #session.commit()
+
+
+
+
+
+
+
+
+
+def createStandards(target, session):
+    '''Some operations after getting ID'''
+    repository = target.repository
+    if not repository:
+        repository = session.query(Repository).filter_by(id=target.repository_id).first()
+
+    if not repository:
+        return
+
+    if target.path:
+        collection_path = os.path.join(repository.path, target.path)
+        if not os.path.isdir(collection_path):
+            os.makedirs(collection_path)
+        thmb = os.path.join(
+            os.path.dirname(__file__), '../templates/icons/asset_thumb.png')
+        dest = os.path.join(collection_path, 'thumb.png')
+        if not os.path.isfile(dest):
+            shutil.copyfile(thmb, dest)
+
+    collection = defaultdict(list)
+    if target.schema:
+        collection = json.loads(target.schema)
+    elif target.template:
+        templateFile = os.path.join(
+            os.path.dirname(__file__), '../templates/collection_templates.json')
+        collection = json.loads(
+            open(templateFile).read()).get(target.template)
+
+    if collection:
+
+        # print collection.get('folders')
+        if collection.get('folders'):
+            generated = {}
+            target.container = False
+            target.holdAssets = False
+
+            for folder in collection.get('folders'):
+                newFolder = os.path.join(
+                    repository.path, target.path or repository.path, folder)
+                if not os.path.isdir(newFolder):
+                    try:
+                        os.makedirs(newFolder)
+                    except OSError:
+                        pass
+                newCollectionName = os.path.basename(folder).title()
+                for part in folder.split('/'):
+                    container = False
+                    holdAssets = False
+                    index = folder.split('/').index(part)
+                    if index == len(folder.split('/')) - 1:
+                        container = False
+                        holdAssets = True
+                    if len(folder.split('/')) == 1:
+                        container = True
+                        holdAssets = False
+
+                    part = part.strip()
+                    tn = folder.split('/').index(part)
+                    tc = '@@'.join(folder.split('/')[:tn + 1])
+                    partPath = os.path.join(
+                        repository.path, target.path,  tc.replace('@@', '/'))
+
+                    if not generated.get(tc):
+                        newCollection = Collection(name=newCollectionName, path=part,
+                                                   repository_id=repository.id,
+                                                   container=container, holdAssets=holdAssets)
+                        if tn:
+                            tcm = '@@'.join(folder.split('/')[:tn])
+                            newCollection.parent = generated.get(tcm)
+                            #session.add(newCollection)
+                        else:
+                            newCollection.parent = target
+                        generated[tc] = newCollection
+                        if 'seq_' in part.lower():
+                            part = 'sequence'
+                        tdest = os.path.join(partPath, 'thumb.png')
+                        tsrc = os.path.join(
+                            os.path.dirname(__file__), '../templates/icons/%s.png' % part.lower())
+                        if os.path.isfile(tsrc):
+                            shutil.copyfile(tsrc, tdest)
+
+        if collection.get('copy'):
+            for c in collection.get('copy'):
+                src = os.path.join(
+                    os.path.dirname(__file__), '../templates/%s' % collection.get('copy')[c])
+                dest = os.path.join(
+                    repository.path, target.path or repository.path, c)
+
+                if os.path.isfile(src):
+                    shutil.copyfile(src, dest)
+
+
+
+
+
+
+
+
+def before_flush(session, flush_context, instances):
+    for i in session.new:
+        if i.__tablename__ == 'collection':
+            createStandards(i, session)
+
+
+event.listen(SessionBase, "before_flush", before_flush)
+
+
+
+
+#@event.listens_for(session, 'before_flush')
+#def receive_before_flush(session, flush_context, instances):
+#    pass
+#    #session.commit()
 
