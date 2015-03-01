@@ -138,6 +138,12 @@ class Collection(IDMixin, Base):
         '''Some operations after getting ID'''
 
         repository = target.repository
+        if not repository:
+            repository = session.query(Repository).filter_by(id=target.repository_id).first()
+
+        if not repository:
+            return
+
         
 
 
