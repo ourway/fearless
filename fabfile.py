@@ -1,6 +1,13 @@
+#!pyenv/bin/python
+
+
 from fabric.api import run, env, hosts, local, task, cd, lcd, settings, prompt, sudo
 
+import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'src/api')))
+
+
 import shutil
 from mako.template import Template
 
@@ -297,6 +304,11 @@ def initilize_to_defaults():
     with env.cd(os.path.join(_get_pwd(), 'src/api')):
         #env.run('ls -la')
         env.run('../../pyenv/bin/python flib/scripts/apply_basic_settings.py')
+
+@task
+def plan():
+    from flib.scripts.tplanner import render_process
+    
 
 
 @task

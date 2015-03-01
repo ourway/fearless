@@ -3,8 +3,8 @@
 import os
 from mako.template import Template
 import json as json
-from models import User, Task, Expert, Project
-from models.db import session_factory
+from flib.models import User, Task, Expert, Project
+from flib.models.db import session_factory
 from uuid import uuid4  # for random guid generation
 import base64
 from collections import OrderedDict, defaultdict
@@ -30,7 +30,7 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0, de
 
     '''
     session.commit()
-    fn = 'templates/TPlans/processes/' + t + '.json'
+    fn = '../templates/TPlans/processes/' + t + '.json'
     structure = {'processes': {}, 'tasks': {}}
     if not os.path.isfile(fn):
         with open(fn, 'wb') as f:
@@ -107,7 +107,7 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0, de
 def render_task(t, session, project_id, parent, prefix, title, order):
     '''lets see what will happen'''
     session.commit()
-    fn = 'templates/TPlans/tasks/' + t + '.json'
+    fn = '../templates/TPlans/tasks/' + t + '.json'
     structure = {'tags': [], 'min_effort': 0, 'max_effort': 2,
                  'resource_expertize': {"NULL":{"minimum_rate":0.75}}, 'outputs': {}}
     if not os.path.isfile(fn):

@@ -2134,10 +2134,13 @@ fearlessApp.controller('taggerCtrl',  function($scope, $rootScope, $routeParams,
     };
     
     $scope.addTag = function(type, target){
-        target.tgs.forEach(function(e){
+        if (target.tgs)
+            target.tgs.forEach(function(e){
                     $scope.tags.data.push(e.name)
-                }
-            )
+                    }
+                )
+        else
+            target.tgs = [];
         if ($scope.tags.userTagFilter && $scope.tags.userTagFilter.name)
         {
             $scope.tags.data.push($scope.tags.userTagFilter.name);
