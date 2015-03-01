@@ -30,7 +30,7 @@ from mako.template import Template
 from flib.utils.fagit import GIT
 from flib.models.helpers import tag_maker
 from flib.models import Repository
-from flib.models.db import Session
+from flib.models.db import Session, session_factory
 session = Session()
 from collections import defaultdict
 
@@ -136,10 +136,10 @@ class Collection(IDMixin, Base):
     @staticmethod
     def AfterUserCreationFuncs(mapper, connection, target):
         '''Some operations after getting ID'''
-        repository = target.repository
-        tid = target.id
-        if not repository:
-            repository = session.query(Repository).filter_by(id=target.repository_id).first()
+
+        extraSession = session_factory()
+        repository = extraSession.query(Repository).filter_by(id=target.repository_id).first()
+        Target = extraSession.query(Collection).filter_by(id=target.id).first()
 
         if not repository:
             return
@@ -148,8 +148,8 @@ class Collection(IDMixin, Base):
 
 
 
-        if target.path:
-            collection_path = os.path.join(repository.path, target.path)
+        if Target.path:
+            collection_path = os.path.join(repository.path, Target.path)
             if not os.path.isdir(collection_path):
                 os.makedirs(collection_path)
             thmb = os.path.join(
@@ -159,25 +159,25 @@ class Collection(IDMixin, Base):
                 shutil.copyfile(thmb, dest)
 
         collection = defaultdict(list)
-        if target.schema:
-            collection = json.loads(target.schema)
-        elif target.template:
+        if Target.schema:
+            collection = json.loads(Target.schema)
+        elif Target.template:
             templateFile = os.path.join(
                 os.path.dirname(__file__), '../templates/collection_templates.json')
             collection = json.loads(
-                open(templateFile).read()).get(target.template)
+                open(templateFile).read()).get(Target.template)
 
         if collection:
 
             # print collection.get('folders')
             if collection.get('folders'):
                 generated = {}
-                target.container = False
-                target.holdAssets = False
+                Target.container = False
+                Target.holdAssets = False
 
                 for folder in collection.get('folders'):
                     newFolder = os.path.join(
-                        repository.path, target.path or repository.path, folder)
+                        repository.path, Target.path or repository.path, folder)
                     if not os.path.isdir(newFolder):
                         try:
                             os.makedirs(newFolder)
@@ -199,7 +199,7 @@ class Collection(IDMixin, Base):
                         tn = folder.split('/').index(part)
                         tc = '@@'.join(folder.split('/')[:tn + 1])
                         partPath = os.path.join(
-                            repository.path, target.path,  tc.replace('@@', '/'))
+                            repository.path, Target.path,  tc.replace('@@', '/'))
 
                         if not generated.get(tc):
                             newCollection = Collection(name=newCollectionName, path=part,
@@ -210,7 +210,7 @@ class Collection(IDMixin, Base):
                                 newCollection.parent = generated.get(tcm)
                                 #session.add(newCollection)
                             else:
-                                newCollection.parent = target
+                                newCollection.parent = Target
                             generated[tc] = newCollection
                             if 'seq_' in part.lower():
                                 part = 'sequence'
@@ -225,10 +225,12 @@ class Collection(IDMixin, Base):
                     src = os.path.join(
                         os.path.dirname(__file__), '../templates/%s' % collection.get('copy')[c])
                     dest = os.path.join(
-                        repository.path, target.path or repository.path, c)
+                        repository.path, Target.path or repository.path, c)
 
                     if os.path.isfile(src):
                         shutil.copyfile(src, dest)
+        extraSession.commit()
+        extraSession.close()
 
     @classmethod
     def __declare_last__(cls):
