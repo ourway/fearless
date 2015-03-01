@@ -152,21 +152,20 @@ def _get_nginx_config():
     with open('%s/bin/nginx/conf/nginx.conf' % _get_pwd(), 'wb') as f:
         f.write(conf)
 
-@task
-def prepare_supervisor():
+def _prepare_supervisor():
     conf = '%s/config/supervisord' % _get_pwd()
     sudo('rm -r /etc/init.d/supervisord')
     sudo('ln -s %s /etc/init.d/supervisord'%conf)
     sudo('service supervisord start')
     sudo('chkconfig supervisord on')
 
-@task
-def get_needed_softwares():
+def _get_needed_softwares():
     #sudo('yum install epel-release -y')
     sudo('yum install pcre-devel -y')
     sudo('yum install mysql-server -y')
     sudo('yum install mysql-devel -y')
     sudo('yum install libxslt-devel littlecms libxml2-devel libffi-devel -y')
+    sudo('yum install libev libev-devel -y')
     sudo('yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u25-linux-x64.rpm -y')
     sudo("ln -s -f /usr/java/default/bin/java /usr/bin/java")
     sudo('yum install riak -y')
@@ -298,27 +297,69 @@ def update_modules():
     with env.cd(_get_pwd()):
         env.run('{d}/pyenv/bin/pip install -U -r {d}/requirements'.format(d=_get_pwd()))
 
+
+
+@task
+def restart():
+    sudo('supervisorctl restart all')
+
+@task
+def start():
+    sudo('supervisorctl start all')
+
+@task
+def stop():
+    sudo('supervisorctl stop all')
+
+
 @task
 def initilize_to_defaults():
     _prepareDatabase()
     with env.cd(os.path.join(_get_pwd(), 'src/api')):
         #env.run('ls -la')
         env.run('../../pyenv/bin/python flib/scripts/apply_basic_settings.py')
+    restart_app()
 
 @task
 def plan():
     from flib.scripts.tplanner import render_process
+
+
+
+@task
+def debug_mode():
+    sudo('supervisorctl stop fearless-api')
+    with env.cd(os.path.join(_get_pwd(), 'src/api')):
+        #env.run('ls -la')
+        env.run('../../pyenv/bin/python flib/app.py')
+
+    sudo('supervisorctl start fearless-api')
+
+
+
+
+@task
+def log():
+    with env.cd(os.path.join(_get_pwd(), 'logs')):
+        #env.run('ls -la')
+        env.run('tail -F *.log')
+
+
+
+
     
 
 
 @task
 def install():
+    _get_needed_softwares()
     _install_nginx()
     _install_redis()
     _install_ffmpeg()
     _install_ruby()
     update_modules()
     _install_basho_repo()
+    _prepare_supervisor()
     _get_supervisord_config()
     #_prepareDatabase()
     initilize_to_defaults()

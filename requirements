@@ -15,6 +15,7 @@ gunicorn
 weasyprint
 pdoc
 tox
+tornado
 requests
 riak
 pyinotify

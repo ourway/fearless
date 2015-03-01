@@ -122,8 +122,8 @@ class IDMixin(object):
     def __tablename__(cls):
         return cls.__name__.lower()
 
-    __table_args__ = {'mysql_engine': 'InnoDB'}
-    __mapper_args__= {'always_refresh': True}
+    #__table_args__ = {'mysql_engine': 'InnoDB'}
+    #__mapper_args__= {'always_refresh': True}
     id = Column(Integer, primary_key=True)
     uuid = Column(String(64), default=getUUID)
     created_on = Column(DateTime, default=now)

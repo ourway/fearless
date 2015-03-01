@@ -446,8 +446,22 @@ app.add_route('/api/test_upload', TestUpload())
 
 if __name__ == '__main__':
     #pass
-    from werkzeug import run_simple
-    run_simple('127.0.0.1', 5005, app, use_debugger=True, use_reloader=True)
+    #import bjoern
+    #bjoern.listen(app, '127.0.0.1', 5005)
+    #bjoern.run()
+
+    #from werkzeug import run_simple
+    #run_simple('127.0.0.1', 5005, app, use_debugger=True, use_reloader=True)
+
+    import tornado.httpserver
+    import tornado.ioloop
+    import tornado.wsgi
+    container = tornado.wsgi.WSGIContainer(app)
+    http_server = tornado.httpserver.HTTPServer(container)
+    http_server.listen(5005)
+    tornado.ioloop.IOLoop.instance().start()
+
+
 
     #from gevent import wsgi
     #from gevent import monkey;monkey.patch_all()
