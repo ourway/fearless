@@ -137,6 +137,7 @@ class Collection(IDMixin, Base):
     def AfterUserCreationFuncs(mapper, connection, target):
         '''Some operations after getting ID'''
         repository = target.repository
+        tid = target.id
         if not repository:
             repository = session.query(Repository).filter_by(id=target.repository_id).first()
 
@@ -207,8 +208,9 @@ class Collection(IDMixin, Base):
                             if tn:
                                 tcm = '@@'.join(folder.split('/')[:tn])
                                 newCollection.parent = generated.get(tcm)
-                            #else:
-                                #newCollection.parent_id = target.id
+                                #session.add(newCollection)
+                            else:
+                                newCollection.parent = target
                             generated[tc] = newCollection
                             if 'seq_' in part.lower():
                                 part = 'sequence'
@@ -217,7 +219,6 @@ class Collection(IDMixin, Base):
                                 os.path.dirname(__file__), '../templates/icons/%s.png' % part.lower())
                             if os.path.isfile(tsrc):
                                 shutil.copyfile(tsrc, tdest)
-                            session.add(newCollection)
 
             if collection.get('copy'):
                 for c in collection.get('copy'):
@@ -240,5 +241,5 @@ class Collection(IDMixin, Base):
 @event.listens_for(session, 'before_flush')
 def receive_before_flush(session, flush_context, instances):
     pass
-    session.commit()
+    #session.commit()
 
