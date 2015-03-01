@@ -12,7 +12,7 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
-#from gevent import monkey;monkey.patch_all()
+from gevent import monkey;monkey.patch_all()
 import sys, os
 current_path = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.dirname(current_path)))
@@ -59,7 +59,7 @@ tables = [i for i in av if i[0] in ascii_uppercase]
 def getSession(req, resp, params):
 
     from flib.utils import helpers
-    Session.remove()
+    #Session.remove()
     req.session = Session()  # imported from models.db
     #print >> sys.stderr, len(req.session.dirty)
     #req.session.rollback()  ## rollback at first
@@ -67,9 +67,9 @@ def getSession(req, resp, params):
 
 def closeSession(req, resp):
 
-    
-    req.session.commit()
-    req.session.close()
+    if req.session.new or req.session.dirty:
+        req.session.commit()
+        req.session.close()
     Session.remove()
 
     '''
