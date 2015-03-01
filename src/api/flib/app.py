@@ -58,6 +58,7 @@ tables = [i for i in av if i[0] in ascii_uppercase]
 def getSession(req, resp, params):
 
     from flib.utils import helpers
+    Session.remove()
     req.session = Session()  # imported from models.db
     #print >> sys.stderr, len(req.session.dirty)
     #req.session.rollback()  ## rollback at first
@@ -444,9 +445,9 @@ app.add_route('/api/test_upload', TestUpload())
 
 if __name__ == '__main__':
     #pass
-    #from werkzeug import run_simple
-    #run_simple('127.0.0.1', 5005, app, use_debugger=False, use_reloader=True)
+    from werkzeug import run_simple
+    run_simple('127.0.0.1', 5005, app, use_debugger=True, use_reloader=True)
 
-    from gevent import wsgi
+    #from gevent import wsgi
     #from gevent import monkey;monkey.patch_all()
-    wsgi.WSGIServer(('127.0.0.1', 5005), app).serve_forever()
+    #wsgi.WSGIServer(('127.0.0.1', 5005), app).serve_forever()

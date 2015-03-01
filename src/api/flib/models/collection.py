@@ -136,7 +136,6 @@ class Collection(IDMixin, Base):
     @staticmethod
     def AfterUserCreationFuncs(mapper, connection, target):
         '''Some operations after getting ID'''
-
         repository = target.repository
         if not repository:
             repository = session.query(Repository).filter_by(id=target.repository_id).first()
@@ -166,6 +165,7 @@ class Collection(IDMixin, Base):
                 os.path.dirname(__file__), '../templates/collection_templates.json')
             collection = json.loads(
                 open(templateFile).read()).get(target.template)
+
         if collection:
 
             # print collection.get('folders')
@@ -207,8 +207,8 @@ class Collection(IDMixin, Base):
                             if tn:
                                 tcm = '@@'.join(folder.split('/')[:tn])
                                 newCollection.parent = generated.get(tcm)
-                            else:
-                                newCollection.parent_id = target.id
+                            #else:
+                                #newCollection.parent_id = target.id
                             generated[tc] = newCollection
                             if 'seq_' in part.lower():
                                 part = 'sequence'
@@ -231,13 +231,14 @@ class Collection(IDMixin, Base):
 
     @classmethod
     def __declare_last__(cls):
+        pass
         event.listen(cls, 'after_insert', cls.AfterUserCreationFuncs)
         event.listen(cls, 'before_delete', cls.BeforeUserDeleteFuncs)
 
 
 
-'''
 @event.listens_for(session, 'before_flush')
 def receive_before_flush(session, flush_context, instances):
     pass
-'''
+    session.commit()
+
