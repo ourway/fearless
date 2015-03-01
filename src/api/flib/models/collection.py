@@ -230,8 +230,10 @@ def createStandards(target, session):
                         tdest = os.path.join(partPath, 'thumb.png')
                         tsrc = os.path.join(
                             os.path.dirname(__file__), '../templates/icons/%s.png' % part.lower())
-                        if os.path.isfile(tsrc):
-                            shutil.copyfile(tsrc, tdest)
+                        if not os.path.isfile(tsrc):
+                            tsrc = os.path.join(os.path.dirname(__file__), '../templates/icons/data.png')
+
+                        shutil.copyfile(tsrc, tdest)
 
         if collection.get('copy'):
             for c in collection.get('copy'):
