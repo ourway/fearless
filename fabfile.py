@@ -297,8 +297,6 @@ def update_modules():
     with env.cd(_get_pwd()):
         env.run('{d}/pyenv/bin/pip install -U -r {d}/requirements'.format(d=_get_pwd()))
 
-
-
 @task
 def restart():
     sudo('supervisorctl restart all')
