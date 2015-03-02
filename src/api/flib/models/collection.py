@@ -84,11 +84,7 @@ class Collection(IDMixin, Base):
         return func.sum(Asset.content_size)
 
 
-    @validates('repository_id')
-    def updateUrl(self, key, data):
-        #if self.path:
-        #    self.url = os.path.join(repo.path, self.path)
-        return data
+
 
     @validates('schema')
     def load_json(self, key, schema):
@@ -98,25 +94,16 @@ class Collection(IDMixin, Base):
         except ValueError:
             pass
 
-    @validates('parent_id')
-    def update_path(self, key, data):
-        parent = session.query(Collection).filter_by(id=data).first()
-        if parent and parent.path not in self.path:
-            newpath = os.path.join(parent.path, self.path)
-            self.path = newpath
-        return data
+
 
     @validates('repository')
     def validate_repo(self, key, data):
-        print data
         return data
 
 
     @validates('path')
     def check_path(self, key, data):
         self.name = os.path.basename(data).title()
-        if self.repository:
-            self.url = os.path.join(self.repository.path, data)
         return data
 
     @hybrid_property
@@ -148,6 +135,11 @@ class Collection(IDMixin, Base):
 
 
 
+def finalFixes(target, session):
+    parent = session.query(Collection).filter_by(id=target.parent_id).first()
+    if parent and parent.path not in target.path:
+        newpath = os.path.join(parent.path, target.path)
+        target.path = newpath
 
 
 
@@ -157,11 +149,8 @@ def createStandards(target, session):
     repository = target.repository
     if not repository:
         repository = session.query(Repository).filter_by(id=target.repository_id).first()
-
-    if not repository:
-        return
-
     if target.path:
+        target.url = os.path.join(repository.path, target.path)  ## important
         collection_path = os.path.join(repository.path, target.path)
         if not os.path.isdir(collection_path):
             os.makedirs(collection_path)
@@ -170,7 +159,6 @@ def createStandards(target, session):
         dest = os.path.join(collection_path, 'thumb.png')
         if not os.path.isfile(dest):
             shutil.copyfile(thmb, dest)
-
     collection = defaultdict(list)
     if target.schema:
         collection = json.loads(target.schema)
@@ -247,17 +235,22 @@ def createStandards(target, session):
 
 
 
-
-
-
-
-
 def before_flush(session, flush_context, instances):
+    for i in session.new:
+        if i.__tablename__ == 'collection':
+            finalFixes(i, session)
+
+
+
+
+
+def after_flush(session, flush_context):
     for i in session.new:
         if i.__tablename__ == 'collection':
             createStandards(i, session)
 
 
+event.listen(SessionBase, "after_flush", after_flush)
 event.listen(SessionBase, "before_flush", before_flush)
 
 
