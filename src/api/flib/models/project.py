@@ -17,10 +17,12 @@ import sh
 import lxml
 from lxml import etree
 import datetime
+import hashlib
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, \
     Table, Float, Boolean, event, func
 
 from sqlalchemy_utils import PasswordType, aggregated
+import base64
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -32,8 +34,10 @@ from flib.utils.defaults import public_upload_folder, public_repository_path, \
 from flib.models.task import Task
 from flib.models.user import User
 from flib.models import r
+from flib.models.db import session_factory
 import ujson as json
 from flib.models.helpers import tag_maker, account_maker
+from mako.template import Template
 
 project_users = Table('project_users', Base.metadata,
                       Column('id', Integer, primary_key=True),
@@ -48,9 +52,7 @@ project_watchers = Table('project_watchers', Base.metadata,
                          Column('user_id', Integer, ForeignKey('user.id'))
                          )
 
-from db import Session
-session = Session()
-from mako.template import Template
+
 
 
 project_reports = Table('project_reports', Base.metadata,
@@ -92,6 +94,7 @@ class Project(IDMixin, Base):
     # 0-active, 1-pending, 2-stopped, 3-finished
     status = Column(Integer, default=0)
     name = Column(String(64), unique=True, nullable=False)
+    last_plan = Column(String(64))  ## latest md5 of tjp plan
     description = Column(Text())
     client_id = Column(Integer, ForeignKey("client.id"))
     start = Column(DateTime, nullable=False, default=now)
@@ -137,6 +140,9 @@ class Project(IDMixin, Base):
     accounts = association_proxy('acns', 'name', creator=account_maker)
     tgs = relationship("Tag", backref='projects', secondary="projects_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
+    tjp = relationship("Document", uselist=False)
+    plan_file = association_proxy('tjp', 'body')
+    
 
     @aggregated('tasks', Column(Integer))
     def calculate_number_of_tasks(self):
@@ -215,11 +221,11 @@ class Project(IDMixin, Base):
     #@property
     def plan(self, do_plan=True, do_guntt=False, do_resource=False,
              do_msproject=False, do_profit=False, do_trace=True,
-             do_traceSvg=False, report_width=2000):
+             do_traceSvg=False, report_width=1000):
         # lets select just one task
         puid = getUUID() + '_' + self.uuid
         schedule_path = os.path.join(public_upload_folder,
-                            'Fearless_project_%s.tjp' % puid)
+                            'Fearless_project_%s.tjp' % self.uuid)
         plan_path = os.path.join(public_upload_folder,
                                  'plan_%s.html' % (self.uuid))
         guntt_path = os.path.join(public_upload_folder,
@@ -237,15 +243,10 @@ class Project(IDMixin, Base):
         traceSvg_path = os.path.join(public_upload_folder,
                                      'TraceReport_%s.html' % (self.uuid))
 
-        for i in [schedule_path, plan_path, guntt_path, resource_path,
-                  msproject_path, profit_path, csv_path, trace_path,
-                  traceSvg_path]:
-            if os.path.isfile(i):
-                #pass
-                os.remove(i)
+
         if not r.get('fearless_tj3_lock'):
             r.set('fearless_tj3_lock', 'OK')
-            r.expire('fearless_tj3_lock', 15)
+            r.expire('fearless_tj3_lock', 5)  ## just for highly requested projects
         else:
             return
 
@@ -255,6 +256,7 @@ class Project(IDMixin, Base):
         templateFile = os.path.join(
             os.path.dirname(__file__), '../templates/masterProject.tjp')
         t = Template(filename=templateFile)
+        session = session_factory()
         projects = session.query(Project).order_by(asc(Project.id)).all()
         resources = session.query(User).all()
         subProjectTasks = []
@@ -271,6 +273,19 @@ class Project(IDMixin, Base):
         finalplan = t.render(reports=reports, subProjectTasks=subProjectTasks,
                              now=now(), subprojects=projects,
                              resources=resources)
+
+        session.close()
+
+
+        if self.last_plan == hashlib.md5(finalplan.encode('utf-8', 'ignore')).hexdigest():
+            print 'Using cached plan'
+            return
+        else:
+            for i in [schedule_path, plan_path, guntt_path, resource_path,
+                      msproject_path, profit_path, csv_path, trace_path,
+                      traceSvg_path]:
+                if os.path.isfile(i):
+                    os.remove(i)
 
         #plan_path = '/tmp/Fearless_project.tjp'
 
@@ -305,14 +320,20 @@ class Project(IDMixin, Base):
         def saveTable(path):
             '''Read main table from these files'''
             if os.path.isfile(path):
+                os.system('sed -i s/TaskJuggler/Fearless/ "%s"' % path)
+                os.system('sed -i s/taskjuggler.org/fearless.ir/ "%s"' % path)
+                os.system('wkhtmltoimage {p} {p}.png'.format(p=path))
                 #report = open(path)
                 #root = etree.parse(report)
                 #try:
                 #    main_table = root.xpath('//table')[0]
+                #     root.xpath('//a')[-1].text = 'Fearless'
                 #    tosave = etree.tostring(main_table)
                 #except lxml.etree.XMLSyntaxError:
-                #    return
+                #    pass
                 #finally:
+                    #pass
+                #    root.write(path)
                 #    pass
                     #with open(path, 'wb') as f:
                     #    f.write(tosave)
@@ -371,6 +392,7 @@ class Project(IDMixin, Base):
 
         self.reports = []  ## clean old
         self.reports.append(data)
+        self.last_plan =  hashlib.md5(finalplan.encode('utf-8', 'ignore')).hexdigest()
         return data
         # else:
         # return tj.stderr

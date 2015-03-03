@@ -12,19 +12,24 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
   taskreport breakdown1_${subproject.id} "plan_${subproject.uuid}"{
       formats html
       start ${subproject.start.strftime('%Y-%m-%d')}
-      end ${subproject.end.strftime('%Y-%m-%d')}
+      % if subproject.end.strftime('%Y-%m-%d') != subproject.start.strftime('%Y-%m-%d'):
+        end ${subproject.end.strftime('%Y-%m-%d')}
+      % endif
       loadunit longauto
       columns name, start, end, gauge, pathcriticalness {title "Critical path"}, complete {title "Progress"}
       taskroot fearless.__${subproject.id}
+
   }
 % endif
 % if do_guntt:
   taskreport breakdown2_${subproject.id} "guntt_${subproject.uuid}"{
       formats html
       start ${subproject.start.strftime('%Y-%m-%d')}
-      end ${subproject.end.strftime('%Y-%m-%d')}
-      loadunit longauto
-      columns bsi, name, chart { scale day width ${report_width} }, complete {title "Progress"}
+      % if subproject.end.strftime('%Y-%m-%d') != subproject.start.strftime('%Y-%m-%d'):
+        end ${subproject.end.strftime('%Y-%m-%d')}
+      % endif
+      loadunit hours
+      columns bsi, name, effort, chart { scale day width ${(subproject.end-subproject.start).days*20 + 20} }, complete {title "Progress"}
       taskroot fearless.__${subproject.id}
   }
 % endif
@@ -32,9 +37,12 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
   resourcereport resourceGraph_${subproject.id} "resource_${subproject.uuid}" {
     scenarios actual
     start ${subproject.start.strftime('%Y-%m-%d')}
-    end ${subproject.end.strftime('%Y-%m-%d')}
+    % if subproject.end.strftime('%Y-%m-%d') != subproject.start.strftime('%Y-%m-%d'):
+      end ${subproject.end.strftime('%Y-%m-%d')}
+    % endif
     formats html
-    columns name, effort, chart {scale day width ${report_width}}
+    columns name, effort, chart {scale day width ${(subproject.end-subproject.start).days*20 + 20} }
+    
     loadunit hours
     # We only like to show leaf tasks for leaf resources.
     hidetask ~(isleaf() & isleaf_())
@@ -46,7 +54,9 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
   export "MS-project_${subproject.uuid}" {
     formats mspxml
     start ${subproject.start.strftime('%Y-%m-%d')}
-    end ${subproject.end.strftime('%Y-%m-%d')}
+    % if subproject.end.strftime('%Y-%m-%d') != subproject.start.strftime('%Y-%m-%d'):
+      end ${subproject.end.strftime('%Y-%m-%d')}
+    % endif
     loadunit days
     taskroot fearless.__${subproject.id}
   }
@@ -76,7 +86,9 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
   tracereport burn_${subproject.id} "TraceReport_${subproject.uuid}" {
     formats html
     start ${subproject.start.strftime('%Y-%m-%d')}
-    end ${subproject.end.strftime('%Y-%m-%d')}
+    % if subproject.end.strftime('%Y-%m-%d') != subproject.start.strftime('%Y-%m-%d'):
+      end ${subproject.end.strftime('%Y-%m-%d')}
+    % endif
     columns complete
     hidetask actual.id != "fearless.__${subproject.id}"
   }

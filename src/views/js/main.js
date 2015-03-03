@@ -1106,8 +1106,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $('#canvasloader-container').fadeIn();
             projectReport = $http.get('/api/project/report/'+$scope.projId+'/plan');
             projectReport.success(function(resp){
-                $scope.prepareCal();
                 $scope.showCal();
+                $scope.prepareCal();
 
                 })
          }
@@ -1407,6 +1407,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             data = $scope.editTaskInfo;
         $http.post('/api/task/update/'+taskId, data).success(function(resp){
             $scope.replan = true;
+            $scope.generateReport();
             $scope.getTasksList();
             for (i in $scope.tasks){
                 _t = $scope.tasks[i];

@@ -297,15 +297,16 @@ background-color: #FFEDA5;
                 <button ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='cal', 'btn-success':mode=='cal'}" 
                         ng-class="{'active':mode=='cal'}" ng-click="showCal();prepareCal();" type="button"><em class="glyphicon glyphicon-calendar"></em> Calendar</button>
                 <a ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
-                    ng-class="{'active':mode=='plan'}" target='_new' href="/static/uploads/plan_{{project.uuid}}.html" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</a>
+                    ng-class="{'active':mode=='plan'}" data-gallery="plan_graphics" href="/static/uploads/plan_{{project.uuid}}.html.png" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</a>
                 <a ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" 
-                        target='_new' href="/static/uploads/guntt_{{project.uuid}}.html" type="button"><em class="glyphicon glyphicon-tasks"></em> Gantt</a>
+                        data-gallery="plan_graphics"
+                        href="/static/uploads/guntt_{{project.uuid}}.html.png" type="button"><em class="glyphicon glyphicon-tasks"></em> Gantt</a>
                 <a ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}"
-                        target='_new' href="/static/uploads/resource_{{project.uuid}}.html" type="button"><em class="glyphicon glyphicon-list-alt"></em> Resources</a>
+                        data-gallery="plan_graphics"
+                        href="/static/uploads/resource_{{project.uuid}}.html.png" type="button"><em class="glyphicon glyphicon-list-alt"></em> Resources</a>
                 <button ng-show="tasks.length>0 && $parent.isAmin" class="btn btn-info" ng-class="{'active':mode=='profit', 'btn-success':mode=='profit'}" 
                         ng-click="generateReport('profit')" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
-                <button  ng-show="tasks.length>0" class="btn btn-info" ng-click="print()" type="button"><em class="glyphicon glyphicon-print"></em> </button>
-                <button ng-show="mode!='cal' && tasks.length>0" class="btn btn-info" ng-click="replan=true;generateReport(mode)" type="button"><em class="glyphicon glyphicon-repeat"></em> </button>
+                <button ng-show="tasks.length>0" class="btn btn-info" ng-click="generateReport(mode)" type="button"><em class="glyphicon glyphicon-repeat"></em> </button>
 			</div>
 	</div>
 

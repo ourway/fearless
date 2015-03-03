@@ -351,9 +351,7 @@ filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff428bca', en
 background: #E6E6E6;
 padding: 1px; 
 color: #333; 
-border-radius: 5px; 
-border: 1px solid #419641;
-box-shadow: 1px 6px 64px rgba(5, 50, 77, 0.17);
+border: 1px solid #f2f2f2;
 }
 
 .strong{
