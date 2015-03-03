@@ -21,7 +21,7 @@ usage:
 '''
 
 __all__ = ['User', 'Report', 'Role', 'Group', 'Client', 'Task',
-           'Repository', 'Project', 'now', 'Ticket',
+           'Repository', 'Project', 'now', 'Ticket', 'Review',
            'Version', 'Tag', 'Shot', 'Asset', 'Scene', 'Sequence',
            'Document', 'Account', 'Date', 'Collection', 'r', 'Departement',
            'Comment', 'fdb', 'vdb', 'adb', 'rdb', 'ddb', 'mdb', 'riakClient', 'Expert']
@@ -81,6 +81,7 @@ from flib.models.comment import Comment
 from flib.models.date import Date
 from flib.models.expert import Expert
 from flib.models.user import User
+from flib.models.review import Review
 from flib.utils.defaults import public_repository_path
 Base.metadata.create_all(engine)
 

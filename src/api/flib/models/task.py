@@ -127,6 +127,7 @@ class Task(IDMixin, Base):
     accounts = association_proxy('acns', 'name', creator=account_maker)
     tgs = relationship("Tag", backref='tasks', secondary="tasks_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
+    reviews = relationship("Review", backref='task')
 
     ##########################################################################
 

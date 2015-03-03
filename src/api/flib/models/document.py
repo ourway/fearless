@@ -22,7 +22,7 @@ from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.associationproxy import association_proxy
-from flib.models.mixin import IDMixin, Base
+from flib.models.mixin import IDMixin, Base, getUUID
 from flib.models.helpers import tag_maker
 from . import rdb
 
@@ -49,9 +49,9 @@ class Document(IDMixin, Base):
     """
     title = Column(String(256), unique=True)
     data = deferred(Column(Text, nullable=False))  # load on access
-    user_id = Column('User', Integer, ForeignKey("user.id"))
-    asset_id = Column('Asset', Integer, ForeignKey("asset.id"))
-    author = relationship("User", backref='documents')
+    user_id = Column(Integer, ForeignKey("user.id"))
+    asset_id = Column(Integer, ForeignKey("asset.id"))
+    author = relationship("User", backref='documents', uselist=False)
     editors = relationship(
         "User", backref='edited_documents', secondary=user_documents)
     asset = relationship("Asset", backref='documents')
@@ -66,10 +66,15 @@ class Document(IDMixin, Base):
     shot_id = Column(Integer, ForeignKey('shot.id'))
     shot = relationship("Shot", backref='documents')
     sequence_id = Column(Integer, ForeignKey('sequence.id'))
+    review_id = Column(Integer, ForeignKey('review.id'))
     sequence = relationship("Sequence", backref='documents')
     period = relationship("Date", uselist=False)
     tgs = relationship("Tag", backref='documents', secondary="documents_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
+
+    def __init__(self, data, *args, **kw):
+        self.data = data
+
 
     @validates('data')
     def save_data_in_riak(self, key, data):

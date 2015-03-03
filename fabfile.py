@@ -159,13 +159,16 @@ def _prepare_supervisor():
     sudo('service supervisord start')
     sudo('chkconfig supervisord on')
 
-def _get_needed_softwares():
+@task
+def update_softwares():
     #sudo('yum install epel-release -y')
-    sudo('yum install pcre-devel -y')
-    sudo('yum install mysql-server -y')
-    sudo('yum install mysql-devel -y')
-    sudo('yum install libxslt-devel littlecms libxml2-devel libffi-devel -y')
-    sudo('yum install libev libev-devel -y')
+    softwares = ['libxslt-devel', 'littlecms', 'libxml2-devel', 'libffi-devel',
+                 'pcre-devel', 'mysql-server', 'libev-devel', 'ImageMagick',
+                 'ImageMagick-devel', 'pcre-devel' ]
+
+    
+    sudo('yum groupinstall "Development Tools"')
+    sudo('yum install %s -y' % ' '.join(softwares))
     sudo('yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u25-linux-x64.rpm -y')
     sudo("ln -s -f /usr/java/default/bin/java /usr/bin/java")
     sudo('yum install riak -y')
@@ -316,7 +319,7 @@ def initilize_to_defaults():
     with env.cd(os.path.join(_get_pwd(), 'src/api')):
         #env.run('ls -la')
         env.run('../../pyenv/bin/python flib/scripts/apply_basic_settings.py')
-    restart_app()
+    restart()
 
 @task
 def plan():
@@ -350,7 +353,7 @@ def log():
 
 @task
 def install():
-    _get_needed_softwares()
+    update_softwares()
     _install_nginx()
     _install_redis()
     _install_ffmpeg()

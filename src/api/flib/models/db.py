@@ -7,9 +7,11 @@ from sqlalchemy.exc import DisconnectionError
 from sqlalchemy.orm.session import Session as SessionBase, object_session
 from sqlalchemy.event.api import listen
 
-
 from sqlalchemy.pool import SingletonThreadPool
 from flib.models.mixin import Base
+
+
+from flib.models.helpers import createCollectionStandards, collectionFinalFixes
 
 #db_path = ':memory:'
 #db_path = 'database/studio.db'
@@ -70,7 +72,7 @@ class _SessionSignalEvents(object):
                 elif change == 'insert' and hasattr(obj, '__commit_insert__'):
                     obj.__commit_insert__()
                 elif change == 'update' and hasattr(obj, '__commit_update__'):
-                    obj.__commit_update__()    
+                    obj.__commit_update__()
             d.clear()
  
     @staticmethod
@@ -122,10 +124,30 @@ engine = create_engine(DB, echo=False,
                        pool_size=256, max_overflow=128)
 
 
-event.listen(engine, 'checkout', checkout_listener)
 
 #engine = create_engine("postgresql+psycopg2://farsheed:rrferl@localhost:5432/fearless2")
 #engine.raw_connection().connection.text_factory = str
 #Session = mptt_sessionmaker(sessionmaker(bind=engine, expire_on_commit=False))
 session_factory = sessionmaker(bind=engine)
 Session = scoped_session(session_factory)
+
+
+
+
+def before_flush(session, flush_context, instances):
+    for i in session.new:
+        if i.__tablename__ == 'collection':
+            collectionFinalFixes(i, session)
+
+
+
+def after_flush(session, flush_context):
+    for i in session.new:
+        if i.__tablename__ == 'collection':
+            createCollectionStandards(i, session)
+
+
+event.listen(SessionBase, "after_flush", after_flush)
+event.listen(SessionBase, "before_flush", before_flush)
+event.listen(engine, 'checkout', checkout_listener)
+

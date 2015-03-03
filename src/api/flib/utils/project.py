@@ -360,8 +360,16 @@ class ListTasks:
                     'complete': i.complete,
                     'dependent_of': [{'title': j.title, 'id': j.id} for j in i.dependent_of],
                     'depends': [{'title': g.title, 'id': g.id} for g in i.depends],
-                    'resources': [{'id': k.id, 'lastname': k.lastname} for k in i.resources]
-
+                    'resources': [{'id': k.id, 'lastname': k.lastname} for k in i.resources],
+                    'reviews': [{
+                            'id':h.id,
+                            'reviewer':{
+                                 'id':h.reviewer.id,
+                                 'firstname':h.reviewer.firstname,
+                                 'lastname':h.reviewer.lastname,
+                                        },
+                            'content':h.content
+                            } for h in i.reviews],
                     } for i in project.tasks]
             resp.body = data
 

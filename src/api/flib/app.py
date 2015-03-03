@@ -96,7 +96,8 @@ class ThingsResource:
         req.env['hooooooo'] = 'gooooooooo'
         # resp.set_header('Set-Cookie','fig=newton; Max-Age=200')
         # print req.get_header('Cookie')
-        resp.body = "okokokoko"
+        resp.content_type = 'text/html'
+        resp.body = "pong"
 
 
 
@@ -388,7 +389,7 @@ for table in tables:
 #######################################################
 
 # things will handle all requests to the '/things' URL path
-app.add_route('/api/things', things)
+app.add_route('/api/ping', things)
 app.add_route('/api/users', Users())
 app.add_route('/api/auth/login', Login())
 app.add_route('/api/auth/signup', Signup())

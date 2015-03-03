@@ -189,11 +189,13 @@ def addFileToGit(path, assetUuid, version):
     if not os.path.isdir(asset_folder):  # not cloned
         command = 'git clone -l "%s" "%s"' % (git_dir, asset_folder)
         process(command)
+        return 'CLONED'
     else:
         command = 'pull'
         arg = 'git --work-tree="{d}" --git-dir="{d}/.git" {c}'.format(
             d=asset_folder, c=command)
         process(arg)
+        return 'PULLED'
 
 
 def getTags(path, assetUuid):
@@ -241,7 +243,7 @@ def generateVideoThumbnail(path, assetUuid, version, w=146, h=110, text='thmb'):
     fid = target.uuid + '_' + text + '_' + str(version)
     fmt = 'png'
     thpath = os.path.join(public_upload_folder, fid + '.' + fmt)
-    arg = '''"%s" -i "%s" -an -r 1 -vf "select=gte(n\,100)" -threads 1 -vframes 1 -s %sx%s -y "%s"''' \
+    arg = '''nice "%s" -i "%s" -an -r 1 -vf "select=gte(n\,100)" -threads 1 -vframes 1 -s %sx%s -y "%s"''' \
         % (ffmpeg, path, w, h, thpath)
     pr = process(arg)
     session.close()
@@ -265,7 +267,7 @@ def generateVideoPreview(path, version, assetUuid):
         ffmpeg -i movie.mkv -r 30 -strict -2 -async 1 -acodec aac -ac 2 -ab 160k -threads 0 -preset slower -profile:v high -level 4.1 -f mp4 -refs 4 ipadVideo.mp4
     '''
 
-    arg = '''"%s" -i "%s" -r 24 -strict -2 -async 1 -acodec aac -ac 2 -ab 160k -threads 1 -preset slower -profile:v high -level 4.1 -f mp4 -refs 4 -s hd480 "%s"''' \
+    arg = '''nice "%s" -i "%s" -r 24 -strict -2 -async 1 -acodec aac -ac 2 -ab 160k -threads 1 -preset slower -profile:v high -level 4.1 -f mp4 -refs 4 -s hd480 "%s"''' \
         % (ffmpeg, path, previewPath)
 
     print arg
@@ -295,7 +297,7 @@ def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb')
     fid = target.uuid + '_' + text + '_' + str(version)
     fmt = 'png'
     newthmbPath = os.path.join(public_upload_folder, fid + '.' + fmt)
-    cmd = 'convert "%s%s" %s -resize %sx%s "%s"' % (
+    cmd = 'nice convert "%s%s" %s -resize %sx%s "%s"' % (
         path, page, extra, w, h, newthmbPath)
     if content_type == 'image/webp':
         cmd = '%s -i "%s" -s %sx%s "%s"' % (ffmpeg, path, w, h, newthmbPath)
