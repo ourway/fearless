@@ -323,6 +323,8 @@ class Project(IDMixin, Base):
                 os.system('sed -i s/TaskJuggler/Fearless/ "%s"' % path)
                 os.system('sed -i s/taskjuggler.org/fearless.ir/ "%s"' % path)
                 os.system('wkhtmltoimage {p} {p}.png'.format(p=path))
+                os.system('gzip -f -9 {p}'.format(p=path))
+                os.system('gzip -f -9 {p}.png'.format(p=path))
                 #report = open(path)
                 #root = etree.parse(report)
                 #try:

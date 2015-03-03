@@ -171,6 +171,7 @@ def update_softwares():
     sudo('yum install %s -y' % ' '.join(softwares))
     sudo('yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u25-linux-x64.rpm -y')
     sudo("ln -s -f /usr/java/default/bin/java /usr/bin/java")
+    sudo('yum install https://dl.dropboxusercontent.com/u/3004939/datacenter/fearless/wkhtmltox-0.12.2.1_linux-centos6-amd64.rpm -y')
     sudo('yum install riak -y')
     sudo('chkconfig riak on')
     sudo('chkconfig mysqld on')

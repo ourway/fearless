@@ -95,8 +95,8 @@ server {
         gzip_vary on;
         gzip_http_version 1.1;
         gzip_comp_level 4;
-        gzip_types text/plain image/png image/jpeg image/gif text/css application/x-javascript;
-        expires 1h;
+        gzip_types text/plain image/png image/jpeg image/gif text/css application/x-javascript application/octet-stream;
+        expires 8h;
         gzip on;
         gzip_static on;
         #expires max;
@@ -109,9 +109,23 @@ server {
         alias ${HOME}/.fearlessrepo;    # your cache path
         gzip_vary on;
         gzip_http_version 1.1;
+        gzip_comp_level 9;
+        gzip_types text/plain text/css text/plain text/xml application/xml application/javascript application/x-javascript text/javascript application/json text/x-json;
+        expires 24h;
+        gzip on;
+        gzip_static on;
+        add_header Cache-Control public;
+        #error_page 404 /404;
+        #error_page 403 /403;
+    }
+
+     location /static/uploads {
+        alias  ${HOME}/.fearlessrepo/uploads;    # your cache path
+        gzip_vary on;
+        gzip_http_version 1.1;
         gzip_comp_level 4;
-        gzip_types text/plain image/png image/jpeg image/gif text/css application/x-javascript;
-        expires off;
+        gzip_types text/plain text/css text/plain text/xml application/xml application/javascript application/x-javascript text/javascript application/json text/x-json;
+        expires 5s;
         gzip on;
         gzip_static on;
         add_header Cache-Control public;
@@ -125,6 +139,12 @@ server {
         proxy_ignore_client_abort off;
         proxy_buffering off;
         proxy_redirect off;
+        gzip             on;
+        gzip_proxied     any;
+        gzip_types       text/css text/plain text/xml application/xml application/javascript application/x-javascript text/javascript application/json text/x-json;
+        gzip_vary        on;
+        gzip_disable     "MSIE [1-6]\.";
+        gzip_comp_level 9;
         proxy_connect_timeout       10;
         proxy_send_timeout          600;
         proxy_read_timeout          600;

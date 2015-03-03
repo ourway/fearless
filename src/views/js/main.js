@@ -1108,6 +1108,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             projectReport.success(function(resp){
                 $scope.showCal();
                 $scope.prepareCal();
+                $scope.generateBurndownChart(resp.trace);
+                $scope.generateProgressChart(resp.json);
 
                 })
          }
@@ -1148,8 +1150,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         }
                     }
 
-                $scope.generateBurndownChart();
-                $scope.generateProgressChart();
+
                 //if ($scope.mode == 'cal')
                 //    $scope.prepareCal();
             });
@@ -1222,11 +1223,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             }
         }
 
-        $scope.generateProgressChart = function(){
-            _data = localStorage.getItem(getprefix + 'json');
-            if (!_data || _data=='undefined')
-                return null;
-            data = JSON.parse(_data);
+        $scope.generateProgressChart = function(data){
+
             complete = 0;
             for (i in data)
             {
@@ -1243,13 +1241,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             
         }
 
-        $scope.generateBurndownChart = function(){
+        $scope.generateBurndownChart = function(data){
             _tasks = $scope.tasks;
 
-            _data = localStorage.getItem(getprefix + 'trace');
-            if (!_data || _data=='undefined')
-                return null;
-            data = JSON.parse(_data);
+
+            //data = JSON.parse(_data);
             complete = 0;
             lables = data.Date;
             keys = Object.keys(data);
@@ -2153,7 +2149,7 @@ fearlessApp.controller('taggerCtrl',  function($scope, $rootScope, $routeParams,
             target.tgs.push({'name':$scope.tags.userTagFilter})
         }
         $scope.tags.userTagFilter = null;
-        console.log($scope.tags.data)
+        //console.log($scope.tags.data)
         $http.post('/api/setTags/'+type+'/'+target.uuid, {'tags':$scope.tags.data});
         $scope.tags.data = [];
     }
