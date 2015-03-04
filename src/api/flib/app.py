@@ -48,7 +48,7 @@ from flib.utils.AAA import Login, Signup, Authenticate,\
 from flib.utils.showtime import GetUserShows
 from flib.utils.project import GetProjectDetails, GetProjectLatestReport, \
     ListProjects, AddProject, AddTask, ListTasks, GetTask, UpdateTask, \
-    DeleteTask, UpdateProject, UserTasksCard
+    DeleteTask, UpdateProject, UserTasksCard, TaskReview
 
 from flib.utils.sequence import AddSequence
 
@@ -420,6 +420,7 @@ app.add_route('/api/task/list/{projId}', ListTasks())
 app.add_route('/api/task/{taskId}', GetTask())
 app.add_route('/api/task/update/{taskId}', UpdateTask())
 app.add_route('/api/task/delete/{taskId}', DeleteTask())
+app.add_route('/api/task/review/{taskId}', TaskReview())
 app.add_route('/api/taskcard/{date}', UserTasksCard())
 app.add_route('/api/sequence/add/{projId}', AddSequence())
 app.add_route('/api/sendmail', Mailer())

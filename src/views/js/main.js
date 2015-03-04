@@ -1345,8 +1345,15 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             })
 
         }
+        $scope.sendTaskReview = function(){
+            $http.post('/api/task/review/'+$scope.reviewTask.id, {'review':$scope.reviewTask.body})
+            .success(function(resp){
+                    reviewTask = {};
+                    $('#taskReviewModal').modal('hide');
+            });
+        }
 
-        $scope.taskDetail = function(taskId) {
+        $scope.taskDetail = function(taskId, review) {
             //console.log(taskId);
             gettask = $http.get('/api/task/'+taskId);
             gettask.success(function(resp){
@@ -1362,12 +1369,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 resp.end = new Date(resp.end*1000);
                 //resp.start = timeConverter(Math.max(resp.start, resp.project_start));
                 //resp.end = new Date(Math.min(resp.end, resp.project_end)*1000);
+                $scope.reviewTask = resp;
+                //$scope.reviewTask.body = null;
+
                 $scope.editTaskInfo = resp;
-                $scope.editTaskInfo.updatedResources = [];
-                $scope.editTaskInfo.updatedDepends = [];
-                $scope.editTaskInfo.updatedResponsibles = [];
-                $scope.editTaskInfo.updatedWatchers= [];
-                $scope.editTaskInfo.updatedAlternativeResources= [];
+
                 $scope.can_depend = JSON.parse(JSON.stringify($scope.tasks));
                 //lets clean tasks that this task is dependent_of
                 for (i in $scope.can_depend){
@@ -1382,8 +1388,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                             $scope.can_depend.splice(i, 1);
                     }
                 }
-
-                $('#taskDetailModal').modal('show');
+                if (!review)
+                    $('#taskDetailModal').modal('show');
 
                     });
             gettask.error(function(resp){
@@ -1409,6 +1415,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
     $scope.updateTask = function(taskId, data){
         if (!data)
             data = $scope.editTaskInfo;
+            data.updatedResources = [];
+            data.updatedDepends = [];
+            data.updatedResponsibles = [];
+            data.updatedWatchers= [];
+            data.updatedAlternativeResources= [];
         $http.post('/api/task/update/'+taskId, data).success(function(resp){
             $scope.replan = true;
             $scope.generateReport();
@@ -1449,8 +1460,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
     };
 
     $scope.isTaskLate = function(task){
-        if (task.complete != 100)
+        if (task.complete!=100 && task.end!=task.start)
+        {
+            console.log(task)
             result = new Date() > new Date(task.end*1000);
+        }
         return result;
     };
 

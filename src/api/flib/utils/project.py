@@ -14,7 +14,7 @@ Clean code is much better than Cleaner comments!
 
 import json as json
 from flib.models import Project, User, Report, Departement, Task, \
-    Sequence, Repository, Collection
+    Sequence, Repository, Collection, Review
 from flib.utils.AAA import Authorize, getUserInfoFromSession
 import falcon
 from flib.utils.helpers import get_params
@@ -240,7 +240,7 @@ class GetProjectLatestReport:
                     effort = d.get('effort')
                     effort_left = d.get('effort left')
                     effort_done = d.get('effort done')
-                    gauge = d.get('gauge')
+                    gauge = d.get('schedule gauge')
 
                     if typ == 'task':
                         target.start = start
@@ -306,7 +306,11 @@ class AddTask:
         start = taskData.get('start')
         end = taskData.get('end')
         priority = taskData.get('priority')
-        project = req.session.query(Project).filter_by(id=int(projId)).first()
+        project = req.session.query(Project).filter_by(id=int(projId)).scalar()
+        if req.session.query(Project).join(Task).filter_by(title=title).all():
+            resp.status = falcon.HTTP_203
+            resp.body = {'message':'task already available'}
+            return
         if not start:
             start = project.start
         else:
@@ -357,6 +361,7 @@ class ListTasks:
                     'title': i.title,
                     'id': i.id,
                     'effort': i.effort,
+                    'gauge': i.gauge,
                     'complete': i.complete,
                     'dependent_of': [{'title': j.title, 'id': j.id} for j in i.dependent_of],
                     'depends': [{'title': g.title, 'id': g.id} for g in i.depends],
@@ -382,7 +387,10 @@ class GetTask:
             resp.status = falcon.HTTP_404
             return
         resp.body = {'title': task.title, 'id': task.id, 'start': task.start,
-                     'end': task.end, 'effort': task.effort,
+                     'end': task.end, 
+                     'effort': task.effort,
+                     'gauge': task.gauge,
+                     'project_lead': task.project.lead_id,
                      'depends': [{'title': i.title, 'id': i.id} for i in task.depends],
                      'dependent_of': [{'title': i.title, 'id': i.id} for i in task.dependent_of],
                      'resources': [{'fullname': i.fullname, 'id': i.id} for i in task.resources],
@@ -496,3 +504,42 @@ class UserTasksCard:
                 }
             }
             for i in data]
+
+class TaskReview:
+    def on_post(self, req, resp, taskId):
+        user = getUserInfoFromSession(req, resp)
+        uid = int(user.get('id'))
+
+        reviewData = get_params(req.stream, flat=False)
+        rew = reviewData.get('review')
+        if rew:
+            r = Review(content=rew, reviewer_id=uid, task_id=taskId)
+            req.session.add(r)
+            resp.status = falcon.HTTP_201
+        else:
+            resp.status = falcon.HTTP_204
+
+    def on_get(self, req, resp, taskId):
+        task = req.session.query(Task).filter_by(id=taskId).scalar()
+        if not task:
+            resp.status = falcon.HTTP_404
+            return
+        resp.body = [
+            {
+                'content':i.content,
+                'created_on':i.created_on,
+                'reviewer':
+                    {
+                        'firstname':i.reviewer.firstname,
+                        'id':i.reviewer.id,
+                        'lastname':i.reviewer.lastname,
+                    }
+            }
+            for i in task.reviews
+            ]
+
+
+
+
+
+

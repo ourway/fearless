@@ -18,6 +18,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 import bz2
 import json as json
 import base64
+from ftfy import fix_text
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
 from sqlalchemy.orm import validates, deferred
@@ -60,6 +61,7 @@ class Document(IDMixin, Base):
     task_id = Column(Integer, ForeignKey('task.id'))
     task = relationship("Task", backref='documents')
     account_id = Column(Integer, ForeignKey('account.id'))
+    ticket_id = Column(Integer, ForeignKey('ticket.id'))
     account = relationship("Account", backref='documents')
     client_id = Column(Integer, ForeignKey('client.id'))
     client = relationship("Client", backref='documents')
@@ -79,11 +81,13 @@ class Document(IDMixin, Base):
     @validates('data')
     def save_data_in_riak(self, key, data):
         self.uuid = getUUID()
-        newReportObject = rdb.new(self.uuid, data.encode('utf-8'))
+        newReportObject = rdb.new(self.uuid, {'doc':fix_text(data)})
         newReportObject.store()
         return self.uuid
 
     @property
     def body(self):
         dataObject = rdb.get(self.uuid)
-        return dataObject.data
+        if isinstance(dataObject.data, dict):
+            return dataObject.data.get('doc')
+
