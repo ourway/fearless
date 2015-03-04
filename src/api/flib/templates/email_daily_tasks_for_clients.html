@@ -3,7 +3,7 @@ Hello and good morning ${recipient},  here is a daily tasks report for ${jtoday}
 <br/>
 % if ongoing_tasks:
     <div id="fearless_report_ongoing_tasks_div" style="border-radius:5px;border:1px solid #f2f2f2;padding:10px;background:#fafafa">
-    <h3>Ongoing on-schedule tasks:</h3>
+    <h3>On Schedule tasks:</h3>
         <table style="border:1px solid #ccc;" >
             <tr style="background:#6EA4B5;color:white">
                 <th>No</th>
@@ -33,12 +33,18 @@ Hello and good morning ${recipient},  here is a daily tasks report for ${jtoday}
                     </td>
                     <td >
                         <span>${task.title}</span><br/>
-                        <small style="color:grey">Task description</small>
+                        <span>${task.title}</span><br/>
+                        <div style="background:#FFF4CA;padding:5px;border:1px solid #ccc;">
+                            % for rev in task.reviews:
+                                <small style="color:#555">${rev.reviewer.lastname.title()}: ${rev.content}</small>
+                            <br/>
+                        % endfor
+                        </div>
                     </td>
                     <td ><strong>${task.complete}%</strong></td>
                     <td><table>
                             % for resource in task.resources:
-                                <tr stlye="border-bottom:1px solid #ccc">
+                                <tr stlye="border-bottom:1px solid #F4ECD8">
                                     <td style="background:#5bc0de;color:white"><small>${resource.firstname} ${resource.lastname}</small></td>
                                 </tr>
                             % endfor
@@ -55,7 +61,7 @@ Hello and good morning ${recipient},  here is a daily tasks report for ${jtoday}
 
 % if behind_tasks:
     <div id="fearless_report_unfinished_tasks_div" style="border-radius:5px;border:1px solid #f2f2f2;padding:10px;background:#fafafa">
-    <h3>Unfinished behind-schedule tasks:</h3>
+    <h3>Behind Schedule tasks:</h3>
     <table style="border:1px solid #ccc;" >
             <tr style="background:#6EA4B5;color:white">
                 <th>No</th>
@@ -82,7 +88,12 @@ Hello and good morning ${recipient},  here is a daily tasks report for ${jtoday}
                     </td>
                     <td >
                         <span>${task.title}</span><br/>
-                        <small style="color:grey">A reason why this task has not finished yet</small>
+                        <div style="background:#FFF4CA;padding:5px;border:1px solid F4ECD8;">
+                            % for rev in task.reviews:
+                                <small style="color:#555">${rev.reviewer.lastname.title()}: ${rev.content}</small>
+                            <br/>
+                        % endfor
+                        </div>
                     </td>
                     <td ><strong>${task.complete}%</strong></td>
                     <td ><strong>${arrow.get(task.end).humanize()}</strong></td>

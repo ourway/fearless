@@ -18,9 +18,11 @@ pta = os.path.abspath(os.path.join(current_path, '../../'))
 #print pta
 sys.path.append(pta)
 
-from flib.models import Task, User, Report, r, fdb
+from flib.models import Project, Review, Task, User, Report, r, fdb
 from flib.models.db import session_factory
+from sqlalchemy import or_, and_
 import arrow
+from datetime import date, timedelta
 from flib.tasks import send_envelope  # send emails
 from mako.template import Template
 import os
@@ -28,6 +30,7 @@ from collections import defaultdict
 from sqlalchemy import desc, asc
 from calverter import Calverter
 cal = Calverter()
+import misaka
 
 
 templates_folder = os.path.join(os.path.dirname(__file__), '../templates')
@@ -42,6 +45,13 @@ year, month, day = now.year, now.month, now.day
 jd = cal.gregorian_to_jd(year, month, day)
 jtoday = '/'.join(map(str, cal.jd_to_jalali(jd)))
 today = now.format('YYYY-MM-DD')
+_yesterday = date.today() - timedelta(1)
+yesterday = _yesterday.strftime('%Y-%m-%d')
+_tomorrow = date.today() + timedelta(1)
+tomorrow = _tomorrow.strftime('%Y-%m-%d')
+print '*'*80
+print '\tReporting on %s' % today
+print '*'*80
 
 ################################################################
 session = session_factory()
@@ -49,11 +59,16 @@ session = session_factory()
 '''On going tasks:  Tasks that started and are not finished'''
 
 
-ongoing_tasks = session.query(Task).filter(Task.start < now.date())\
-    .filter(Task.end > now.date()).order_by(desc(Task.complete)).all()
+projects = session.query(Project).all()
+
+for i in projects:
+    i.plan()
+
+ongoing_tasks = session.query(Task).filter(or_(Task.gauge=='on schedule', Task.gauge=='ahead of schedule'))\
+        .order_by(desc(Task.complete)).all()
 '''Behind schedule tasks:  Tasks that are not finished on time and are not completed yet'''
-behind_tasks = session.query(Task).filter(Task.end < now.date())\
-    .filter(Task.complete < 100).order_by(asc(Task.end)).all()
+behind_tasks = session.query(Task).filter_by(gauge='behind schedule')\
+    .order_by(asc(Task.end)).all()
 
 
 
@@ -139,6 +154,34 @@ def dailyTaskCardForResources():
     return True
 
 
+def dailyUserReportsToClients():
+    reports = session.query(Report).filter(Report.user).filter(Report.created_on.between(today, tomorrow))\
+        .order_by(desc(Report.created_on)).all()
+
+    result = []
+    for i in reports:
+        data = {
+            'reporter': {'id':i.user[0].id, 'firstname':i.user[0].firstname,
+                         'lastname':i.user[0].lastname},
+                'body': i.body,
+                'datetime': i.created_on,
+                'tgs':i.tgs,
+                }
+        result.append(data)
+    to = ['farsheed.ashouri@gmail.com']
+    subject = 'Studio Reports - User Reports - %s' % jtoday
+    message =  getTemplate('email_daily_tasks_for_clients.html')\
+        .render(ongoing_tasks=target_ongoing_tasks, behind_tasks=target_behind_tasks,
+                today=today, jtoday=jtoday, arrow=arrow, recipient=target.firstname,
+                responsibility='contributing to')
+
+    sent = send_envelope.delay(to, cc, bcc, subject, message)
+    print 'Report sent to %s' % target.email
+
+
+
+
+
 if __name__ == '__main__':
     '''This module should be run directly for crontab'''
     import sys
@@ -149,6 +192,7 @@ if __name__ == '__main__':
         print '\t\t dailyTasksReportForClients'
         print '\t\t dailyTasksReportForProjectLeads'
         print '\t\t dailyTaskCardForResources'
+        print '\t\t dailyUserReportsToClients'
         print '\t------------------'
         sys.exit()
     command = sys.argv[1] + '()'
