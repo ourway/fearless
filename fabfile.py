@@ -164,9 +164,12 @@ def update_softwares():
     #sudo('yum install epel-release -y')
     softwares = ['libxslt-devel', 'littlecms', 'libxml2-devel', 'libffi-devel',
                  'pcre-devel', 'mysql-server', 'libev-devel', 'ImageMagick',
-                 'ImageMagick-devel', 'pcre-devel' ]
+                 'ImageMagick-devel', 'pcre-devel', 'postgresql94-devel',
+                 'postgresql94-server', 'postgresql94-contrib', 'postgresql94-libs',
+                 'postgresql94-docs', 'postgresql94']
 
     
+    sudo('yum install http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-centos94-9.4-1.noarch.rpm -y')
     sudo('yum groupinstall "Development Tools"')
     sudo('yum install %s -y' % ' '.join(softwares))
     sudo('yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u25-linux-x64.rpm -y')
