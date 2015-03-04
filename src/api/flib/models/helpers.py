@@ -45,9 +45,15 @@ def createCollectionStandards(target, session):
         collection_path = os.path.join(repository.path, target.path)
         if not os.path.isdir(collection_path):
             os.makedirs(collection_path)
-        thmb = os.path.join(
+        default_thmb = os.path.join(
             os.path.dirname(__file__), '../templates/icons/asset_thumb.png')
         dest = os.path.join(collection_path, 'thumb.png')
+        main_thumb = os.path.join(
+            os.path.dirname(__file__), '../templates/icons/%s.png' % target.name.lower())
+
+        thmb = default_thmb
+        if os.path.isfile(main_thumb):
+            thmb = main_thumb
         if not os.path.isfile(dest):
             shutil.copyfile(thmb, dest)
     collection = defaultdict(list)
@@ -111,7 +117,6 @@ def createCollectionStandards(target, session):
                             os.path.dirname(__file__), '../templates/icons/%s.png' % part.lower())
                         if not os.path.isfile(tsrc):
                             tsrc = os.path.join(os.path.dirname(__file__), '../templates/icons/data.png')
-
                         shutil.copyfile(tsrc, tdest)
 
         if collection.get('copy'):

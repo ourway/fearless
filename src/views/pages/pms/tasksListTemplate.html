@@ -1,7 +1,14 @@
 <div>
-    <input ng-if="tasks" type="text" class="form-control" placeholder="Filter Tasks" 
+    <input ng-if="tasks.length" type="text" class="form-control" placeholder="Filter Tasks" 
     ng-model="project.filterTaskName" />
     <div id="tasksDiv">
+        <div ng-if="tasks.length" style="margin: 0px;" class="alert alert-info alert-dismissable">
+           <button type="button" class="close" data-dismiss="alert" 
+              aria-hidden="true">
+              &times;
+           </button>
+           <span>This project has {{tasks.length}} tasks.</span>
+        </div>
         <table class="table table-responsive table table-bordered table-striped table-hover refresh-container pull-down">
         <tr title="{{task.name}}" class="active" 
             ng-repeat="task in tasks | orderBy:'start' | filter:project.filterTaskName ">
@@ -11,7 +18,34 @@
                 <div ng-show="isMyTask(task)">
                     <a><em style="color:rgb(96, 139, 181);" class="glyphicon glyphicon-user"></em></a>
                 </div>
-                <div ng-show="task.effort==0">
+
+            </td>
+            <td ng-class="{'success':task.complete==100, 'warning':task.complete==0 && !isTaskLate(task), 'danger':isTaskLate(task)}">
+                <em style="color:lightgrey" class="glyphicon glyphicon-list-alt"></em>
+                <a class="taskA" ng-click="taskDetail(task.id)"  ng-class="{'farsi':!$parent.isASCII(task.title)}" 
+                    style="font-size: 13px;" data-task-title="{{toTitleCase(task.title)}}" 
+                    ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" 
+                    id="task_{{task.id}}" >{{toTitleCase(task.title).slice(0,30)}}</a>
+
+
+            <div class="progress" style="height:3px;margin-bottom: 0px;">
+                <div class="progress-bar" role="progressbar" aria-valuenow="{{task.complete}}" 
+                    aria-valuemin="0" aria-valuemax="100" style="width: {{task.complete}}%;">
+                  <span class="sr-only">{{task.complete}}% Complete</span>
+              </div>
+            </div>
+
+            <small style="color:grey" ng-repeat="person in task.resources track by $index">
+                <a ng-show="person.id!=$parent.userInfo.userid" style="color:grey" href="#/user/{{person.id}}">{{person.lastname}}</a>
+                <a ng-show="person.id==$parent.userInfo.userid" style="color:grey" href="#/user/{{person.id}}"><strong>You</strong></a>
+                <small ng-if="$index!=task.resources.length-1">, </small>
+            </small>
+            <br/>
+            <a class="taskDetailOptions glyphicon glyphicon-edit"
+                style="padding:3px;cursor:pointer;text-decoration:none;color:grey"></a>
+            </td>
+            <td>
+                        <div ng-show="task.effort==0">
                     <a><em style="color:#515151" class="glyphicon glyphicon-screenshot"></em></a>
                 </div>
                <div ng-show="task.complete==100">
@@ -23,27 +57,6 @@
                 <div ng-show="task.depends.length>0">
                     <em style="color:grey" class="glyphicon glyphicon-import"></em>
                 </div>
-            </td>
-            <td ng-class="{'success':task.complete==100, 'warning':task.complete==0 && !isTaskLate(task), 'danger':isTaskLate(task)}">
-                <em style="color:lightgrey" class="glyphicon glyphicon-list-alt"></em>
-                <a class="taskA" ng-click="taskDetail(task.id)"  ng-class="{'farsi':!$parent.isASCII(task.title)}" 
-                    style="font-size: 13px;" data-task-title="{{toTitleCase(task.title)}}" 
-                    ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" 
-                    id="task_{{task.id}}" >{{toTitleCase(task.title).slice(0,30)}}</a>
-
-
-            <div class="progress" style="height:3px;">
-                <div class="progress-bar" role="progressbar" aria-valuenow="{{task.complete}}" 
-                    aria-valuemin="0" aria-valuemax="100" style="width: {{task.complete}}%;">
-                  <span class="sr-only">{{task.complete}}% Complete</span>
-              </div>
-            </div>
-                <a><button class="taskDetailOptions btn btn-sm btn-default glyphicon glyphicon-edit pull-right"></button></a>
-            <small style="color:grey" ng-repeat="person in task.resources track by $index">
-                <a style="color:grey" href="#/user/{{person.id}}">{{person.lastname}}</a>
-                <small ng-if="$index!=task.resources.length-1">, <small>
-            </small>
-            </td>
         </tr>
         </table>
     </div>

@@ -992,37 +992,13 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
 
 fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
         $scope.$parent.page = 'pms';
+        $('#burndown_chart_div').children().remove();
+        $('#progress_chart_div').children().remove();
 
         $scope.replan = true;
         $scope.timeConverter = timeConverter;
 
-        $scope.burndownChart = new Morris.Line({
-          element: 'burndown_chart_div',
-          xkey: 'date',
-          events:[timeConverter()],
-          data:[{'date':new Date().toDateString(), 'value':0, 'expected':0, 'Offset':0}],
-          ykeys: ['value', 'expected', 'Offset'],
-          lineColors: ['#5bc0de', 'green', '#c2aeae'],
-          lineWidth: ['5', '1', '1'],
-          labels: ['Completed', 'Expected', 'Offset'],
-          fillOpacity:1,
-          goals: [0, 100],
-          parseTime:true,
-          hideHover:'auto',
-          resize:true,
-        });
 
-        $scope.progressPyChart = Morris.Donut({
-          element: 'progress_chart_div',
-          data: [
-            {label: "Completed", value: 0},
-            {label: "Remaining", value: 100},
-          ],
-          colors:['#5bc0de','lightgrey'],
-          postUnits:'%',
-          hideHover:'auto',
-          resize:true
-        });
 
 
             $scope.projId = $routeParams.projId;
@@ -1108,9 +1084,41 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             projectReport.success(function(resp){
                 $scope.showCal();
                 $scope.prepareCal();
-                $scope.generateBurndownChart(resp.trace);
-                $scope.generateProgressChart(resp.json);
-
+                if (resp.trace)
+                    {
+                    $('#burndown_chart_div').children().remove();
+        $scope.burndownChart = new Morris.Line({
+          element: 'burndown_chart_div',
+          xkey: 'date',
+          events:[timeConverter()],
+          data:[{'date':new Date().toDateString(), 'value':0, 'expected':0, 'Offset':0}],
+          ykeys: ['value', 'expected', 'Offset'],
+          lineColors: ['#5bc0de', 'green', '#c2aeae'],
+          lineWidth: ['5', '1', '1'],
+          labels: ['Completed', 'Expected', 'Offset'],
+          fillOpacity:1,
+          goals: [0, 100],
+          parseTime:true,
+          hideHover:'auto',
+          resize:true,
+        });
+                    $scope.generateBurndownChart(resp.trace);
+                    }
+                if (resp.json){
+                    $('#progress_chart_div').children().remove();
+        $scope.progressPyChart = Morris.Donut({
+          element: 'progress_chart_div',
+          data: [
+            {label: "Completed", value: 0},
+            {label: "Remaining", value: 100},
+          ],
+          colors:['#5bc0de','lightgrey'],
+          postUnits:'%',
+          hideHover:'auto',
+          resize:true
+        });
+                    $scope.generateProgressChart(resp.json);
+                    }
                 })
          }
 

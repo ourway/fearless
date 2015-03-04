@@ -4,7 +4,7 @@
 				<div class="modal-dialog">
 					<div class="modal-content">
 						<div class="modal-header">
-							 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+							 <button class="close" data-dismiss="modal" aria-hidden="true">×</button>
 							<h4 class="modal-title" id="myModalLabel">
                                 Add a new item to {{collection.name}}
 							</h4>
@@ -18,11 +18,10 @@
                         <input type="text" class="form-control" placeholder="enter item name here ..." ng-model="newSubCollection.name" autofocus/>
 					</div>
 				</div>
-			</form>
 						</div>
 						<div class="modal-footer">
-                            <button type="button" class="btn btn-default" ng-click="newSubCollection={}" data-dismiss="modal">Close</button>
-                            <button type="button" ng-disabled="!newSubCollection.name"
+                            <button class="btn btn-default" ng-click="newSubCollection={}" data-dismiss="modal">Close</button>
+                            <button type="submit" ng-disabled="!newSubCollection.name"
                                 ng-click="createNewSubCollection()" class="btn btn-success">Add item to {{collection.name}}</button>
 						</div>
 					</div>
@@ -30,6 +29,7 @@
 				</div>
 
 			</div>
+			</form>
 
 
 
@@ -91,7 +91,9 @@
                         <a href="#ams/c/{{subcol.id}}?page=1" title="{{subcol.description}}"
                         ><img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
 						<div class="caption">
-                            <h5><a href="#ams/c/{{subcol.id}}?page=1" style="color:#333;word-wrap: break-word;">{{subcol.name}}</a>
+                            <h5><a href="#ams/c/{{subcol.id}}?page=1" 
+                                    title="{{subcol.name}}"
+                                    style="color:#337AB7;word-wrap: break-word;text-decoration:none"><strong>{{subcol.name}}</strong></a>
                                 <small ng-show="subcol.number_of_assets">[<span style="color:green">{{subcol.number_of_assets}}</span>]</small>
                                 <span ng-show="subcol.children.length">
                                     [<span style="color:grey"><strong>{{subcol.children.length}}</strong></span>]</span>

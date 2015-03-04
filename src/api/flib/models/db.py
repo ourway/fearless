@@ -29,9 +29,12 @@ msqldbname = 'fearless1'
 msql = 'mysql+mysqldb://root:rrferl@localhost/%s' % msqldbname
 
 sqlite = 'sqlite:///%s' % db_path
-postgres = 'postgresql+psycopg2://user:password@/dbname'
+#postgres = 'postgresql+psycopg2://user:password@/dbname'
+postgres = 'postgresql+psycopg2://postgres:rrferl@localhost:5432/fearless1'
+#postgresql+psycopg2://user:password@host:port/dbname
 
 DB = msql
+#DB = postgres
 
 
 def checkout_listener(dbapi_con, con_record, con_proxy):
