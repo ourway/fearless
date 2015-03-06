@@ -54,7 +54,8 @@ mdb.set_properties({'search_index': 'fearless_messages_database'})
 mdb.enable_search()
 # r.flushdb()
 
-from flib.models.db import session_factory, engine, Base
+from flib.models.db import session_factory, engine
+from flib.models.mixin import Base
 session = session_factory()
 
 

@@ -19,6 +19,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Tabl
 
 #from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
+from sqlalchemy.orm.session import Session as SessionBase
 from sqlalchemy.orm import validates, deferred
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -72,6 +73,7 @@ class Collection(IDMixin, Base):
         "Tag", backref='collections', secondary="collections_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
 
+
     @aggregated('assets', Column(Integer))
     def number_of_assets(self):
         return func.sum('1')
@@ -81,29 +83,23 @@ class Collection(IDMixin, Base):
         from . import Asset
         return func.sum(Asset.content_size)
 
+
+
+
     @validates('schema')
-    def load_schema(self, key, schema):
+    def load_json(self, key, schema):
         try:
-            collection_data = self.parseScheme(schema)
-            if collection_data:
-                self.createChildren(collection_data)
+            data = json.loads(schema)
             return schema
         except ValueError:
             pass
 
-    @validates('template')
-    def read_template(self, key, template):
-        try:
-            collection_data = self.parseTemplate(template)
-            if collection_data:
-                self.createChildren(collection_data)
-            return template
-        except ValueError:
-            pass
-
     @validates('parent_id')
-    def okok(self, key, data):
-        self.create_and_update_path(data)
+    def update_path(self, key, data):
+        parent = session.query(Collection).filter_by(id=data).first()
+        if parent and parent.path not in self.path:
+            newpath = os.path.join(parent.path, self.path)
+            self.path = newpath
         return data
 
     @validates('path')
@@ -118,48 +114,73 @@ class Collection(IDMixin, Base):
         #    self.repository.path, self.path or '')
         #git = GIT('.', wt=collection_path)
         # return git.archive()
+    @staticmethod
+    def BeforeUserDeleteFuncs(mapper, connection, target):
+        print 'deleting collection %s' % target.id
+        try:
+            shutil.rmtree(target.url)
+        except Exception, e:
+            print e
 
-    def create_and_update_path(self, parent_id):
-        from flib.models import Repository, Collection
-        repository = session.query(Repository).filter_by(
-            id=self.repository_id).scalar()
-        parent = session.query(Collection).filter_by(id=parent_id).scalar()
-        if parent and not parent.path in self.path:
-            self.path = os.path.join(parent.path, self.path)
-        self.url = os.path.join(repository.path, self.path)  # important
-        if not os.path.isdir(self.url):
-            os.makedirs(self.url)
-        default_thmb = os.path.join(
+
+    @classmethod
+    def __declare_last__(cls):
+        pass
+        #event.listen(cls, 'after_insert', cls.AfterUserCreationFuncs)
+        event.listen(cls, 'before_delete', cls.BeforeUserDeleteFuncs)
+
+
+
+
+def createStandards(target, session):
+    '''Some operations after getting ID'''
+    repository = target.repository
+    parent = target.parent
+    if not repository:
+        repository = session.query(Repository).filter_by(id=target.repository_id).one()
+    if not parent:
+        parent = session.query(Collection).filter_by(id=target.parent_id).scalar()
+
+    if parent and not parent.path in target.path:
+        target.path = os.path.join(parent.path, target.path)
+
+    target.url = os.path.join(repository.path, target.path)
+    if not os.path.isdir(target.url):
+        os.makedirs(target.url)
+        thmb = os.path.join(
             os.path.dirname(__file__), '../templates/icons/asset_thumb.png')
-        dest = os.path.join(self.url, 'thumb.png')
-        main_thumb = os.path.join(
-            os.path.dirname(__file__), '../templates/icons/%s.png' % self.name.lower())
-
-        thmb = default_thmb
-        if os.path.isfile(main_thumb):
-            thmb = main_thumb
+        prefthmb = os.path.join(
+            os.path.dirname(__file__), '../templates/icons/%s.png'%target.name.lower())
+        dest = os.path.join(target.url, 'thumb.png')
         if not os.path.isfile(dest):
-            shutil.copyfile(thmb, dest)
+            if os.path.isfile(prefthmb):
+                thmb=prefthmb
+            if os.path.isfile(thmb):
+                shutil.copyfile(thmb, dest)
+            else:
+                print thmb, 'NOT FOUND'
 
-    def parseScheme(self, schema):
-        collection = defaultdict(list)
-        return json.loads(self.schema)
 
-    def parseTemplate(self, template):
+    collection = defaultdict(list)
+    if target.schema:
+        collection = json.loads(target.schema)
+    elif target.template:
         templateFile = os.path.join(
             os.path.dirname(__file__), '../templates/collection_templates.json')
-        return json.loads(
-            open(templateFile).read()).get(template)
+        collection = json.loads(
+            open(templateFile).read()).get(target.template)
 
-    def createChildren(self, collection):
+    if collection:
+
+        # print collection.get('folders')
         if collection.get('folders'):
             generated = {}
-            self.container = False
-            self.holdAssets = False
+            target.container = False
+            target.holdAssets = False
 
             for folder in collection.get('folders'):
                 newFolder = os.path.join(
-                    self.url, folder)
+                    repository.path, target.path or repository.path, folder)
                 if not os.path.isdir(newFolder):
                     try:
                         os.makedirs(newFolder)
@@ -180,55 +201,62 @@ class Collection(IDMixin, Base):
                     part = part.strip()
                     tn = folder.split('/').index(part)
                     tc = '@@'.join(folder.split('/')[:tn + 1])
-                    partPath = os.path.join(self.url,  tc.replace('@@', '/'))
+                    partPath = os.path.join(
+                        repository.path, target.path,  tc.replace('@@', '/'))
 
                     if not generated.get(tc):
                         newCollection = Collection(name=newCollectionName, path=part,
-                                                   repository_id=self.repository_id,
+                                                   repository_id=repository.id,
                                                    container=container, holdAssets=holdAssets)
-                        # session.add(newCollection)
                         if tn:
                             tcm = '@@'.join(folder.split('/')[:tn])
                             newCollection.parent = generated.get(tcm)
+                            #session.add(newCollection)
                         else:
-                            newCollection.parent = self
+                            newCollection.parent = target
                         generated[tc] = newCollection
                         if 'seq_' in part.lower():
                             part = 'sequence'
                         tdest = os.path.join(partPath, 'thumb.png')
                         tsrc = os.path.join(
                             os.path.dirname(__file__), '../templates/icons/%s.png' % part.lower())
+                        def_src = os.path.join(
+                            os.path.dirname(__file__), '../templates/icons/data.png')
                         if not os.path.isfile(tsrc):
-                            tsrc = os.path.join(
-                                os.path.dirname(__file__), '../templates/icons/data.png')
+                            tsrc = def_src
                         shutil.copyfile(tsrc, tdest)
+ 
 
         if collection.get('copy'):
             for c in collection.get('copy'):
                 src = os.path.join(
                     os.path.dirname(__file__), '../templates/%s' % collection.get('copy')[c])
                 dest = os.path.join(
-                    self.url, c)
+                    repository.path, target.path or repository.path, c)
 
                 if os.path.isfile(src):
                     shutil.copyfile(src, dest)
 
-    @staticmethod
-    def BeforeDeleteFuncs(mapper, connection, self):
-        print 'deleting collection %s' % self.id
-        if self.url and os.path.isdir(self.url):
-            try:
-                shutil.rmtree(self.url)
-            except Exception, e:
-                print e
 
-    @classmethod
-    def __declare_last__(cls):
-        pass
-        event.listen(cls, 'before_delete', cls.BeforeDeleteFuncs)
+
+
+
+
+
+
+def before_flush(session, flush_context, instances):
+    for i in session.new:
+        if i.__tablename__ == 'collection':
+            createStandards(i, session)
+
+
+event.listen(SessionBase, "before_flush", before_flush)
+
+
 
 
 #@event.listens_for(session, 'before_flush')
-# def receive_before_flush(session, flush_context, instances):
+#def receive_before_flush(session, flush_context, instances):
 #    pass
 #    #session.commit()
+

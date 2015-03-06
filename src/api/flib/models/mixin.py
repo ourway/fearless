@@ -20,12 +20,26 @@ from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
     Float, Boolean, event
 
+from flib.models.db import Session
+
 from uuid import uuid4  # for random guid generation
 import base64
 
 now = datetime.datetime.utcnow
 
-Base = declarative_base()
+
+class ORMClass(object):
+    """The base of the Base class
+    """
+
+    query = Session.query_property()
+
+
+
+
+Base = declarative_base(cls=ORMClass)
+
+
 logger = None
 db_files_path = os.path.join(os.path.dirname(__file__), '../database/files')
 if not os.path.isdir(db_files_path):

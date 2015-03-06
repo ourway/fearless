@@ -86,7 +86,7 @@
                 </button>
 			</div>
             <h3>{{collection.name | uppercase}}</h3>
-                <div class="col-md-2" ng-repeat="subcol in collection.children track by $index">
+                <div class="col-lg-3 col-md-3 col-sm-3" ng-repeat="subcol in collection.children track by $index">
 					<div class="thumbnail asm_thumb">
                         <a href="#ams/c/{{subcol.id}}?page=1" title="{{subcol.description}}"
                         ><img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>

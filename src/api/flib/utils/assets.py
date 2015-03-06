@@ -64,22 +64,18 @@ class AssetSave:
 
         try:
             repo = int(repo)
-            targetRepo = req.session.query(
-                Repository).filter_by(id=repo).first()
+            targetRepo = Repository.query.filter_by(id=repo).scalar()
         except ValueError:
-            targetRepo = req.session.query(
-                Repository).filter_by(name=repo).first()
+            targetRepo = Repository.query.filter_by(name=repo).scalar()
 
         if not uploader:
             uploader = -1
-            targetRepo = req.session.query(Repository).filter(
-                Repository.name == 'public').first()
+            targetRepo = Repository.query.filter_by(name='public').scalar()
 
-        targetUser = req.session.query(User).filter_by(id=uploader).first()
+        targetUser = User.query.filter_by(id=uploader).scalar()
 
         if not targetRepo:
-            targetRepo = req.session.query(
-                Repository).filter_by(name=repo).first()
+            targetRepo = Repository.query.filter_by(name=repo).scalar()
             if not targetRepo:
                 targetRepo = Repository(
                     name=repo, path=os.path.join(public_repository_path, repo))
@@ -92,12 +88,12 @@ class AssetSave:
         _cid = req.get_param('collection_id')
         collection = None
         if _cid:
-            collection = req.session.query(Collection).filter_by(repository=targetRepo)\
-                            .filter_by(id=_cid).first()
+            collection = Collection.query.filter_by(repository=targetRepo)\
+                            .filter_by(id=_cid).scalar()
         _cname = req.get_param('collection')
         if _cname:
-            collection = req.session.query(Collection).filter_by(repository=targetRepo)\
-                            .filter_by(name=_cname).first()
+            collection = Collection.query.filter_by(repository=targetRepo)\
+                            .filter_by(name=_cname).scalar()
         if not collection:
             collection = Collection(path='danger', repository=targetRepo)
             req.session.add(collection)
@@ -138,8 +134,8 @@ class AssetSave:
                                             name)
             #name = os.path.basename(tempraryStoragePath)
             if _md5:
-                availableAsset = req.session.query(Asset).filter_by(key=_md5).join(
-                    Collection).filter_by(repository_id=targetRepo.id).first()
+                availableAsset = Asset.query.filter_by(key=_md5).join(
+                    Collection).filter_by(repository_id=targetRepo.id).scalar()
                 if availableAsset:
                     # create folder if not available
                     checkPath(os.path.dirname(tempraryStoragePath))
@@ -166,9 +162,9 @@ class AssetSave:
 
             fullname = name
             name = (name[:10] + '..') if len(name) > 10 else name
-            asset = req.session.query(Asset).filter(
+            asset = Asset.query.filter(
                 Asset.repository == targetRepo).filter_by(collection=collection)\
-                .filter_by(fullname=fullname).first()
+                .filter_by(fullname=fullname).scalar()
             resp.status = falcon.HTTP_200
             if not asset:
                 _uid = getUUID()
@@ -199,8 +195,7 @@ class AssetSave:
                     f.write(thmb_data)
             if attach_to:
                 parent_id = int(attach_to)
-                parent = req.session.query(
-                    Asset).filter_by(id=parent_id).first()
+                parent = Asset.query.filter_by(id=parent_id).scalar()
                 asset.attached_to.append(parent)
             resp.body = {'message': 'Asset created|updated', 'key': asset.key,
                          'url': asset.url, 'fullname': asset.fullname, 'uuid': asset.uuid,
@@ -273,11 +268,10 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False, c
     dataMd5 = md5.hexdigest()
     # check if there is an asset with same key
     if not repoId:
-        availableAsset = req.session.query(
-            Asset).filter_by(key=dataMd5).first()
+        availableAsset = Asset.query.filter_by(key=dataMd5).scalar()
     else:
         availableAsset = req.session.query(Asset).filter_by(key=dataMd5).join(
-            Collection).filter_by(repository_id=repoId).first()
+            Collection).filter_by(repository_id=repoId).scalar()
 
     '''First lets clean asset is there no files linked to it'''
     if availableAsset:
@@ -351,10 +345,9 @@ class GetAsset:
         '''Serve asset based on a key (riak key for finding path'''
         name = req.get_param('name')
         if name == 'true':
-            target = req.session.query(Asset).filter(
-                Asset.fullname == key).first()
+            target = Asset.query.filter_by(fullname=key).scalar()
         else:
-            target = req.session.query(Asset).filter(Asset.key == key).first()
+            target = Asset.query.filter_by(key=key).scalar()
         if target:
             sz = os.path.getsize(target.full_path)
             modifier = target.modifiers[-1]
@@ -379,7 +372,7 @@ class GetAsset:
 class DeleteAsset:
 
     def on_delete(self, req, resp, id):
-        target = req.session.query(Asset).filter(Asset.id == id).first()
+        target = Asset.query.filter_by(id=id).scalar()
         userInfo = getUserInfoFromSession(req, resp)
         if userInfo.get('id') == target.owner.id:
             req.session.delete(target)
@@ -468,8 +461,7 @@ class ListAssets:
 class CollectionInfo:
 
     def on_get(self, req, resp, collectionId):
-        target = req.session.query(Collection).filter(
-            Collection.id == int(collectionId)).first()
+        target = Collection.query.filter_by(id=int(collectionId)).scalar()
         start = req.get_param('s')
         end = req.get_param('e')
         if start:
@@ -484,10 +476,9 @@ class CollectionInfo:
         end = max(start, end)
 
         if target:
-            assets = req.session.query(Asset).filter_by(collection_id=target.id).order_by(
+            assets = Asset.query.filter_by(collection_id=target.id).order_by(
                 desc(Asset.modified_on)).slice(start, end)
-            assets_count = req.session.query(Asset).filter_by(
-                collection_id=target.id).count()
+            assets_count = Asset.query.filter_by(collection_id=target.id).count()
             data = dict()
             data['name'] = target.name
             data['name'] = target.name
@@ -571,8 +562,7 @@ class AssetCheckout:
     def on_post(self, req, resp, assetId):
         '''Get asset thumbnails from riak'''
         try:
-            target = req.session.query(Asset).filter_by(
-                id=int(assetId)).first()
+            target = Asset.query.filter_by(id=int(assetId)).scalar()
         except ValueError:
             resp.status = falcon.HTTP_404
             return

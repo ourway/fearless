@@ -885,6 +885,7 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
                    $scope.getProjsData();
                     $scope.newProject = {};
                    $('#projectAddModal').modal('hide');
+                   //document.location = '#/pms/'+resp.id;
                    });
         }
 
@@ -1026,6 +1027,16 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             }
             $scope.resetNewtask();
             $scope.resetNewSequnences();
+            $scope.deleteProject = function(){
+                if (confirm('Are you sure you want to delete this project?')){
+                    $http.delete('/api/db/project/'+$scope.projId).success(function(resp){
+                            
+                            document.location = '#/pms';
+                            })
+
+                }
+
+            }
             $scope.getProjectDetails = function(){
             projectDetails = $http.get('/api/project/get/'+$scope.projId);
             projectDetails.success(function(resp){
@@ -1173,7 +1184,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 {
                     if (resp.message == 'OK'){
                         $('#taskSeqModal').modal('hide');
-                        $scope.generateReport();
+                        $scope.getProjectDetails();
 
                     }
                 });

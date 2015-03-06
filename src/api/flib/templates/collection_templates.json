@@ -215,6 +215,21 @@
             "Characters.txt": "characters_guideline.txt"
         },
         "ignore": []
+    },
+    "research": {
+        "folders": {
+            "references": [],
+            "publish": [],
+            "drafts": [],
+            },
+        "copy": {
+            "thumb.png": "icons/research.png"
+        },
+        "files": {
+            "README.txt": "readme.txt",
+            "Characters.txt": "characters_guideline.txt"
+        },
+        "ignore": []
     }
 }
 

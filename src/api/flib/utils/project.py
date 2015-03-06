@@ -30,7 +30,7 @@ from cStringIO import StringIO
 class GetProjectDetails:
 
     def on_get(self, req, resp, id):
-        project = req.session.query(Project).filter(Project.id == id).first()
+        project = Project.query.filter(Project.id == id).first()
         collections = list()
         if project:
             if project.repositories:
@@ -74,9 +74,9 @@ class ListProjects:
     def on_get(self, req, resp):
         user = getUserInfoFromSession(req, resp)
         uid = user.get('id')
-        projects = req.session.query(Project).filter(or_(Project.lead_id == uid,
+        projects = Project.query.filter(or_(Project.lead_id == uid,
                                                          Project.director_id == uid, Project.creator_id == uid)).all()
-        involving = req.session.query(Project).join(Task)\
+        involving = Project.query.join(Task)\
             .join(Task.resources).filter(Task.resources.any(User.id == uid)).all()
         data = list(set(projects + involving))
         resp.body = data
@@ -100,8 +100,8 @@ class AddProject:
             lead_id = int(projectData.get('lead_id'))
 
         if start and end and name and lead_id:
-            leader = req.session.query(User).filter_by(id=lead_id).first()
-            creater = req.session.query(User).filter_by(
+            leader = User.query.filter_by(id=lead_id).first()
+            creater = User.query.filter_by(
                 id=user.get('id')).first()
             new = Project(
                 start=start, name=name, end=end, lead=leader, creater=creater)
@@ -111,7 +111,7 @@ class AddProject:
             newRepoFolder = os.path.join(home, '.fearlessrepo', repoName)
             if not os.path.isdir(newRepoFolder):
                 os.makedirs(newRepoFolder)
-            new_repository = req.session.query(Repository).filter(
+            new_repository = Repository.query.filter(
                 Repository.name == repoName).first()
             if not new_repository:
                 new_repository = Repository(name=repoName, path=newRepoFolder)
@@ -171,7 +171,7 @@ class GetProjectLatestReport:
         elif action == 'traceSvg':
             do_traceSvg = True
 
-        project = req.session.query(Project).filter(Project.id == id).first()
+        project = Project.query.filter(Project.id == id).first()
         if not project:
             resp.status = falcon.HTTP_404
             return
@@ -185,7 +185,7 @@ class GetProjectLatestReport:
             reports = project.reports
             if reports:
                 repid = reports[-1]
-                report = req.session.query(Report).filter_by(id=repid).scalar()
+                report = Report.query.filter_by(id=repid).scalar()
                 if report:
                     data = report.body
         if data:
@@ -215,11 +215,11 @@ class GetProjectLatestReport:
                 typ = d.get('type')
                 if typ == 'task':
                     taskid = int(d.get('taskid'))
-                    target = req.session.query(Task).filter(
+                    target = Task.query.filter(
                         Task.id == taskid).first()
                 elif typ == 'project':
                     projectid = int(d.get('projectid'))
-                    target = req.session.query(Project).filter(
+                    target = Project.query.filter(
                         Project.id == projectid).first()
                 if target and update:  # donble check
                     start = d.get('start')
@@ -264,7 +264,7 @@ class UpdateProject:
     def on_post(self, req, resp, projId):
         user = getUserInfoFromSession(req, resp)
         data = get_params(req.stream, flat=False)
-        project = req.session.query(Project).filter(
+        project = Project.query.filter(
             Project.id == int(projId)).first()
         if project:
             project.start = data.get('start')
@@ -277,8 +277,7 @@ class UpdateProject:
             if data.get('watchers'):
                 for eachWatcherId in data.get('watchers'):
                     _id = int(eachWatcherId.get('id'))
-                    watcher = req.session.query(
-                        User).filter(User.id == _id).first()
+                    watcher = User.query.filter(User.id == _id).first()
                     project.watchers.append(watcher)
 
             resp.body = {'message': 'OK'}
@@ -298,8 +297,8 @@ class AddTask:
         start = taskData.get('start')
         end = taskData.get('end')
         priority = taskData.get('priority')
-        project = req.session.query(Project).filter_by(id=int(projId)).scalar()
-        if req.session.query(Project).join(Task).filter_by(title=title).all():
+        project = Project.query.filter_by(id=int(projId)).scalar()
+        if Project.query.join(Task).filter_by(title=title).all():
             resp.status = falcon.HTTP_203
             resp.body = {'message': 'task already available'}
             return
@@ -322,16 +321,16 @@ class AddTask:
         if taskData.get('manager'):
             manager = int(taskData.get('manager').get('id'))
         for i in resources:
-            resource = req.session.query(User).filter(User.id == i).first()
+            resource = User.query.filter(User.id == i).first()
             if resource:
                 newTask.resources.append(resource)
         if manager:
-            manager = req.session.query(User).filter(
+            manager = User.query.filter(
                 User.id == manager).first()
             if manager:
                 newTask.responsibles.append(manager)
         for i in depends:
-            depend = req.session.query(Task).filter(Task.id == i).first()
+            depend = Task.query.filter(Task.id == i).first()
             if depend:
                 newTask.depends.append(depend)
         #depend = session.query(Task).filter(Task.id==depends).first()
@@ -344,7 +343,7 @@ class ListTasks:
 
     def on_get(self, req, resp, projId):
         user = getUserInfoFromSession(req, resp)
-        project = req.session.query(Project).filter(
+        project = Project.query.filter(
             Project.id == projId).first()
         if project:
             data = [{
@@ -374,7 +373,7 @@ class ListTasks:
 class GetTask:
 
     def on_get(self, req, resp, taskId):
-        task = req.session.query(Task).filter(Task.id == taskId).first()
+        task = Task.query.filter(Task.id == taskId).first()
         if not task:
             resp.status = falcon.HTTP_404
             return
@@ -423,7 +422,7 @@ class UpdateTask:
         priority = taskData.get('priority')
         _id = int(taskData.get('id'))
         priority = int(taskData.get('priority'))
-        target = req.session.query(Task).filter(Task.id == _id).first()
+        target = Task.query.filter(Task.id == _id).first()
         if target:
             target.title = title
             target.start = start
@@ -435,7 +434,7 @@ class UpdateTask:
             if resources:
                 target.resources = []
             for i in resources:
-                resource = req.session.query(User).filter(User.id == i).first()
+                resource = User.query.filter(User.id == i).first()
                 if not resource in target.project.users:
                     target.project.users.append(resource)
                 if resource:
@@ -443,7 +442,7 @@ class UpdateTask:
             if depends:
                 target.depends = []
             for i in depends:
-                depend = req.session.query(Task).filter(Task.id == i).first()
+                depend = Task.query.filter(Task.id == i).first()
                 if depend:
                     target.depends.append(depend)
 
@@ -457,7 +456,7 @@ class DeleteTask:
 
     def on_delete(self, req, resp, taskId):
         user = getUserInfoFromSession(req, resp)
-        target = req.session.query(Task).filter(Task.id == taskId).first()
+        target = Task.query.filter(Task.id == taskId).first()
         if target:
             req.session.delete(target)
             resp.status = falcon.HTTP_202
@@ -478,12 +477,12 @@ class UserTasksCard:
         tomorrow = (now() + datetime.timedelta(hours=24)).strftime('%Y-%m-%d')
         if date == 'today':
             '''These are tasks that started today and not finished yet'''
-            data = req.session.query(Task).filter(Task.resources.any(id=uid))\
+            data = Task.query.filter(Task.resources.any(id=uid))\
                 .filter(Task.start <= now())\
                 .filter(Task.complete < 100).filter(Task.end > now()).all()
         elif date == 'before':
             '''These are tasks that should have been ended before nut not completed yet'''
-            data = req.session.query(Task).filter(Task.resources.any(id=uid))\
+            data = Task.query.filter(Task.resources.any(id=uid))\
                 .filter(Task.end <= now()).filter(Task.complete < 100).all()
 
         resp.body = [
@@ -514,7 +513,7 @@ class TaskReview:
             resp.status = falcon.HTTP_204
 
     def on_get(self, req, resp, taskId):
-        task = req.session.query(Task).filter_by(id=taskId).scalar()
+        task = Task.query.filter_by(id=taskId).scalar()
         if not task:
             resp.status = falcon.HTTP_404
             return
