@@ -576,8 +576,8 @@ class AssetCheckout:
         except ValueError:
             resp.status = falcon.HTTP_404
             return
-        from tasks import process
-        from utils.defaults import ASSETS
+        from flib.tasks import process
+        from flib.utils.defaults import ASSETS
         asset_folder = os.path.join(ASSETS, target.uuid)
         if not os.path.isdir(asset_folder):
             resp.status = falcon.HTTP_204  # empty content
