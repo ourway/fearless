@@ -119,7 +119,7 @@
                 </div>
 
 
-                <div ng-if="asset.content_type.split('/')[0]=='image'">
+                <div ng-if="asset.poster && asset.content_type.split('/')[0]=='image'">
                     <img ng-src="{{'/static/'+asset.poster}}" style="margin:auto;width:100%" class="thumbnail"/>
                 </div>
                 <div style="padding:15px;" class="col-md-12" ng-if="asset.thumbnail && assetVersions.length>1">
