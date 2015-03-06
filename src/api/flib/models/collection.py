@@ -125,13 +125,7 @@ class Collection(IDMixin, Base):
         #    self.repository.path, self.path or '')
         #git = GIT('.', wt=collection_path)
         # return git.archive()
-    @staticmethod
-    def BeforeDeleteFuncs(mapper, connection, self):
-        print 'deleting collection %s' % self.id
-        try:
-            shutil.rmtree(self.url)
-        except Exception, e:
-            print e
+
 
     def create_and_update_path(self, parent_id):
         from flib.models import Repository, Collection
@@ -226,6 +220,18 @@ class Collection(IDMixin, Base):
 
                 if os.path.isfile(src):
                     shutil.copyfile(src, dest)
+
+
+
+
+    @staticmethod
+    def BeforeDeleteFuncs(mapper, connection, self):
+        print 'deleting collection %s' % self.id
+        if self.url and os.path.isdir(self.url):
+            try:
+                shutil.rmtree(self.url)
+            except Exception, e:
+                print e
 
 
     @classmethod
