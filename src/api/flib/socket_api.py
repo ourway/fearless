@@ -16,10 +16,10 @@ Clean code is much better than Cleaner comments!
 from gevent import monkey
 monkey.patch_all()
 
-import sys, os
+import sys
+import os
 current_path = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.dirname(current_path)))
-
 
 
 from flib.falcon_patch import falcon

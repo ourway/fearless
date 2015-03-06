@@ -72,7 +72,6 @@ class Collection(IDMixin, Base):
         "Tag", backref='collections', secondary="collections_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)
 
-
     @aggregated('assets', Column(Integer))
     def number_of_assets(self):
         return func.sum('1')
@@ -81,9 +80,6 @@ class Collection(IDMixin, Base):
     def collection_size(self):
         from . import Asset
         return func.sum(Asset.content_size)
-
-
-
 
     @validates('schema')
     def load_schema(self, key, schema):
@@ -105,13 +101,10 @@ class Collection(IDMixin, Base):
         except ValueError:
             pass
 
-
-
     @validates('parent_id')
     def okok(self, key, data):
         self.create_and_update_path(data)
         return data
-
 
     @validates('path')
     def check_path(self, key, data):
@@ -126,14 +119,14 @@ class Collection(IDMixin, Base):
         #git = GIT('.', wt=collection_path)
         # return git.archive()
 
-
     def create_and_update_path(self, parent_id):
         from flib.models import Repository, Collection
-        repository = session.query(Repository).filter_by(id=self.repository_id).scalar()
+        repository = session.query(Repository).filter_by(
+            id=self.repository_id).scalar()
         parent = session.query(Collection).filter_by(id=parent_id).scalar()
         if parent and not parent.path in self.path:
             self.path = os.path.join(parent.path, self.path)
-        self.url = os.path.join(repository.path, self.path)  ## important
+        self.url = os.path.join(repository.path, self.path)  # important
         if not os.path.isdir(self.url):
             os.makedirs(self.url)
         default_thmb = os.path.join(
@@ -152,13 +145,11 @@ class Collection(IDMixin, Base):
         collection = defaultdict(list)
         return json.loads(self.schema)
 
-
     def parseTemplate(self, template):
         templateFile = os.path.join(
-                os.path.dirname(__file__), '../templates/collection_templates.json')
+            os.path.dirname(__file__), '../templates/collection_templates.json')
         return json.loads(
-                open(templateFile).read()).get(template)
-
+            open(templateFile).read()).get(template)
 
     def createChildren(self, collection):
         if collection.get('folders'):
@@ -195,7 +186,7 @@ class Collection(IDMixin, Base):
                         newCollection = Collection(name=newCollectionName, path=part,
                                                    repository_id=self.repository_id,
                                                    container=container, holdAssets=holdAssets)
-                        #session.add(newCollection)
+                        # session.add(newCollection)
                         if tn:
                             tcm = '@@'.join(folder.split('/')[:tn])
                             newCollection.parent = generated.get(tcm)
@@ -208,7 +199,8 @@ class Collection(IDMixin, Base):
                         tsrc = os.path.join(
                             os.path.dirname(__file__), '../templates/icons/%s.png' % part.lower())
                         if not os.path.isfile(tsrc):
-                            tsrc = os.path.join(os.path.dirname(__file__), '../templates/icons/data.png')
+                            tsrc = os.path.join(
+                                os.path.dirname(__file__), '../templates/icons/data.png')
                         shutil.copyfile(tsrc, tdest)
 
         if collection.get('copy'):
@@ -221,9 +213,6 @@ class Collection(IDMixin, Base):
                 if os.path.isfile(src):
                     shutil.copyfile(src, dest)
 
-
-
-
     @staticmethod
     def BeforeDeleteFuncs(mapper, connection, self):
         print 'deleting collection %s' % self.id
@@ -233,22 +222,13 @@ class Collection(IDMixin, Base):
             except Exception, e:
                 print e
 
-
     @classmethod
     def __declare_last__(cls):
         pass
         event.listen(cls, 'before_delete', cls.BeforeDeleteFuncs)
 
 
-
-
-
-
-
-
-
 #@event.listens_for(session, 'before_flush')
-#def receive_before_flush(session, flush_context, instances):
+# def receive_before_flush(session, flush_context, instances):
 #    pass
 #    #session.commit()
-

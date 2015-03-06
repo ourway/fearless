@@ -48,7 +48,8 @@ class Account(IDMixin, UniqueMixin, Base):
     max_credit = Column(Float(precision=3), default=0)
     credit = Column(Float(precision=3), default=0)
     parent_id = Column(Integer, ForeignKey('account.id'))
-    parent = relationship("Account", backref=backref("children", cascade="all, delete, delete-orphan"), remote_side=[id])
+    parent = relationship("Account", backref=backref(
+        "children", cascade="all, delete, delete-orphan"), remote_side=[id])
     period = relationship("Date", uselist=False)
     tgs = relationship("Tag", backref='accounts', secondary="accounts_tags")
     tags = association_proxy('tgs', 'name', creator=tag_maker)

@@ -12,10 +12,11 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
-import sys, os
+import sys
+import os
 current_path = os.path.dirname(__file__)
 pta = os.path.abspath(os.path.join(current_path, '../../'))
-#print pta
+# print pta
 sys.path.append(pta)
 
 from flib.models import Project, Review, Task, User, Report, r, fdb
@@ -49,9 +50,9 @@ _yesterday = date.today() - timedelta(1)
 yesterday = _yesterday.strftime('%Y-%m-%d')
 _tomorrow = date.today() + timedelta(1)
 tomorrow = _tomorrow.strftime('%Y-%m-%d')
-print '*'*80
+print '*' * 80
 print '\tReporting on %s' % today
-print '*'*80
+print '*' * 80
 
 ################################################################
 session = session_factory()
@@ -64,12 +65,11 @@ projects = session.query(Project).all()
 for i in projects:
     i.plan()
 
-ongoing_tasks = session.query(Task).filter(or_(Task.gauge=='on schedule', Task.gauge=='ahead of schedule'))\
-        .order_by(desc(Task.complete)).all()
+ongoing_tasks = session.query(Task).filter(or_(Task.gauge == 'on schedule', Task.gauge == 'ahead of schedule'))\
+    .order_by(desc(Task.complete)).all()
 '''Behind schedule tasks:  Tasks that are not finished on time and are not completed yet'''
 behind_tasks = session.query(Task).filter_by(gauge='behind schedule')\
     .order_by(asc(Task.end)).all()
-
 
 
 #################################################################
@@ -86,8 +86,8 @@ def dailyTasksReportForClients():
         .render(ongoing_tasks=ongoing_tasks, behind_tasks=behind_tasks, today=today,
                 jtoday=jtoday, arrow=arrow, recipient='product owner', responsibility='managing')
 
-    #print message
-    #return
+    # print message
+    # return
     #to = ['hamid2177@gmail.com']
     to = ['farsheed.ashouri@gmail.com']
     subject = 'Studio Reports - Daily Tasks - %s' % jtoday
@@ -161,12 +161,12 @@ def dailyUserReportsToClients():
     result = []
     for i in reports:
         data = {
-            'reporter': {'id':i.user[0].id, 'firstname':i.user[0].firstname,
-                         'lastname':i.user[0].lastname},
-                'body': i.body,
-                'datetime': i.created_on,
-                'tgs':i.tgs,
-                }
+            'reporter': {'id': i.user[0].id, 'firstname': i.user[0].firstname,
+                         'lastname': i.user[0].lastname},
+            'body': i.body,
+            'datetime': i.created_on,
+            'tgs': i.tgs,
+        }
         result.append(data)
     to = ['farsheed.ashouri@gmail.com']
     subject = 'Studio Reports - User Reports - %s' % jtoday
@@ -177,9 +177,6 @@ def dailyUserReportsToClients():
 
     sent = send_envelope.delay(to, cc, bcc, subject, message)
     print 'Report sent to %s' % target.email
-
-
-
 
 
 if __name__ == '__main__':

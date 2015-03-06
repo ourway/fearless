@@ -117,7 +117,6 @@ class UniqueMixin(object):
 
 class IDMixin(object):
 
-
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()

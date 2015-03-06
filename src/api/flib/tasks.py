@@ -95,8 +95,6 @@ class mydatatype(object):
     pass
 
 
-
-
 @Capp.task
 def remove_asset(name):
     pass
@@ -290,7 +288,7 @@ def generateImageThumbnail(path, version, w=146, h=110, asset=None, text='thmb')
     fmt = 'png'
     extra = ''
     page = ''
-    #if content_type == 'image/vnd.adobe.photoshop':
+    # if content_type == 'image/vnd.adobe.photoshop':
     #    extra = '-flatten'
     if content_type == 'application/pdf' or content_type.split('/')[1] in ['gif'] or content_type == 'image/vnd.adobe.photoshop':
         page = '[0]'

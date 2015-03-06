@@ -62,7 +62,6 @@ class AddReport:
             resp.body = {'message': 'OK'}
 
 
-
 class UserReports(object):
 
     @Authorize('admin')
@@ -72,11 +71,11 @@ class UserReports(object):
         result = []
         for i in reports:
             data = {
-                'reporter': {'id':i.user[0].id, 'firstname':i.user[0].firstname,
-                             'lastname':i.user[0].lastname},
-                    'body': i.body,
-                    'datetime': i.created_on,
-                    'tgs':i.tgs,
-                    }
+                'reporter': {'id': i.user[0].id, 'firstname': i.user[0].firstname,
+                             'lastname': i.user[0].lastname},
+                'body': i.body,
+                'datetime': i.created_on,
+                'tgs': i.tgs,
+            }
             result.append(data)
         resp.body = result

@@ -152,6 +152,3 @@ def csv2json(csvfile):
             value = s[index].strip()
             obj[key].append(value)
     return dict(obj)
-
-
-

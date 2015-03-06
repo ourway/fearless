@@ -169,7 +169,8 @@ class SetMessage:
                     '_____\n %s \n_____' % message.get('body'))
                 mail_subject = ('New message from %s: ' %
                                 FROM.firstname) + message.get('subject')
-                sent = send_envelope.delay([TO.email], [], [], mail_subject, mail_body)
+                sent = send_envelope.delay(
+                    [TO.email], [], [], mail_subject, mail_body)
             if data:
                 resp.body = {'message': data, 'key': key}
             else:

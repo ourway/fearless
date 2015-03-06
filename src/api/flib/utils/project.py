@@ -117,18 +117,13 @@ class AddProject:
                 new_repository = Repository(name=repoName, path=newRepoFolder)
                 #
 
-
             chars_section = Collection(name='Characters', path='chars')
 
-            
-            
             props_section = Collection(name='Props', path='props')
             sets_section = Collection(name='Sets', path='sets')
             sequences_section = Collection(name='Sequences', path='sequences')
             editorial_section = Collection(name='Editorial', path='editorial')
             resources_section = Collection(name='Resources', path='resources')
-            
-            
 
             new_repository.collections.append(chars_section)
             new_repository.collections.append(props_section)
@@ -136,8 +131,6 @@ class AddProject:
             new_repository.collections.append(sequences_section)
             new_repository.collections.append(editorial_section)
             new_repository.collections.append(resources_section)
-            
-
 
             new.repositories.append(new_repository)
             req.session.add(new)
@@ -152,41 +145,40 @@ class GetProjectLatestReport:
 
     def on_get(self, req, resp, id, action):
 
-        ## defaults
-        do_plan=True
-        do_guntt=True
-        do_resource=True
-        do_msproject=False,
-        do_profit=False
-        do_trace=True
-        do_traceSvg=False
-        report_width = req.get_param('report_width') or 2000;
+        # defaults
+        do_plan = True
+        do_guntt = True
+        do_resource = True
+        do_msproject = False,
+        do_profit = False
+        do_trace = True
+        do_traceSvg = False
+        report_width = req.get_param('report_width') or 2000
         report_width = int(report_width)
 
-
         if action != 'plan':
-            do_plan=False
+            do_plan = False
         elif action == 'guntt':
-            do_guntt=True
+            do_guntt = True
         elif action == 'resource':
-            do_resource=True
+            do_resource = True
         elif action == 'msproject':
-            do_msproject=True
+            do_msproject = True
         elif action == 'profit':
-            do_profit=True
+            do_profit = True
         elif action == 'trace':
-            do_trace=True
+            do_trace = True
         elif action == 'traceSvg':
-            do_traceSvg=True
+            do_traceSvg = True
 
         project = req.session.query(Project).filter(Project.id == id).first()
         if not project:
             resp.status = falcon.HTTP_404
             return
 
-        data = project.plan(do_plan=do_plan, do_guntt=do_guntt, do_resource=do_resource, 
-                             do_msproject=do_msproject, do_profit=do_profit,
-                             do_trace=do_trace, do_traceSvg=do_traceSvg)
+        data = project.plan(do_plan=do_plan, do_guntt=do_guntt, do_resource=do_resource,
+                            do_msproject=do_msproject, do_profit=do_profit,
+                            do_trace=do_trace, do_traceSvg=do_traceSvg)
         update = True
         if not data:
             update = False
@@ -309,7 +301,7 @@ class AddTask:
         project = req.session.query(Project).filter_by(id=int(projId)).scalar()
         if req.session.query(Project).join(Task).filter_by(title=title).all():
             resp.status = falcon.HTTP_203
-            resp.body = {'message':'task already available'}
+            resp.body = {'message': 'task already available'}
             return
         if not start:
             start = project.start
@@ -367,14 +359,14 @@ class ListTasks:
                     'depends': [{'title': g.title, 'id': g.id} for g in i.depends],
                     'resources': [{'id': k.id, 'lastname': k.lastname} for k in i.resources],
                     'reviews': [{
-                            'id':h.id,
-                            'reviewer':{
-                                 'id':h.reviewer.id,
-                                 'firstname':h.reviewer.firstname,
-                                 'lastname':h.reviewer.lastname,
-                                        },
-                            'content':h.content
-                            } for h in i.reviews],
+                        'id': h.id,
+                        'reviewer': {
+                                'id': h.reviewer.id,
+                                'firstname': h.reviewer.firstname,
+                                'lastname': h.reviewer.lastname,
+                                },
+                        'content': h.content
+                    } for h in i.reviews],
                     } for i in project.tasks]
             resp.body = data
 
@@ -387,7 +379,7 @@ class GetTask:
             resp.status = falcon.HTTP_404
             return
         resp.body = {'title': task.title, 'id': task.id, 'start': task.start,
-                     'end': task.end, 
+                     'end': task.end,
                      'effort': task.effort,
                      'gauge': task.gauge,
                      'project_lead': task.project.lead_id,
@@ -505,7 +497,9 @@ class UserTasksCard:
             }
             for i in data]
 
+
 class TaskReview:
+
     def on_post(self, req, resp, taskId):
         user = getUserInfoFromSession(req, resp)
         uid = int(user.get('id'))
@@ -526,20 +520,14 @@ class TaskReview:
             return
         resp.body = [
             {
-                'content':i.content,
-                'created_on':i.created_on,
+                'content': i.content,
+                'created_on': i.created_on,
                 'reviewer':
                     {
-                        'firstname':i.reviewer.firstname,
-                        'id':i.reviewer.id,
-                        'lastname':i.reviewer.lastname,
+                        'firstname': i.reviewer.firstname,
+                        'id': i.reviewer.id,
+                        'lastname': i.reviewer.lastname,
                     }
             }
             for i in task.reviews
-            ]
-
-
-
-
-
-
+        ]

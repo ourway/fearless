@@ -206,8 +206,6 @@ class Asset(IDMixin, Base):
         return os.path.join(os.path.basename(self.collection.repository.path),
                             self.collection.path, self.fullname)
 
-
-
     @staticmethod
     def before_insert(mapper, connection, target):
         target.content_size = os.path.getsize(target.full_path)
@@ -235,11 +233,9 @@ class Asset(IDMixin, Base):
             newThumb = generateImageThumbnail.delay(target.full_path, target.version,
                                                     146, 110, target.id, 'thmb')
 
-
     @staticmethod
     def before_update(mapper, connection, target):
         target.content_size = os.path.getsize(target.full_path)
-
 
     @staticmethod
     def before_delete(mapper, connection, target):
@@ -251,7 +247,7 @@ class Asset(IDMixin, Base):
                 print e
         for i in [target.preview, target.poster]:
             if i:
-                ipath =  os.path.join(os.path.dirname(public_upload_folder), i)
+                ipath = os.path.join(os.path.dirname(public_upload_folder), i)
                 if os.path.isfile(ipath):
                     os.remove(ipath)
 
@@ -263,9 +259,6 @@ class Asset(IDMixin, Base):
                     shutil.rmtree(folder)
                 except Exception, e:
                     print e
-        
-
-            
 
     @classmethod
     def __declare_last__(cls):

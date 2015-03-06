@@ -74,6 +74,7 @@ def setup_logger(logger_name, log_file, level=logging.DEBUG):
 
 
 class Config(object):
+
     """Config abstraction
     Idea is coming from Sphinx config.
     """

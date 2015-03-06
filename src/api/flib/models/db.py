@@ -11,7 +11,6 @@ from sqlalchemy.pool import SingletonThreadPool
 from flib.models.mixin import Base
 
 
-
 #db_path = ':memory:'
 #db_path = 'database/studio.db'
 db_path = os.path.join(os.path.dirname(__file__), '../database/studio.db')
@@ -30,7 +29,7 @@ msql = 'mysql+mysqldb://root:rrferl@localhost/%s' % msqldbname
 sqlite = 'sqlite:///%s' % db_path
 #postgres = 'postgresql+psycopg2://user:password@/dbname'
 postgres = 'postgresql+psycopg2://postgres:rrferl@localhost:5432/fearless1'
-#postgresql+psycopg2://user:password@host:port/dbname
+# postgresql+psycopg2://user:password@host:port/dbname
 
 DB = msql
 #DB = postgres
@@ -49,19 +48,20 @@ def checkout_listener(dbapi_con, con_record, con_proxy):
             raise
 
 
-
-
 class SignallingSession(SessionBase):
+
     def __init__(self, **options):
         self._model_changes = {}
         SessionBase.__init__(self, **options)
- 
+
+
 class _SessionSignalEvents(object):
- 
+
     def register(self):
         listen(SessionBase, 'after_commit', self.session_signal_after_commit)
-        listen(SessionBase, 'after_rollback', self.session_signal_after_rollback)
- 
+        listen(SessionBase, 'after_rollback',
+               self.session_signal_after_rollback)
+
     @staticmethod
     def session_signal_after_commit(session):
         if not isinstance(session, SignallingSession):
@@ -76,7 +76,7 @@ class _SessionSignalEvents(object):
                 elif change == 'update' and hasattr(obj, '__commit_update__'):
                     obj.__commit_update__()
             d.clear()
- 
+
     @staticmethod
     def session_signal_after_rollback(session):
         if not isinstance(session, SignallingSession):
@@ -84,26 +84,27 @@ class _SessionSignalEvents(object):
         d = session._model_changes
         if d:
             d.clear()
-            
+
+
 class _MapperSignalEvents(object):
- 
+
     def __init__(self, mapper):
         self.mapper = mapper
- 
+
     def register(self):
         listen(self.mapper, 'after_delete', self.mapper_signal_after_delete)
         listen(self.mapper, 'after_insert', self.mapper_signal_after_insert)
         listen(self.mapper, 'after_update', self.mapper_signal_after_update)
- 
+
     def mapper_signal_after_delete(self, mapper, connection, target):
         self._record(mapper, target, 'delete')
- 
+
     def mapper_signal_after_insert(self, mapper, connection, target):
         self._record(mapper, target, 'insert')
- 
+
     def mapper_signal_after_update(self, mapper, connection, target):
         self._record(mapper, target, 'update')
- 
+
     @staticmethod
     def _record(mapper, target, operation):
         s = object_session(target)
@@ -113,18 +114,16 @@ class _MapperSignalEvents(object):
 
 
 # Usage
- 
+
 # this must happen only once
 _MapperSignalEvents(orm.mapper).register()
 _SessionSignalEvents().register()
 
 
-
 #engine = create_engine(DB, echo=False, convert_unicode=True)
 engine = create_engine(DB, echo=False,
-            convert_unicode=True, pool_recycle=3600,
+                       convert_unicode=True, pool_recycle=3600,
                        pool_size=256, max_overflow=128)
-
 
 
 #engine = create_engine("postgresql+psycopg2://farsheed:rrferl@localhost:5432/fearless2")
@@ -134,19 +133,16 @@ session_factory = sessionmaker(bind=engine)
 Session = scoped_session(session_factory)
 
 
-
-
 def before_flush(session, flush_context, instances):
     pass
-    #for i in session.new:
+    # for i in session.new:
     #    if i.__tablename__ == 'collection':
     #        collectionFinalFixes(i, session)
 
 
-
 def after_flush(session):
     pass
-    #for i in session.new:
+    # for i in session.new:
     #    if i.__tablename__ == 'collection':
     #        createCollectionStandards(i, session)
 
@@ -154,4 +150,3 @@ def after_flush(session):
 event.listen(SessionBase, "before_commit", after_flush)
 event.listen(SessionBase, "before_flush", before_flush)
 event.listen(engine, 'checkout', checkout_listener)
-

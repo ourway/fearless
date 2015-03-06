@@ -64,9 +64,11 @@ class AssetSave:
 
         try:
             repo = int(repo)
-            targetRepo = req.session.query(Repository).filter_by(id=repo).first()
+            targetRepo = req.session.query(
+                Repository).filter_by(id=repo).first()
         except ValueError:
-            targetRepo = req.session.query(Repository).filter_by(name=repo).first()
+            targetRepo = req.session.query(
+                Repository).filter_by(name=repo).first()
 
         if not uploader:
             uploader = -1
@@ -76,9 +78,11 @@ class AssetSave:
         targetUser = req.session.query(User).filter_by(id=uploader).first()
 
         if not targetRepo:
-            targetRepo = req.session.query(Repository).filter_by(name=repo).first()
+            targetRepo = req.session.query(
+                Repository).filter_by(name=repo).first()
             if not targetRepo:
-                targetRepo = Repository(name=repo, path=os.path.join(public_repository_path, repo))
+                targetRepo = Repository(
+                    name=repo, path=os.path.join(public_repository_path, repo))
                 req.session.add(targetRepo)
 
         ''' When client sends md5, it means that there is probabaly an exsisting file with that md5
@@ -97,7 +101,6 @@ class AssetSave:
         if not collection:
             collection = Collection(path='danger', repository=targetRepo)
             req.session.add(collection)
-
 
         body = req.stream
         b64 = req.get_param('b64')
@@ -152,8 +155,9 @@ class AssetSave:
                     bodyMd5 = safeCopyAndMd5(
                         req, body, tempraryStoragePath, targetRepo.id, targetUser, b64=b64, content_range=cr)
 
-                    if bodyMd5 in ['IN_PROGRESS', 'IN_PROGRESS_NEW']:  ## in uploading progress
-                        resp.body = {'info':bodyMd5}
+                    # in uploading progress
+                    if bodyMd5 in ['IN_PROGRESS', 'IN_PROGRESS_NEW']:
+                        resp.body = {'info': bodyMd5}
                         resp.status = falcon.HTTP_206
                         return
                 else:
@@ -195,7 +199,8 @@ class AssetSave:
                     f.write(thmb_data)
             if attach_to:
                 parent_id = int(attach_to)
-                parent = req.session.query(Asset).filter_by(id=parent_id).first()
+                parent = req.session.query(
+                    Asset).filter_by(id=parent_id).first()
                 asset.attached_to.append(parent)
             resp.body = {'message': 'Asset created|updated', 'key': asset.key,
                          'url': asset.url, 'fullname': asset.fullname, 'uuid': asset.uuid,
@@ -207,7 +212,7 @@ class AssetSave:
                 chunk = req.stream.read(2 ** 22)
                 if not chunk:
                     break
-            
+
             resp.status = falcon.HTTP_400
             resp.body = {'message': 'Something Wrong!'}
 
@@ -224,25 +229,24 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False, c
     checkPath(destDir)
 
     ''' if available asset, then we need to symblink it if asset uuid if different than available one!'''
-    
+
     start_byte = 0
     in_progress = False
     if content_range:
         in_progress = True
         _bp = content_range.split()
-        if len(_bp)==2 and len(_bp[1].split('/'))==2:  ## a simple validation:
+        # a simple validation:
+        if len(_bp) == 2 and len(_bp[1].split('/')) == 2:
             _bd = _bp[1].split('/')
             start_byte, eb = map(int, _bd[0].split('-'))
             tb = int(_bd[-1])
-            if tb==eb+1:
+            if tb == eb + 1:
                 in_progress = False
-
-
 
     if os.path.islink(destinationPath):
         os.remove(destinationPath)
 
-    if not start_byte:  ## if its a new file
+    if not start_byte:  # if its a new file
         if os.path.isfile(destinationPath):
             os.remove(destinationPath)
 
@@ -254,8 +258,8 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False, c
             b.seek(0)
             fileobj = b
         while True:
-            chunk = fileobj.read(2 ** 22) ## 4 megs
-            #chunk = fileobj.read(1024) ## 1Kb
+            chunk = fileobj.read(2 ** 22)  # 4 megs
+            # chunk = fileobj.read(1024) ## 1Kb
             if not chunk:
                 break
             md5.update(chunk)
@@ -531,7 +535,7 @@ class CollectionInfo:
                 else:
                     break
             if target.children:
-                data['children'] = [{'name': i.name, 'id': i.id, 'path': i.path, 'number_of_assets': i.number_of_assets, 
+                data['children'] = [{'name': i.name, 'id': i.id, 'path': i.path, 'number_of_assets': i.number_of_assets,
                                      'children': [{'name': c1.name, 'id': c1.id, 'path': c1.path, } for c1 in i.children]
                                      } for i in target.children]
             resp.body = data
@@ -576,7 +580,7 @@ class AssetCheckout:
         from utils.defaults import ASSETS
         asset_folder = os.path.join(ASSETS, target.uuid)
         if not os.path.isdir(asset_folder):
-            resp.status = falcon.HTTP_204  ## empty content
+            resp.status = falcon.HTTP_204  # empty content
             return
 
         version = req.get_param('version')
@@ -598,22 +602,18 @@ class AssetCheckout:
 
 
 class TestUpload:
+
     def on_put(self, req, resp):
         print 'uploading'
         obj = req.stream
         print 'got stream'
 
-           
-
-
         with open('/home/fearless/Desktop/upload', 'a+') as f:
             while True:
                 chunk = obj.read(1024)
-                if not chunk: break
+                if not chunk:
+                    break
                 f.write(chunk)
                 print 'chunk'
-    
+
         resp.status = falcon.HTTP_201
-
-
-        

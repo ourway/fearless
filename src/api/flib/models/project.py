@@ -53,8 +53,6 @@ project_watchers = Table('project_watchers', Base.metadata,
                          )
 
 
-
-
 project_reports = Table('project_reports', Base.metadata,
                         Column('project_id', Integer, ForeignKey("project.id"),
                                primary_key=True),
@@ -94,7 +92,7 @@ class Project(IDMixin, Base):
     # 0-active, 1-pending, 2-stopped, 3-finished
     status = Column(Integer, default=0)
     name = Column(String(64), unique=True, nullable=False)
-    last_plan = Column(String(64))  ## latest md5 of tjp plan
+    last_plan = Column(String(64))  # latest md5 of tjp plan
     description = Column(Text())
     client_id = Column(Integer, ForeignKey("client.id"))
     start = Column(DateTime, nullable=False, default=now)
@@ -142,7 +140,6 @@ class Project(IDMixin, Base):
     tags = association_proxy('tgs', 'name', creator=tag_maker)
     tjp = relationship("Document", uselist=False)
     plan_file = association_proxy('tjp', 'body')
-    
 
     @aggregated('tasks', Column(Integer))
     def calculate_number_of_tasks(self):
@@ -212,9 +209,9 @@ class Project(IDMixin, Base):
         # send tasks in reverse order
         subProjectTasks = sp.render(tasks=_tasks, subproject=self)
         report = sr.render(subproject=self, do_plan=do_plan,
-                      do_guntt=do_guntt, do_resource=do_resource,
-                      do_msproject=do_msproject, do_profit=do_profit,
-                      do_trace=do_trace, do_traceSvg=do_traceSvg,
+                           do_guntt=do_guntt, do_resource=do_resource,
+                           do_msproject=do_msproject, do_profit=do_profit,
+                           do_trace=do_trace, do_traceSvg=do_traceSvg,
                            report_width=report_width)
         return {'report': report, 'subProjectTasks': subProjectTasks}
 
@@ -225,7 +222,7 @@ class Project(IDMixin, Base):
         # lets select just one task
         puid = getUUID() + '_' + self.uuid
         schedule_path = os.path.join(public_upload_folder,
-                            'Fearless_project_%s.tjp' % self.uuid)
+                                     'Fearless_project_%s.tjp' % self.uuid)
         plan_path = os.path.join(public_upload_folder,
                                  'plan_%s.html' % (self.uuid))
         guntt_path = os.path.join(public_upload_folder,
@@ -243,10 +240,10 @@ class Project(IDMixin, Base):
         traceSvg_path = os.path.join(public_upload_folder,
                                      'TraceReport_%s.html' % (self.uuid))
 
-
         if not r.get('fearless_tj3_lock'):
             r.set('fearless_tj3_lock', 'OK')
-            r.expire('fearless_tj3_lock', 5)  ## just for highly requested projects
+            # just for highly requested projects
+            r.expire('fearless_tj3_lock', 5)
         else:
             return
 
@@ -264,9 +261,9 @@ class Project(IDMixin, Base):
         for p in projects:
             if p.tasks:
                 planData = p.tjp_subproject(do_plan=do_plan, do_guntt=do_guntt,
-                            do_resource=do_resource, do_msproject=do_msproject,
-                            do_profit=do_profit, do_trace=do_trace,
-                            do_traceSvg=do_traceSvg, report_width=report_width)
+                                            do_resource=do_resource, do_msproject=do_msproject,
+                                            do_profit=do_profit, do_trace=do_trace,
+                                            do_traceSvg=do_traceSvg, report_width=report_width)
                 subProjectTasks.append(planData.get('subProjectTasks'))
                 reports.append(planData.get('report'))
 
@@ -275,7 +272,6 @@ class Project(IDMixin, Base):
                              resources=resources)
 
         session.close()
-
 
         if self.last_plan == hashlib.md5(finalplan.encode('utf-8', 'ignore')).hexdigest():
             print 'Using cached plan'
@@ -289,9 +285,7 @@ class Project(IDMixin, Base):
 
         #plan_path = '/tmp/Fearless_project.tjp'
 
-
         tj3 = sh.Command('../../bin/ruby/bin/tj3')
-
 
         with open(schedule_path, 'wb') as f:
             f.write(finalplan.encode('utf-8'))
@@ -299,8 +293,8 @@ class Project(IDMixin, Base):
             print 'Start Calculating project %s' % self.id
             import time
             s = time.time()
-            tj = tj3( schedule_path, '--silent', '--no-color', '--add-trace',
-                    o=public_upload_folder, c='1')
+            tj = tj3(schedule_path, '--silent', '--no-color', '--add-trace',
+                     o=public_upload_folder, c='1')
             print 'Finished in %s seconds' % round(time.time() - s, 3)
         except Exception, e:
             print e
@@ -316,7 +310,6 @@ class Project(IDMixin, Base):
         plan, guntt, resource, msproject, profit = None, None, None, None, None
         csvfile, trace, burndown = None, None, None
 
-
         def saveTable(path):
             '''Read main table from these files'''
             if os.path.isfile(path):
@@ -327,19 +320,18 @@ class Project(IDMixin, Base):
                 os.system('gzip -f -9 {p}.png'.format(p=path))
                 #report = open(path)
                 #root = etree.parse(report)
-                #try:
+                # try:
                 #    main_table = root.xpath('//table')[0]
                 #     root.xpath('//a')[-1].text = 'Fearless'
                 #    tosave = etree.tostring(main_table)
-                #except lxml.etree.XMLSyntaxError:
+                # except lxml.etree.XMLSyntaxError:
                 #    pass
-                #finally:
-                    #pass
+                # finally:
+                # pass
                 #    root.write(path)
                 #    pass
-                    #with open(path, 'wb') as f:
-                    #    f.write(tosave)
-
+                # with open(path, 'wb') as f:
+                #    f.write(tosave)
 
                 return path
                 # self.reports.append(tosave)
@@ -349,13 +341,13 @@ class Project(IDMixin, Base):
             if os.path.isfile(path):
                 tosave = None
                 #report = open(path)
-                #try:
+                # try:
                 #    root = etree.parse(report)
-                #except lxml.etree.XMLSyntaxError:
+                # except lxml.etree.XMLSyntaxError:
                 #    return
-                #finally:
+                # finally:
                 #    pass
-                    #os.remove(path)
+                # os.remove(path)
                 #svg = root.xpath('//svg')[0]
                 #tosave = etree.tostring(svg)
                 return tosave
@@ -392,9 +384,10 @@ class Project(IDMixin, Base):
             data['burndown'] = burndown
         data = json.dumps(data)
 
-        self.reports = []  ## clean old
+        self.reports = []  # clean old
         self.reports.append(data)
-        self.last_plan =  hashlib.md5(finalplan.encode('utf-8', 'ignore')).hexdigest()
+        self.last_plan = hashlib.md5(
+            finalplan.encode('utf-8', 'ignore')).hexdigest()
         return data
         # else:
         # return tj.stderr

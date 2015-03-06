@@ -54,7 +54,8 @@ class Repository(IDMixin, Base):
     collections = relationship(
         'Collection', backref='repository', cascade="all, delete, delete-orphan")
     project_id = Column(Integer, ForeignKey("project.id"))
-    project = relationship('Project', backref=backref('repositories', cascade="all, delete, delete-orphan"))
+    project = relationship('Project', backref=backref(
+        'repositories', cascade="all, delete, delete-orphan"))
     owner_id = Column(Integer, ForeignKey('user.id'))
     owner = relationship("User", backref="ownes_repositories")
     period = relationship("Date", uselist=False)
@@ -72,7 +73,6 @@ class Repository(IDMixin, Base):
         #GIT(readme).add('repo *%s* created successfully' % self.name)
         return path
 
-
     @staticmethod
     def before_delete(mapper, connection, target):
         print 'Deleting repository %s' % target.id
@@ -82,7 +82,6 @@ class Repository(IDMixin, Base):
                 shutil.rmtree(ipath)
             except Exception, e:
                 pass
-
 
     @classmethod
     def __declare_last__(cls):

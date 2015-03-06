@@ -13,7 +13,8 @@ Clean code is much better than Cleaner comments!
 '''
 
 #from gevent import monkey;monkey.patch_all()
-import sys, os
+import sys
+import os
 current_path = os.path.dirname(__file__)
 sys.path.append(os.path.abspath(os.path.dirname(current_path)))
 
@@ -59,15 +60,15 @@ tables = [i for i in av if i[0] in ascii_uppercase]
 def getSession(req, resp, params):
 
     from flib.utils import helpers
-    #Session.remove()
+    # Session.remove()
     req.session = Session()  # imported from models.db
     #print >> sys.stderr, len(req.session.dirty)
-    #req.session.rollback()  ## rollback at first
+    # req.session.rollback()  ## rollback at first
 
 
 def closeSession(req, resp):
 
-    #if req.session.new or req.session.dirty:
+    # if req.session.new or req.session.dirty:
     req.session.commit()
     req.session.close()
     Session.remove()
@@ -100,14 +101,13 @@ class ThingsResource:
         resp.body = "pong"
 
 
-
 class GetUserAssetTags:
 
     def on_get(self, req, resp):
         user = getUserInfoFromSession(req, resp)
         #resp.body = user
-        resp.body = req.session.query(Tag).join(Asset.tgs).join(User).filter_by(id=user.get('id')).all()
-
+        resp.body = req.session.query(Tag).join(Asset.tgs).join(
+            User).filter_by(id=user.get('id')).all()
 
 
 class UpdateAssetTags:
@@ -117,6 +117,7 @@ class UpdateAssetTags:
         data = get_params(req.stream, False)
         target.tags = data.get('tags')
         resp.status = falcon.HTTP_202
+
 
 class UpdateCollectionTags:
 
@@ -134,7 +135,6 @@ class UpdateProjectTags:
         data = get_params(req.stream, False)
         target.tags = data.get('tags')
         resp.status = falcon.HTTP_202
-
 
 
 class DB:
@@ -219,11 +219,11 @@ class DB:
                         if isinstance(filter, dict):
                             eq = filter.pop('_')
                             query += '.filter({t}.{k}{eq}"{v}")'.format(t=table, eq=eq,
-                                                k=filter.keys()[0], v=filter[filter.keys()[0]])
-
+                                                                        k=filter.keys()[0], v=filter[filter.keys()[0]])
 
                 for tag in tags:
-                    query += '.filter({t}.tgs.any(name="{tag}"))'.format(t=table, tag=tag)
+                    query += '.filter({t}.tgs.any(name="{tag}"))'.format(
+                        t=table, tag=tag)
 
                 if get_count:
                     data = eval(query).count()
@@ -231,8 +231,6 @@ class DB:
                     if not data:
                         resp.status = falcon.HTTP_204
                     return
-
-
 
                 query += '.order_by({sort}({t}.{order}))'.format(sort=sort,
                                                                  order=order_by, t=table)
@@ -447,10 +445,10 @@ app.add_route('/api/test_upload', TestUpload())
 
 
 if __name__ == '__main__':
-    #pass
+    # pass
     #import bjoern
     #bjoern.listen(app, '127.0.0.1', 5005)
-    #bjoern.run()
+    # bjoern.run()
 
     #from werkzeug import run_simple
     #run_simple('127.0.0.1', 5005, app, use_debugger=True, use_reloader=True)
@@ -462,8 +460,6 @@ if __name__ == '__main__':
     http_server = tornado.httpserver.HTTPServer(container)
     http_server.listen(5005)
     tornado.ioloop.IOLoop.instance().start()
-
-
 
     #from gevent import wsgi
     #from gevent import monkey;monkey.patch_all()

@@ -77,11 +77,10 @@ class Document(IDMixin, Base):
     def __init__(self, data, *args, **kw):
         self.data = data
 
-
     @validates('data')
     def save_data_in_riak(self, key, data):
         self.uuid = getUUID()
-        newReportObject = rdb.new(self.uuid, {'doc':fix_text(data)})
+        newReportObject = rdb.new(self.uuid, {'doc': fix_text(data)})
         newReportObject.store()
         return self.uuid
 
@@ -90,4 +89,3 @@ class Document(IDMixin, Base):
         dataObject = rdb.get(self.uuid)
         if isinstance(dataObject.data, dict):
             return dataObject.data.get('doc')
-

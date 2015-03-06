@@ -25,12 +25,13 @@ from flib.models.helpers import tag_maker, account_maker
 
 
 review_tags = Table("review_tags", Base.metadata,
-                       Column('id', Integer, primary_key=True),
-                       Column(
-                           "review_id", Integer, ForeignKey("review.id"), primary_key=True),
-                       Column(
-                           "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
-                       )
+                    Column('id', Integer, primary_key=True),
+                    Column(
+                        "review_id", Integer, ForeignKey("review.id"), primary_key=True),
+                    Column(
+                        "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
+                    )
+
 
 class Review(IDMixin, Base):
 
@@ -45,5 +46,3 @@ class Review(IDMixin, Base):
     tags = association_proxy('tgs', 'name', creator=tag_maker)
     cnt = relationship("Document", backref='review', uselist=False)
     content = association_proxy('cnt', 'body')
-
-

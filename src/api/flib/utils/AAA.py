@@ -87,7 +87,8 @@ def Authenticate(req, resp, params):
             '''probabaly acceess count expired, lets create one and let user in'''
             r.set(api_count_key, 1)
             r.expire(api_count_key, 60)
-        elif int(access_count) <= 1000:  ## not more than 1000 requests per second!  its fair
+        # not more than 1000 requests per second!  its fair
+        elif int(access_count) <= 1000:
             r.incr(api_count_key, 1)
         elif not '/api/test_upload' in req.path and not '/api/asset/save' in req.path:
             message = 'Too many api access in short amount of time'
@@ -496,7 +497,7 @@ def isAuthorizedTo(req, userId, actionName):
 
     for userGroup in target.grps:  # grps is access to gourp objects
         if actionName.lower() == userGroup.name.lower():
-                return True
+            return True
         for role in userGroup.rls:  # rls is access to role object
             if actionName.lower() == role.name.lower():
                 return True

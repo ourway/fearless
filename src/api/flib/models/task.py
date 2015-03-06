@@ -167,7 +167,6 @@ class Task(IDMixin, Base):
         else:
             data = convert_to_datetime(data)
 
-
         if data and self.project and self.project.end:
             try:
                 data = min(data, self.project.end)
