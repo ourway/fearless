@@ -11,7 +11,6 @@ from sqlalchemy.pool import SingletonThreadPool
 from flib.models.mixin import Base
 
 
-from flib.models.helpers import createCollectionStandards, collectionFinalFixes
 
 #db_path = ':memory:'
 #db_path = 'database/studio.db'
@@ -138,19 +137,21 @@ Session = scoped_session(session_factory)
 
 
 def before_flush(session, flush_context, instances):
-    for i in session.new:
-        if i.__tablename__ == 'collection':
-            collectionFinalFixes(i, session)
+    pass
+    #for i in session.new:
+    #    if i.__tablename__ == 'collection':
+    #        collectionFinalFixes(i, session)
 
 
 
-def after_flush(session, flush_context):
-    for i in session.new:
-        if i.__tablename__ == 'collection':
-            createCollectionStandards(i, session)
+def after_flush(session):
+    pass
+    #for i in session.new:
+    #    if i.__tablename__ == 'collection':
+    #        createCollectionStandards(i, session)
 
 
-event.listen(SessionBase, "after_flush", after_flush)
+event.listen(SessionBase, "before_commit", after_flush)
 event.listen(SessionBase, "before_flush", before_flush)
 event.listen(engine, 'checkout', checkout_listener)
 
