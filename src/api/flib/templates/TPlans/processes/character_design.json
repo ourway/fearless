@@ -10,7 +10,8 @@
             "Sketch":
                 {
                     "order":2,
-                    "template":"character_sketch"
+                    "template":"character_sketch",
+                    "disabled":false
                 
                 },
             "Character side and front":

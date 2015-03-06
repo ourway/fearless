@@ -5,13 +5,6 @@
                 {
                     "template":"character_concept_process",
                     "order":1
-                },
-           "character acting process":
-                {
-                    "template":"character_acting_process",
-                    "order":1
                 }
-
-
         }
 }

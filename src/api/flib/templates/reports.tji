@@ -1,13 +1,10 @@
 taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
     formats csv
-    #start ${subproject.start.strftime('%Y-%m-%d')}
-    #end ${subproject.end.strftime('%Y-%m-%d')}
     scenarios actual
     loadunit hours
     columns id, line, name, opentasks, start, end, managers, effort, resources,  effortdone, gauge, effortleft, criticalness, duration, complete, efficiency
     taskroot fearless.__${subproject.id}
 }
-
 % if do_plan:
   taskreport breakdown1_${subproject.id} "plan_${subproject.uuid}"{
       formats html
@@ -15,8 +12,10 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
       % if subproject.end.strftime('%Y-%m-%d') != subproject.start.strftime('%Y-%m-%d'):
         end ${subproject.end.strftime('%Y-%m-%d')}
       % endif
-      loadunit longauto
-      columns name, start, end, gauge, pathcriticalness {title "Critical path"}, complete {title "Progress"}
+      hidetask isleaf()
+      sorttasks id.up # not 'tree' to really hide parent tasks
+      loadunit weeks
+      columns name, start, end, gauge {title "status"}, pathcriticalness {title "Criticalness"}, effort, resources, complete {title "Progress"}
       taskroot fearless.__${subproject.id}
 
   }
@@ -29,6 +28,7 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
         end ${subproject.end.strftime('%Y-%m-%d')}
       % endif
       loadunit hours
+      #sorttasks plan.start.up # not 'tree' to really hide parent tasks
       columns bsi, name, effort, chart { scale day width ${(subproject.end-subproject.start).days*20 + 20} }, complete {title "Progress"}
       taskroot fearless.__${subproject.id}
   }
@@ -41,11 +41,10 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
       end ${subproject.end.strftime('%Y-%m-%d')}
     % endif
     formats html
-    columns name, effort, chart {scale day width ${(subproject.end-subproject.start).days*20 + 20} }
-    
+    columns name, effort, fte, chart {scale day width ${(subproject.end-subproject.start).days*20 + 20} }
     loadunit hours
-    # We only like to show leaf tasks for leaf resources.
-    hidetask ~(isleaf() & isleaf_())
+    hidetask ~(isleaf())
+    sorttasks plan.start.up # not 'tree' to really hide parent tasks
     hideresource ~(p${subproject.id})
     taskroot fearless.__${subproject.id}
   }
@@ -57,6 +56,8 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
     % if subproject.end.strftime('%Y-%m-%d') != subproject.start.strftime('%Y-%m-%d'):
       end ${subproject.end.strftime('%Y-%m-%d')}
     % endif
+    hidetask isleaf()
+    sorttasks id.up # not 'tree' to really hide parent tasks
     loadunit days
     taskroot fearless.__${subproject.id}
   }

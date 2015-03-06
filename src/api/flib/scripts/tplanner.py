@@ -1,6 +1,7 @@
 #!../../pyenv/bin/python
 
-import os
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), '../../'))
 from mako.template import Template
 import json as json
 from flib.models import User, Task, Expert, Project
@@ -30,7 +31,8 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0, de
 
     '''
     session.commit()
-    fn = '../templates/TPlans/processes/' + t + '.json'
+    fn = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                '../templates/TPlans/processes/' , t + '.json'))
     structure = {'processes': {}, 'tasks': {}}
     if not os.path.isfile(fn):
         with open(fn, 'wb') as f:
@@ -107,7 +109,8 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0, de
 def render_task(t, session, project_id, parent, prefix, title, order):
     '''lets see what will happen'''
     session.commit()
-    fn = '../templates/TPlans/tasks/' + t + '.json'
+    fn = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                '../templates/TPlans/tasks/' , t + '.json'))
     structure = {'tags': [], 'min_effort': 0, 'max_effort': 2,
                  'resource_expertize': {"NULL": {"minimum_rate": 0.75}}, 'outputs': {}}
     if not os.path.isfile(fn):
@@ -166,7 +169,7 @@ def render_task(t, session, project_id, parent, prefix, title, order):
 
 if __name__ == '__main__':
     character_preproduction_template = "Art_character_preproduction"
-    PROJ = 3
+    PROJ = 1
     session = session_factory()
     prodb = session.query(Project).filter_by(id=PROJ).one()  # must be present
 

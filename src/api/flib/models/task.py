@@ -136,8 +136,8 @@ class Task(IDMixin, Base):
 
     #@property
     def tjp_task(self):
-        templateFile = os.path.join(
-            os.path.dirname(__file__), '../templates/task.tji')
+        templateFile = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), '../templates/task.tji'))
         t = Template(filename=templateFile)
         subtask = '\n'.join([i.tjp_task() for i in self.children])
         return t.render(task=self, subtask=subtask)

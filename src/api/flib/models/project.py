@@ -194,10 +194,10 @@ class Project(IDMixin, Base):
     def tjp_subproject(self, do_plan=True, do_guntt=False, do_resource=False,
                        do_msproject=False, do_profit=False, do_trace=True,
                        do_traceSvg=False, report_width=2000):
-        subProjectTemplateFile = os.path.join(
-            os.path.dirname(__file__), '../templates/subProject.tji')
-        subProjectReportFile = os.path.join(
-            os.path.dirname(__file__), '../templates/reports.tji')
+        subProjectTemplateFile = os.path.abspath(
+            os.path.join( os.path.dirname(__file__), '../templates/subProject.tji'))
+        subProjectReportFile = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), '../templates/reports.tji'))
         sp = Template(filename=subProjectTemplateFile)
         sr = Template(filename=subProjectReportFile)
         _tasks = []
@@ -250,8 +250,8 @@ class Project(IDMixin, Base):
         if not self.tasks:
             self.reports = []
             return
-        templateFile = os.path.join(
-            os.path.dirname(__file__), '../templates/masterProject.tjp')
+        templateFile = os.path.abspath(
+            os.path.join( os.path.dirname(__file__), '../templates/masterProject.tjp'))
         t = Template(filename=templateFile)
         session = session_factory()
         projects = session.query(Project).order_by(asc(Project.id)).all()
