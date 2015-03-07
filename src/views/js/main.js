@@ -2221,7 +2221,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
             // suggestion engine expects JavaScript objects so this converts all of
             // those strings
             filter: function(list) {
-              return $.map(list, function(asset) { return { fullname: asset }; });
+              return $.map(list || {}, function(asset) { return { fullname: asset }; });
             }
                     
           }

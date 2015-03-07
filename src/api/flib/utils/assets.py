@@ -135,7 +135,7 @@ class AssetSave:
             #name = os.path.basename(tempraryStoragePath)
             if _md5:
                 availableAsset = Asset.query.filter_by(key=_md5).join(
-                    Collection).filter_by(repository_id=targetRepo.id).scalar()
+                    Collection).filter_by(repository_id=targetRepo.id).first()
                 if availableAsset:
                     # create folder if not available
                     checkPath(os.path.dirname(tempraryStoragePath))

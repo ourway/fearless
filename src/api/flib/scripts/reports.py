@@ -167,17 +167,19 @@ def dailyUserReportsToClients():
         data = {
             'reporter': {'id': i.user[0].id, 'firstname': i.user[0].firstname,
                          'lastname': i.user[0].lastname},
-            'body': i.body,
+            'body': misaka.html(i.body),
             'datetime': i.created_on,
             'prettytime': arrow.get(i.created_on).humanize(),
             'tgs': i.tgs,
         }
         result.append(data)
+    tasks = []
     message =  getTemplate('email_daily_user_reports_for_clients.html')\
-        .render(today=today, jtoday=jtoday, arrow=arrow, reports=result,
+        .render(today=today, tasks=tasks, jtoday=jtoday, arrow=arrow, reports=result,
                 responsibility='leading')
     subject = 'Studio Daily Reports - %s' % jtoday
-    emails = ['farsheed.ashouri@gmail.com']
+    emails =  ['hamid2177@gmail.com']
+    #emails =  ['farsheed.ashouri@gmail.com']
     sent = send_envelope.delay(emails, cc, bcc, subject, message)
     print 'Report sent to %s' % emails
 
