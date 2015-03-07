@@ -17,7 +17,12 @@ to review:
     <h5><u>${i['reporter']['firstname']} ${i['reporter']['lastname']}</u> reported
         <span style="color:grey">${i['prettytime']}</span>
     </h5>
-    <blockquote>${i['body']}</blockquote>
+    <blockquote
+        % if i['lang'] in ['fa', 'ps', 'ar']:
+            style="text-align:right;direction:rtl;"
+        % endif
+        
+        >${i['body']}</blockquote>
 </div>
 <div style="background:#f8f8f8;padding:5px;border:1px solid #ccc;border-top:0px">
     % if tasks:

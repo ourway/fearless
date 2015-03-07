@@ -147,7 +147,9 @@
                         <textarea style="height:250px;" class="form-control" ng-model="asset.data"></textarea>
                     </div>
 
-                    <div ng-if="asset.data" style="border:1px solid #f2f2f2;padding:5px;margin-top:10px;word-break: break-word" ng-bind-html="marked(asset.data)"></div>
+                    <div ng-if="asset.data" 
+                        style="border:1px solid #f2f2f2;padding:5px;margin-top:10px;word-break: break-word" 
+                        ng-bind-html="marked(asset.data)"></div>
                 </div>
                 <div ng-if="asset.content_type.split('/')[1]=='plain; charset=utf-8' && asset.content_size<1024*16" ng-init="loadAssetData()">
                     <pre><code class="lang-text">{{asset.data}}</code></pre>

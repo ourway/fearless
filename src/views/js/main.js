@@ -2384,7 +2384,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
 
 fearlessApp.controller('userReportsCtrl',  function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
 
-
+        $scope.marked = marked;
         getReports = $http.get('/api/userReports').success(function(resp){
                 $scope.reports = resp;
 

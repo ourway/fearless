@@ -13,9 +13,9 @@
                 <a href="#/user/{{report.reporter.id}}"><b>{{report.reporter.firstname}} {{report.reporter.lastname}}</b></a>
             </div>
             <div class="panel-body">
-                <p ng-class="{'farsi':!$parent.isASCII(report.body, true)}">
-                    {{report.body}}
-                </p>
+                <div ng-bind-html="marked(report.body)"
+                ng-class="{'farsi':!$parent.isASCII(report.body, true)}">
+                </div>
             </div>
             <div class="panel-footer clearfix">
                 <div >

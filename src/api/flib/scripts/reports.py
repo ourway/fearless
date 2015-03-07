@@ -15,10 +15,12 @@ Clean code is much better than Cleaner comments!
 import sys
 import os
 current_path = os.path.dirname(__file__)
+from guess_language import guessLanguage as gl
 pta = os.path.abspath(os.path.join(current_path, '../../'))
 # print pta
 sys.path.append(pta)
 
+from guess_language import guessLanguage as lg
 from flib.models import Project, Review, Task, User, Report, r, fdb
 from flib.models.db import session_factory
 from sqlalchemy import or_, and_
@@ -161,18 +163,19 @@ def dailyUserReportsToClients():
     if not reports:
         print '\tnot any report available'
         return
-
     result = []
     for i in reports:
         data = {
             'reporter': {'id': i.user[0].id, 'firstname': i.user[0].firstname,
                          'lastname': i.user[0].lastname},
             'body': misaka.html(i.body),
-            'datetime': i.created_on,
+            'datetime': arrow.get(i.created_on),
             'prettytime': arrow.get(i.created_on).humanize(),
             'tgs': i.tgs,
+            'lang':lg(i.body)
         }
         result.append(data)
+
     tasks = []
     message =  getTemplate('email_daily_user_reports_for_clients.html')\
         .render(today=today, tasks=tasks, jtoday=jtoday, arrow=arrow, reports=result,
