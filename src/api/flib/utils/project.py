@@ -343,9 +343,17 @@ class ListTasks:
 
     def on_get(self, req, resp, projId):
         user = getUserInfoFromSession(req, resp)
-        project = Project.query.filter(
-            Project.id == projId).first()
-        if project:
+        sole = req.get_param('sole')
+        tasks = Task.query.join(Project).filter_by(id=projId)
+        if sole:
+            tasks = tasks.join(Task)\
+                .filter(or_(Task.resources.any(id=user.get('id')),
+                            Task.watchers.any(id=user.get('id')),
+                            Task.responsibles.any(id=user.get('id')),
+                            Task.project.has(lead_id=user.get('id'))
+                            ))
+
+        if tasks:
             data = [{
                     'start': i.start,
                     'end': i.end,
@@ -366,7 +374,7 @@ class ListTasks:
                                 },
                         'content': h.content
                     } for h in i.reviews],
-                    } for i in project.tasks]
+                    } for i in tasks.all()]
             resp.body = data
 
 

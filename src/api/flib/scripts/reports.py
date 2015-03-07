@@ -142,7 +142,6 @@ def dailyTaskCardForResources():
         to = [target.email]
         #to = ['hamid2177@gmail.com']
         #to = ['farsheed.ashouri@gmail.com']
-        to = [target.email]
         subject = 'Studio Reports - Task card - %s' % jtoday
         message =  getTemplate('email_daily_tasks_for_clients.html')\
             .render(ongoing_tasks=target_ongoing_tasks, behind_tasks=target_behind_tasks,
@@ -155,8 +154,13 @@ def dailyTaskCardForResources():
 
 
 def dailyUserReportsToClients():
-    reports = session.query(Report).filter(Report.user).filter(Report.created_on.between(today, tomorrow))\
+    reports = session.query(Report).filter(Report.user).\
+        filter(Report.created_on>yesterday)\
         .order_by(desc(Report.created_on)).all()
+    
+    if not reports:
+        print '\tnot any report available'
+        return
 
     result = []
     for i in reports:
@@ -165,18 +169,27 @@ def dailyUserReportsToClients():
                          'lastname': i.user[0].lastname},
             'body': i.body,
             'datetime': i.created_on,
+            'prettytime': arrow.get(i.created_on).humanize(),
             'tgs': i.tgs,
         }
         result.append(data)
-    to = ['farsheed.ashouri@gmail.com']
-    subject = 'Studio Reports - User Reports - %s' % jtoday
-    message =  getTemplate('email_daily_tasks_for_clients.html')\
-        .render(ongoing_tasks=target_ongoing_tasks, behind_tasks=target_behind_tasks,
-                today=today, jtoday=jtoday, arrow=arrow, recipient=target.firstname,
-                responsibility='contributing to')
+    message =  getTemplate('email_daily_user_reports_for_clients.html')\
+        .render(today=today, jtoday=jtoday, arrow=arrow, reports=result,
+                responsibility='leading')
+    subject = 'Studio Daily Reports - %s' % jtoday
+    emails = ['farsheed.ashouri@gmail.com']
+    sent = send_envelope.delay(emails, cc, bcc, subject, message)
+    print 'Report sent to %s' % emails
 
-    sent = send_envelope.delay(to, cc, bcc, subject, message)
-    print 'Report sent to %s' % target.email
+
+    return
+
+
+def dailyTaskReviewsToClients():
+    revs = session.query(Review).filter(Review.created_on>yesterday)\
+        .order_by(desc(Review.created_on)).all()
+
+    return
 
 
 if __name__ == '__main__':
@@ -190,6 +203,7 @@ if __name__ == '__main__':
         print '\t\t dailyTasksReportForProjectLeads'
         print '\t\t dailyTaskCardForResources'
         print '\t\t dailyUserReportsToClients'
+        print '\t\t dailyTaskReviewsToClients'
         print '\t------------------'
         sys.exit()
     command = sys.argv[1] + '()'

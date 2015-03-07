@@ -243,7 +243,7 @@ class Project(IDMixin, Base):
         if not r.get('fearless_tj3_lock'):
             r.set('fearless_tj3_lock', 'OK')
             # just for highly requested projects
-            r.expire('fearless_tj3_lock', 5)
+            r.expire('fearless_tj3_lock', 10)
         else:
             return
 
@@ -309,15 +309,20 @@ class Project(IDMixin, Base):
         # if not tj.stderr:
         plan, guntt, resource, msproject, profit = None, None, None, None, None
         csvfile, trace, burndown = None, None, None
+        
+        def change_tm(path):
+            if os.path.isfile(path):
+                os.system('sed -i s/TaskJuggler/Fearless/ "%s"' % path)
+                os.system('sed -i s/taskjuggler.org/fearless.ir/ "%s"' %path)
+                os.system('wkhtmltoimage {p} {p}.png'.format(p=path))
+                os.system('gzip -f -9 {p}'.format(p=path))
+                os.system('gzip -f -9 {p}.png'.format(p=path))
 
         def saveTable(path):
             '''Read main table from these files'''
             if os.path.isfile(path):
-                os.system('sed -i s/TaskJuggler/Fearless/ "%s"' % path)
-                os.system('sed -i s/taskjuggler.org/fearless.ir/ "%s"' % path)
-                os.system('wkhtmltoimage {p} {p}.png'.format(p=path))
-                os.system('gzip -f -9 {p}'.format(p=path))
-                os.system('gzip -f -9 {p}.png'.format(p=path))
+                change_tm(path)
+
                 #report = open(path)
                 #root = etree.parse(report)
                 # try:
@@ -339,6 +344,7 @@ class Project(IDMixin, Base):
         def getSvg(path):
             '''extract svg element of report'''
             if os.path.isfile(path):
+                change_tm(path)
                 tosave = None
                 #report = open(path)
                 # try:
@@ -353,6 +359,8 @@ class Project(IDMixin, Base):
                 return tosave
 
         if os.path.isfile(msproject_path):
+            os.system('sed -i s/TaskJuggler/Fearless/ "%s"' % msproject_path)
+            os.system('sed -i s/taskjuggler.org/fearless.ir/ "%s"' % msproject_path)
             msproject = open(msproject_path, 'rb').read()  # msproject file
         if os.path.isfile(csv_path):
             csvfile = open(csv_path, 'rb').read()  # msproject file

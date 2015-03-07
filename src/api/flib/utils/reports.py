@@ -23,6 +23,7 @@ import os
 from flib.models import User, Report
 from flib.utils.AAA import getUserInfoFromSession, Authorize
 from sqlalchemy import desc, asc
+from sqlalchemy import or_, and_
 from collections import defaultdict
 
 
@@ -53,8 +54,7 @@ class AddReport:
 
     def on_put(self, req, resp, **kw):
         u = getUserInfoFromSession(req, resp)
-        targetUser = req.session.query(User).filter(
-            User.id == u.get('id')).first()
+        targetUser = User.query.filter_by(id=u.get('id')).first()
         data = get_params(req.stream, flat=False)
         if data and data.get('body'):
             targetUser.reports.append(data.get('body'))
@@ -66,7 +66,7 @@ class UserReports(object):
 
     @Authorize('admin')
     def on_get(self, req, resp, **kw):
-        reports = req.session.query(Report).filter(Report.user).\
+        reports = Report.query.filter(Report.user).\
             order_by(desc(Report.created_on)).all()
         result = []
         for i in reports:

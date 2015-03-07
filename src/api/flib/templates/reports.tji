@@ -14,8 +14,8 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
       % endif
       hidetask isleaf()
       sorttasks id.up # not 'tree' to really hide parent tasks
-      loadunit weeks
-      columns name, start, end, gauge {title "status"}, pathcriticalness {title "Criticalness"}, effort, resources, complete {title "Progress"}
+      loadunit days
+      columns name, start, end, gauge {title "status"}, pathcriticalness {title "Criticalness"}, duration {title "Duration Days"}, resources, complete {title "Progress"}
       taskroot fearless.__${subproject.id}
 
   }
@@ -57,7 +57,6 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
       end ${subproject.end.strftime('%Y-%m-%d')}
     % endif
     hidetask isleaf()
-    sorttasks id.up # not 'tree' to really hide parent tasks
     loadunit days
     taskroot fearless.__${subproject.id}
   }

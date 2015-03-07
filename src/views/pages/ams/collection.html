@@ -78,7 +78,7 @@
 
 			</ul>
 
-        <div class="col-md-8 column">
+        <div class="col-md-8">
 			<div class="btn-group" ng-show="collection.container">
                 <button id="collectionAddButton" class="btn btn-success btn-sm" type="button" data-toggle="modal" data-target="#collectionAddModal">
                     <em class="glyphicon glyphicon-plus"></em>
@@ -86,7 +86,7 @@
                 </button>
 			</div>
             <h3>{{collection.name | uppercase}}</h3>
-                <div class="col-lg-3 col-md-3 col-sm-3" ng-repeat="subcol in collection.children track by $index">
+                <div class="col-md-3" ng-repeat="subcol in collection.children track by $index">
 					<div class="thumbnail asm_thumb">
                         <a href="#ams/c/{{subcol.id}}?page=1" title="{{subcol.description}}"
                         ><img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
@@ -103,8 +103,9 @@
 						</div>
 					</div>
                 </div>
+        <br/>
 		</div>
-        <div class="col-md-12 column" ng-show="collection.holdAssets">
+        <div class="col-md-12" ng-show="collection.holdAssets">
         <hr/>
 
             <form id="fileupload" method="PUT" enctype="multipart/form-data" 
@@ -113,7 +114,7 @@
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
         <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
         <div class="row fileupload-buttonbar">
-            <div class="col-md-7">
+            <div class="col-md-12 col-lg-12">
                 <!-- The fileinput-button span is used to style the file input field as button -->
                 <span class="btn btn-success fileinput-button" ng-class="{disabled: disabled}">
                     <i class="glyphicon glyphicon-plus"></i>

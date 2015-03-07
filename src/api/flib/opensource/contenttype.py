@@ -408,7 +408,7 @@ CONTENT_TYPE = {
     '.mpga': 'audio/mpeg',
     '.mpl': 'video/mp2t',
     '.mpls': 'video/mp2t',
-    '.mpp': 'audio/x-musepack',
+    '.mpp': 'application/vnd.ms-project',
     '.mrl': 'text/x-mrml',
     '.mrml': 'text/x-mrml',
     '.mrw': 'image/x-minolta-mrw',

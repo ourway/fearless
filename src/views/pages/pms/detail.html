@@ -294,19 +294,34 @@ background-color: #FFEDA5;
             </div>
             
             <div class="btn-group hidden-sm hidden-xs">
-                <button ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='cal', 'btn-success':mode=='cal'}" 
-                        ng-class="{'active':mode=='cal'}" ng-click="showCal();prepareCal();" type="button"><em class="glyphicon glyphicon-calendar"></em> Calendar</button>
-                <a ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
-                    ng-class="{'active':mode=='plan'}" data-gallery="plan_graphics" href="/static/uploads/plan_{{project.uuid}}.html.png" type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</a>
+                <button ng-show="tasks.length>0" class="btn btn-info" 
+                    ng-class="{'active':mode=='cal', 'btn-success':mode=='cal'}" 
+                    ng-class="{'active':mode=='cal'}" ng-click="showCal();prepareCal();" 
+                    type="button"><em class="glyphicon glyphicon-calendar"></em> Calendar</button>
+                    <a ng-show="tasks.length>0" class="btn btn-info" 
+                        ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
+                    ng-class="{'active':mode=='plan'}" 
+                    data-gallery="plan_graphics" href="/static/uploads/plan_{{project.uuid}}.html.png" 
+                    type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</a>
                 <a ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" 
                         data-gallery="plan_graphics"
-                        href="/static/uploads/guntt_{{project.uuid}}.html.png" type="button"><em class="glyphicon glyphicon-tasks"></em> Gantt</a>
-                <a ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}"
+                        href="/static/uploads/guntt_{{project.uuid}}.html.png" type="button">
+                            <em class="glyphicon glyphicon-tasks"></em> Gantt</a>
+                        <a ng-show="tasks.length>0" class="btn btn-info" 
+                            ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}"
                         data-gallery="plan_graphics"
-                        href="/static/uploads/resource_{{project.uuid}}.html.png" type="button"><em class="glyphicon glyphicon-list-alt"></em> Resources</a>
-                <button ng-show="tasks.length>0 && $parent.isAmin" class="btn btn-info" ng-class="{'active':mode=='profit', 'btn-success':mode=='profit'}" 
-                        ng-click="generateReport('profit')" type="button"><em class="glyphicon glyphicon-adjust"></em> Budget</button>
-                <button ng-show="tasks.length>0" class="btn btn-info" ng-click="generateReport(mode)" type="button"><em class="glyphicon glyphicon-repeat"></em> </button>
+                        href="/static/uploads/resource_{{project.uuid}}.html.png" type="button">
+                        <em class="glyphicon glyphicon-list-alt"></em> Resources</a>
+                    <button ng-show="tasks.length>0 && $parent.isAmin"
+                        class="btn btn-info" ng-class="{'active':mode=='profit', 'btn-success':mode=='profit'}" 
+                    ng-click="generateReport('profit')" type="button">
+                    <em class="glyphicon glyphicon-adjust"></em> Budget</button>
+                    <button ng-show="tasks.length>0" class="btn btn-info" ng-click="getMSP()" 
+                        type="button"><em class="fa fa-file-powerpoint-o"></em> </button>
+                    <button ng-show="tasks.length>0" class="btn btn-info" ng-click="getCSV()" 
+                        type="button"><em class="fa  fa-file-excel-o"></em> </button>
+                    <button ng-show="tasks.length>0" class="btn btn-info" ng-click="generateReport(mode)" 
+                        type="button"><em class="glyphicon glyphicon-repeat"></em> </button>
 			</div>
 	</div>
 

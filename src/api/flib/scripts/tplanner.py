@@ -20,7 +20,7 @@ def sort_by_order(a):
     return a[1].get('order')
 
 
-def render_process(session, t, project_id, prefix, parent=None, last_order=0, depends=[]):
+def render_process(session, t, project_id, prefix=None, parent=None, last_order=0, depends=[]):
     ''' 
         Renders a process template
         @t: mako template
@@ -31,6 +31,8 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0, de
 
     '''
     session.commit()
+    if not prefix:
+        prefix = getUUID()[:4]+ '_'
     fn = os.path.abspath(os.path.join(os.path.dirname(__file__),
                 '../templates/TPlans/processes/' , t + '.json'))
     structure = {'processes': {}, 'tasks': {}}
@@ -38,11 +40,9 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0, de
         with open(fn, 'wb') as f:
             f.write(json.dumps(structure, sort_keys=True, indent=4))
     templ = Template(filename=fn)  # create a mako template
-    print 'processing %s' % prefix + t
     raw_root = templ.render()
     plan = json.loads(raw_root)
-    if plan.get('active') and plan.get('active') == True:
-        print 'bypassing inactive process/task "%s"' % t
+    if 'active' in plan.keys() and plan.get('active') == False:
         return
     outputs = []
     found_tasks = False
@@ -56,7 +56,6 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0, de
         session.add(newt)
     # I am using a custom force depend list for external dependency injection
     if depends and all(depends):
-        print t, depends[0].title
         newt.depends = depends
     #    callerTask = session.query(Task).filter_by(title=prefix+parent).one()
     #    newt.parent = [callerTask]
@@ -79,6 +78,8 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0, de
 
     for process in everything:
         title, info = process
+        if 'disabled' in info.keys() and info.get('disabled') == True:
+            continue
         template = info['template']  # an info should have a template
         title = prefix + title
         processTask = session.query(Task).filter_by(title=title).scalar()
@@ -103,12 +104,20 @@ def render_process(session, t, project_id, prefix, parent=None, last_order=0, de
             render_task(template, session,
                         project_id, process[0], prefix, process[0], order=600 - info['order'])
 
+
+    if parent:
+        assert len(newt.parent)==1
+
     return newt
 
 
 def render_task(t, session, project_id, parent, prefix, title, order):
     '''lets see what will happen'''
     session.commit()
+    if parent:
+        parent_task = session.query(Task).filter_by(
+            title=prefix + parent).one()
+
     fn = os.path.abspath(os.path.join(os.path.dirname(__file__),
                 '../templates/TPlans/tasks/' , t + '.json'))
     structure = {'tags': [], 'min_effort': 0, 'max_effort': 2,
@@ -152,10 +161,6 @@ def render_task(t, session, project_id, parent, prefix, title, order):
             if not theTask:
                 theTask = Task(
                     title=prefix + title + '_task', project_id=project_id, effort=effort, priority=order)
-
-            if parent:
-                parent_task = session.query(Task).filter_by(
-                    title=prefix + parent).one()
                 theTask.parent = [parent_task]
 
             theTask.resources = [
@@ -164,23 +169,21 @@ def render_task(t, session, project_id, parent, prefix, title, order):
         else:
             raise ValueError(
                 'Cant find any reources for expertise "%s"' % _expert)
+    if parent:
+        assert len(theTask.parent)==1
     return theTask
 
 
 if __name__ == '__main__':
-    character_preproduction_template = "Art_character_preproduction"
     PROJ = 1
     session = session_factory()
+
     prodb = session.query(Project).filter_by(id=PROJ).one()  # must be present
-
-    # for test only
     prodb.tasks = []
-    session.commit()
 
-    # depends must be a list
-    render_process(session, character_preproduction_template, PROJ, 'Sepehr_')
-    # depends must be a list
-    render_process(session, character_preproduction_template, PROJ, 'Tiger_')
+    render_process(session, "Art_character_preproduction", PROJ, 'Sepehr_')
+    render_process(session, "Art_character_preproduction", PROJ, 'Tiger_')
+
     session.commit()
 
     prodb.plan(

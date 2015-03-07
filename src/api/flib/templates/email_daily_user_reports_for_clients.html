@@ -1,3 +1,16 @@
-Hello, Here are today's reports for you:
+Hello, You have ${len(reports)} report(s) to review:
+% for i in reports:
+<div style="
+        border:1px solid #777;
+        border-top:10px solid #777;
+        background:#FAF0D4;padding:2px;padding-left:10px;margin-top:10px">
+        <small style="color:grey">${i['datetime']}</small>
+    <h5><u>${i['reporter']['firstname']} ${i['reporter']['lastname']}</u> reported
+        <span style="color:grey">${i['prettytime']}</span>
+    </h5>
+    <blockquote>${i['body']}</blockquote>
+</div>
+% endfor
+
 
 
