@@ -6,7 +6,7 @@
     <br/>
         <div class="col-md-2 column">
             <p ng-if="persian" class="farsi">
-            گزارشات شما باید کمتر از ۱۰۰۰ حرف و بیشتر از ۲۵ حرف باشند. 
+            گزارشات شما باید کمتر از ۱۰۰۰ حرف و بیشتر از ۲۵ حرف باشند.
             </p>
             <p ng-if="!persian">
             Your reports must be longer than 25 characters and less than 1000 ones.
@@ -22,12 +22,24 @@
 					<div ng-disabled="report.messageCallBack">
                         <textarea ng-class="{'farsi':persian}" id="report_textarea" type="text" class="form-control" placeholder="{{repotPlaceholder}}" ng-model="report.body"></textarea>
                         <br/>
-                        <button ng-if="persian" ng-disabled="!report.body || report.body.length<25 || report.body.length>1000" 
+                        <div ng-include="'pages/ams/fileUploadTemplate.html'"></div>
+                        <button ng-if="persian" ng-disabled="!report.body || report.body.length<25 || report.body.length>1000"
                             type="submit" ng-click="sendReport()" class="pull-right farsi btn btn-primary">گزارش من را بفرست</button>
                         <button ng-if="!persian" ng-disabled="!report.body || report.body.length<25 || report.body.length>1000"
                             type="submit" ng-click="sendReport()" class="btn btn-primary">Send My Report</button>
-					</div>
-				</div>
+			</div>
+		  </div>
+
+                  <hr/>
+                  <h3>Your latest reports</h3>
+                      <div class="col-m5-4" ng-repeat='rep in latest'
+                      style="border:1px solid #ccc;background:#F7FFFB;padding:5px;margin-top:10px;">
+                            <pre>{{$parent.prettyDate(rep.datetime)}} ago</pre>
+                            <div
+                            ng-class="{'farsi':!$parent.isASCII(rep.body, true)}"
+                            ng-bind-html="marked(rep.body)"></div>
+                      </div>
+                  <hr/>
 
 		</div>
         <div class="col-md-2 column">
@@ -38,13 +50,20 @@
                 <button class="btn btn-default langChange"
                     ng-click="repotPlaceholder='گزارش روزانه یا ساعتی خود را اینجا بنویسید ...';persian=true;"
                     type="button"><em class=" glyphicon glyphicon-align-right"></em></button>
+
+
             </div>
+
             <br/>
             <br/>
             <a href="#help/reports">Need help?</a>
-		</div>
+        </div>
+
+
+
     </div>
-    <br/>
+</div>
+
 
 <script>
 
@@ -53,7 +72,7 @@
     });
 
     $('.langChange').click(function(){
-    
+
         $('#report_textarea').focus();
     })
 

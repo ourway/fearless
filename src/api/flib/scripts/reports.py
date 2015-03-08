@@ -157,9 +157,9 @@ def dailyTaskCardForResources():
 
 def dailyUserReportsToClients():
     reports = session.query(Report).filter(Report.user).\
-        filter(Report.created_on>yesterday)\
+        filter(Report.created_on.between(today, tomorrow))\
         .order_by(desc(Report.created_on)).all()
-    
+
     if not reports:
         print '\tnot any report available'
         return
@@ -181,8 +181,8 @@ def dailyUserReportsToClients():
         .render(today=today, tasks=tasks, jtoday=jtoday, arrow=arrow, reports=result,
                 responsibility='leading')
     subject = 'Studio Daily Reports - %s' % jtoday
-    emails =  ['hamid2177@gmail.com']
-    #emails =  ['farsheed.ashouri@gmail.com']
+    #emails =  ['hamid2177@gmail.com']
+    emails =  ['farsheed.ashouri@gmail.com']
     sent = send_envelope.delay(emails, cc, bcc, subject, message)
     print 'Report sent to %s' % emails
 

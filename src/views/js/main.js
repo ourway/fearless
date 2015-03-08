@@ -1,5 +1,5 @@
 var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular',
-        'ui.grid', 'ngSanitize', 'ui.bootstrap', 'checklist-model', 'blueimp.fileupload', 
+        'ui.grid', 'ngSanitize', 'ui.bootstrap', 'checklist-model', 'blueimp.fileupload',
         'siyfion.sfTypeahead', 'bootstrap-tagsinput', 'ngAnimate', 'flow']);
 
 /*
@@ -32,7 +32,7 @@ fearlessApp.factory('messageService', function() {
                     unread+=1;
                 });
         return unread;
-    };    
+    };
     return itemsService;
 });
 
@@ -89,13 +89,13 @@ function pad(num, size) {
 var substringMatcher = function(strs) {
   return function findMatches(q, cb) {
     var matches, substrRegex;
- 
+
     // an array that will be populated with substring matches
     matches = [];
- 
+
     // regex used to determine if a string contains the substring `q`
     substrRegex = new RegExp(q, 'i');
- 
+
     // iterate through the pool of strings and for any string that
     // contains the substring `q`, add it to the `matches` array
     $.each(strs, function(i, str) {
@@ -105,7 +105,7 @@ var substringMatcher = function(strs) {
         matches.push({ value: str });
       }
     });
- 
+
     cb(matches);
   };
 };
@@ -345,14 +345,14 @@ function updateImageSize(img, maxWidth, maxHeight){
               }
             });
             $('#newproj_watchers').on('itemAdded', function(event) {
-                    
+
               // event.item: contains the item
             });
         }
 
 
         $scope.prettyDate = function(time){
-            var _d = moment.unix(time); 
+            var _d = moment.unix(time);
             return moment.duration(_d-moment()).humanize();
 
         }
@@ -402,14 +402,14 @@ function updateImageSize(img, maxWidth, maxHeight){
             req = $http.get('/api/db/departement').success(function(resp){
                     $scope.departements = resp;
                 });
-         
+
         }
 
         $scope.getExps = function(){
             req = $http.get('/api/db/expert').success(function(resp){
                     $scope.experts = resp;
                 });
-         
+
         }
         $scope.sendmail = function(mail){
             m = $http.post('/api/sendmail', mail);
@@ -417,7 +417,7 @@ function updateImageSize(img, maxWidth, maxHeight){
 
         $scope.persianDate = function(d, mode){
         // d is like 2015-1-1
-        list = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 
+        list = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد',
                 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
         if (d)
             a = new Date(d)  // 1000 is for unix time date;
@@ -453,7 +453,7 @@ function updateImageSize(img, maxWidth, maxHeight){
 
 
     $scope.doLogin = function() {
-        
+
         if (validateEmail($scope.loginInfo.email) == false && $scope.loginInfo.action != 'changepassword')
             return null;
         $scope.AuthRespInfo = null;
@@ -478,7 +478,7 @@ function updateImageSize(img, maxWidth, maxHeight){
 
                if (resp.message=='success') //green light
                     {
-                        
+
                     //console.log(resp);
 
                         if (resp.avatar != 'null')
@@ -686,7 +686,7 @@ fearlessApp.controller('titleCtrl', function ($scope, $http, $location) {
 //  ========================
 
 
-function validateEmail(email) { 
+function validateEmail(email) {
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
 }
@@ -713,7 +713,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
         userId = $routeParams.userId;
         if (!userId)
             userId = $scope.$parent.userInfo.userid;
-    $scope.accounting = accounting; 
+    $scope.accounting = accounting;
     $scope.$parent.getGroups();
     $scope.$parent.getDeps();
     $scope.$parent.getExps();
@@ -726,7 +726,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
         myWindow.document.write(_final);
         myWindow.document.close(); //missing code
         myWindow.focus();
-        myWindow.print(); 
+        myWindow.print();
     }
 
 
@@ -747,9 +747,9 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
             resp.agreement_end = new Date(resp.agreement_end*1000);
             delete resp.created_on;
             delete resp.modified_on;
-            $scope.user = resp; 
+            $scope.user = resp;
             $http.get('/api/db/user/'+userId+'?field=grps&list=true').success(function(grps){
-                $scope.user.grps = grps; 
+                $scope.user.grps = grps;
                 })
             $http.get('/api/db/user/'+userId+'?field=dps&list=true').success(function(dps){
                 $scope.user.dps = dps;
@@ -765,14 +765,14 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
 
         userTasksReq = $http.get('/api/db/user/'+userId+'?field=tasks&list=true');
             userTasksReq.success(function(tasks){
-                $scope.userTasks = tasks; 
+                $scope.userTasks = tasks;
             });
 
         $scope.fileNameChanged = function(e){
-        
+
             if (!e.files.length)
                 return null;
-        
+
             picFile = e.files[0];
             reader = new FileReader();
             reader.onloadend = function(){
@@ -780,7 +780,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
                 // lets create a new iimage
                 img = new Image();
                 img.onload = function(){
-                    
+
                     _pic = updateImageSize(this, 300, 300);
                     $scope.user.avatar=_pic;
                     $scope.$apply();
@@ -841,12 +841,40 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
 fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $timeout, $location){
         $rootScope.title = "User Reports - Fearless";
         $scope.report = {};
+        $scope.assets = [];
+        $scope.marked = marked;
         $scope.persian = false;
         $scope.repotPlaceholder = 'Write your daily or hourly report here ...';
+
+        $scope.attachurl = "/api/asset/save/reports?multipart=true&tags=report";
+        // i used multipart cause i need filename
+        //
+        $http.get('/api/report/latest').success(function(resp){
+            $scope.latest = resp;
+        })
+        $scope.uploadOptions = {
+            url:$scope.attachurl,
+            type:'PUT',
+            singleFileUploads:true,
+            maxChunkSize: 1024*1024*16, // 4Mb
+            //maxChunkSize: 1024, // 1kb
+            sequentialUploads:true,
+            done: function(e, data) {
+
+              $scope.assets.push(data.result.id);
+                //$scope.getCollectionDetails();
+            //$(data.context['0']).fadeOut(700);
+            //limitMultiFileUploads:1,
+
+        }
+        }
+
+
         $scope.sendReport = function(){
             req = $http.put('/api/report', $scope.report);
             req.success(function(resp){
                 if (resp.message == 'OK'){
+                        //$scope.latest.push($scope.report);
                         $scope.report.body = null;
                         $scope.report.messageCallBack = 'Thank you! Your report has been sent.'
                         $timeout(function(){
@@ -859,12 +887,12 @@ fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $timeou
                     }
                 })
        }
-        
+
 
         });
 
 fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $location){
-    
+
     //$scope.newProjectStartDate = new Date();Centeral Auth
     //Centeral Auth
     $scope.newProject = {};
@@ -927,8 +955,8 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
         $scope.accounting = accounting;
 
         $scope.calculate_salery = function(user, rawMode){
-                result = $scope.ceilG(user.monthly_salary - 
-                ((user.monthly_salary/user.monthly_working_hours)*user.monthly_present_hours*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + 
+                result = $scope.ceilG(user.monthly_salary -
+                ((user.monthly_salary/user.monthly_working_hours)*user.monthly_present_hours*(user.retention+user.payroll_tax+user.insurance_deductions)/100 +
                 ($scope.roundG((user.monthly_salary/user.monthly_working_hours)*($scope.ceilG(user.monthly_working_hours-user.monthly_present_hours))))));
                 //$scope.final_payment+=result;
                 if (rawMode)
@@ -944,7 +972,7 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
                 result += $scope.calculate_salery($scope.users[i], true);
             }
             return accounting.formatNumber(result);
-        
+
         };
 
 
@@ -957,7 +985,7 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
             myWindow.document.write(_final);
             myWindow.document.close(); //missing code
             myWindow.focus();
-            myWindow.print(); 
+            myWindow.print();
         }
 
     $scope.mailSumpup = function(){
@@ -972,7 +1000,7 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
                 if (confirm('Are you sure you want to send sumpup?'))
                     $scope.$parent.sendmail(mail);
     }
-        
+
         $scope.getRoles = function(){
 
             $http.get('/api/db/role').success(function(resp){
@@ -1030,7 +1058,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             $scope.deleteProject = function(){
                 if (confirm('Are you sure you want to delete this project?')){
                     $http.delete('/api/db/project/'+$scope.projId).success(function(resp){
-                            
+
                             document.location = '#/pms';
                             })
 
@@ -1074,7 +1102,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     });
             };
 
-            
+
             _t = timeConverter(false, true).split('-').slice(0, 3).toString().split(' ').toString();
             getprefix = 'project_'+ $scope.projId+ '_' + _t + '_';
             $scope.generateReport = function(mode){
@@ -1153,7 +1181,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         myWindow.document.write(styles + $scope.printable + copyright);
         myWindow.document.close(); //missing code
         myWindow.focus();
-        myWindow.print(); 
+        myWindow.print();
     }
 
 
@@ -1174,8 +1202,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                         if (ev.effort>0 && ev.resources.length){
                         n = {
                                 'id':ev.id,
-                                'title':ev.title, 
-                                'start':new Date(ev.start*1000), 
+                                'title':ev.title,
+                                'start':new Date(ev.start*1000),
                                 'end':new Date(ev.end*1000),
 
                             };
@@ -1193,7 +1221,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
     }
 
     $scope.createNewSeq = function(){
-        
+
         $http.put('/api/sequence/add/'+$scope.projId, $scope.newSequences).success(function(resp)
                 {
                     if (resp.message == 'OK'){
@@ -1221,7 +1249,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 $scope.getTasksList();
                 //$scope.getProjectDetails();
                 $scope.generateReport();
-               
+
                });
     }
 
@@ -1239,7 +1267,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     return true
                 }
             }
-                
+
         };
 
         $scope.isCurrenclyResource = function(resource){
@@ -1271,7 +1299,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     {label: "Remaining", value: 100-complete},
                   ]
                 $scope.progressPyChart.setData(data);
-            
+
         }
 
         $scope.generateBurndownChart = function(data){
@@ -1317,7 +1345,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     expected = (expected_efforts/total_efforts) * 100;
                 }
                 chartData.push({
-                        date:ldate, value:complete, 
+                        date:ldate, value:complete,
                         expected:parseInt(expected),
                         Offset:complete - parseInt(expected)
                         })
@@ -1355,7 +1383,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     eventClick: function(calEvent, jsEvent, view) {
                             //alert('Event: ' + calEvent.title);
                             $scope.taskDetail(calEvent.id);
-                            
+
 
         },
 			header: {
@@ -1431,12 +1459,12 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     if (resp.message == 'OK'){
                         $scope.generateReport();
                         $('#projectEditModal').modal('hide');
-                        
+
                     }
                 })
 
         };
-        
+
     $scope.updateTask = function(taskId, data){
         if (!data)
             data = $scope.editTaskInfo;
@@ -1459,7 +1487,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
         });
     }
-    
+
     $scope.deleteTask = function(taskId){
         if (confirm('Are you sure you want to delete the task?'))
         {
@@ -1478,7 +1506,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
     $scope.isMyTask = function(task){
         result = false;
         task.resources.forEach(function(e){
-                if (e.id==$scope.$parent.userInfo.userid) 
+                if (e.id==$scope.$parent.userInfo.userid)
                     result = true;
             })
         return result;
@@ -1526,7 +1554,7 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
         }
 
         }
-        
+
         $scope.setTags = function(){
             $('#assetTags').tagsinput({
               typeaheadjs: {
@@ -1538,7 +1566,7 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
             });
             $('#assetTags').on('itemAdded', function(event) {
 
-                    
+
               // event.item: contains the item
             });
         }
@@ -1637,8 +1665,8 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                     if (download)
                         window.location = '/static/ASSETS/'+ $scope.asset.uuid + '/' + $scope.asset.fullname;
                     //document.location='/static/ASSETS/'+$scope.asset.uuid+'/'+$scope.asset.fullname;
-                    
-                    }) 
+
+                    })
         }
         $scope.getAssetInfo = function(versionsOnly){
             req = $http.get('/api/db/asset/'+assetId).success(function(Resp, code){
@@ -1686,12 +1714,12 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
         $scope.$watch(assetId, function(){
                 $scope.getAssetInfo();
             })
-        
+
 
         });
 
 
-fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routeParams, 
+fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routeParams,
             $http, $location, Restangular, $timeout, $filter, $window){
 
 
@@ -1804,7 +1832,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                             $scope.getCollectionDetails();
                         //$(data.context['0']).fadeOut(700);
                         //limitMultiFileUploads:1,
-                        
+
                     }
                     }
                     //$('#fileupload').bind('fileuploaddone', function (e, data) {
@@ -1846,7 +1874,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                 $scope.getCollectionDetails();
                 })
 
-    
+
 
         $scope.toggleThumbnail = function(){
             if ($scope.thumbnails)
@@ -1873,7 +1901,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                 else{
                     alert(resp.info);
                 }
-                
+
                 })
         }
 
@@ -1886,10 +1914,10 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         });
 
 fearlessApp.controller('errorsCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
-        
+
         })
 fearlessApp.controller('tasksCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
-        
+
         })
 
 fearlessApp.controller('taskDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
@@ -1897,13 +1925,13 @@ fearlessApp.controller('taskDetailCtrl', function($scope, $rootScope, $routePara
         $scope.getTaskDetails = function(){
             req = $http.get('/api/task/'+taskId).success(function(resp){
                     $scope.task = resp;
-                
+
                 })
         }
         })
 
 
-    
+
 fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $interval, $rootScope, messageService, $http, $routeParams) {
     $scope.messages = {};
     if($scope.$parent)
@@ -1912,7 +1940,7 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
     $scope.getUnreadCount  = messageService.getUnreadCount;
     $scope.messages.folder = $routeParams.folder || 'inbox';
 
-    
+
     $scope.init = function(process){
         req = $http.get('/api/messages/list');
         req.success(function(resp){
@@ -1932,10 +1960,10 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
             }
             });
         }
-            $scope.newMessage = {};            
+            $scope.newMessage = {};
        })
     }
-   	
+
  	$scope.date = new Date;
     $scope.sortingOrder = 'id';
     $scope.pageSizes = [10,20,50,100];
@@ -1945,9 +1973,9 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
     $scope.itemsPerPage = 10;
     $scope.pagedItems = [];
     $scope.currentPage = 0;
-    
+
     /* inbox functions -------------------------------------- */
-    
+
 
 
 
@@ -1963,7 +1991,7 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         if ($scope.replyMode || $scope.forwardMode)
             $scope.newMessage.body += ('\n _____ \n\n <sup> Authored on '
                     + new Date($scope.selected.datetime * 1000).toString()
-                    + ' by '+$scope.selected.from_s.firstname_s 
+                    + ' by '+$scope.selected.from_s.firstname_s
                     + ' ' + $scope.selected.from_s.lastname_s +'</sub> \n >'
                     + $scope.selected.body_s);
         req = $http.post('/api/messages/set', $scope.newMessage);
@@ -1984,7 +2012,7 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         }
         return haystack.toLowerCase().indexOf(needle.toLowerCase()) !== -1;
     };
-    
+
     $scope.$watch($routeParams.folder, function(){
             })
     // filter the items
@@ -2001,12 +2029,12 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         // now group by pages
         $scope.groupToPages();
     };
-    
+
     // calculate page in place
     $scope.groupToPages = function () {
         $scope.selected = null;
         $scope.pagedItems = [];
-        
+
         for (var i = 0; i < $scope.filteredItems.length; i++) {
           if (i % $scope.itemsPerPage === 0) {
             $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)] = [ $scope.filteredItems[i] ];
@@ -2015,7 +2043,7 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
           }
         }
     };
-    
+
     $scope.range = function (start, end) {
         var ret = [];
         if (!end) {
@@ -2027,25 +2055,25 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         }
         return ret;
     };
-    
+
     $scope.prevPage = function () {
         if ($scope.currentPage > 0) {
             $scope.currentPage--;
         }
         return false;
     };
-    
+
     $scope.nextPage = function () {
         if ($scope.currentPage < $scope.pagedItems.length - 1) {
             $scope.currentPage++;
         }
         return false;
     };
-    
+
     $scope.setPage = function () {
         $scope.currentPage = this.n;
     };
-    
+
     $scope.moveItem = function (item, target) {
             if (!target){
                 if ($scope.messages.folder != 'trash')
@@ -2067,7 +2095,7 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
     };
 
 
-    
+
     $scope.isMessageSelected = function () {
         if (typeof $scope.selected!=="undefined" && $scope.selected!==null) {
 
@@ -2113,45 +2141,45 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         $http.post('/api/messages/update/'+message.key, data);
     }
 
-    
+
     $scope.readAll = function () {
         for (var i in $scope.messages.items) {
             $scope.messages.items[i].read = true;
             $scope.updateMessage($scope.messages.items[i]);
         }
     };
-    
+
     $scope.closeMessage = function () {
         $scope.selected = null;
     };
-    
+
     $scope.renderMessageBody = function(body)
     {
         if (body)
             return marked(body);
         };
-    
+
     /* end inbox functions ---------------------------------- */
-    
+
 
 
     // initialize
     //$scope.init();
 
 
-    
+
 })// end inboxCtrl
 fearlessApp.controller('messagesCtrl',  function ($scope) {
-    
+
     $scope.message = function(idx) {
         return messages(idx);
     };
-    
+
 });// end messageCtrl
 
 
 fearlessApp.controller('taggerCtrl',  function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
-        
+
     $scope.tags = {};
     $scope.tags.data = [];
     var tags = new Bloodhound({
@@ -2166,7 +2194,7 @@ fearlessApp.controller('taggerCtrl',  function($scope, $rootScope, $routeParams,
         // suggestion engine expects JavaScript objects so this converts all of
         // those strings
 
-                
+
       }
     });
     tags.initialize();
@@ -2176,7 +2204,7 @@ fearlessApp.controller('taggerCtrl',  function($scope, $rootScope, $routeParams,
       displayKey: 'name',
       source: tags.ttAdapter(),
     };
-    
+
     $scope.addTag = function(type, target){
         if (target.tgs)
             target.tgs.forEach(function(e){
@@ -2223,7 +2251,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
             filter: function(list) {
               return $.map(list || {}, function(asset) { return { fullname: asset }; });
             }
-                    
+
           }
         });
         // kicks off the loading/processing of `local` and `prefetch`
@@ -2288,7 +2316,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
                 tag.selected=false;
             else
                 tag.selected=true;
-            
+
             tags = [];
             for (i in $scope.assetTags){
                 _t = $scope.assetTags[i];
@@ -2321,7 +2349,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
                 }
 
             tag_query = '/api/asset/get_user_tags';
-            tagReq = $http.get(tag_query); 
+            tagReq = $http.get(tag_query);
             tagReq.success(function(resp){
                 $scope.assetTags = resp;
                 if ($routeParams.tags)
@@ -2348,7 +2376,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
             req = $http.get(query);
             req.success(function(resp){
                     $scope.userAssets = resp;
-                    
+
                     })
             query = '/api/db/asset?filters=owner_id='+$scope.$parent.userInfo.userid+'&count=true';
             if (search_for)
@@ -2358,7 +2386,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
             creq = $http.get(query);
             creq.success(function(cresp){
                     $scope.assetsCount = cresp.count;
-                    
+
                     })
         }
 
@@ -2377,7 +2405,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
                         }
                 });
 
-    
+
 });// end messageCtrl
 
 

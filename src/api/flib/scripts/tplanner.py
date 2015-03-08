@@ -175,7 +175,7 @@ def render_task(t, session, project_id, parent, prefix, title, order):
 
 
 if __name__ == '__main__':
-    PROJ = 1
+    PROJ = 5
     session = session_factory()
 
     prodb = session.query(Project).filter_by(id=PROJ).one()  # must be present

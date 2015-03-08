@@ -28,6 +28,7 @@ from flib.opensource.contenttype import contenttype
 from flib.utils.validators import checkPath
 from base64 import encode, decode, decodestring
 from sqlalchemy import desc
+import arrow
 
 # from celery.result import AsyncResult
 from flib.models import Asset, Repository, Collection, User, fdb
@@ -84,6 +85,10 @@ class AssetSave:
         ''' When client sends md5, it means that there is probabaly an exsisting file with that md5
             So we server doesnt need file data.  Just need to link old data '''
         _md5 = req.get_param('md5')
+        tags = []
+        _tags = req.get_param('tags')
+        if _tags:
+            tags = _tags.split(',')
 
         _cid = req.get_param('collection_id')
         collection = None
@@ -95,8 +100,13 @@ class AssetSave:
             collection = Collection.query.filter_by(repository=targetRepo)\
                             .filter_by(name=_cname).scalar()
         if not collection:
-            collection = Collection(path='danger', repository=targetRepo)
-            req.session.add(collection)
+            now = arrow.utcnow()
+            today = now.format('YYYY-MM-DD')
+            collection = Collection.query.filter_by(path=today)\
+                .filter_by(repository=targetRepo).scalar()
+            if not collection:
+                collection = Collection(path=today, repository=targetRepo)
+                req.session.add(collection)
 
         body = req.stream
         b64 = req.get_param('b64')
@@ -197,7 +207,11 @@ class AssetSave:
                 parent_id = int(attach_to)
                 parent = Asset.query.filter_by(id=parent_id).scalar()
                 asset.attached_to.append(parent)
-            resp.body = {'message': 'Asset created|updated', 'key': asset.key,
+            if tags:
+                asset.tags += tags
+                collection.tags += tags
+            req.session.flush()
+            resp.body = {'key': asset.key, 'id':asset.id,
                          'url': asset.url, 'fullname': asset.fullname, 'uuid': asset.uuid,
                          'name': asset.name, 'content_type': asset.content_type.split('/')[0],
                          'datetime': time.time()}
@@ -253,7 +267,7 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False, c
             b.seek(0)
             fileobj = b
         while True:
-            chunk = fileobj.read(2 ** 22)  # 4 megs
+            chunk = fileobj.read(2 ** 24)  # 4 megs
             # chunk = fileobj.read(1024) ## 1Kb
             if not chunk:
                 break
@@ -268,10 +282,10 @@ def safeCopyAndMd5(req, fileobj, destinationPath, repoId, uploader, b64=False, c
     dataMd5 = md5.hexdigest()
     # check if there is an asset with same key
     if not repoId:
-        availableAsset = Asset.query.filter_by(key=dataMd5).scalar()
+        availableAsset = Asset.query.filter_by(key=dataMd5).first()
     else:
         availableAsset = req.session.query(Asset).filter_by(key=dataMd5).join(
-            Collection).filter_by(repository_id=repoId).scalar()
+            Collection).filter_by(repository_id=repoId).first()
 
     '''First lets clean asset is there no files linked to it'''
     if availableAsset:

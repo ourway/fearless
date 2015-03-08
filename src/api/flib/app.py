@@ -32,7 +32,7 @@ import simplejson as json
 from flib.utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection, TestUpload
 from utils.messages import GetMessagesList, GetMessages, GetMessage, SetMessage, \
     SearchMessages, MoveMessage, DeleteMessage, UpdateMessage
-from flib.utils.reports import Mailer, AddReport, UserReports
+from flib.utils.reports import Mailer, AddReport, UserReports, GetUserLatestReports
 
 from flib.models import __all__ as av
 from flib.models import *
@@ -423,6 +423,7 @@ app.add_route('/api/taskcard/{date}', UserTasksCard())
 app.add_route('/api/sequence/add/{projId}', AddSequence())
 app.add_route('/api/sendmail', Mailer())
 app.add_route('/api/report', AddReport())
+app.add_route('/api/report/latest', GetUserLatestReports())
 app.add_route('/api/note/get/{key}', GetNote())
 app.add_route('/api/note/set/{key}', SetNote())
 app.add_route('/api/note/search/{query}', SearchNote())

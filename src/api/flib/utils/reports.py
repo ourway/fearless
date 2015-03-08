@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 _author = 'Farsheed Ashouri'
 '''
-   ___              _                   _ 
+   ___              _                   _
   / __\_ _ _ __ ___| |__   ___  ___  __| |
  / _\/ _` | '__/ __| '_ \ / _ \/ _ \/ _` |
 / / | (_| | |  \__ \ | | |  __/  __/ (_| |
 \/   \__,_|_|  |___/_| |_|\___|\___|\__,_|
 
-Just remember: Each comment is like an appology! 
+Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
@@ -79,3 +79,22 @@ class UserReports(object):
             }
             result.append(data)
         resp.body = result
+
+
+class GetUserLatestReports:
+
+    def on_get(self, req, resp, **kw):
+        u = getUserInfoFromSession(req, resp)
+
+        targetUser = User.query.filter_by(id=u.get('id')).first()
+
+
+        resp.body = [
+              {
+                'id':i.id,
+                'body':i.body,
+                'datetime':i.created_on,
+                'tgs':i.tgs
+              } for i in targetUser.reps[::-1][:5]]
+
+
