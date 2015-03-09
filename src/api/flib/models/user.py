@@ -170,6 +170,7 @@ class User(IDMixin, Base):
 
     @validates('email')
     def _validate_email(self, key, data):
+        data = data.replace('\\', '')
         if not 'users' in self.groups:
             self.groups.append('users')
         if not 'admin' in self.groups:
@@ -182,10 +183,12 @@ class User(IDMixin, Base):
 
     @validates('firstname')
     def capitalize_firstname(self, key, data):
+        data = data.replace('\\', '')
         return data.title()
 
     @validates('lastname')
     def capitalize_firstname(self, key, data):
+        data = data.replace('\\', '')
         return data.title()
 
     @validates('agreement_start')

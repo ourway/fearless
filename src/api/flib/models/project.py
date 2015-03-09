@@ -180,6 +180,11 @@ class Project(IDMixin, Base):
                 self.end = data.end
         return data
 
+
+    @validates('name')
+    def _check_name(self, key, data):
+        return data.replace('\\', '')
+
     @validates('end')
     def _check_end(self, key, data):
         result = convert_to_datetime(data)

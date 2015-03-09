@@ -25,7 +25,7 @@ import importlib
 from flib.utils.helpers import commit, jsonify, get_params
 from flib.utils.documents import SetNote, GetNote, SearchNote
 import urlparse
-from urllib import unquote
+from urllib import unquote, quote
 from string import ascii_uppercase
 from sqlalchemy.ext.serializer import loads, dumps
 import simplejson as json
@@ -151,6 +151,8 @@ class DB:
         # if not isAuthorizedTo(u.get('id'), 'see_%s'%table):
         #    raise falcon.HTTPUnauthorized('Not Authorized', 'Permission Denied')
         key = req.get_param('key') or 'id'
+        if key:
+            key = key.replace('\\', '\\\\')
         listMe = req.get_param('list')
         table = table.title()
         show = req.get_param('show')
@@ -219,11 +221,11 @@ class DB:
                         if isinstance(filter, dict):
                             eq = filter.pop('_')
                             query += '.filter({t}.{k}{eq}"{v}")'.format(t=table, eq=eq,
-                                                                        k=filter.keys()[0], v=filter[filter.keys()[0]])
+                                k=filter.keys()[0], v=filter[filter.keys()[0]])
 
                 for tag in tags:
                     query += '.filter({t}.tgs.any(name="{tag}"))'.format(
-                        t=table, tag=tag)
+                        t=table, tag=tag.replace('\\', '\\\\'))
 
                 if get_count:
                     data = eval(query).count()

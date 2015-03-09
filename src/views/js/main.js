@@ -256,12 +256,12 @@ var TITLE = 'TITLE';
              .when('/pms/t/:taskId', {
                 templateUrl: 'pages/pms/task.html',
                 controller: 'taskDetailCtrl',
-                 reloadOnSearch: false // dont reload the page on $location.search
+                 reloadOnSearch: true // dont reload the page on $location.search
             })
              .when('/tasks', {
                 templateUrl: 'pages/pms/tasks.html',
                 controller: 'tasksCtrl',
-                 reloadOnSearch: false // dont reload the page on $location.search
+                 reloadOnSearch: true // dont reload the page on $location.search
             })
              .when('/404', {
                 templateUrl: 'pages/errors/404.html',
@@ -849,9 +849,11 @@ fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $timeou
         $scope.attachurl = "/api/asset/save/reports?multipart=true&tags=report";
         // i used multipart cause i need filename
         //
+        $scope.getLatestReports = function() {
         $http.get('/api/report/latest').success(function(resp){
             $scope.latest = resp;
         })
+        }
         $scope.uploadOptions = {
             url:$scope.attachurl,
             type:'PUT',
@@ -862,12 +864,15 @@ fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $timeou
             done: function(e, data) {
 
               $scope.assets.push(data.result.id);
+              $scope.getLatestReports();
                 //$scope.getCollectionDetails();
             //$(data.context['0']).fadeOut(700);
             //limitMultiFileUploads:1,
 
         }
         }
+        
+        $scope.getLatestReports();
 
 
         $scope.sendReport = function(){
@@ -1398,6 +1403,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
             })
 
         }
+
         $scope.sendTaskReview = function(){
             $http.post('/api/task/review/'+$scope.reviewTask.id, {'review':$scope.reviewTask.body})
             .success(function(resp){
@@ -1922,9 +1928,22 @@ fearlessApp.controller('tasksCtrl', function($scope, $rootScope, $routeParams, $
 
 fearlessApp.controller('taskDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
         taskId = $routeParams.taskId;
+        $scope.marked=marked;
+
+        $scope.sendTaskReview = function(){
+            $http.post('/api/task/review/'+$scope.reviewTask.id, {'review':$scope.reviewTask.body})
+            .success(function(resp){
+                    reviewTask = {};
+                    $scope.getTaskDetails();
+                    $('#taskReviewModal').modal('hide');
+            });
+        }
+
         $scope.getTaskDetails = function(){
             req = $http.get('/api/task/'+taskId).success(function(resp){
                     $scope.task = resp;
+                    $scope.reviewTask = resp;
+                    $scope.$parent.comment_id = resp.uuid;
 
                 })
         }

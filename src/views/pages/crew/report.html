@@ -24,7 +24,7 @@
                         <br/>
                         <div ng-include="'pages/ams/fileUploadTemplate.html'"></div>
                         <button ng-if="persian" ng-disabled="!report.body || report.body.length<25 || report.body.length>1000"
-                            type="submit" ng-click="sendReport()" class="pull-right farsi btn btn-primary">گزارش من را بفرست</button>
+                            type="submit" ng-click="sendReport()" class="farsi btn btn-primary">گزارش من را بفرست</button>
                         <button ng-if="!persian" ng-disabled="!report.body || report.body.length<25 || report.body.length>1000"
                             type="submit" ng-click="sendReport()" class="btn btn-primary">Send My Report</button>
 			</div>

@@ -65,6 +65,7 @@ class Repository(IDMixin, Base):
 
     @validates('path')
     def create_folders(self, key, path):
+        path = path.replace(' ', '_')
         if not os.path.isdir(path):
             os.makedirs(path)
         readme = os.path.join(path, 'fearless.rst')
@@ -72,6 +73,12 @@ class Repository(IDMixin, Base):
             f.write('welcome to Fearless repository.')
         #GIT(readme).add('repo *%s* created successfully' % self.name)
         return path
+
+    @validates('name')
+    def check_name(self, key, name):
+        name = path.replace(' ', '_')
+        return name.replace('\\', '')
+
 
     @staticmethod
     def before_delete(mapper, connection, target):
@@ -82,6 +89,7 @@ class Repository(IDMixin, Base):
                 shutil.rmtree(ipath)
             except Exception, e:
                 pass
+
 
     @classmethod
     def __declare_last__(cls):

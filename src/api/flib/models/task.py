@@ -148,7 +148,9 @@ class Task(IDMixin, Base):
     @validates('title')
     def check_name(self, key, data):
         # print key, task
-        return fix_text(data)
+
+        _data = data.replace('\\', '')
+        return fix_text(_data)
 
     @validates('responsibles')
     def update_resources(self, key, data):

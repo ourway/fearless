@@ -108,7 +108,7 @@ class Asset(IDMixin, Base):
 
     @validates('name')
     def check_name(self, key, name):
-        return name
+        return name.replace('\\', '')
 
     @validates('content_type')
     def add_a_tag_based_on_contenttpye(self, key, ct):
@@ -122,7 +122,7 @@ class Asset(IDMixin, Base):
     @validates('fullname')
     def find_type(self, key, fullname):
         self.content_type = contenttype(fullname)
-        return fullname
+        return fullname.replace('\\', '')
 
     @validates('collection_id')
     def check_file(self, key, collection_id):

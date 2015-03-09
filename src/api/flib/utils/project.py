@@ -400,6 +400,20 @@ class GetTask:
                      'complete': task.complete,
                      'uuid': task.uuid,
                      'duration': task.duration,
+                     'reviews': [
+                         {
+                             'body':r.content,
+                             'datetime':r.created_on,
+                             'reviewer': 
+                             {
+                                 'id':r.reviewer.id,
+                                 'firstname':r.reviewer.firstname,
+                                 'lastname':r.reviewer.lastname,
+                             },
+                             'id':r.id
+                         }
+                         
+                         for r in task.reviews[::-1]],
                      'project': {'id': task.project.id, 'name': task.project.name, 'start': task.project.start, 'end': task.project.end}
                      }
 

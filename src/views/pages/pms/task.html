@@ -1,9 +1,73 @@
 <div class="container taskDiv" ng-init="getTaskDetails()" >
     <br/>
     <div class="row clearfix" ng-cloak>
+        <div class="col-md-12">
+            <div class="col-md-4">
+                <div class="panel"
+                    ng-class="
+                    {
+                    'panel-info':task.gauge=='on schedule', 
+                    'panel-success':task.gauge=='ahead of schedule', 
+                    'panel-danger':task.gauge=='behind schedule'
+                    }"
+                >
+            <div class="panel-heading"> 
+                <h4>{{task.title.replace('_', ' ')}}</h4>
+            </div>
+                
 
+            <div class="panel-footer clearfix">
+                <div >
+                    <span
+                    ng-class="
+                    {
+                    'text-info':task.gauge=='on schedule', 
+                    'text-success':task.gauge=='ahead of schedule', 
+                    'text-danger':task.gauge=='behind schedule'
+                    }"                        
+                        
+                        >{{task.gauge}}</span>
+                </div>
+            </div>
+        </div> 
+            </div>
+            <div class="col-md-4">
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#taskReviewModal">Write Review</button>
+            </div>
+        </div>
 
     </div>
+    <hr/>
+    <div class="col-md-12">
+        <div class="col-md-5">
+    <div ng-include="'pages/comment/index.html'"></div>
+    </div>
+        <div class="col-md-7">
+        <div class="panel panel-info" ng-repeat="report in task.reviews track by $index">
+            <div class="panel-heading"> 
+                <a href="#/user/{{report.reviewer.id}}"><b>{{report.reviewer.firstname}} {{report.reviewer.lastname}}</b></a>
+            </div>
+            <div class="panel-body">
+                <div ng-bind-html="marked(report.body)"
+                ng-class="{'farsi':!$parent.isASCII(report.body, true)}">
+                </div>
+            </div>
+            <div class="panel-footer clearfix">
+                <div >
+                <small>Reviewd {{$parent.prettyDate(report.datetime)}} ago</small>
+                </div>
+            </div>
+        </div> 
+        </div>
+    </div>
 </div>
+
+
+<div class="modal fade" id="taskReviewModal" ng-init="" ng-include="'pages/pms/taskReviewModalTemplate.html'"
+    role="dialog" aria-labelledby="taskReviewModal" aria-hidden="true"></div>
+
+
 
 

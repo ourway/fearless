@@ -34,6 +34,10 @@ class Tag(IDMixin, UniqueMixin, Base):
     parent_id = Column(Integer, ForeignKey('tag.id'))
     parent = relationship("Tag", backref="children", remote_side=[id])
 
+    @validates('name')
+    def check_name(self, key, data):
+        return data.replace('\\', '')
+
     @classmethod
     def unique_hash(cls, name):
         if name:
