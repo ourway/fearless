@@ -7,7 +7,7 @@ wget --no-check-certificate https://www.python.org/ftp/python/2.7.8/Python-2.7.8
 sudo yum groupinstall "Development tools" -y
 sudo yum install zlib-devel bzip2-devel openssl-devel ncurses-devel sqlite-devel -y
 
-## extract and cinfigure 
+## extract and cinfigure
 tar xf Python-2.7.8.tar.xz
 cd Python-2.7.8
 ./configure --prefix=/usr/local
@@ -39,7 +39,7 @@ pip install supervisor
 rm -f get-pip.py
 
 ## install virtualenv
-sudo pip install -U virtualenv
+sudo pip install -U virtualenv httpie
 
 ## prepare a pyenv
 python2.7 -m virtualenv --always-copy pyenv
