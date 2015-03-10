@@ -189,7 +189,8 @@ class AssetSave:
                 asset.name = name
                 asset.fullname = fullname
                 asset.key = bodyMd5
-            # Asset descriptions
+            # Asset descriptionspath
+            asset.path = assetPath
             if req.get_param('description'):
                 asset.description = req.get_param('description')
             if targetUser:

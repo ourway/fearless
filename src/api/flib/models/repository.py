@@ -76,7 +76,7 @@ class Repository(IDMixin, Base):
 
     @validates('name')
     def check_name(self, key, name):
-        name = path.replace(' ', '_')
+        name = name.replace(' ', '_')
         return name.replace('\\', '')
 
 

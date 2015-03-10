@@ -81,7 +81,7 @@ def _install_basho_repo():
         (PACKAGE_CLOUD_RIAK_DIR, OS, DIST, HOSTNAME, FILENAME)
     po_info = sudo(cmd)
 
-    
+
 
 def _download_openssl():
     '''Download openssl'''
@@ -168,8 +168,9 @@ def update_softwares():
                  'postgresql94-server', 'postgresql94-contrib', 'postgresql94-libs',
                  'postgresql94-docs', 'postgresql94']
 
-    
+
     sudo('yum install http://yum.postgresql.org/9.4/redhat/rhel-6-x86_64/pgdg-centos94-9.4-1.noarch.rpm -y')
+    sudo('yum install http://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/ius-release-1.0-13.ius.centos6.noarch.rpm -y')
     sudo('yum groupinstall "Development Tools"')
     sudo('yum install %s -y' % ' '.join(softwares))
     sudo('yum install https://mirror.its.sfu.ca/mirror/CentOS-Third-Party/NSG/common/x86_64/jdk-7u25-linux-x64.rpm -y')
@@ -352,7 +353,7 @@ def log():
 
 
 
-    
+
 
 
 @task
@@ -368,7 +369,7 @@ def install():
     _get_supervisord_config()
     #_prepareDatabase()
     initilize_to_defaults()
-    
+
 
 
 
