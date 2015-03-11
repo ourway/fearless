@@ -153,7 +153,7 @@ def _get_nginx_config():
 
 def _prepare_supervisor():
     conf = '%s/config/supervisord' % _get_pwd()
-    sudo('rm -r /etc/init.d/supervisord')
+    sudo('rm -rf /etc/init.d/supervisord')
     sudo('ln -s %s /etc/init.d/supervisord'%conf)
     sudo('service supervisord start')
     sudo('chkconfig supervisord on')
@@ -178,6 +178,9 @@ def update_softwares():
     sudo('chkconfig mysqld on')
     sudo('service riak start')
     sudo('service mysqld start')
+    env.mysqluser = prompt('What is your MySQL user?', default='root')
+    env.mysqlpassword = prompt('Enter your new MySql password:')
+    env.run('/usr/bin/mysqladmin -u %s password %s'%(env.mysqluser, env.mysqlpassword))
 
 
 def _get_supervisord_config():

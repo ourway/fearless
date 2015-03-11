@@ -49,10 +49,3 @@ sudo /usr/local/bin/python2.7 -m pip install -U virtualenv
 source pyenv/bin/activate
 pip install fabric mako cython numpy
 fab install
-
-
-
-
-
-
-
