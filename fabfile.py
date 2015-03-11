@@ -68,8 +68,7 @@ def _download_nginx():
 
 
 
-@task
-def install_basho_repo():
+def _install_basho_repo():
     #!/bin/bash
 
     HOSTNAME='basho_riak'
