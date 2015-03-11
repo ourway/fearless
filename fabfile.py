@@ -68,8 +68,8 @@ def _download_nginx():
 
 
 
-
-def _install_basho_repo():
+@task
+def install_basho_repo():
     #!/bin/bash
 
     HOSTNAME='basho_riak'
@@ -356,13 +356,13 @@ def log():
 
 @task
 def install():
+    _install_basho_repo()
     update_softwares()
     _install_nginx()
     _install_redis()
     _install_ffmpeg()
     _install_ruby()
     update_modules()
-    _install_basho_repo()
     _prepare_supervisor()
     _get_supervisord_config()
     #_prepareDatabase()
