@@ -241,7 +241,7 @@ var TITLE = 'TITLE';
              .when('/ams/c/:collectionId', {
                 templateUrl: 'pages/ams/collection.html',
                 controller: 'collectionCtrl',
-                 reloadOnSearch: false // dont reload the page on $location.search
+                 reloadOnSearch: true // dont reload the page on $location.search
             })
              .when('/ams/a/:assetId', {
                 templateUrl: 'pages/ams/asset.html',
@@ -1831,7 +1831,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                         url:$scope.attachurl,
                         type:'PUT',
                         singleFileUploads:true,
-                        maxChunkSize: 1024*1024*16, // 16Mb
+                        maxChunkSize: 1024*1024*4, // 16Mb
                         //maxChunkSize: 1024, // 1kb
                         sequentialUploads:true,
                         done: function(e, data) {

@@ -113,7 +113,6 @@ class AssetSave:
         _subpath = req.get_param('subpath')
         if _subpath:
             sub_collections = _subpath.strip().split('/')[:-1]
-            print sub_collections
             _scp = None
             for sc in sub_collections:
                 scdb = Collection.query.filter_by(repository=targetRepo)\
@@ -126,8 +125,6 @@ class AssetSave:
 
             if sub_collections:
                 collection = scdb  ## set collection to last subpath folder
-
-
 
 
         body = req.stream
@@ -164,7 +161,6 @@ class AssetSave:
             assetPath = name
             tempraryStoragePath = path.join(targetRepo.path, collection.path,
                                             name)
-            print tempraryStoragePath
             #name = os.path.basename(tempraryStoragePath)
             if _md5:
                 availableAsset = Asset.query.filter_by(key=_md5).join(
