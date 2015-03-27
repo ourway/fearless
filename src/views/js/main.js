@@ -241,7 +241,7 @@ var TITLE = 'TITLE';
              .when('/ams/c/:collectionId', {
                 templateUrl: 'pages/ams/collection.html',
                 controller: 'collectionCtrl',
-                 reloadOnSearch: true // dont reload the page on $location.search
+                 reloadOnSearch: false // dont reload the page on $location.search
             })
              .when('/ams/a/:assetId', {
                 templateUrl: 'pages/ams/asset.html',
@@ -1783,6 +1783,18 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             }
         }
 
+        $scope.nextPage = function(){
+            $('#collectionAssetsList').fadeOut(100);
+            $routeParams.page = parseInt($routeParams.page)+1;
+            $scope.getCollectionDetails();
+
+        }
+        $scope.prevPage = function(){
+            $('#collectionAssetsList').fadeOut(100);
+            $routeParams.page = parseInt($routeParams.page)-1;
+            $scope.getCollectionDetails();
+
+        }
 
         $scope.$parent.page = 'ams';
         $scope.collection = {};
@@ -1810,6 +1822,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             req = $http.get('/api/collection/'+ci+'?s='+start+'&e='+end);
             req.success(function(resp){
                     $scope.collection = resp;
+                    $('#collectionAssetsList').fadeIn(100);
                     if (!resp)
                         $location.path('404')
                     else {
@@ -1876,10 +1889,10 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
         }
 
 
-
-        $scope.$watch(ci, function(){
-                $scope.getCollectionDetails();
-                })
+        $scope.getCollectionDetails()
+       // $scope.$watch(ci, function(){
+       //         $scope.getCollectionDetails();
+       //         })
 
 
 

@@ -116,14 +116,27 @@
         <div class="col-md-12" ng-show="collection.assets.length>0">
             <div ng-if="collection.holdAssets">
             <hr/>
-            <h3 ng-show="collection.assets.length>0">Assets <small>({{(collection.page-1)*10+1}}-{{ (collection.page-1)*10+collection.assets.length}} of {{collection.assets_count}}) 
+            <h3 ng-show="collection.assets.length>0">Assets <small>{{collection.assets_count}} files
                     <span ng-if="collection.collection_size">
-                        -
-                        [{{$parent.getReadableFileSizeString(collection.collection_size)}}]
+                        [ {{$parent.getReadableFileSizeString(collection.collection_size)}} ]
                     </span>
+                         | Page {{collection.page}}
             
+                    <div class="pull-right">
+                        <span class="text-muted"><b>{{(collection.page-1)*10+1}}</b>–<b>{{ (collection.page-1)*10+collection.assets.length}}</b> </span>
+                        <div class="btn-group btn-group">
+                            <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: collection.page == 1}" ng-click="prevPage()">
+                                <em class="glyphicon glyphicon-chevron-left"></em>
+                            </button>
+                            <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: collection.page >= collection.assets_count/10}" ng-click="nextPage()">
+                                <em class="glyphicon glyphicon-chevron-right"></em>
+                            </button>
+                        </div>
+                    </div>
+
+
             </small></h3>
-				<div class="form-group">
+				<div class="form-group" >
 					<div class="col-md-6">
                         <input type="text" class="form-control" placeholder="Search for {{collection.name}} Assets here" 
                         ng-model="collection.CollectionAssetFilter" />
@@ -147,7 +160,7 @@
                 </div>
                 <br/>
                 <br/>
-                <table class="table table-striped table-hover refresh-container pull-down" >
+                <table id="collectionAssetsList" class="table table-striped table-hover refresh-container pull-down" >
                         <thead class="hidden-xs">
                             <td class="col-md-1"><a href="javascript:;"><strong>ID</strong></a></td>
                             <td ng-if="thumbnails" class="col-md-2"><a href="javascript:;"><strong></strong></a></td>
