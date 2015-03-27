@@ -57,7 +57,9 @@
                                 download="{{file.name}}" data-gallery>{{file.name}}</a>
                             <a data-ng-switch-default data-ng-href="{{file.url}}" title="{{file.name}}" download="{{file.name}}">{{file.name}}</a>
                         </span>
-                        <span data-ng-switch-default>{{file.name}}</span>
+                        <span data-ng-switch-default>{{file.name}} 
+                            <span style="color:lightgrey">{{file.relativePath}}</span>
+                        </span>
                    
                     </p>
                     <strong data-ng-show="file.error" class="error text-danger">{{file.error}}</strong>

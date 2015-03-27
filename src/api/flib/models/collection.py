@@ -104,7 +104,7 @@ class Collection(IDMixin, Base):
 
     @validates('path')
     def check_path(self, key, data):
-        self.name = os.path.basename(data).title()
+        self.name = os.path.basename(data)
         return data
 
     @hybrid_property

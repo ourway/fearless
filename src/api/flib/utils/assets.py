@@ -90,6 +90,8 @@ class AssetSave:
         if _tags:
             tags = _tags.split(',')
 
+            
+
         _cid = req.get_param('collection_id')
         collection = None
         if _cid:
@@ -107,6 +109,26 @@ class AssetSave:
             if not collection:
                 collection = Collection(path=today, repository=targetRepo)
                 req.session.add(collection)
+
+        _subpath = req.get_param('subpath')
+        if _subpath:
+            sub_collections = _subpath.strip().split('/')[:-1]
+            print sub_collections
+            _scp = None
+            for sc in sub_collections:
+                scdb = Collection.query.filter_by(repository=targetRepo)\
+                    .filter_by(parent=_scp or collection).filter_by(name=sc).first()
+                if not scdb:
+                    scdb = Collection(path=sc, parent=_scp or collection, repository=targetRepo)
+                    req.session.add(scdb)
+                    req.session.flush()
+                _scp = scdb
+
+            if sub_collections:
+                collection = scdb  ## set collection to last subpath folder
+
+
+
 
         body = req.stream
         b64 = req.get_param('b64')
@@ -142,6 +164,7 @@ class AssetSave:
             assetPath = name
             tempraryStoragePath = path.join(targetRepo.path, collection.path,
                                             name)
+            print tempraryStoragePath
             #name = os.path.basename(tempraryStoragePath)
             if _md5:
                 availableAsset = Asset.query.filter_by(key=_md5).join(

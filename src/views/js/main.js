@@ -1831,15 +1831,16 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                         url:$scope.attachurl,
                         type:'PUT',
                         singleFileUploads:true,
-                        maxChunkSize: 1024*1024*4, // 1Mb
+                        maxChunkSize: 1024*1024*16, // 16Mb
                         //maxChunkSize: 1024, // 1kb
                         sequentialUploads:true,
                         done: function(e, data) {
                             $scope.getCollectionDetails();
-                        //$(data.context['0']).fadeOut(700);
-                        //limitMultiFileUploads:1,
-
-                    }
+                     },
+                        send: function(e, data) {
+                            subpath = data.files[0].relativePath;
+                            data.url += '&subpath='+subpath;
+                                 }
                     }
                     //$('#fileupload').bind('fileuploaddone', function (e, data) {
                    //         $scope.getCollectionDetails();
