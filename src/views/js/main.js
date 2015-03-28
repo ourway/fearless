@@ -2373,7 +2373,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
             s = ($scope.page-1)*50;
             e = s+50;
             query = '/api/db/asset?sort='+sort+'&s='+s+'&e='+e+'&order_by='+ order_by + '&filters=owner_id='+
-                    $scope.$parent.userInfo.userid;
+                    ($routeParams.oid || $scope.$parent.userInfo.userid);
             if ($routeParams.tags)
                 {
                 $scope.tagMode = true;
@@ -2381,7 +2381,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
                 query += '&tags='+$routeParams.tags;
                 }
 
-            tag_query = '/api/asset/get_user_tags';
+            tag_query = '/api/asset/get_user_tags/'+ ($routeParams.oid || $scope.$parent.userInfo.userid);
             tagReq = $http.get(tag_query);
             tagReq.success(function(resp){
                 $scope.assetTags = resp;
@@ -2411,11 +2411,15 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
                     $scope.userAssets = resp;
 
                     })
-            query = '/api/db/asset?filters=owner_id='+$scope.$parent.userInfo.userid+'&count=true';
+            query = '/api/db/asset?filters=owner_id='+ $routeParams.oid || $scope.$parent.userInfo.userid+'&count=true';
             if (search_for)
                 query += '&filters=fullname=' + search_for;
             if ($routeParams.tags)
+                {
+                $location.search('page', null);
+                //$routeParams.page = 1;
                 query += '&tags='+$routeParams.tags;
+                }
             creq = $http.get(query);
             creq.success(function(cresp){
                     $scope.assetsCount = cresp.count;

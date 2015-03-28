@@ -93,9 +93,9 @@
                         <br/>
                         <ul class="nav nav-pills nav-stacked" style="margin-left: -15px;">
                             <li class="" ng-repeat="tag in $parent.asset.tgs track by $index">
-                            <a style="word-break: break-all;"><em class="fa fa-tag"></em> <span ng-show="true" 
+                            <a style="word-break: break-all;" href="#/ams?tags={{tag.name}}"><em class="fa fa-tag"></em> <em ng-show="true" 
                                     style="cursor:pointer" ng-click="$parent.asset.tgs.splice($index, 1);addTag('asset', $parent.asset)" 
-                                    class="badge pull-right fa fa-remove"> </span>{{tag.name}}</a>
+                                    class="pull-right fa fa-remove"> </em>{{tag.name}}</a>
                             </li>
                         </ul>
 

@@ -34,17 +34,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 <div class="container collectionDiv">
 		<div class="col-md-12 column">
 			<ul class="breadcrumb" style="min-height: 45px">
@@ -52,33 +41,38 @@
 					<a href="#/pms">Projects</a> <span class="divider"></span>
 				</li>
 				<li>
-                <a href="#/pms/{{collection.project.id}}">{{collection.project.name}}</a> <span class="divider"></span>
+                <a href="#/pms/{{collection.project.id}}">{{collection.project.name}}</a> 
+                <span class="divider"></span>
                 </li>
                 <li ng-if="collection.parent.parent.parent.parent">
                 <a href="#/ams/c/{{collection.parent.parent.parent.parent.id}}?page=1">{{collection.parent.parent.parent.parent.name}}</a> <span class="divider"></span>
 				</li>
                 <li ng-if="collection.parent.parent.parent">
-                <a href="#/ams/c/{{collection.parent.parent.parent.id}}?page=1">{{collection.parent.parent.parent.name}}</a> <span class="divider"></span>
+                <a href="#/ams/c/{{collection.parent.parent.parent.id}}?page=1">{{collection.parent.parent.parent.name}}</a>
+                <span class="divider"></span>
 				</li>
                 <li ng-if="collection.parent.parent">
-                <a href="#/ams/c/{{collection.parent.parent.id}}?page=1">{{collection.parent.parent.name}}</a> <span class="divider"></span>
+                <a href="#/ams/c/{{collection.parent.parent.id}}?page=1">{{collection.parent.parent.name}}</a> 
+                <span class="divider"></span>
 				</li>
                 <li ng-if="collection.parent">
-                <a href="#/ams/c/{{collection.parent.id}}?page=1">{{collection.parent.name}}</a> <span class="divider"></span>
+                <a href="#/ams/c/{{collection.parent.id}}?page=1">{{collection.parent.name}}</a> 
+                <span class="divider"></span>
 				</li>
 				<li class="active">
 				    {{collection.name}}
                     </li>
 
                     <span class="pull-right">
-                        <button id="collectionDeleteButton" class="btn btn-default btn-sm" ng-click="deleteCollection()" type="button"> 
+                        <button id="collectionDeleteButton" class="btn btn-default btn-sm" 
+                            ng-click="deleteCollection()" type="button"> 
                             <em class="glyphicon glyphicon-trash"></em>
                         </button>
                     </span>
 
 			</ul>
 
-        <div class="col-md-8">
+        <div class="col-md-12">
 			<div class="btn-group" ng-show="collection.container">
                 <button id="collectionAddButton" class="btn btn-success btn-sm" type="button" data-toggle="modal" data-target="#collectionAddModal">
                     <em class="glyphicon glyphicon-plus"></em>
@@ -86,7 +80,7 @@
                 </button>
 			</div>
             <h3>{{collection.name | uppercase}}</h3>
-                <div class="col-md-3" ng-repeat="subcol in collection.children track by $index">
+                <div class="col-md-2 col-lg-2 col-sm-2" ng-repeat="subcol in collection.children track by $index">
 					<div class="thumbnail asm_thumb">
                         <a href="#ams/c/{{subcol.id}}?page=1" title="{{subcol.description}}"
                         ><img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
@@ -105,7 +99,7 @@
                 </div>
         <br/>
 		</div>
-        <div class="col-md-12" ng-show="collection.holdAssets">
+        <div class="raw" ng-show="collection.holdAssets">
         <hr/>
             <div ng-include="'pages/ams/fileUploadTemplate.html'"></div>
     <br>
@@ -202,7 +196,7 @@
                             <li class="" ng-repeat="tag in $parent.collection.tgs track by $index">
                             <a style="word-break: break-all;" ><em class="fa fa-tag"></em> <span ng-show="true" 
                                     style="cursor:pointer" ng-click="$parent.collection.tgs.splice($index, 1);addTag('collection', $parent.collection)" 
-                                    class="badge pull-right fa fa-remove"> </span>{{tag.name}}</a>
+                                    class="pull-right fa fa-remove"> </span>{{tag.name}}</a>
                             </li>
                         </ul>
 
@@ -216,17 +210,5 @@
 
 </div>
 
-
-
-<script>
-/*jslint unparam: true */
-/*global window, $ */
-$(function () {
-    'use strict';
-    // Change this to the location of your server-side upload handler:
-    var url ='http://127.0.0.1/api/test_upload?multipart=true';
-
-});
-</script>
 
 

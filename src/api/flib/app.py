@@ -103,11 +103,11 @@ class ThingsResource:
 
 class GetUserAssetTags:
 
-    def on_get(self, req, resp):
-        user = getUserInfoFromSession(req, resp)
+    def on_get(self, req, resp, userId):
+        #user = getUserInfoFromSession(req, resp)
         #resp.body = user
         resp.body = req.session.query(Tag).join(Asset.tgs).join(
-            User).filter_by(id=user.get('id')).all()
+            User).filter_by(id=userId).all()
 
 
 class UpdateAssetTags:
@@ -406,7 +406,7 @@ app.add_route('/api/asset', ListAssets())
 app.add_route('/api/asset/{key}', GetAsset())
 app.add_route('/api/asset/delete/{id}', DeleteAsset())
 app.add_route('/api/asset/checkout/{assetId}', AssetCheckout())
-app.add_route('/api/asset/get_user_tags', GetUserAssetTags())
+app.add_route('/api/asset/get_user_tags/{userId}', GetUserAssetTags())
 app.add_route('/api/showtime/{userid}', GetUserShows())
 app.add_route('/api/project', ListProjects())
 app.add_route('/api/project/add', AddProject())
