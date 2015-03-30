@@ -70,7 +70,7 @@ def Authenticate(req, resp, params):
     # return
     ip = req.env.get('HTTP_X_FORWARDED_FOR') or req.env.get('REMOTE_ADDR')
     free_services = ['/api/auth/signup', '/api/auth/login',
-                     '/api/things', '/api/auth/activate', '/api/auth/reactivate',
+                     '/api/ping', '/api/auth/activate', '/api/auth/reactivate',
                      '/api/auth/reset', '/api/auth/logout', '/api/auth/getUserInfo',
                      '/api/auth/changepasswordverify', '/api/auth/changepassword', '/api/test_upload']
 
@@ -90,7 +90,7 @@ def Authenticate(req, resp, params):
         # not more than 1000 requests per second!  its fair
         elif int(access_count) <= 1000:
             r.incr(api_count_key, 1)
-        elif not '/api/test_upload' in req.path and not '/api/asset/save' in req.path:
+        elif not '/api/ping' in req.path and not '/api/asset/save' in req.path:
             message = 'Too many api access in short amount of time'
             raise falcon.HTTPUnauthorized('Authentication required', message)
 

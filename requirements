@@ -9,7 +9,6 @@ gevent-websocket
 ujson
 numpy
 pyseq
-psycopg2
 falcon==0.1.10
 moviepy
 gunicorn
