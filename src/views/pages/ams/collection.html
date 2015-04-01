@@ -1,35 +1,83 @@
 
 
-			<div class="modal fade" id="collectionAddModal" role="dialog" ng-init="" aria-labelledby="AddNewSequences" aria-hidden="true">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							 <button class="close" data-dismiss="modal" aria-hidden="true">×</button>
-							<h4 class="modal-title" id="myModalLabel">
-                                Add a new item to {{collection.name}}
-							</h4>
-						</div>
-                        <div class="modal-body">
+    <div class="modal fade" id="collectionAddModal" role="dialog" ng-init="" aria-labelledby="AddNewSequences" aria-hidden="true">
+            <div class="modal-dialog">
+                    <div class="modal-content">
+                            <div class="modal-header">
+                                     <button class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h4 class="modal-title" id="myModalLabel">
+            Add a new item to {{collection.name}}
+                                    </h4>
+                            </div>
+    <div class="modal-body">
 
-			<form class="form-horizontal" role="form">
-				<div class="form-group">
-					 <label for="inputemail3" class="col-sm-4 control-label">new item name</label>
-					<div class="col-sm-6">
-                        <input type="text" class="form-control" placeholder="enter item name here ..." ng-model="newSubCollection.name" autofocus/>
-					</div>
-				</div>
-						</div>
-						<div class="modal-footer">
-                            <button class="btn btn-default" ng-click="newSubCollection={}" data-dismiss="modal">Close</button>
-                            <button type="submit" ng-disabled="!newSubCollection.name"
-                                ng-click="createNewSubCollection()" class="btn btn-success">Add item to {{collection.name}}</button>
-						</div>
-					</div>
+    <form class="form-horizontal" role="form">
+            <div class="form-group">
+                     <label for="inputemail3" class="col-sm-4 control-label">new item name</label>
+                    <div class="col-sm-6">
+    <input type="text" class="form-control" placeholder="enter item name here ..." ng-model="newSubCollection.name" autofocus/>
+                    </div>
+            </div>
+                            </div>
+                            <div class="modal-footer">
+        <button class="btn btn-default" ng-click="newSubCollection={}" data-dismiss="modal">Close</button>
+        <button type="submit" ng-disabled="!newSubCollection.name"
+            ng-click="createNewSubCollection()" class="btn btn-success">Add item to {{collection.name}}</button>
+                            </div>
+                    </div>
 
-				</div>
+            </div>
 
-			</div>
-			</form>
+    </form>
+    </div>
+
+
+    <div class="modal fade" id="newDocumentModal" role="dialog" ng-init="" aria-labelledby="AddNewDocument" aria-hidden="true">
+            <div class="modal-dialog">
+                    <div class="modal-content">
+                            <div class="modal-header">
+                                     <button class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h4 class="modal-title" id="myModalLabel">
+            Add a new document to {{collection.name}}
+                                    </h4>
+                            </div>
+    <div class="modal-body">
+
+    <form class="form-horizontal" role="form">
+        <div class="form-group">
+                     <label for="inputemail3" class="col-sm-4 control-label">New ducument name</label>
+            <div class="col-sm-6">
+                <input type="text" class="form-control" placeholder="enter new document name here ..." 
+                ng-model="newDocument.name" autofocus/>
+            </div>
+        </div>
+        <div class="form-group">
+                     <label for="inputemail3" class="col-sm-4 control-label">Ducument type</label>
+            <div class="col-sm-6">
+                <select class="form-control" ng-model="newDocument.type"
+                    ng-options="opt as opt.label for opt in ndocumentOptions">
+                </select>
+            </div>
+        </div>
+
+
+    </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-default" ng-click="newDocument={}" data-dismiss="modal">Close</button>
+            <button type="submit" ng-disabled="! (newDocument.name && newDocument.type)"
+            ng-click="createNewDocument()" class="btn btn-success">Add document to {{collection.name}}</button>
+        </div>
+
+
+
+
+        </div>
+
+    </div>
+
+    </form>
+    </div>
 
 
 
@@ -107,6 +155,14 @@
 
         </div>
 
+        <div ng-if="collection.holdAssets">
+            <div class="col-md-4">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#newDocumentModal">
+                    <em class="fa  fa-file-o"></em>
+                    New Document
+                </button>
+            </div>
+        </div>
         <div class="col-md-12" ng-show="collection.assets.length>0">
             <div ng-if="collection.holdAssets">
             <hr/>

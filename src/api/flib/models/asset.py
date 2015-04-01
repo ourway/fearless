@@ -59,6 +59,14 @@ assets_tags = Table("assets_tags", Base.metadata,
                         "tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
                     )
 
+assets_tasks = Table("assets_tasks", Base.metadata,
+                    Column('id', Integer, primary_key=True),
+                    Column(
+                        "asset_id", Integer, ForeignKey("asset.id"), primary_key=True),
+                    Column(
+                        "task_id", Integer, ForeignKey("task.id"), primary_key=True)
+                    )
+
 
 class Asset(IDMixin, Base):
 
@@ -83,6 +91,7 @@ class Asset(IDMixin, Base):
     ready = Column(Boolean, default=False)  # post processing
     period = relationship("Date", uselist=False)
     users = relationship('User', backref='assets', secondary='users_assets')
+    tasks = relationship('Task', backref='assets', secondary='assets_tasks')
     owner = relationship('User', backref='owning_assets')
     modifiers = relationship(
         'User', viewonly=True,  backref='modifying_assets', secondary='users_assets')

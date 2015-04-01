@@ -1728,6 +1728,16 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
 fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routeParams,
             $http, $location, Restangular, $timeout, $filter, $window){
 
+        $scope.newDocument = {};
+        $scope.ndocumentOptions = [
+
+            { label: 'Documentation', value: 'md', 'template': '###### Created by Fearless\n---\n', tags:'documentation, document, markdown'},
+            { label: 'Python', value: 'py' , tags:'python, program, script', 'template': '#!/usr/bin/env python\n\n#Created by Fearless'},
+            { label: 'Text', value: 'txt' , 'template': '', tags:'text'},
+            { label: 'Nuke Script', value: 'nk' , 'template': '', tags:'composite, nuke, script'},
+            { label: 'Maya Ascii', value: 'ma' , 'template': '', tags:'maya, 3d, script'}
+        ];
+
 
         $scope.activateVideo = function(vid){
         if (vid)
@@ -1794,6 +1804,18 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             $routeParams.page = parseInt($routeParams.page)-1;
             $scope.getCollectionDetails();
 
+        }
+
+        $scope.createNewDocument = function(){
+            dn = $scope.newDocument.name + '.' + $scope.newDocument.type.value;
+            documentData = $scope.newDocument.type.template;  // empty
+            uploadurl = "/api/asset/save/"+$scope.collection.repository.name
+                        +"?collection_id="+$scope.collection.id
+                        +'&name='+dn+'&tags='+$scope.newDocument.type.tags;
+            $http.put(uploadurl, documentData, {transformRequest: []} );
+            $('#newDocumentModal').modal('hide');
+            $scope.newDocument = {};
+            $scope.getCollectionDetails();
         }
 
         $scope.$parent.page = 'ams';
@@ -1943,6 +1965,7 @@ fearlessApp.controller('tasksCtrl', function($scope, $rootScope, $routeParams, $
 fearlessApp.controller('taskDetailCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
         taskId = $routeParams.taskId;
         $scope.marked=marked;
+        $rootScope.title = 'Fearless tasks';
 
         $scope.sendTaskReview = function(){
             $http.post('/api/task/review/'+$scope.reviewTask.id, {'review':$scope.reviewTask.body})
@@ -1956,6 +1979,7 @@ fearlessApp.controller('taskDetailCtrl', function($scope, $rootScope, $routePara
         $scope.getTaskDetails = function(){
             req = $http.get('/api/task/'+taskId).success(function(resp){
                     $scope.task = resp;
+                    $rootScope.title = 'Task: ' +  resp.title + ' - Fearless';
                     $scope.reviewTask = resp;
                     $scope.$parent.comment_id = resp.uuid;
 

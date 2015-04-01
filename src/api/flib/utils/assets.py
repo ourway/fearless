@@ -33,7 +33,7 @@ from datetime import datetime
 import arrow
 
 # from celery.result import AsyncResult
-from flib.models import Asset, Repository, Collection, User, fdb
+from flib.models import Asset, Repository, Collection, User, Task, fdb
 from flib.utils.AAA import getUserInfoFromSession
 from flib.utils.defaults import public_upload_folder, public_repository_path, GIT_folder, ASSETS
 from flib.models.mixin import getUUID
@@ -90,7 +90,7 @@ class AssetSave:
         tags = []
         _tags = req.get_param('tags')
         if _tags:
-            tags = _tags.split(',')
+            tags = [tag.strip() for tag in _tags.split(',')]
 
             
 
@@ -111,6 +111,8 @@ class AssetSave:
             if not collection:
                 collection = Collection(path=today, repository=targetRepo)
                 req.session.add(collection)
+
+
 
         _subpath = req.get_param('subpath')
         if _subpath:
@@ -229,6 +231,12 @@ class AssetSave:
                 parent_id = int(attach_to)
                 parent = Asset.query.filter_by(id=parent_id).scalar()
                 asset.attached_to.append(parent)
+
+            task_id = req.get_param('task_id')
+            if task_id:
+                target_task = Task.query.filter_by(id=task_id).scalar()
+                target_task.assets.append(asset)
+
             if tags:
                 asset.tags += tags
                 collection.tags += tags
@@ -619,7 +627,7 @@ class AssetCheckout:
             LD = pickle.load(open(LOCK, 'rb'))
             now = datetime.utcnow()
             locktime = LD.get('datetime')
-            if locktime and (now-locktime).seconds < 10:  ## 10 seconds is maximum time for checking out
+            if locktime and (now-locktime).seconds < 15:  ## 15 seconds is maximum time for checking out
                 resp.status = falcon.HTTP_202
                 resp.body = {'message':'File is busy. try again'}
                 return
@@ -636,6 +644,8 @@ class AssetCheckout:
         fid = target.uuid + '_preview_' + version.split('_')[1]
         fmt = 'mp4'
         preview = os.path.join('uploads', fid + '.' + fmt)
+        if os.path.isfile(LOCK):
+            os.remove(LOCK)
         resp.body = {'poster': poster, 'thumbnail': thumbnail,
                      'version': version, 'preview': preview}
 

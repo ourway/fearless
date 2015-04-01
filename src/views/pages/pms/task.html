@@ -1,5 +1,6 @@
 <div class="container taskDiv" ng-init="getTaskDetails()" >
-    <br/>
+      <h3 align="center"><small style="margin-top: -13px; position: absolute;">Fearless</small>Tasks&reg;</h3>
+    <hr/>
     <div class="row clearfix" ng-cloak>
         <div class="col-md-12">
             <div class="col-md-4">
@@ -12,21 +13,25 @@
                     }"
                 >
             <div class="panel-heading"> 
-                <h4>{{task.title.replace('_', ' ')}}</h4>
+                <h4><em class="fa fa-bookmark-o"></em> {{task.title.replace('_', ' ')}}</h4>
             </div>
                 
+            <div class="panel-body"> 
+                <li style="list-style:none" ng-repeat="resource in task.resources">
+                <em class="fa fa-user"></em> <a href="#/user/{{resource.id}}">{{resource.fullname}}</a>
+                </li>
+            </div>
 
             <div class="panel-footer clearfix">
                 <div >
+                <em class="fa fa-calendar-o"></em>
                     <span
                     ng-class="
                     {
                     'text-info':task.gauge=='on schedule', 
                     'text-success':task.gauge=='ahead of schedule', 
                     'text-danger':task.gauge=='behind schedule'
-                    }"                        
-                        
-                        >{{task.gauge}}</span>
+                    }">{{task.gauge}}</span>
                 </div>
             </div>
         </div> 
@@ -34,7 +39,10 @@
             <div class="col-md-4">
             </div>
             <div class="col-md-4">
-                <button class="btn btn-primary" data-toggle="modal" data-target="#taskReviewModal">Write Review</button>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#taskReviewModal">
+                    <em class="fa  fa-file-o"></em>
+                    Write Review
+                </button>
             </div>
         </div>
 
@@ -47,6 +55,7 @@
         <div class="col-md-7">
         <div class="panel panel-info" ng-repeat="report in task.reviews track by $index">
             <div class="panel-heading"> 
+                <em class="fa fa-user"></em>
                 <a href="#/user/{{report.reviewer.id}}"><b>{{report.reviewer.firstname}} {{report.reviewer.lastname}}</b></a>
             </div>
             <div class="panel-body">
@@ -56,6 +65,7 @@
             </div>
             <div class="panel-footer clearfix">
                 <div >
+                <em class="fa fa-clock-o"></em>
                 <small>Reviewd {{$parent.prettyDate(report.datetime)}} ago</small>
                 </div>
             </div>

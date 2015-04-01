@@ -10,6 +10,7 @@
     <div>
         <div class="panel panel-success" ng-repeat="report in reports  | filter:reports.rfilter track by $index">
             <div class="panel-heading"> 
+                <em class="fa fa-user"></em>
                 <a href="#/user/{{report.reporter.id}}"><b>{{report.reporter.firstname}} {{report.reporter.lastname}}</b></a>
             </div>
             <div class="panel-body">
@@ -19,6 +20,7 @@
             </div>
             <div class="panel-footer clearfix">
                 <div >
+                <em class="fa fa-clock-o"></em>
                 <small>Reported {{$parent.prettyDate(report.datetime)}} ago</small>
                 </div>
             </div>
