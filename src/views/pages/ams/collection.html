@@ -249,8 +249,8 @@
 					<div class="">
                         <br/>
                         <ul class="nav nav-pills nav-stacked" style="margin-left: -15px;">
-                            <li class="" ng-repeat="tag in $parent.collection.tgs track by $index">
-                            <a style="word-break: break-all;" ><em class="fa fa-tag"></em> <span ng-show="true" 
+                            <li ng-repeat="tag in $parent.collection.tgs track by $index">
+                            <a style="word-break: break-all;padding:2px" ><em class="fa fa-tag"></em> <span ng-show="true" 
                                     style="cursor:pointer" ng-click="$parent.collection.tgs.splice($index, 1);addTag('collection', $parent.collection)" 
                                     class="pull-right fa fa-remove"> </span>{{tag.name}}</a>
                             </li>

@@ -11,7 +11,7 @@
             <li class="hidden-sm hidden-xs" style="cursor:pointer" ng-repeat="tag in assetTags | orderBy:'name'"
             ng-click="tagSelection(tag)"
             ng-class={'active':tag.selected}>
-                <a style="font-size:10pt;"  
+                <a style="font-size:10pt;padding:3px"  
                     ng-click="btn-sm" >
                     <span class="fa fa-tag"> {{tag.name}}</span>
                 </a>  
