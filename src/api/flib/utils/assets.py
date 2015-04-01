@@ -16,6 +16,7 @@ import time
 import hashlib
 from cStringIO import StringIO
 import falcon
+import cPickle as pickle
 from slugify import slugify, slugify_filename
 from urllib import unquote
 import os
@@ -28,6 +29,7 @@ from flib.opensource.contenttype import contenttype
 from flib.utils.validators import checkPath
 from base64 import encode, decode, decodestring
 from sqlalchemy import desc
+from datetime import datetime
 import arrow
 
 # from celery.result import AsyncResult
@@ -600,6 +602,7 @@ class AssetCheckout:
         except ValueError:
             resp.status = falcon.HTTP_404
             return
+        userInfo = getUserInfoFromSession(req, resp)
         from flib.tasks import process
         from flib.utils.defaults import ASSETS
         asset_folder = os.path.join(ASSETS, target.uuid)
@@ -611,6 +614,18 @@ class AssetCheckout:
         command = 'checkout %s' % version
         arg = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(
             d=asset_folder, c=command)
+        LOCK = os.path.join(asset_folder, 'LOCK')
+        if os.path.isfile(LOCK):
+            LD = pickle.load(open(LOCK, 'rb'))
+            now = datetime.utcnow()
+            locktime = LD.get('datetime')
+            if locktime and (now-locktime).seconds < 10:  ## 10 seconds is maximum time for checking out
+                resp.status = falcon.HTTP_202
+                resp.body = {'message':'File is busy. try again'}
+                return
+
+        LD = {'datetime':datetime.utcnow(), 'user':userInfo.get('lastname')}
+        pickle.dump(LD, open(LOCK, 'wb'))
         error, result = process(arg)
         pstKey = '%s_poster_v%s' % (target.uuid, version.split('_')[1])
         thmbKey = '%s_thmb_v%s' % (target.uuid, version.split('_')[1])
