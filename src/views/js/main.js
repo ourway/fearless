@@ -871,7 +871,7 @@ fearlessApp.controller('reportCtrl', function($scope, $rootScope, $http, $timeou
 
         }
         }
-        
+
         $scope.getLatestReports();
 
 
@@ -1192,7 +1192,11 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
 
     $scope.getTasksList = function(){
-        gettask = $http.get('/api/task/list/'+$scope.projId+'?sole=true');
+        url = '/api/task/list/'+$scope.projId;
+        console.log();
+        if ($scope.$parent.userGroups.indexOf('admin')<0)
+            url += '?sole=true';
+        gettask = $http.get(url);
         gettask.success(function(resp){
                 if (!resp)
                     return null;
