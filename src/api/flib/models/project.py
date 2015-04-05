@@ -248,7 +248,7 @@ class Project(IDMixin, Base):
         if not r.get('fearless_tj3_lock'):
             r.set('fearless_tj3_lock', 'OK')
             # just for highly requested projects
-            r.expire('fearless_tj3_lock', 10)
+            r.expire('fearless_tj3_lock', 5)
         else:
             return
 
