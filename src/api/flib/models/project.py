@@ -230,6 +230,10 @@ class Project(IDMixin, Base):
                                      'Fearless_project_%s.tjp' % self.uuid)
         plan_path = os.path.join(public_upload_folder,
                                  'plan_%s.html' % (self.uuid))
+        overall_plan_path = os.path.join(public_upload_folder, 'plan.html')
+        overall_gantt_path = os.path.join(public_upload_folder, 'gantt.html')
+        overall_resource_path = os.path.join(public_upload_folder, 'resource.html')
+
         guntt_path = os.path.join(public_upload_folder,
                                   'guntt_%s.html' % (self.uuid))
         resource_path = os.path.join(public_upload_folder,
@@ -373,6 +377,9 @@ class Project(IDMixin, Base):
             trace = open(trace_path, 'rb').read()  # msproject file
 
         plan = saveTable(plan_path)
+        oppl = saveTable(overall_plan_path)
+        ogan = saveTable(overall_gantt_path)
+        ores = saveTable(overall_resource_path)
         guntt = saveTable(guntt_path)
         resource = saveTable(resource_path)
         profit = saveTable(profit_path)

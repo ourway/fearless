@@ -1,4 +1,9 @@
-project FEARLESS_MAIN_PROJECT "Fearless Main Project" 2014-10-01 - 2018-01-01 {
+<%
+mindate = min([i.start for i in subprojects])
+maxdate = max([i.end for i in subprojects])
+%>
+
+project FEARLESS_MAIN_PROJECT "Fearless Main Project" ${mindate.strftime('%Y-%m-%d')} - ${maxdate.strftime('%Y-%m-%d')} {
     timingresolution 60min
   #now 2015-01-29
   now  ${now.strftime('%Y-%m-%d-%H:00')}
@@ -101,3 +106,29 @@ task fearless "Fearless Projects" {
     hidetask plan.id != "fearless"
   }
 % endif
+
+
+
+  taskreport breakdown_all "plan"{
+      formats html
+      hidetask isleaf()
+      sorttasks id.up # not 'tree' to really hide parent tasks
+      loadunit days
+      columns name, start, end, gauge {title "status"}, pathcriticalness {title "Criticalness"}, duration {title "Duration Days"}, resources, complete {title "Progress"}
+
+  }
+  taskreport gantt_breakdown_all "gantt"{
+      formats html
+      loadunit hours
+      #sorttasks plan.start.up # not 'tree' to really hide parent tasks
+      columns bsi, name, effort, chart { scale day width ${(maxdate-mindate).days*20 + 20} } , complete {title "Progress"}
+  }
+
+  resourcereport resourceGraph "resource" {
+    scenarios actual
+    formats html
+    columns name, effort, fte, chart { scale day width ${(maxdate-mindate).days*20 + 20} }
+    loadunit hours
+    hidetask ~(isleaf())
+    sorttasks plan.start.up # not 'tree' to really hide parent tasks
+  }

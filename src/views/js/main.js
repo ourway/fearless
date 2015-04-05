@@ -361,6 +361,8 @@ function updateImageSize(img, maxWidth, maxHeight){
             return data;
         }
 
+
+
         $scope.getReadableFileSizeString = function(fileSizeInBytes) {
             var i = -1;
             var byteUnits = [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'];
@@ -1028,7 +1030,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         $scope.$parent.page = 'pms';
         $('#burndown_chart_div').children().remove();
         $('#progress_chart_div').children().remove();
-
         $scope.replan = true;
         $scope.timeConverter = timeConverter;
 

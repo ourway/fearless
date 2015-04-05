@@ -6,7 +6,18 @@
 
 <div class="col-md-12" >
     <div class="btn-group"  ng-show="$parent.isAdmin || $parent.isManager"  >
-        <button id="projectAddButton" class="btn btn-info" type="button"><em class="glyphicon glyphicon-plus"></em> Add Project</button>
+        <button id="projectAddButton" class="btn btn-primary" type="button"><em class="glyphicon glyphicon-plus"></em> Add Project</button>
+            <a class="btn btn-info" 
+            href="/static/uploads/plan.html.png?v={{timeConverter(false, true)}}" target="_new"
+            type="button"><em class="glyphicon glyphicon-eye-open"></em> Overall Plan</a>
+            <a class="btn btn-info" 
+            href="/static/uploads/resource.html.png?v={{timeConverter(false, true)}}" target="_new"
+            type="button"><em class="glyphicon glyphicon-list-alt"></em> Resources</a>
+            <a class="btn btn-info" 
+            href="/static/uploads/resource.html.png?v={{timeConverter(false, true)}}" target="_new"
+            type="button"><em class="glyphicon glyphicon-list-alt"></em> Resources</a>
+
+
     </div>
 </div>
 <br/>

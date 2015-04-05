@@ -301,16 +301,16 @@ background-color: #FFEDA5;
                     <a ng-show="tasks.length>0" class="btn btn-info" 
                         ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
                     ng-class="{'active':mode=='plan'}" 
-                    data-gallery="plan_graphics" href="/static/uploads/plan_{{project.uuid}}.html.png" 
+                    data-gallery="plan_graphics" href="/static/uploads/plan_{{project.uuid}}.html.png?v={{timeConverter(false, true)}}" 
                     type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</a>
                 <a ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" 
                         data-gallery="plan_graphics"
-                        href="/static/uploads/guntt_{{project.uuid}}.html.png" type="button">
+                        href="/static/uploads/guntt_{{project.uuid}}.html.png?v={{timeConverter(false, true)}}" type="button">
                             <em class="glyphicon glyphicon-tasks"></em> Gantt</a>
                         <a ng-show="tasks.length>0" class="btn btn-info" 
                             ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}"
                         data-gallery="plan_graphics"
-                        href="/static/uploads/resource_{{project.uuid}}.html.png" type="button">
+                        href="/static/uploads/resource_{{project.uuid}}.html.png?v={{timeConverter(false, true)}}" type="button">
                         <em class="glyphicon glyphicon-list-alt"></em> Resources</a>
                     <button ng-show="tasks.length>0 && $parent.isAmin"
                         class="btn btn-info" ng-class="{'active':mode=='profit', 'btn-success':mode=='profit'}" 
