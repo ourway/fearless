@@ -414,7 +414,7 @@ class Reset:
         target = req.session.query(User).filter(
             User.email == form.get('email')).first()
         if target:
-            host = req.protocol + '://' + req.headers.get('HOST')
+            host = req.protocol + '://' + get_ip()
             reset_link = host + \
                 '/api/auth/changepasswordverify?token=' + target.token
             send_envelope.delay(form.get('email'), [], [],  'Account Password Reset',
