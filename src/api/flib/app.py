@@ -28,7 +28,6 @@ import urlparse
 from urllib import unquote, quote
 from string import ascii_uppercase
 from sqlalchemy.ext.serializer import loads, dumps
-import simplejson as json
 from flib.utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection, TestUpload
 from utils.messages import GetMessagesList, GetMessages, GetMessage, SetMessage, \
     SearchMessages, MoveMessage, DeleteMessage, UpdateMessage
@@ -160,11 +159,12 @@ class DB:
         end = req.get_param('e')
 
         filters_raw = req.get_param('filters')
+        add = req.get_param('add') or ''
+        add = add.split(',')
         tags = req.get_param_as_list('tags') or []
         appendix = req.get_param_as_list('appendix') or []
         filters = []
         if filters_raw:
-
             filters += [{i.split('=')[0]:i.split('=')[1], '_':'=='}
                         for i in filters_raw.split(',') if '=' in i]
             filters += [{i.split('>')[0]:i.split('>')[1], '_':'>'}
@@ -206,6 +206,7 @@ class DB:
             if start != None and end != None:
                 query += '.slice(start, end)'
             data = eval(query).all()
+
             resp.body = data
             if not data:
                 resp.status = falcon.HTTP_204
@@ -287,7 +288,22 @@ class DB:
 
         if len(args) == 5 and len(data) == 1 and not listMe:
             data = data[0]
+
             _d = {}
+            #for t in add:
+            #    ex = eval('data.{ad}'.format(ad=t))
+            #    for i in dir(ex):
+            #        if not i.startswith('_'):
+            #            value = getattr(ex, i)
+            #            if isinstance(value, (str, unicode, long, int, float, bool, datetime)):
+            #                ex[i] = value
+
+                #_d[t] = ex
+
+            #print _d
+
+
+
             for i in dir(data):
                 if not i.startswith('_'):
                     value = getattr(data, i)
@@ -295,6 +311,7 @@ class DB:
                         _d[i] = value
                     # if isinstance(value, long) and i.endswith('_id'):
                     #    table = i.split('_')[0]
+
 
             resp.body = _d
             if not _d:
