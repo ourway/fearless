@@ -17,7 +17,7 @@
 				<li class="active">
 				    {{asset.fullname}}
                     </li>
-                    <span class="pull-right">
+                    <span class="pull-right" ng-if="asset.owner_id==$parent.userInfo.userid">
                         <button id="collectionAddButton" class="btn btn-default btn-sm" ng-click="deleteAsset()" type="button"> 
                             <em class="glyphicon glyphicon-trash"></em>
                         </button>

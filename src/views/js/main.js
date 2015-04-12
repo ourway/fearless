@@ -246,7 +246,7 @@ var TITLE = 'TITLE';
              .when('/ams/a/:assetId', {
                 templateUrl: 'pages/ams/asset.html',
                 controller: 'assetCtrl',
-                 reloadOnSearch: false // dont reload the page on $location.search
+                 reloadOnSearch: true // dont reload the page on $location.search
             })
              .when('/ams', {
                 templateUrl: 'pages/ams/index.html',
@@ -1632,7 +1632,10 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
         }
 
         $scope.loadAssetData = function(){
-            $http.get('/static/' + $scope.asset.url).success(function(resp){
+
+            data_url = '/static/ASSETS/'+ $scope.asset.uuid + '/' + $scope.asset.fullname;
+            //data_url = '/static/' + $scope.asset.url;
+            $http.get(data_url).success(function(resp){
 
                         $scope.asset.data = resp;
                         $timeout($scope.highlightCode, 10);
@@ -1673,6 +1676,7 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                         $scope.asset.preview = resp.preview;
                     $scope.checkout_load = null;
                     $scope.checkouted = v;
+                    $location.search('version', v);
                     if (download)
                         window.location = '/static/ASSETS/'+ $scope.asset.uuid + '/' + $scope.asset.fullname;
                     //document.location='/static/ASSETS/'+$scope.asset.uuid+'/'+$scope.asset.fullname;
@@ -1695,7 +1699,8 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                         $scope.asset.tgs = tgs;
                         })
 
-                    $scope.checkout('v_'+Resp.version);
+                    v = $routeParams.version;
+                    $scope.checkout(v || ('v_'+Resp.version));
                     $scope.assetVersions = Resp.git_tags.split(',');
                     $rootScope.title = 'Asset: ' + Resp.name + ' - ' + 'Fearless';
                     $scope.$parent.comment_id = Resp.uuid;
