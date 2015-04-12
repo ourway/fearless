@@ -90,8 +90,8 @@ def dailyTasksReportForClients():
 
     # print message
     # return
-    #to = ['hamid2177@gmail.com']
-    to = ['farsheed.ashouri@gmail.com']
+    to = ['hamid2177@gmail.com']
+    #to = ['farsheed.ashouri@gmail.com']
     subject = 'Studio Reports - Daily Tasks - %s' % jtoday
     #intro = "Good morning, Here is a basic simple (alpha version) report about studio's daily tasks for %s<br/>." % today
     #message = '<hr/>'.join(tasks)

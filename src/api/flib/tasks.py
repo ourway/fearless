@@ -265,7 +265,7 @@ def generateVideoPreview(path, version, assetUuid):
         ffmpeg -i movie.mkv -r 30 -strict -2 -async 1 -acodec aac -ac 2 -ab 160k -threads 0 -preset slower -profile:v high -level 4.1 -f mp4 -refs 4 ipadVideo.mp4
     '''
 
-    arg = '''nice "%s" -i "%s" -r 24 -strict -2 -async 1 -acodec aac -ac 2 -ab 160k -threads 1 -preset slower -profile:v high -level 4.1 -f mp4 -refs 4 -s hd480 "%s"''' \
+    arg = '''nice "%s" -i "%s" -r 24 -strict -2 -async 1 -acodec aac -ac 2 -ab 160k -threads 1 -preset slower -level 4.1 -f mp4 -refs 4 -s hd480 -y "%s"''' \
         % (ffmpeg, path, previewPath)
 
     print arg

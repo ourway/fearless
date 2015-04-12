@@ -33,7 +33,6 @@ Hello and good morning ${recipient},  here is a daily tasks report for ${jtoday}
                     </td>
                     <td >
                         <span>${task.title}</span><br/>
-                        <span>${task.title}</span><br/>
                         <div style="background:#FFF4CA;padding:5px;border:1px solid #ccc;">
                             % for rev in task.reviews:
                                 <small style="color:#555">${rev.reviewer.lastname.title()}: ${rev.content}</small>

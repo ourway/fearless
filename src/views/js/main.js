@@ -1177,8 +1177,8 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
         saveAs(blob, $scope.project.name+'.csv');
     }
     $scope.getMSP = function(){
-        var blob = new Blob([$scope.msp], {type: "application/vnd.ms-project"});
-        saveAs(blob, $scope.project.name+'.msp');
+        var blob = new Blob([$scope.msp], {type: "application/xml"});
+        saveAs(blob, $scope.project.name+'.xml');
     }
     $scope.print = function(){
         styles = '<html><head><link rel="stylesheet" href="css/tjmanual.css"> <link rel="stylesheet" href="css/tjreport.css"></head><body>';
@@ -1195,7 +1195,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
     $scope.getTasksList = function(){
         url = '/api/task/list/'+$scope.projId;
         console.log();
-        if ($scope.$parent.userGroups.indexOf('admin')<0)
+        if ($scope.$parent.userGroups.indexOf('admin')<0 &&  $scope.$parent.userGroups.indexOf('managers')<0)
             url += '?sole=true';
         gettask = $http.get(url);
         gettask.success(function(resp){
