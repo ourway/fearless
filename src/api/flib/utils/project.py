@@ -75,7 +75,8 @@ class ListProjects:
         user = getUserInfoFromSession(req, resp)
         uid = user.get('id')
         projects = Project.query.filter(or_(Project.lead_id == uid,
-                                                         Project.director_id == uid, Project.creator_id == uid)).all()
+                            Project.director_id == uid, Project.creator_id == uid,
+                                Project.watchers.any(User.id == uid))).all()
         involving = Project.query.join(Task)\
             .join(Task.resources).filter(Task.resources.any(User.id == uid)).all()
         data = list(set(projects + involving))
