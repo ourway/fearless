@@ -246,7 +246,7 @@ var TITLE = 'TITLE';
              .when('/ams/a/:assetId', {
                 templateUrl: 'pages/ams/asset.html',
                 controller: 'assetCtrl',
-                 reloadOnSearch: true // dont reload the page on $location.search
+                 reloadOnSearch: false // dont reload the page on $location.search
             })
              .when('/ams', {
                 templateUrl: 'pages/ams/index.html',
@@ -1655,8 +1655,11 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                         +'?collection_id='+$scope.asset.collection_id+'&name='+$scope.asset.fullname
                         , $scope.asset.data, {transformRequest: []});
                 send.success(function(resp){
+                    v = $scope.asset.git_tags.split(',').length +1;
+                    $location.search('version', 'v_'+v);
                     $scope.editMode = false;
                     $scope.getAssetInfo(true); //only asset versions;
+
                         });
                 send.error(function(resp){
                     $scope.getAssetInfo();
@@ -1692,7 +1695,11 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                         }
                     //$location.search('version', Resp.version)
                     if (!versionsOnly)
+                        {
                         $scope.asset = Resp;
+                        //$location.search('version', 'v_'+v);
+
+                        }
 
                     getTags = $http.get('/api/db/asset/'+assetId+'?field=tgs');
                     getTags.success(function(tgs){
@@ -1701,6 +1708,7 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
 
                     v = $routeParams.version;
                     $scope.checkout(v || ('v_'+Resp.version));
+
                     $scope.assetVersions = Resp.git_tags.split(',');
                     $rootScope.title = 'Asset: ' + Resp.name + ' - ' + 'Fearless';
                     $scope.$parent.comment_id = Resp.uuid;

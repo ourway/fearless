@@ -189,10 +189,15 @@ def addFileToGit(path, assetUuid, version):
         process(command)
         return 'CLONED'
     else:
-        command = 'pull'
-        arg = 'git --work-tree="{d}" --git-dir="{d}/.git" {c}'.format(
-            d=asset_folder, c=command)
-        process(arg)
+        print 'Pulling asset %s' % assetUuid
+        command1 = 'pull origin master'
+        command2 = 'pull origin master --tags'
+        arg1= 'git --work-tree="{d}" --git-dir="{d}/.git" {c}'.format(
+            d=asset_folder, c=command1)
+        arg2= 'git --work-tree="{d}" --git-dir="{d}/.git" {c}'.format(
+            d=asset_folder, c=command2)
+        process(arg1)
+        process(arg2)
         return 'PULLED'
 
 

@@ -92,7 +92,7 @@ class AssetSave:
         if _tags:
             tags = [tag.strip() for tag in _tags.split(',')]
 
-            
+
 
         _cid = req.get_param('collection_id')
         collection = None
@@ -619,9 +619,17 @@ class AssetCheckout:
             return
 
         version = req.get_param('version')
-        command = 'checkout %s' % version
-        arg = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(
-            d=asset_folder, c=command)
+        command1= 'checkout %s' % version
+        command2= 'pull origin master'
+        command3= 'pull origin master --tags'
+        print 'checing out asset %s to %s' % (assetId, version)
+        arg1 = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(
+            d=asset_folder, c=command1)
+        arg2 = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(
+            d=asset_folder, c=command2)
+        arg3 = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(
+            d=asset_folder, c=command3)
+
         LOCK = os.path.join(asset_folder, 'LOCK')
         if os.path.isfile(LOCK):
             LD = pickle.load(open(LOCK, 'rb'))
@@ -634,7 +642,9 @@ class AssetCheckout:
 
         LD = {'datetime':datetime.utcnow(), 'user':userInfo.get('lastname')}
         pickle.dump(LD, open(LOCK, 'wb'))
-        error, result = process(arg)
+        error2, result2 = process(arg2)  ## pull
+        error3, result3 = process(arg3)  ## tags
+        error1, result1 = process(arg1)  ## checkout
         pstKey = '%s_poster_v%s' % (target.uuid, version.split('_')[1])
         thmbKey = '%s_thmb_v%s' % (target.uuid, version.split('_')[1])
         poster = os.path.join(

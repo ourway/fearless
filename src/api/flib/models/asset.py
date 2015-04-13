@@ -143,6 +143,7 @@ class Asset(IDMixin, Base):
 
     @validates('version')
     def commit(self, key, data):
+        print 'updating asset'
         from flib.tasks import addFileToGit
         from flib.tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
         if self.uuid:
@@ -221,6 +222,7 @@ class Asset(IDMixin, Base):
     @staticmethod
     def AfterAssetCreationFuncs(mapper, connection, target):
         '''Some operations after getting ID'''
+        print 'preparing asset'
         from flib.tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
         from flib.tasks import addFileToGit
         addFileToGit.delay(target.full_path, target.uuid, target.version)
