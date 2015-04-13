@@ -191,7 +191,7 @@
                 		<div class="col-xs-12"><hr></div>
                         <div class="col-xs-12">
                             <!--message body-->
-                            <div style="word-break: break-word" ng-bind-html="renderMessageBody(selected.body_s)"></div>
+                            <div ng-class="{'farsi':!$parent.isASCII(selected.body_s, true)}"  ng-bind-html="renderMessageBody(selected.body_s)"></div>
                             <!--/message body-->
                         </div>
                         <div class="col-xs-12 clearfix"><hr></div>
@@ -244,7 +244,7 @@
 
                     <div class="form-group" ng-if="!forwardMode" >
                       <label class="col-sm-12" for="inputBody">Message</label>
-                      <div class="col-sm-12"><textarea class="form-control" id="inputBody" ng-model="newMessage.body" rows="12" autofocus></textarea></div>
+                      <div class="col-sm-12"><textarea class="form-control" ng-class="{'farsi':!$parent.isASCII(newMessage.body, true)}" id="inputBody" ng-model="newMessage.body" rows="12" autofocus></textarea></div>
                     </div>
                 </form>
               </div>

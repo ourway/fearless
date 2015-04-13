@@ -34,6 +34,7 @@ app.add_route('/conn/chat', Chat())
 
 if __name__ == '__main__':
     from gevent.pywsgi import WSGIServer
+    print 'Running Fearless Socket API'
     from geventwebsocket import WebSocketError
     from geventwebsocket.handler import WebSocketHandler
     server = WSGIServer(("0.0.0.0", 5004), app,

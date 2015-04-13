@@ -46,6 +46,7 @@ class SyncShow:
                     client = json.loads(showInfo).get(
                         'client') or req.env.get('HTTP_X_FORWARDED_FOR')
                     if assetId:
+			print assetId
                         if not str(client) in r.lrange('show_%s_watchers' % assetId, 0, -1):
                             r.rpush('show_%s_watchers' % assetId, client)
                             r.expire('show_%s_watchers' % assetId, 1)
