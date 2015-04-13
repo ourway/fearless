@@ -246,7 +246,7 @@ var TITLE = 'TITLE';
              .when('/ams/a/:assetId', {
                 templateUrl: 'pages/ams/asset.html',
                 controller: 'assetCtrl',
-                 reloadOnSearch: false // dont reload the page on $location.search
+                 reloadOnSearch: true // dont reload the page on $location.search
             })
              .when('/ams', {
                 templateUrl: 'pages/ams/index.html',
@@ -1711,8 +1711,13 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
 
                     $scope.assetVersions = Resp.git_tags.split(',');
                     $rootScope.title = 'Asset: ' + Resp.name + ' - ' + 'Fearless';
-                    $scope.$parent.comment_id = Resp.uuid;
-                    $scope.$parent.getComments();
+                    try{
+                        $scope.$parent.comment_id = Resp.uuid;
+                        $scope.$parent.getComments();
+                        }
+                    catch(err){
+                        // pass
+                        }
                     if (Resp.owner_id){
 
                         ureq = $http.get('/api/db/user/'+Resp.owner_id).success(function(resp){
