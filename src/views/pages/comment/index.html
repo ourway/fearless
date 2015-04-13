@@ -1,10 +1,12 @@
-
 <div class="container" ng-if="$parent.comment_id">
-    <div class="col-lg-4 col-sm-6 text-center" ng-init="$parent.getComments()">
+    <div class="raw">
+    <div class="col-lg-6 col-md-6 col-sm-6 text-center" ng-init="$parent.getComments()">
     <div class="well">
-        <h4>What is on your mind?<br/><small>Write only about this page</small></h4>
+        <span class="pull-left badge badge-info">{{$parent.numberOfComments[$parent.comment_id]}}</span>
+        <h4>Comments <small>about this page</small></h4>
     <div class="input-group">
-        <input type="text" id="userComment" class="form-control input-sm chat-input" ng-model="$parent.newComment.content" placeholder="Write your message here..." />
+        <input type="text" id="userComment" class="form-control input-sm chat-input"
+        ng-model="$parent.newComment.content" placeholder="Write your comment here..." />
 	    <span class="input-group-btn" ng-click="$parent.addComment()">     
             <button class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-comment"></span> Add Comment</button>
         </span>
@@ -12,8 +14,11 @@
     <hr data-brackets-id="">
     <ul data-brackets-id="" id="sortable" class="list-unstyled ui-sortable">
         <div ng-repeat="comment in $parent.comments[$parent.comment_id] track by $index">
-            <a ng-if="$parent.userInfo.userid != comment.user_id " href="#user/{{comment.user_id}}" class="pull-left primary-font">{{$parent.members[comment.user_id].firstname}} {{$parent.members[comment.user_id].lastname}}</a>
-            <strong ng-if="$parent.userInfo.userid == comment.user_id " class="pull-left primary-font">Me</strong>
+            <a ng-if="$parent.userInfo.userid != comment.user_id "
+                href="#user/{{comment.user_id}}" 
+                class="pull-left primary-font">{{$parent.members[comment.user_id].firstname}} {{$parent.members[comment.user_id].lastname}}</a>
+            <strong ng-if="$parent.userInfo.userid == comment.user_id " 
+                class="pull-left primary-font text-info">Me</strong>
 
 
 
@@ -23,11 +28,17 @@
         </small>
 
         </br>
-        <li class="ui-state-default" ng-class="{'farsi':!$parent.isASCII(comment.content)}"><p class="commentText">{{comment.content}}</p></li>
+        <li class="ui-state-default" style="padding:0px;"
+        ng-class="{'farsi':!$parent.isASCII(comment.content)}"><p class="commentText">{{comment.content}}</p></li>
         </br>
         <div>
     </ul>
+    <a style="cursor:pointer" 
+        ng-click="$parent.getComments($parent.comments[$parent.comment_id].length, 
+                    $parent.comments[$parent.comment_id].length+10, true)"
+        ng-show="$parent.numberOfComments[$parent.comment_id]>10">Load more</a>
     </div>
+</div>
 </div>
 
 <script>

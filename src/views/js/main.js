@@ -330,6 +330,7 @@ function updateImageSize(img, maxWidth, maxHeight){
         $rootScope.title = "Centeral Auth - Fearless";
         $scope.comments = {};
         $scope.newComment = {};
+        $scope.numberOfComments = {};
         $scope.login_init = function() {
             //
         }
@@ -373,13 +374,25 @@ function updateImageSize(img, maxWidth, maxHeight){
             return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
         };
 
-
-        $scope.getComments = function(){
-            req = $http.get('/api/db/comment/'+$scope.comment_id+'?key=item&list=true');
+        $scope.getComments = function(start, end, concat){
+            if (!start)
+                start = 0;
+            if (!end)
+                end = 10;
+            req = $http.get('/api/db/comment/'+$scope.comment_id+'?key=item&list=true&s='+start+'&e='+end);
             req.success(function(resp){
-                    $scope.comments[$scope.comment_id] = resp;
+                    if (concat && resp)
+                        $scope.comments[$scope.comment_id] = $scope.comments[$scope.comment_id].concat(resp);
+                    if(!concat)
+                        $scope.comments[$scope.comment_id] = resp;
+                });
+            req = $http.get('/api/db/comment/'+$scope.comment_id+'?key=item&count=true');
+            req.success(function(resp){
+                    $scope.numberOfComments[$scope.comment_id] = resp.count;
                 })
+
         }
+
         $scope.addComment = function(){
             $scope.newComment.user_id = $scope.userInfo.userid;
             $scope.newComment.item = $scope.comment_id;
@@ -387,9 +400,13 @@ function updateImageSize(img, maxWidth, maxHeight){
                 req = $http.put('/api/db/comment', $scope.newComment);
                 req.success(function(resp){
                         if (!$scope.comments[$scope.comment_id])
-                            $scope.comments[$scope.comment_id] = [];
+                            {
+                                $scope.comments[$scope.comment_id] = [];
+                                $scope.numberOfComments[$scope.comment_id] = 0;
+                            }
                         $scope.comments[$scope.comment_id].splice(0, 0, $scope.newComment);
                         $scope.newComment = {};
+                        $scope.numberOfComments[$scope.comment_id] +=1 ;
                     })
 
             }
@@ -1658,7 +1675,7 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                     v = $scope.asset.git_tags.split(',').length +1;
                     $location.search('version', 'v_'+v);
                     $scope.editMode = false;
-                    $scope.getAssetInfo(true); //only asset versions;
+                    $scope.getAssetInfo(); //only asset versions;
 
                         });
                 send.error(function(resp){
@@ -1707,7 +1724,7 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                         })
 
                     v = $routeParams.version;
-                    $scope.checkout(v || ('v_'+Resp.version));
+                    //$scope.checkout(v || ('v_'+Resp.version));
 
                     $scope.assetVersions = Resp.git_tags.split(',');
                     $rootScope.title = 'Asset: ' + Resp.name + ' - ' + 'Fearless';

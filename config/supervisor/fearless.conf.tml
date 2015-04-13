@@ -33,7 +33,7 @@ stderr_logfile=${dir}/logs/socket_error.log
 
 
 [program:fearless-celery]
-command=${dir}/pyenv/bin/celery -A flib.tasks worker -c 1 -l info
+command=${dir}/pyenv/bin/celery -A flib.tasks worker -c 2 -l info
 autostart=true
 directory=${dir}/src/api
 stopsignal=TERM
