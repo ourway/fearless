@@ -1019,7 +1019,8 @@ fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routePara
                 mail['message']+= 'Here is a sum up of crew salaries, Please review:<br/>';
                 mail['message']+= invoice;
                 //mail['to'] = 'farsheed.ashouri@gmail.com';
-                mail['to'] = ['hamid2177@gmail.com'];
+                //mail['to'] = ['hamid2177@gmail.com'];
+                mail['to'] = ['sara_kayvan@hotmail.com'];
                 mail['subject'] = 'گزارش کارکرد ماه ' + $scope.$parent.persianDate(null, 1) + ' پروژه پادشاه آب';
                 if (confirm('Are you sure you want to send sumpup?'))
                     $scope.$parent.sendmail(mail);
