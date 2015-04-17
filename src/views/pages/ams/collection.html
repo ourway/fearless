@@ -226,7 +226,8 @@
                                 <td ng-if="thumbnails && !asset.thumbnail" class="hidden-xs"  style="vertical-align: middle;"></td>
                                 <td ng-if="thumbnails && asset.thumbnail" class="hidden-xs"  style="vertical-align: middle;">
                                     <a href="/static/{{asset.poster}}" data-gallery="collectionLinks"><img class="thumbnail" ng-src="/static/{{asset.thumbnail}}" /></a></td>
-                                <td  style="vertical-align: middle;"><a href="#/ams/a/{{asset.id}}?uuid={{asset.uuid}}">{{asset.fullname}}</strong></a></td>
+                                <td  style="vertical-align: middle;">
+                                    <a href="#/ams/a/{{asset.id}}?uuid={{asset.uuid}}&version=v_{{asset.version}}">{{asset.fullname}}</strong></a></td>
                             <td  style="vertical-align: middle;">
                                 <span> {{$parent.getReadableFileSizeString(asset.content_size)}} </span>
                             </td>
