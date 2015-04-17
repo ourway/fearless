@@ -531,6 +531,7 @@ class CollectionInfo:
                 data['assets'] = [
                     {'id': i.id,
                      'name': i.name,
+                     'uuid': i.uuid,
                      'url': i.url,
                      'content_size': i.content_size,
                      'fullname': i.fullname,

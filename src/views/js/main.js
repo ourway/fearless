@@ -433,6 +433,15 @@ function updateImageSize(img, maxWidth, maxHeight){
         $scope.sendmail = function(mail){
             m = $http.post('/api/sendmail', mail);
         }
+        $scope.makeid = function()
+            {
+                var text = "";
+                var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                for( var i=0; i < 5; i++ )
+                    text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+                return text;
+            }
 
         $scope.persianDate = function(d, mode){
         // d is like 2015-1-1
@@ -1109,7 +1118,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                             $scope.projectBackup = resp;
                             if ($scope.$parent){
                                 $scope.$parent.comment_id = resp.uuid;
-                                $scope.$parent.getComments();
+                                //$scope.$parent.getComments();
                                 }
 
 
@@ -1651,7 +1660,7 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
 
         $scope.loadAssetData = function(){
 
-            data_url = '/static/ASSETS/'+ $scope.asset.uuid + '/' + $scope.asset.fullname;
+            data_url = '/static/ASSETS/'+ $scope.asset.uuid + '/' + $scope.asset.fullname + '?rid=' + $scope.$parent.makeid();
             //data_url = '/static/' + $scope.asset.url;
             $http.get(data_url).success(function(resp){
 
@@ -1675,6 +1684,7 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                 send.success(function(resp){
                     v = $scope.asset.git_tags.split(',').length +1;
                     $location.search('version', 'v_'+v);
+                    $scope.checkouted = v;
                     $scope.editMode = false;
                     $scope.getAssetInfo(); //only asset versions;
 
@@ -1725,13 +1735,13 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                         })
 
                     v = $routeParams.version;
-                    //$scope.checkout(v || ('v_'+Resp.version));
+                    $scope.checkout(v || ('v_'+Resp.version));
 
                     $scope.assetVersions = Resp.git_tags.split(',');
                     $rootScope.title = 'Asset: ' + Resp.name + ' - ' + 'Fearless';
                     try{
                         $scope.$parent.comment_id = Resp.uuid;
-                        $scope.$parent.getComments();
+                        //$scope.$parent.getComments();
                         }
                     catch(err){
                         // pass
@@ -1928,7 +1938,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
                     if ($scope.$parent){
                         $scope.$parent.comment_id = resp.uuid;
-                        $scope.$parent.getComments();
+                        //$scope.$parent.getComments();
                         }
 
                     //$scope.activateVideo();

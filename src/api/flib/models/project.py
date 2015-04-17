@@ -225,7 +225,7 @@ class Project(IDMixin, Base):
              do_msproject=False, do_profit=False, do_trace=True,
              do_traceSvg=False, report_width=1000):
         # lets select just one task
-        puid = getUUID() + '_' + self.uuid
+        #puid = getUUID() + '_' + self.uuid
         schedule_path = os.path.join(public_upload_folder,
                                      'Fearless_project_%s.tjp' % self.uuid)
         plan_path = os.path.join(public_upload_folder,
