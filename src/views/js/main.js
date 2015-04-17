@@ -1659,7 +1659,9 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
         }
 
         $scope.loadAssetData = function(){
-
+            $scope.asset.data = '##Checking Out\n - Wait please ...'
+            
+            $timeout(function(){
             data_url = '/static/ASSETS/'+ $scope.asset.uuid + '/' + $scope.asset.fullname + '?rid=' + $scope.$parent.makeid();
             //data_url = '/static/' + $scope.asset.url;
             $http.get(data_url).success(function(resp){
@@ -1668,7 +1670,8 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                         $timeout($scope.highlightCode, 10);
 
                     });
-        }
+        }, 1000);
+            };
 
         $scope.editAssetContents = function(){
             if ($scope.editMode)
@@ -1725,6 +1728,7 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                     if (!versionsOnly)
                         {
                         $scope.asset = Resp;
+                        $scope.asset.data = null;
                         //$location.search('version', 'v_'+v);
 
                         }
