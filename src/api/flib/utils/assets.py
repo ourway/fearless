@@ -619,12 +619,12 @@ class AssetCheckout:
             return
 
         version = req.get_param('version')
-        command1= 'checkout %s' % version
-        command2= 'pull origin master'
-        command3= 'pull origin master --tags'
-        print 'checing out asset %s to %s' % (assetId, version)
+        command1= 'pull origin master'
+        command2= 'pull origin master --tags'
+        command3= 'checkout %s' % version
         arg1 = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(
             d=asset_folder, c=command1)
+	print arg1
         arg2 = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(
             d=asset_folder, c=command2)
         arg3 = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(
@@ -642,9 +642,9 @@ class AssetCheckout:
 
         LD = {'datetime':datetime.utcnow(), 'user':userInfo.get('lastname')}
         pickle.dump(LD, open(LOCK, 'wb'))
-        error2, result2 = process(arg2)  ## pull
-        error3, result3 = process(arg3)  ## tags
-        error1, result1 = process(arg1)  ## checkout
+        error1, result1 = process(arg1)  ## pull
+        error2, result2 = process(arg2)  ## tags
+        error3, result3 = process(arg3)  ## checkout
         pstKey = '%s_poster_v%s' % (target.uuid, version.split('_')[1])
         thmbKey = '%s_thmb_v%s' % (target.uuid, version.split('_')[1])
         poster = os.path.join(
