@@ -79,9 +79,6 @@
     </form>
     </div>
 
-
-
-
 <div class="container collectionDiv">
 		<div class="col-md-12 column">
 			<ul class="breadcrumb" style="min-height: 45px">
@@ -132,16 +129,18 @@
 					<div class="thumbnail asm_thumb">
                         <a href="#ams/c/{{subcol.id}}?page=1" title="{{subcol.description}}"
                         ><img class="asm_col_thumb_img" alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
-						<div class="caption">
-                            <h5><a href="#ams/c/{{subcol.id}}?page=1" 
-                                    title="{{subcol.name}}"
-                                    style="color:#337AB7;word-wrap: break-word;text-decoration:none"><strong>{{subcol.name}}</strong></a>
-                                <small ng-show="subcol.number_of_assets">[<span style="color:green">{{subcol.number_of_assets}}</span>]</small>
-                                <span ng-show="subcol.children.length">
-                                    [<span style="color:grey"><strong>{{subcol.children.length}}</strong></span>]</span>
-                        </h5>
-							<p>
-							</p>
+                    <div class="caption">
+			<ul class="nav nav-pills nav-stacked">
+                            <li class="active"  
+                                style="" ng-controller="inboxCtrl" ng-init="init()">
+        <a href="#ams/c/{{subcol.id}}?page=1"><span ng-show="subcol.children.length" 
+                class="badge pull-right" style="color:#fff;background:grey">{{subcol.children.length}}</span><span class="badge pull-right">{{subcol.number_of_assets}}</span></strong></span><strong>{{subcol.name}}</strong></a>
+                            </li>
+
+			</ul>
+
+                        <p>
+			</p>
 						</div>
 					</div>
                 </div>
@@ -208,8 +207,6 @@
                             </button>
                         </div>
                 </div>
-                <br/>
-                <br/>
                 <table id="collectionAssetsList" class="table table-striped table-hover refresh-container pull-down" >
                         <thead class="hidden-xs">
                             <td class="col-md-1"><a href="javascript:;"><strong>ID</strong></a></td>
@@ -236,6 +233,7 @@
                             </tr>
                         </tbody>
                     <table>
+
     <hr ng-show="collection.assets.length>0"/>
     </div>
 	</div>
@@ -263,9 +261,7 @@
     </div>
 
 
-    <div ng-include="'pages/comment/index.html'"></div>
-
 </div>
 
 
-
+<div ng-include="'pages/comment/index.html'"></div>

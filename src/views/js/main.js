@@ -1905,8 +1905,6 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     else {
                     for (i in $scope.collection.assets){
                         _asset = $scope.collection.assets[i];
-
-
                     }
                     getTags = $http.get('/api/db/collection/'+ci+'?field=tgs');
                     getTags.success(function(tgs){
@@ -1941,6 +1939,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
 
                     if ($scope.$parent){
+                        console.log('adasdada')
                         $scope.$parent.comment_id = resp.uuid;
                         //$scope.$parent.getComments();
                         }

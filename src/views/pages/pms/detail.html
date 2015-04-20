@@ -242,8 +242,16 @@ background-color: #FFEDA5;
                 <div class="col-md-3 column" style="border-right: 1px solid #ccc;">
                      <h3 style="color:grey">Collections</h3>
                         <div id="CollectionsDiv" >
-                            <a class="projectCollectionsA col-md-5" href="#/ams/c/{{collection.id}}?page=1" ng-repeat="collection in project.collections track by $index" 
-                                title="{{collection.name}}">{{collection.name}}</a>
+
+			<ul class="nav nav-pills nav-stacked">
+                            <li class="active" ng-repeat="collection in project.collections track by $index"
+                                style="" ng-controller="inboxCtrl" ng-init="init()">
+                                <a href="#/ams/c/{{collection.id}}?page=1"><em class="fa fa-folder"></em> <span ng-show="collection.number_of_children" 
+                                        class="badge pull-right">{{collection.number_of_children}}</span>{{collection.name}}</a>
+                            </li>
+
+			</ul>
+
                         </div>
                 </div>
                 <div class="col-md-7 column" style="border-right: 1px solid #ccc;">

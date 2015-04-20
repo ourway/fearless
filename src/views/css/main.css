@@ -250,7 +250,8 @@ text-shadow: 0px 1px 1px #FFF;
 }
 .asm_thumb{
 box-shadow: 1px 1px 4px rgba(0,0,0,0.16);
-border-radius: 5px
+border-radius: 5px;
+height:250px;
 }
 
 .asm_thumb_solo{

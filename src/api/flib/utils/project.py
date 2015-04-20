@@ -51,9 +51,18 @@ class GetProjectDetails:
                 'complete': project.complete,
                 'watchers': [{'firstname': i.firstname, 'lastname': i.lastname, 'fullname': i.fullname, 'id': i.id} for i in project.watchers],
                 #'tasks':[{'title':i.title, 'id':i.id} for i in project.tasks],
-                'collections': [{'name': i.name.title(), 'id': i.id, 'path': i.path,
-                                 'repository': i.repository.name.title(),
-                                 'repository_path': i.repository.path} for i in collections if not i.parent]}
+                'collections': [
+                                {
+                                    'name': i.name.title(),
+                                    'id': i.id,
+                                    'path': i.path,
+                                    'number_of_children': len(i.children),
+                                    'repository': i.repository.name.title(),
+                                    'repository_path': i.repository.path
+                                }
+                                    for i in collections if not i.parent
+                                ]
+                    }
             if project.lead:
                 data['leader'] = {
                     'fullname': project.lead.fullname, 'id': project.lead.id}
