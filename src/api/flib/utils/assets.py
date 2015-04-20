@@ -106,10 +106,11 @@ class AssetSave:
         if not collection:
             now = arrow.utcnow()
             today = now.format('YYYY-MM-DD')
-            collection = Collection.query.filter_by(path=today)\
+            cpath = '%s.%s'%(userInfo.get('alias'), today)
+            collection = Collection.query.filter_by(path=cpath)\
                 .filter_by(repository=targetRepo).scalar()
             if not collection:
-                collection = Collection(path=today, repository=targetRepo)
+                collection = Collection(path=cpath, repository=targetRepo)
                 req.session.add(collection)
 
 
@@ -553,6 +554,7 @@ class CollectionInfo:
             data['holdAssets'] = target.holdAssets
             data['collection_size'] = target.collection_size
             data['uuid'] = target.uuid
+            data['owner_id'] = target.owner_id
             data['path'] = target.path
             data['description'] = target.description
             data['repository'] = {
@@ -580,6 +582,7 @@ class CollectionInfo:
 class AddCollection:
 
     def on_put(self, req, resp):
+        userInfo = getUserInfoFromSession(req, resp)
         data = get_params(req.stream, flat=False)
         name = data.get('name')
         repository_id = data.get('repository_id')
@@ -588,8 +591,8 @@ class AddCollection:
         template = data.get('template').lower()
         if name and repository_id:
             _uid = getUUID()
-            newC = Collection(
-                name=name, uuid=_uid, path=name, repository_id=repository_id)
+            newC = Collection( name=name, uuid=_uid, path=name,
+                              repository_id=repository_id, owner_id=userInfo.get('id'))
             if parent_id:
                 newC.parent_id = parent_id
             if template:

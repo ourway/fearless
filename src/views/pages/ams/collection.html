@@ -111,7 +111,7 @@
 				    {{collection.name}}
                     </li>
 
-                    <span class="pull-right">
+                      <span class="pull-right" ng-show="$parent.isAdmin || collection.owner_id==$parent.userInfo.userid">
                         <button id="collectionDeleteButton" class="btn btn-default btn-sm" 
                             ng-click="deleteCollection()" type="button"> 
                             <em class="glyphicon glyphicon-trash"></em>
@@ -121,7 +121,7 @@
 			</ul>
 
         <div class="col-md-12">
-			<div class="btn-group" ng-show="collection.container">
+			<div class="btn-group" ng-show="collection.container || $parent.isAdmin">
                 <button id="collectionAddButton" class="btn btn-success btn-sm" type="button" data-toggle="modal" data-target="#collectionAddModal">
                     <em class="glyphicon glyphicon-plus"></em>
                     <em class="glyphicon glyphicon-folder-open"></em>
