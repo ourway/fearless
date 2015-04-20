@@ -1979,8 +1979,8 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                 $scope.thumbnails=true;
         }
         $scope.initToggle = function(){
-            $('#toggle-thmb').bootstrapToggle();
-            $scope.thumbnails=false;
+            //$('#toggle-thmb').bootstrapToggle(true);
+            $scope.thumbnails=true;
         }
 
         $scope.createNewSubCollection = function(){
