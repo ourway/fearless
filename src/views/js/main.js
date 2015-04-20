@@ -1890,9 +1890,9 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     page = 0;
             }
             start = 0;
-            end = 10;
+            end = 20;
             if (page){
-                c = 10;
+                c = 20;
                 start = c*page;
                 end = start + c;
             }
@@ -1939,7 +1939,6 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
 
                     if ($scope.$parent){
-                        console.log('adasdada')
                         $scope.$parent.comment_id = resp.uuid;
                         //$scope.$parent.getComments();
                         }
