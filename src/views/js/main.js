@@ -1784,6 +1784,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             $http, $location, Restangular, $timeout, $filter, $window){
 
         $scope.newDocument = {};
+        $scope.foptions = {};
         $scope.ndocumentOptions = [
 
             { label: 'Documentation', value: 'md', 'template': '###### Created by Fearless\n---\n', tags:'documentation, document, markdown'},
