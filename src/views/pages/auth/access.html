@@ -10,8 +10,8 @@
             <br/>
             <div class="col-md-5 column thumbnail" style="background:#f2f2f2;margin:5px" ng-repeat="user in users | orderBy:'firstname'| filter:filterUA" >
                 <div class="col-md-3">
-                    <img ng-show="user.avatar" ng-src="{{user.avatar}}" width="100" class="img-responsive img-rounded img-thumbnail"/>
-                    <img ng-show="!user.avatar" ng-src="images/user_man-512.png" width="100" class="img-responsive img-rounded img-thumbnail"/>
+                    <img ng-show="user.avatar" ng-src="{{user.avatar}}" style="height:100px" height="100" class="img-responsive img-rounded img-thumbnail"/>
+                    <img ng-show="!user.avatar" ng-src="images/user_man-512.png" style="height:100px" height="100" class="img-responsive img-rounded img-thumbnail"/>
                 </div>
                 <div class="col-md-9">
                     <br/>

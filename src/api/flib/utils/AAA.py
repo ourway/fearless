@@ -230,7 +230,7 @@ class Signup:
                 'message': 'error', 'info': 'You need to wait', 'wait': 5}
             return
 
-        host = req.protocol + '://' + req.headers.get('HOST')
+        host = req.protocol + '://' + get_ip()
         form = json.loads(req.stream.read())
         email = form.get('email')
         if email:
@@ -267,10 +267,8 @@ class Signup:
 
 
 class Verify:
-
     '''Account activation
     '''
-
     def on_get(self, req, resp):
 
         ip = req.env.get('HTTP_X_FORWARDED_FOR')
@@ -290,6 +288,7 @@ class Verify:
             resp.status = falcon.HTTP_302
             m = encodestring('Welcome!  Successfully Activated.')
             resp.location = '/app/#auth/login?m=%s' % m
+
 
 
 class Reactivate:
@@ -385,6 +384,7 @@ class ChangePassword:
             new_token = str(uuid.uuid4())
             target.token = new_token
             target.password = pass1
+            req.session.flush()
             resp.body = {'message': 'password changed'}
         else:
             resp.body = {'message': 'error in password change'}
@@ -414,7 +414,7 @@ class Reset:
         target = req.session.query(User).filter(
             User.email == form.get('email')).first()
         if target:
-            host = req.protocol + '://' + get_ip() 
+            host = req.protocol + '://' + get_ip()
             reset_link = host + \
                 '/api/auth/changepasswordverify?token=' + target.token
             send_envelope.delay(form.get('email'), [], [],  'Account Password Reset',
