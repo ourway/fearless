@@ -121,7 +121,7 @@
                 ng-repeat="subcol in collection.children | filter:foptions.filterName track by $index  ">
 		<div class="thumbnail asm_thumb">
                     <a href="#ams/c/{{subcol.id}}?page=1" title="{{subcol.description}}"><img class="asm_col_thumb_img" 
-                        alt="150x100" width="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
+                        alt="150x100" width="150" height="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
                     <div class="caption">
 			<ul class="nav nav-pills nav-stacked">
                             <li class="active" style="" ng-controller="inboxCtrl" ng-init="init()">
