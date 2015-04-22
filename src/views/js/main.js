@@ -1745,7 +1745,7 @@ fearlessApp.controller('assetCtrl', function($scope, $rootScope, $routeParams, $
                     $rootScope.title = 'Asset: ' + Resp.name + ' - ' + 'Fearless';
                     try{
                         $scope.$parent.comment_id = Resp.uuid;
-                        //$scope.$parent.getComments();
+                        $scope.$parent.getComments();
                         }
                     catch(err){
                         // pass
@@ -1940,7 +1940,7 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
                     if ($scope.$parent){
                         $scope.$parent.comment_id = resp.uuid;
-                        //$scope.$parent.getComments();
+                        $scope.$parent.getComments();
                         }
 
                     //$scope.activateVideo();
