@@ -11,8 +11,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'src/api
 import shutil
 from mako.template import Template
 
-nginx_version = '1.7.10'
-redis_version = '2.8.19'
+nginx_version = '1.8.0'
+redis_version = '3.0.0'
 ruby_version = '2.2.0'
 openssl_version = '1.0.2'
 
@@ -198,6 +198,7 @@ def _get_supervisord_config():
 
 
 
+@task
 def _install_nginx():
     '''install nginx'''
     nginx_file = _download_nginx()
@@ -220,6 +221,7 @@ def _install_nginx():
     _get_nginx_config()
 
 
+@task
 def _install_redis():
     '''install redis'''
     redis_file = _download_redis()
