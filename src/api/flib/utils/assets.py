@@ -573,7 +573,8 @@ class CollectionInfo:
                 else:
                     break
             if target.children:
-                data['children'] = [{'name': i.name, 'id': i.id, 'path': i.path, 'number_of_assets': i.number_of_assets,
+                data['children'] = [{'name': i.name, 'id': i.id,
+                                     'collection_size':i.collection_size, 'path': i.path, 'number_of_assets': i.number_of_assets,
                                      'children': [{'name': c1.name, 'id': c1.id, 'path': c1.path, } for c1 in i.children]
                                      } for i in target.children]
             resp.body = data

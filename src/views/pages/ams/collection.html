@@ -132,6 +132,12 @@
                             </li>
 			</ul>
                         <p>
+                        <table>
+                            <tr>
+                                <td ng-if="subcol.children.length"><span 
+                                    class="text-info sm">{{$parent.getReadableFileSizeString(subcol.collection_size)}}</span></td>
+                            </tr>
+                        </table>
                         <!-- Some Description here --!>
 			</p>
 		    </div>
