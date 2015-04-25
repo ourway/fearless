@@ -480,6 +480,8 @@ function updateImageSize(img, maxWidth, maxHeight){
         $scope.userInfo = {'logged_in':false};
 
 
+
+
     $scope.doLogin = function() {
 
         if (validateEmail($scope.loginInfo.email) == false && $scope.loginInfo.action != 'changepassword')
@@ -2438,7 +2440,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
         }
 
         $scope.getUserAssets = function(order_by, sort, search_for){
-
+            $scope.currentUser = ($routeParams.oid || $scope.$parent.userInfo.userid);
             $scope.tagMode = false;
             if (!$scope.page)
                 $scope.page = 1;
@@ -2451,7 +2453,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
             s = ($scope.page-1)*50;
             e = s+50;
             query = '/api/db/asset?sort='+sort+'&s='+s+'&e='+e+'&order_by='+ order_by + '&filters=owner_id='+
-                    ($routeParams.oid || $scope.$parent.userInfo.userid);
+                    $scope.currentUser;
             if ($routeParams.tags)
                 {
                 $scope.tagMode = true;
@@ -2459,7 +2461,7 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
                 query += '&tags='+$routeParams.tags;
                 }
 
-            tag_query = '/api/asset/get_user_tags/'+ ($routeParams.oid || $scope.$parent.userInfo.userid);
+            tag_query = '/api/asset/get_user_tags/'+ $scope.currentUser;
             tagReq = $http.get(tag_query);
             tagReq.success(function(resp){
                 $scope.assetTags = resp;

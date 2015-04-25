@@ -507,8 +507,8 @@ class Users:
 
     def on_get(self, req, resp, **kw):
 
-        target = req.session.query(User).all()
-        data = [{'firstname': user.lastname, 'lastname': user.firstname,
+        target = req.session.query(User).order_by(User.lastname).all()
+        data = [{'firstname': user.firstname, 'lastname': user.lastname,
                  'fullname': user.fullname, 'id': user.id} for user in target]
         resp.body = data
 
