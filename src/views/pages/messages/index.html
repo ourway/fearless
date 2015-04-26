@@ -12,25 +12,25 @@
                 <br/>
                 <li class="hidden-sm hidden-xs" ng-class="{'active':messages.folder=='inbox'}">
                 <a href="#/messages?folder=inbox" 
-                    ng-click="groupToPages()"><em class="fa fa-inbox"></em> <span ng-show="messages.folder=='inbox'" class="badge pull-right">{{messages.items.length}}</span> Inbox </a>
+                    ng-click="groupToPages()"><em class="fa fa-inbox"></em> <span ng-show="messages.folder=='inbox'" class="badge pull-right">{{unreadCount}}</span> Inbox </a>
                 </li>
                 <li class="hidden-sm hidden-xs" ng-class="{'active':messages.folder=='archive'}">
-                    <a href="#/messages?folder=archive"><em class="fa fa-archive"></em> <span ng-show="messages.folder=='archive'" class="badge pull-right">{{messages.items.length}}</span>Archived</a>
+                    <a href="#/messages?folder=archive"><em class="fa fa-archive"></em> <span ng-show="messages.folder=='archive'" class="badge pull-right">{{unreadCount}}</span>Archived</a>
                 </li>
                 <li class="hidden-sm hidden-xs" ng-class="{'active':messages.folder=='star'}">
-                    <a href="#/messages?folder=star"><em class="fa fa-star"></em> <span ng-show="messages.folder=='star'" class="badge pull-right">{{messages.items.length}}</span>Important</a>
+                    <a href="#/messages?folder=star"><em class="fa fa-star"></em> <span ng-show="messages.folder=='star'" class="badge pull-right">{{unreadCount}}</span>Important</a>
                 </li>
                 <li class="hidden-sm hidden-xs" ng-class="{'active':messages.folder=='sent'}">
-                    <a href="#/messages?folder=sent"><em class="fa fa-send"></em> <span ng-show="messages.folder=='sent'" class="badge pull-right">{{messages.items.length}}</span>Sent</a>
+                    <a href="#/messages?folder=sent"><em class="fa fa-send"></em> <span ng-show="messages.folder=='sent'" class="badge pull-right">{{unreadCount}}</span>Sent</a>
                 </li>
                 <li class="hidden-sm hidden-xs" ng-class="{'active':messages.folder=='draft'}">
-                    <a href="#/messages?folder=draft"><em class="fa fa-edit"></em> <span ng-show="messages.folder=='draft'" class="badge pull-right">{{messages.items.length}}</span>Drafts</a>
+                    <a href="#/messages?folder=draft"><em class="fa fa-edit"></em> <span ng-show="messages.folder=='draft'" class="badge pull-right">{{unreadCount}}</span>Drafts</a>
                 </li>
                 <li class="hidden-sm hidden-xs" ng-class="{'active':messages.folder=='spam'}">
-                    <a href="#/messages?folder=spam"><em class="fa fa-inbox"></em> <span ng-show="messages.folder=='spam'" class="badge pull-right">{{messages.items.length}}</span>Spam</a>
+                    <a href="#/messages?folder=spam"><em class="fa fa-inbox"></em> <span ng-show="messages.folder=='spam'" class="badge pull-right">{{unreadCount}}</span>Spam</a>
                 </li>
                 <li class="hidden-sm hidden-xs" ng-class="{'active':messages.folder=='trash'}">
-                    <a href="#/messages?folder=trash"><em class="fa fa-trash"></em> <span ng-show="messages.folder=='trash'" class="badge pull-right">{{messages.items.length}}</span>Trash</a>
+                    <a href="#/messages?folder=trash"><em class="fa fa-trash"></em> <span ng-show="messages.folder=='trash'" class="badge pull-right">{{unreadCount}}</span>Trash</a>
                 </li>
             </ul>
             <hr>

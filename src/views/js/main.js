@@ -2050,7 +2050,7 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
     if($scope.$parent)
         $scope.messages.resources = $scope.$parent.resources;
     messageService.messages = [];
-    $scope.getUnreadCount  = messageService.getUnreadCount;
+    $scope.unreadCount  = 0;
     $scope.messages.folder = $routeParams.folder || 'inbox';
 
 
@@ -2058,7 +2058,6 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         req = $http.get('/api/messages/list');
         req.success(function(resp){
         messageService.messages = resp;
-        $scope.messages.items = resp;
         if (process){
             $scope.messages.items = [];
             $rootScope.title = 'Messages';
@@ -2067,6 +2066,8 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
             for (i in results){
                 m = results[i];
                 newm = m;
+                if (newm.read==false)
+                    $scope.unreadCount+=1;
                 newm.prettyDate = $scope.$parent.prettyDate(m.datetime);
                 $scope.messages.items.push(newm);
                 $scope.search($scope.messages.folder);

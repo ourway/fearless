@@ -148,9 +148,9 @@ def createStandards(target, session):
     if not os.path.isdir(target.url):
         os.makedirs(target.url)
         thmb = os.path.join(
-            os.path.dirname(__file__), '../templates/icons/asset_thumb.png')
+            os.path.dirname(__file__), '../templates/icons/asset_thumb-fs8.png')
         prefthmb = os.path.join(
-            os.path.dirname(__file__), '../templates/icons/%s.png'%target.name.lower())
+            os.path.dirname(__file__), '../templates/icons/%s-fs8.png'%target.name.lower())
         dest = os.path.join(target.url, 'thumb.png')
         if not os.path.isfile(dest):
             if os.path.isfile(prefthmb):
@@ -219,9 +219,9 @@ def createStandards(target, session):
                             part = 'sequence'
                         tdest = os.path.join(partPath, 'thumb.png')
                         tsrc = os.path.join(
-                            os.path.dirname(__file__), '../templates/icons/%s.png' % part.lower())
+                            os.path.dirname(__file__), '../templates/icons/%s-fs8.png' % part.lower())
                         def_src = os.path.join(
-                            os.path.dirname(__file__), '../templates/icons/data.png')
+                            os.path.dirname(__file__), '../templates/icons/data-fs8.png')
                         if not os.path.isfile(tsrc):
                             tsrc = def_src
                         shutil.copyfile(tsrc, tdest)

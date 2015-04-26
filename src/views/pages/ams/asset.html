@@ -116,7 +116,9 @@
                     <source 
                    data-setup='{"techOrder": ["flash", "html5", "links"]}'
                     ng-src="{{'/static/'+asset.preview}}" type="video/mp4" /></video>
+                    <a title="Right click, Save link as" href="{{'/static/'+asset.preview}}"><em class="fa fa-file-video-o"></em> Download this Preview</a>
                 </div>
+
 
 
                 <div ng-if="asset.poster && asset.content_type.split('/')[0]=='image'">

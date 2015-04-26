@@ -11,13 +11,15 @@
         <div class="col-md-2 column">
             
 			<ul class="nav nav-pills nav-stacked">
-                <li class="active" style="margin:5px;width:100%" ng-controller="inboxCtrl" ng-init="init()">
-                        <a href="#/messages"><em class="fa fa-envelope-o"></em> <span class="badge pull-right">{{getUnreadCount()}}</span>Inbox</a>
+                            <li ng-class="{'active':unreadCount>0}" style="margin:5px;width:100%" ng-controller="inboxCtrl" ng-init="init(true)">
+                            <a href="#/messages"><em class="fa fa-envelope-o"></em> <span ng-show="unreadCount>0" class="badge pull-right">{{unreadCount}}</span>Inbox</a>
                 
-                </li>
+                        </li>
+                        <!--
 				<li class="active" style="margin:5px;width:100%">
-					 <a href="#/notebook"><em class="fa fa-book"></em>  <span class="badge pull-right">2</span>Notes</a>
-				</li>
+					 <a href="#/notebook"><em class="fa fa-book"></em>  <span class="badge pull-right">0</span>Notes</a>
+                                         </li>
+                        --!>
 			</ul>
 
             <hr/>
