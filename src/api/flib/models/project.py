@@ -287,7 +287,7 @@ class Project(IDMixin, Base):
             return
         else:
             for i in [schedule_path, plan_path, guntt_path, resource_path,
-                      msproject_path, profit_path, csv_path, trace_path,
+                      msproject_path, profit_path, csv_path,
                       traceSvg_path]:
                 if os.path.isfile(i):
                     os.remove(i)
