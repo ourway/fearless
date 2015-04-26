@@ -246,7 +246,7 @@ def generateVideoThumbnail(path, assetUuid, version, w=146, h=110, text='thmb'):
     fid = target.uuid + '_' + text + '_' + str(version)
     fmt = 'png'
     thpath = os.path.join(public_upload_folder, fid + '.' + fmt)
-    arg = '''nice "%s" -i "%s" -an -r 1 -vf "select=gte(n\,100)" -threads 1 -vframes 1 -s %sx%s -y "%s"''' \
+    arg = '''nice "%s" -i "%s" -an -r 1 -vf "select=gte(n\,10)" -threads 1 -vframes 1 -s %sx%s -y "%s"''' \
         % (ffmpeg, path, w, h, thpath)
     pr = process(arg)
     session.close()
