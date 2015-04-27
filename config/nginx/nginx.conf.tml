@@ -44,8 +44,8 @@ http {
   # Unicorn nor Rainbows! is optimized for it at the moment
   sendfile off;
 
-  output_buffers 1 512k;
-  directio 512;
+  output_buffers 1 50m;
+  directio 80m;
 
   tcp_nopush off; # off may be better for *some* Comet/long-poll stuff
   tcp_nodelay on; # on may be better for some Comet/long-poll stuff
