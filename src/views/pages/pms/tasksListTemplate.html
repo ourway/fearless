@@ -1,5 +1,5 @@
 <div>
-    <input ng-if="tasks.length" type="text" class="form-control" placeholder="Filter Tasks" 
+    <input ng-show="tasks.length" type="text" class="form-control" placeholder="Filter Tasks" 
     ng-model="project.filterTaskName" />
     <div id="tasksDiv">
         <div ng-if="tasks.length" style="margin: 0px;" class="alert alert-info alert-dismissable">
@@ -11,7 +11,7 @@
         </div>
         <table class="table table-responsive table table-bordered table-striped table-hover refresh-container pull-down">
         <tr title="{{task.title}}" class="active" 
-            ng-repeat="task in tasks | orderBy:'start' | filter:project.filterTaskName ">
+            ng-repeat="task in tasks | orderBy:'start' | filter:project.filterTaskName">
             <td class="info">
                 <div style="color:grey"><b>{{$index+1}}</b></div>
                 <br/>

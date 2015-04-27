@@ -1071,7 +1071,6 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                     $scope.getProjectDetails();
                     $scope.getTasksList();
                     $scope.generateReport();
-
                     })
             $scope.toTitleCase = toTitleCase;
             $rootScope.title = "Project " + $scope.projId + " - Fearless";
@@ -1116,7 +1115,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                                 })
                             resp.watchers.forEach(function(e){resp.updatedWatchers.push(e)});
                             $scope.project = resp;
-                            $scope.project.filterTaskName = null;
+                            //$scope.project.filterTaskName = ;
                             $scope.projectBackup = resp;
                             if ($scope.$parent){
                                 $scope.$parent.comment_id = resp.uuid;
