@@ -68,7 +68,7 @@ for i in projects:
     i.plan()
 
 ongoing_tasks = session.query(Task).filter(or_(Task.gauge == 'on schedule', Task.gauge == 'ahead of schedule'))\
-    .order_by(desc(Task.complete)).all()
+    .filter(Task.complete<100).order_by(desc(Task.complete)).all()
 '''Behind schedule tasks:  Tasks that are not finished on time and are not completed yet'''
 behind_tasks = session.query(Task).filter_by(gauge='behind schedule')\
     .order_by(asc(Task.end)).all()
