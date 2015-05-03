@@ -90,6 +90,7 @@ def dailyTasksReportForClients():
 
     # print message
     # return
+    #to = ['hamid2177@gmail.com', 'alishahdad1353@yahoo.com']
     to = ['hamid2177@gmail.com']
     #to = ['farsheed.ashouri@gmail.com']
     subject = 'Studio Reports - Daily Tasks - %s' % jtoday
@@ -181,6 +182,7 @@ def dailyUserReportsToClients():
         .render(today=today, tasks=tasks, jtoday=jtoday, arrow=arrow, reports=result,
                 responsibility='leading')
     subject = 'Studio Daily Reports - %s' % jtoday
+    #emails =  ['hamid2177@gmail.com', 'alishahdad1353@yahoo.com']
     emails =  ['hamid2177@gmail.com']
     #emails =  ['farsheed.ashouri@gmail.com']
     sent = send_envelope.delay(emails, cc, bcc, subject, message)
