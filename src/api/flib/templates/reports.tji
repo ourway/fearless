@@ -12,10 +12,10 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
       % if subproject.end.strftime('%Y-%m-%d') != subproject.start.strftime('%Y-%m-%d'):
         end ${subproject.end.strftime('%Y-%m-%d')}
       % endif
-      hidetask isleaf()
+      #hidetask isleaf()
       sorttasks id.up # not 'tree' to really hide parent tasks
       loadunit days
-      columns name, start, end, gauge {title "status"}, pathcriticalness {title "Criticalness"}, duration {title "Duration Days"}, resources, complete {title "Progress"}
+      columns bsi, name, start, end, gauge {title "status"}, pathcriticalness {title "Criticalness"}, duration {title "Duration Days"}, complete {title "Progress"}
       taskroot fearless.__${subproject.id}
 
   }
