@@ -303,7 +303,7 @@ class Project(IDMixin, Base):
             import time
             s = time.time()
             tj = tj3(schedule_path, '--silent', '--no-color', '--add-trace',
-                     o=public_upload_folder, c='1')
+                     o=public_upload_folder, c='4')
             print 'Finished in %s seconds' % round(time.time() - s, 3)
         except Exception, e:
             print e
