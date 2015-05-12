@@ -43,7 +43,10 @@
    <div class="panel panel-default" id="" >
     <table class="table table-striped table-hover refresh-container pull-down">
         <tr ng-repeat="user in $parent.resources">
-            <td ng-class="{'info':user.id==currentUser}"><a href="#/ams?oid={{user.id}}">{{user.lastname}}</a></td>
+            <td ng-class="{'info':user.id==currentUser}">
+		<a ng-show="user.id!=$parent.userInfo.userid" href="#/ams?oid={{user.id}}">{{user.lastname}}</a>
+		<a style="" href="/app/#/profile" ng-show="user.id==$parent.userInfo.userid">You</a>
+	    </td>
         </tr>
     </table>
 </div>
