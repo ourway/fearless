@@ -45,7 +45,7 @@
         <tr ng-repeat="user in $parent.resources">
             <td ng-class="{'info':user.id==currentUser}">
 		<a ng-show="user.id!=$parent.userInfo.userid" href="#/ams?oid={{user.id}}">{{user.lastname}}</a>
-		<a style="" href="/app/#/profile" ng-show="user.id==$parent.userInfo.userid">You</a>
+		<a style="" href="/app/#/ams" ng-show="user.id==$parent.userInfo.userid">You</a>
 	    </td>
         </tr>
     </table>
