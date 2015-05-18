@@ -796,6 +796,11 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
         userTasksReq = $http.get('/api/db/user/'+userId+'?field=tasks&list=true');
             userTasksReq.success(function(tasks){
                 $scope.userTasks = tasks;
+		if (tasks.length){
+                	sum_task_progress = 0;
+			tasks.forEach(function(e){sum_task_progress+=e.complete});	
+			$scope.overall_task_progress = Math.round(sum_task_progress / tasks.length);
+		}
             });
 
         $scope.fileNameChanged = function(e){

@@ -3,15 +3,25 @@
             <h5>کارکرد {{$parent.persianDate(null, 1)}} ماه سال {{$parent.persianDate(null, 2)}} <b>{{user.persian_firstname}} {{user.persian_lastname}}</b> 
                 <span ng-if="user.departements">از دپارتمان IT</span> <span ng-if="user.job">با سمت {{user.job}}</span></h5>
             <h6>با سلام خدمت مدیریت مالی و تولید، گزارش کارکرد {{user.persian_firstname}} {{user.persian_lastname}} در ماه  {{$parent.persianDate(null, 1)}} به شرح زیر میباشد:</h6>
-        <div ng-if="userTasks.length!=0" >
+        <div ng-if="userTasks.length!=0">
             <table class="table table-responsive table-bordered" ng-if="userTasks">
-                <tr class="success"><td class="col-sm-1">ردیف</td><td>نام فعالیت</td><td>کد هزینه</td><td>پروژه</td></tr>
+                <tr class="success"><td class="col-sm-1">ردیف</td><td>نام فعالیت</td><td>درصد پیشرفت</td><td>وضعیت</td><td>کد هزینه</td><td>پروژه</td></tr>
                 <tr ng-repeat="task in userTasks track by $index">
                     <td>{{$index+1}}</td>
                     <td><a href="#pms/task/{{task.id}}">{{task.title}}</a></td>
+                    <td><b>{{task.complete}}<b/></td>
+                    <td><b ng-class="{'text-info':task.gauge=='on schedule', 'text-danger':task.gauge=='behind schedule'}">{{task.gauge}}<b/></td>
                     <td> </td>
                     <td><a href="#pms/{{task.project_id}}">{{task.project_id}}</a></td>
                 </tr>
+		<tr>
+		    <td></td>
+		    <td></td>
+		    <td><h4>{{overall_task_progress}}</h4></td>
+		    <td></td>
+		    <td></td>
+			
+		</tr>
             </table>
 
             <span ng-if="userTasks.length==0" style="color:darkred">هیچ فعالیتی در برنامه ماهانه ایشان وجود ندارد</span>
