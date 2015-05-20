@@ -601,6 +601,7 @@ class AddCollection:
 
             # if not os.path.isdir(newC.url):
             req.session.add(newC)
+            req.session.flush()
             resp.body = {'message': 'OK', 'info': {'uuid': _uid}}
             # else:
             #    resp.body = {'message':'ERROR', 'info':'Collection is available on server'}
@@ -629,7 +630,6 @@ class AssetCheckout:
         command3= 'checkout %s' % version
         arg1 = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(
             d=asset_folder, c=command1)
-	print arg1
         arg2 = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(
             d=asset_folder, c=command2)
         arg3 = 'git --git-dir="{d}/.git" --work-tree="{d}" {c}'.format(

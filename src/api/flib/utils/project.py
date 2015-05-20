@@ -145,6 +145,7 @@ class AddProject:
             new.repositories.append(new_repository)
             req.session.add(new)
             resp.status = falcon.HTTP_201
+            req.session.flush()
             resp.body = {'message': 'OK'}
 
         #project = session.query(Project).filter(Project.lead_id==user.get('id')).all()
