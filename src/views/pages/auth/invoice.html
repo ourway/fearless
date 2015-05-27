@@ -8,7 +8,7 @@
                 <tr class="success"><td class="col-sm-1">ردیف</td><td>نام فعالیت</td><td>درصد پیشرفت</td><td>وضعیت</td><td>کد هزینه</td><td>پروژه</td></tr>
                 <tr ng-repeat="task in userTasks track by $index">
                     <td>{{$index+1}}</td>
-                    <td><a href="#pms/task/{{task.id}}">{{task.title}}</a></td>
+                    <td><a href="#pms/t/{{task.id}}">{{task.title}}</a></td>
                     <td><b>{{task.complete}}<b/></td>
                     <td><b ng-class="{'text-info':task.gauge=='on schedule', 'text-danger':task.gauge=='behind schedule'}">{{task.gauge}}<b/></td>
                     <td> </td>

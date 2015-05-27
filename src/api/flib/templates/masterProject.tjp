@@ -36,6 +36,7 @@ project FEARLESS_MAIN_PROJECT "Fearless Main Project" ${mindate.strftime('%Y-%m-
     vacation "Martyrdom of Fatima" ${vy}-4-3
     vacation "Birthday of Imam Ali" ${vy}-5-13
     vacation "Prophet's Ascension" ${vy}-5-27
+    vacation "nime shaban" ${vy}-6-3
     vacation "Anniversary of Khomeini's Death" ${vy}-6-4
     vacation "Revolt of Khordad 15" ${vy}-6-5
     vacation "Imam Mahdi's birthday" ${vy}-7-13
