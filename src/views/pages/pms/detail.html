@@ -328,8 +328,8 @@ background-color: #FFEDA5;
                         type="button"><em class="fa fa-file-powerpoint-o"></em> </button>
                     <button ng-show="tasks.length>0" class="btn btn-info" ng-click="getCSV()" 
                         type="button"><em class="fa  fa-file-excel-o"></em> </button>
-                    <button ng-show="tasks.length>0" class="btn btn-info" ng-click="generateReport(mode)" 
-                        type="button"><em class="glyphicon glyphicon-repeat"></em> </button>
+                    <button ng-show="tasks.length>0" class="btn " ng-class="{'btn-info':!planning, 'btn-warning':planning}" ng-click="generateReport(mode)" 
+                        type="button"><em class="glyphicon" ng-class="{'glyphicon-repeat':!planning, 'glyphicon-dashboard':planning}"></em> </button>
 			</div>
 	</div>
 

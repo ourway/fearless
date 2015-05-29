@@ -521,15 +521,7 @@ function updateImageSize(img, maxWidth, maxHeight){
                         $scope.userInfo.logged_in = true;
                         try {
                             next_page = atob($routeParams.next);
-                            //console.log(next_page)
-                            if (next_page.split('/')[1] === 'api' || next_page === 'showtime' )
-                            {
-                                window.location = next_page;
-                            }
-                            else
-                            {
-                                $location.path(next_page);
-                            }
+                            $location.path(next_page);
                         }
                         catch(e){
                             $location.path( '/' ) ;
@@ -966,6 +958,11 @@ fearlessApp.controller('projectCtrl', function($scope, $rootScope, $http, $locat
 
 fearlessApp.controller('userAccessCtrl', function($scope, $rootScope, $routeParams, $http, $location, Restangular){
         $rootScope.title = "Members - Fearless";
+        if ($scope.$parent.userGroups.indexOf('admin')<0)
+            {
+                $location.path('/404')
+                return null;
+            }
         $scope.$parent.page = 'auth';
         $scope.getUsers = function(){
             $http.get('/api/db/user').success(function(resp){
@@ -1124,7 +1121,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                             $scope.projectBackup = resp;
                             if ($scope.$parent){
                                 $scope.$parent.comment_id = resp.uuid;
-                                //$scope.$parent.getComments();
+                                $scope.$parent.getComments();
                                 }
 
 
@@ -1161,8 +1158,10 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
 
             $('#canvasloader-container').fadeIn();
             projectReport = $http.get('/api/project/report/'+$scope.projId+'/plan');
+            $scope.planning = true;
             projectReport.success(function(resp){
                 $scope.msp = resp.msproject;
+                $scope.planning = false;
                 $scope.csv = resp.csvfile;
                 $scope.showCal();
                 $scope.prepareCal();
@@ -1258,9 +1257,7 @@ fearlessApp.controller('projectDetailCtrl', function($scope, $rootScope, $routeP
                 //if ($scope.mode == 'cal')
                 //    $scope.prepareCal();
             });
-        gettask.error(function(resp){
-                location.reload();
-                })
+
     }
 
     $scope.createNewSeq = function(){
@@ -2533,7 +2530,11 @@ fearlessApp.controller('assetsIndexCtrl',  function($scope, $rootScope, $routePa
 
 
 fearlessApp.controller('userReportsCtrl',  function($scope, $rootScope, $routeParams, $http, $location, Restangular, $timeout){
-
+        if ($scope.$parent.userGroups.indexOf('admin')<0)
+            {
+                $location.path('/404')
+                return null;
+            }
         $scope.marked = marked;
         getReports = $http.get('/api/userReports').success(function(resp){
                 $scope.reports = resp;

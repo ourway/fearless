@@ -92,7 +92,7 @@
 
                     </div>
 
-                    <div class="pull-right">
+                    <div class="pull-right" ng-show="!isMessageSelected()">
                         <span class="text-muted"><b>{{(itemsPerPage * currentPage) + 1}}</b>–<b>{{(itemsPerPage * currentPage) + pagedItems[currentPage].length}}</b> 
                             of <b>{{messages.items.length}}</b></span>
                         <div class="btn-group btn-group">

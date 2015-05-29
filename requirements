@@ -4,7 +4,7 @@ celery
 gevent
 wsaccel
 greenlet
-ftfy
+ftfy >= 4, < 5
 gevent-websocket
 ujson
 numpy

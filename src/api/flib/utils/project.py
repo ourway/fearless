@@ -356,9 +356,10 @@ class ListTasks:
         user = getUserInfoFromSession(req, resp)
         sole = req.get_param('sole')
         tasks = Task.query.join(Project).filter_by(id=projId)
-        if sole:
-            tasks = tasks.join(Task)\
-                .filter(or_(Task.resources.any(id=user.get('id')),
+        isWatcher = any(Project.query.filter_by(id=projId).\
+                        filter(Project.watchers.any(id=user.get('id'))).all())
+        if sole and not isWatcher:
+            tasks = tasks.filter(or_(Task.resources.any(id=user.get('id')),
                             Task.watchers.any(id=user.get('id')),
                             Task.responsibles.any(id=user.get('id')),
                             Task.project.has(lead_id=user.get('id'))
@@ -415,7 +416,7 @@ class GetTask:
                          {
                              'body':r.content,
                              'datetime':r.created_on,
-                             'reviewer': 
+                             'reviewer':
                              {
                                  'id':r.reviewer.id,
                                  'firstname':r.reviewer.firstname,
@@ -423,7 +424,7 @@ class GetTask:
                              },
                              'id':r.id
                          }
-                         
+
                          for r in task.reviews[::-1]],
                      'project': {'id': task.project.id, 'name': task.project.name, 'start': task.project.start, 'end': task.project.end}
                      }
