@@ -41,6 +41,7 @@
                 <a ng-show="person.id==$parent.userInfo.userid" style="color:grey" href="#/user/{{person.id}}"><strong>You</strong></a>
                 <small ng-if="$index!=task.resources.length-1">, </small>
             </small>
+	    <small ng-class="{'text-info':task.gauge=='on schedule', 'text-warning':task.gauge=='behind schedule', 'text-success':task.gauge=='ahead of schedule'}"> | {{task.complete}}% - {{task.gauge}}</small>
             <br/>
             <a class="taskDetailOptions glyphicon glyphicon-edit"
                  data-toggle="modal" data-target="#taskReviewModal"

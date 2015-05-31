@@ -29,7 +29,7 @@ taskreport breakdown_${subproject.id} "csv_${subproject.uuid}"{
       % endif
       loadunit hours
       #sorttasks plan.start.up # not 'tree' to really hide parent tasks
-      columns bsi, name, effort, chart { scale day width ${(subproject.end-subproject.start).days*20 + 20} }, complete {title "Progress"}
+      columns bsi, name, effort, duration, chart { scale day width ${(subproject.end-subproject.start).days*20 + 20} }, complete {title "Progress"}
       taskroot fearless.__${subproject.id}
   }
 % endif
