@@ -555,6 +555,8 @@ class CollectionInfo:
             data['collection_size'] = target.collection_size
             data['uuid'] = target.uuid
             data['owner_id'] = target.owner_id
+            data['created_on'] = target.created_on
+            data['modified_on'] = target.modified_on
             data['path'] = target.path
             data['description'] = target.description
             data['repository'] = {

@@ -2051,7 +2051,8 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
     if($scope.$parent)
         $scope.messages.resources = $scope.$parent.resources;
     messageService.messages = [];
-    $rootScope.title = 'Messages';
+    if ($routeParams.master=='true')
+    	$rootScope.title = 'Messages';
     $scope.unreadCount  = 0;
     $scope.messages.folder = $routeParams.folder || 'inbox';
 

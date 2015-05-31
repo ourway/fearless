@@ -116,7 +116,7 @@
                 </div>
 
 	    </div>
-            <h3>{{collection.name | uppercase}}</h3>
+            <h3>{{collection.name | uppercase}} <small class="text-info">updated {{$parent.prettyDate(collection.modified_on)}} ago</small></h3>
             <div class="col-md-2 col-lg-2 col-sm-2" 
                 ng-repeat="subcol in collection.children | filter:foptions.filterName track by $index  ">
 		<div class="thumbnail asm_thumb">

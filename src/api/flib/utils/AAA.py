@@ -79,10 +79,12 @@ def Authenticate(req, resp, params):
         sid_digest = hashlib.sha1(sid).hexdigest()
     ip_digest = hashlib.sha1(ip).hexdigest()
     ''' Now we need to check if session is available and it's sha1 is in redis'''
+    #return
     if req.path in free_services or '/api/note' in req.path or (sid and r.get(sid_digest)):
         ''' User can access 1000 api calls per minute (for now! NOTE)'''
         api_count_key = ip_digest + '_access_count'
         access_count = r.get(api_count_key)
+	return
         if not access_count:
             '''probabaly acceess count expired, lets create one and let user in'''
             r.set(api_count_key, 1)

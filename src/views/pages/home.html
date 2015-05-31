@@ -12,7 +12,7 @@
             
 			<ul class="nav nav-pills nav-stacked">
                             <li ng-class="{'active':unreadCount>0}" style="margin:5px;width:100%" ng-controller="inboxCtrl" ng-init="init(true)">
-                            <a href="#/messages"><em class="fa fa-envelope-o"></em> <span ng-show="unreadCount>0" class="badge pull-right">{{unreadCount}}</span>Inbox</a>
+                            <a href="#/messages?master=true"><em class="fa fa-envelope-o"></em> <span ng-show="unreadCount>0" class="badge pull-right">{{unreadCount}}</span>Inbox</a>
                 
                         </li>
                         <!--
