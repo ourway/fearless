@@ -42,12 +42,12 @@ http {
 
   # you generally want to serve static files with nginx since neither
   # Unicorn nor Rainbows! is optimized for it at the moment
-  sendfile off;
+  sendfile on;
 
   output_buffers 1 50m;
   directio 80m;
 
-  tcp_nopush off; # off may be better for *some* Comet/long-poll stuff
+  tcp_nopush on; # off may be better for *some* Comet/long-poll stuff
   tcp_nodelay on; # on may be better for some Comet/long-poll stuff
 
   # we haven't checked to see if Rack::Deflate on the app server is
