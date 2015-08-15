@@ -85,7 +85,7 @@
 
                     <tr ng-repeat="asset in userAssets | filter:assetOptions.userAssetsFilter.fullname track by $index">
                             <td class="hidden-xs">{{asset.id}}</td>
-                            <td><a href="#/ams/a/{{asset.id}}">{{asset.fullname.slice(0, 48)}}</a></td>
+                            <td><a href="#/ams/a/{{asset.id}}?version=v_{{asset.version}}">{{asset.fullname.slice(0, 48)}}</a></td>
                             <td class="hidden-xs">{{$parent.prettyDate(asset.created_on)}} ago</td>
                             <td >{{$parent.getReadableFileSizeString(asset.content_size)}}</td>
                     </tr>

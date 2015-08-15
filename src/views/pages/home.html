@@ -1,4 +1,8 @@
-    <div class="jumbotron" style="background: url(images/home-bg.jpg); background-position: 6px -223px; color: #fff;">
+<div class="jumbotron" style="
+    background: url(images/home-bg.jpg);
+    background-position: 6px -223px; color: #fff;
+    margin-top: -34px;
+    ">
       <div ng-cloak class="container">
           <h1>FEAR:LESS</h1>
           <p>{{message}}</p>
@@ -9,11 +13,11 @@
     <div class="container">
         <!-- Example row of columns -->
         <div class="col-md-2 column">
-            
+
 			<ul class="nav nav-pills nav-stacked">
                             <li ng-class="{'active':unreadCount>0}" style="margin:5px;width:100%" ng-controller="inboxCtrl" ng-init="init(true)">
                             <a href="#/messages?master=true"><em class="fa fa-envelope-o"></em> <span ng-show="unreadCount>0" class="badge pull-right">{{unreadCount}}</span>Inbox</a>
-                
+
                         </li>
                         <!--
 				<li class="active" style="margin:5px;width:100%">
@@ -42,7 +46,7 @@
                         <td>{{$index+1}}</td>
                         <td> <a href="#/pms/t/{{t.id}}">{{t.title}}</a> </td>
                         <td> <a href="#/pms/{{t.project.id}}">{{t.project.name}}</a> </td>
-                    
+
                 </tr>
             </table>
 				</div>
@@ -55,13 +59,13 @@
                     You have unfinished tasks!
                 </div>
 				<div class="panel-footer">
-                    <small ng-if="user.tasksForToday.length>0 && user.unfinishedTasks.length<1" 
+                    <small ng-if="user.tasksForToday.length>0 && user.unfinishedTasks.length<1"
                         style="color:grey">These are the task you work on them</small>
                     <small ng-if="user.tasksForToday.length>0 && user.unfinishedTasks.length>0"
                         style="color:darkorange">You have tasks you need to start doing today but also <b>unfinished tasks</b></small>
-                    <small ng-if="user.tasksForToday.length<1 && user.unfinishedTasks.length<1" 
+                    <small ng-if="user.tasksForToday.length<1 && user.unfinishedTasks.length<1"
                         style="color:green">Well, You are free for now!</small>
-                    <small ng-if="user.tasksForToday.length<1 && user.unfinishedTasks.length>0" 
+                    <small ng-if="user.tasksForToday.length<1 && user.unfinishedTasks.length>0"
                         style="color:darkorange">Well, You have unfinish jobs!</small>
 				</div>
 			</div>
@@ -85,7 +89,7 @@
                         <td>{{$index+1}}</td>
                         <td> <a href="#/pms/t/{{t.id}}">{{t.title}}</a> </td>
                         <td> <a href="#/pms/{{t.project.id}}">{{t.project.name}}</a> </td>
-                    
+
                 </tr>
             </table>
 				</div>

@@ -10,17 +10,17 @@
                             <div class="form-group">
                                 <label for="inputemail3" class="col-sm-4 control-label">new item name</label>
                                 <div class="col-sm-6">
-                                    <input type="text" class="form-control" 
+                                    <input type="text" class="form-control"
                                         placeholder="enter item name here ..." ng-model="newSubCollection.name" autofocus/>
                                 </div>
                             </div>
                         </form>
                     </div>
                     <div class="modal-footer">
-                            <button class="btn btn-default" ng-click="newSubCollection={}" 
+                            <button class="btn btn-default" ng-click="newSubCollection={}"
                             data-dismiss="modal">Close</button>
                             <button type="submit" ng-disabled="!newSubCollection.name"
-                                ng-click="createNewSubCollection()" 
+                                ng-click="createNewSubCollection()"
                                 class="btn btn-success">Add item to {{collection.name}}
                             </button>
                     </div>
@@ -44,7 +44,7 @@
                             <div class="form-group">
                                 <label for="inputemail3" class="col-sm-4 control-label">New ducument name</label>
                                 <div class="col-sm-6">
-                                    <input type="text" class="form-control" placeholder="enter new document name here ..." 
+                                    <input type="text" class="form-control" placeholder="enter new document name here ..."
                                     ng-model="newDocument.name" autofocus/>
                                 </div>
                             </div>
@@ -73,7 +73,7 @@
 	    <ul class="breadcrumb" style="min-height: 45px">
 		<li> <a href="#/pms">Projects</a> <span class="divider"></span> </li>
                 <li>
-                    <a href="#/pms/{{collection.project.id}}">{{collection.project.name}}</a> 
+                    <a href="#/pms/{{collection.project.id}}">{{collection.project.name}}</a>
                     <span class="divider"></span>
                 </li>
                 <li ng-if="collection.parent.parent.parent.parent">
@@ -85,19 +85,19 @@
                     <span class="divider"></span>
 	        </li>
                 <li ng-if="collection.parent.parent">
-                    <a href="#/ams/c/{{collection.parent.parent.id}}?page=1">{{collection.parent.parent.name}}</a> 
+                    <a href="#/ams/c/{{collection.parent.parent.id}}?page=1">{{collection.parent.parent.name}}</a>
                     <span class="divider"></span>
 		</li>
                 <li ng-if="collection.parent">
-                    <a href="#/ams/c/{{collection.parent.id}}?page=1">{{collection.parent.name}}</a> 
+                    <a href="#/ams/c/{{collection.parent.id}}?page=1">{{collection.parent.name}}</a>
                     <span class="divider"></span>
 		</li>
 	        <li class="active">
 		    {{collection.name}}
                 </li>
                 <span class="pull-right" ng-show="$parent.isAdmin || collection.owner_id==$parent.userInfo.userid">
-                    <button id="collectionDeleteButton" class="btn btn-default btn-sm" 
-                        ng-click="deleteCollection()" type="button"> 
+                    <button id="collectionDeleteButton" class="btn btn-default btn-sm"
+                        ng-click="deleteCollection()" type="button">
                         <em class="glyphicon glyphicon-trash"></em>
                     </button>
                 </span>
@@ -106,7 +106,7 @@
 
             <div class="col-md-12" >
 	    <div class="btn-group" ng-show="collection.container || $parent.isAdmin">
-                <button id="collectionAddButton" class="btn btn-success btn-sm" type="button" 
+                <button id="collectionAddButton" class="btn btn-success btn-sm" type="button"
                     data-toggle="modal" data-target="#collectionAddModal">
                     <em class="glyphicon glyphicon-plus"></em>
                     <em class="glyphicon glyphicon-folder-open"></em>
@@ -117,24 +117,24 @@
 
 	    </div>
             <h3>{{collection.name | uppercase}} <small class="text-info">updated {{$parent.prettyDate(collection.modified_on)}} ago</small></h3>
-            <div class="col-md-2 col-lg-2 col-sm-2" 
+            <div class="col-md-2 col-lg-2 col-sm-2"
                 ng-repeat="subcol in collection.children | filter:foptions.filterName track by $index  ">
 		<div class="thumbnail asm_thumb">
-                    <a href="#ams/c/{{subcol.id}}?page=1" title="{{subcol.description}}"><img class="asm_col_thumb_img" 
+                    <a href="#ams/c/{{subcol.id}}?page=1" title="{{subcol.description}}"><img class="asm_col_thumb_img"
                         alt="150x100" width="150" height="150" ng-src="/static/{{collection.repository.name}}/{{subcol.path}}/thumb.png" /></a>
                     <div class="caption">
 			<ul class="nav nav-pills nav-stacked">
                             <li class="active" style="" ng-controller="inboxCtrl" ng-init="init()">
-                            <a href="#ams/c/{{subcol.id}}?page=1"><span 
-                                    ng-show="subcol.children.length" class="badge pull-right" 
-                                    style="color:#fff;background:grey">{{subcol.children.length}}</span><span 
+                            <a href="#ams/c/{{subcol.id}}?page=1"><span
+                                    ng-show="subcol.children.length" class="badge pull-right"
+                                    style="color:#fff;background:grey">{{subcol.children.length}}</span><span
                                     class="badge pull-right">{{subcol.number_of_assets}}</span> </strong></span><strong>{{subcol.name.substring(0,20)}}</strong></a>
                             </li>
 			</ul>
                         <p>
                         <table>
                             <tr>
-                                <td ng-if="subcol.children.length"><span 
+                                <td ng-if="subcol.children.length"><span
                                     class="text-info sm">{{$parent.getReadableFileSizeString(subcol.collection_size)}}</span></td>
                             </tr>
                         </table>
@@ -162,7 +162,7 @@
 
         <div class="col-md-12" >
             <div>
-                <h3 ng-show="collection.assets.length>0">Assets 
+                <h3 ng-show="collection.assets.length>0">Assets
                     <small>{{collection.assets_count}} files
                         <span ng-if="collection.collection_size">
                             [ {{$parent.getReadableFileSizeString(collection.collection_size)}} ]</span>
@@ -172,12 +172,12 @@
                                     {{ (collection.page-1)*20+collection.assets.length}}</b>
                             </span>
                             <div class="btn-group btn-group">
-                                <button type="button" class="btn btn-default btn-sm" 
-                                    ng-class="{disabled: collection.page == 1}" 
+                                <button type="button" class="btn btn-default btn-sm"
+                                    ng-class="{disabled: collection.page == 1}"
                                     ng-click="prevPage()">
                                     <em class="glyphicon glyphicon-chevron-left"></em>
                                 </button>
-                                <button type="button" class="btn btn-default btn-sm" 
+                                <button type="button" class="btn btn-default btn-sm"
                                     ng-class="{disabled: collection.page >= collection.assets_count/20}"
                                     ng-click="nextPage()">
                                     <em class="glyphicon glyphicon-chevron-right"></em>
@@ -188,22 +188,22 @@
                 </h3>
                 <div class="form-group" >
                     <div class="col-md-6" ng-show="collection.assets.length>0">
-                        <input type="text" class="form-control" placeholder="Search for {{collection.name}} Assets here" 
+                        <input type="text" class="form-control" placeholder="Search for {{collection.name}} Assets here"
                             ng-model="collection.CollectionAssetFilter" />
                     </div>
                     <div class="form-group hidden-sm hidden-xs col-md-4" ng-show="collection.assets.length>0">
                         <label class="checkbox-inline" ng-init="initToggle();">
-                            <input id="toggle-thmb" type="checkbox" 
+                            <input id="toggle-thmb" type="checkbox"
                             ng-checked="thumbnails" ng-click="toggleThumbnail()" data-toggle="toggle"> Thumbnails
                         </label>
                     </div>
 
                     <div class="col-md-2 btn-group btn-group" ng-show="">
-                        <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: collection.page == 1}" 
+                        <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: collection.page == 1}"
                             ng-click="getCollectionDetails(collection.page-2)">
                             <em class="glyphicon glyphicon-chevron-left"></em>
                         </button>
-                        <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: collection.page >= collection.assets_count/20}" 
+                        <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: collection.page >= collection.assets_count/20}"
                             ng-click="getCollectionDetails(collection.page)">
                             <em class="glyphicon glyphicon-chevron-right"></em>
                         </button>
@@ -223,15 +223,16 @@
                             <td class="hidden-xs" style="vertical-align: middle;" >{{asset.id}}</td>
                             <td ng-if="thumbnails && !asset.thumbnail" class="hidden-xs"  style="vertical-align: middle;">
                             <img class="thumbnail" ng-src="/app/images/file.png" />
-                            
+
                             </td>
                             <td ng-if="thumbnails && asset.thumbnail" class="hidden-xs"  style="vertical-align: middle;">
-                                <a href="/static/{{asset.poster}}" data-gallery="collectionLinks"><img class="thumbnail" 
+                                <a href="/static/{{asset.poster}}" data-gallery="collectionLinks"><img class="thumbnail"
                                     ng-src="/static/{{asset.thumbnail}}" /></a>
                             </td>
 
                             <td style="vertical-align: middle;">
-                                <a href="#/ams/a/{{asset.id}}?uuid={{asset.uuid}}&version=v_{{asset.version}}">{{asset.fullname}}</strong></a></td>
+                                <a href="/static/{{asset.url}}"><i class="fa fa-download fa-2x"></i></a>
+                                <a href="#/ams/a/{{asset.id}}?version=v_{{asset.version}}">{{asset.fullname}}</strong></a></td>
                             <td  style="vertical-align: middle;">
                                 <span> {{$parent.getReadableFileSizeString(asset.content_size)}} </span>
                             </td>
@@ -246,15 +247,15 @@
         </div>
     <div class="col-md-3">
         <div ng-controller="taggerCtrl" class="">
-            <input type="search" id="tagSearchInput"  class="typeahead form-control" 
+            <input type="search" id="tagSearchInput"  class="typeahead form-control"
                 options="tagOptions" datasets="completeData" placeholder="Tag this collection"
                 ng-model="tags.userTagFilter" ng-keyup="$event.keyCode == 13 ? addTag('collection', $parent.collection) : null" sf-typeahead>
 	    <div class="">
                 <br/>
                 <ul class="nav nav-pills nav-stacked" style="margin-left: -15px;">
                     <li ng-repeat="tag in $parent.collection.tgs track by $index">
-                    <a style="word-break: break-all;padding:2px" ><em class="fa fa-tag"></em> <span ng-show="true" 
-                            style="cursor:pointer" ng-click="$parent.collection.tgs.splice($index, 1);addTag('collection', $parent.collection)" 
+                    <a style="word-break: break-all;padding:2px" ><em class="fa fa-tag"></em> <span ng-show="true"
+                            style="cursor:pointer" ng-click="$parent.collection.tgs.splice($index, 1);addTag('collection', $parent.collection)"
                             class="pull-right fa fa-remove"> </span>{{tag.name}}</a>
                     </li>
                 </ul>
