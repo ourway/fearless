@@ -24,25 +24,22 @@ import time
 import csv
 from collections import defaultdict
 import base64
+import re
 import uuid
 import socket, struct, fcntl
 from flib.opensource.contenttype import contenttype
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sockfd = sock.fileno()
-SIOCGIFADDR = 0x8915
+#sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#sockfd = sock.fileno()
+#SIOCGIFADDR = 0x8915
 
 
-def get_ip(iface = 'eth1'):
-    ifreq = struct.pack('16sH14s', iface, socket.AF_INET, '\x00'*14)
-    try:
-        res = fcntl.ioctl(sockfd, SIOCGIFADDR, ifreq)
-    except:
-        return get_ip(iface = 'eth0')
-    ip = struct.unpack('16sH2x4s8x', res)[2]
-    data = socket.inet_ntoa(ip)
-    return data
-
+def get_ip(req):
+    pat = re.compile(r'[\w:]//+([\d.]+)\/')
+    referer = req.env.get('HTTP_REFERER')
+    res = re.findall(pat, referer)
+    if res:
+        return res[-1]
 
 
 def Commit():

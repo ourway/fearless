@@ -101,11 +101,13 @@ def remove_asset(name):
 
 
 @Capp.task
-def send_envelope(to, cc, bcc, subject, message, attach=None):
+def send_envelope(to, cc, bcc, subject, message, reply_to=None, attach=None):
 
     _et = os.path.join(templates_folder, 'email.html')
     ET = Template(filename=_et)
     M = ET.render(message=message, subject=subject)
+    if not reply_to:
+        reply_to='farsheed.ashouri@gmail.com'
     envelope = Envelope(
         from_addr=(u'farsheed.ashouri@gmail.com',
                    u'Fearless Notifications'),
@@ -113,7 +115,8 @@ def send_envelope(to, cc, bcc, subject, message, attach=None):
         cc_addr=cc,
         bcc_addr=bcc,
         subject=subject,
-        html_body=M
+        html_body=M,
+        headers = {'Reply-To': reply_to}
     )
     #envelope.add_attachment('/home/farsheed/Desktop/guntt.html', mimetype="text/html")
 

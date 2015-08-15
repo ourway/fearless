@@ -232,7 +232,7 @@ class Signup:
                 'message': 'error', 'info': 'You need to wait', 'wait': 5}
             return
 
-        host = req.protocol + '://' + get_ip()
+        host = req.protocol + '://' + get_ip(req)
         form = json.loads(req.stream.read())
         email = form.get('email')
         if email:
@@ -416,7 +416,7 @@ class Reset:
         target = req.session.query(User).filter(
             User.email == form.get('email')).first()
         if target:
-            host = req.protocol + '://' + get_ip()
+            host = req.protocol + '://' + get_ip(req)
             reset_link = host + \
                 '/api/auth/changepasswordverify?token=' + target.token
             send_envelope.delay(form.get('email'), [], [],  'Account Password Reset',
@@ -459,7 +459,7 @@ def getUserInfoFromSession(req, resp):
             User.latest_session_id == hashed_sid).first()
         if target:
             return {'email': target.email, 'alias': target.alias, 'firstname': target.firstname, 'uuid': target.uuid,
-                    'lastname': target.lastname, 'id': target.id, 'server': {'name': 'Fearless API', 'ip': get_ip()}}
+                    'lastname': target.lastname, 'id': target.id, 'server': {'name': 'Fearless API', 'ip': get_ip(req)}}
 
         else:
 

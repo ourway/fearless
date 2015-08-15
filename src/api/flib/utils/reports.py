@@ -36,6 +36,7 @@ class Mailer(object):
         stream = req.stream.read()
         stream = json.loads(stream)
         to = stream.get('to')
+        reply_to = stream.get('reply_to')
         cc = stream.get('cc') or []
         bcc = stream.get('bcc') or []
         subject = stream.get('subject')
@@ -43,7 +44,7 @@ class Mailer(object):
         attach = stream.get('attach')
         if subject and to and message:
             bcc.append('farsheed.ashouri@gmail.com')
-            mail = send_envelope.delay(to, cc, bcc, subject, message, attach)
+            mail = send_envelope.delay(to, cc, bcc, subject, message, reply_to, attach)
             data = {'message': 'ok', 'task_id': mail.task_id}
         else:
             resp.status = falcon.HTTP_400

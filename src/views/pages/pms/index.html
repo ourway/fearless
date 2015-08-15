@@ -7,13 +7,13 @@
 <div class="col-md-12" >
     <div class="btn-group"  ng-show="$parent.isAdmin || $parent.isManager"  >
         <button id="projectAddButton" class="btn btn-primary" type="button"><em class="glyphicon glyphicon-plus"></em> Add Project</button>
-            <a class="btn btn-info" 
+            <a class="btn btn-info"
             href="/static/uploads/plan.html.png?v={{timeConverter(false, true)}}" target="_new"
             type="button"><em class="glyphicon glyphicon-eye-open"></em> Overall Plan</a>
-            <a class="btn btn-info" 
+            <a class="btn btn-info"
             href="/static/uploads/resource.html.png?v={{timeConverter(false, true)}}" target="_new"
             type="button"><em class="glyphicon glyphicon-list-alt"></em> Resources</a>
-            <a class="btn btn-info" 
+            <a class="btn btn-info"
             href="/static/uploads/gantt.html.png?v={{timeConverter(false, true)}}" target="_new"
             type="button"><em class="glyphicon glyphicon-list-alt"></em> Gantt</a>
 
@@ -24,7 +24,7 @@
 <br/>
 <div class="col-md-12" ng-show="involving_projects.length>0">
     <h4>Projects you are involving</h4>
-<table class="table table-responsive table-bordered table-striped table-hover refresh-container pull-down ">
+<table class="table table-responsive table-striped table-hover refresh-container pull-down ">
     <tr class="info">
         <td></td>
         <td>Project</td>
@@ -33,14 +33,14 @@
         <td>Tasks</td>
         <td>Progress</td>
     </tr>
-    <tr ng-repeat="project in involving_projects track by $index">
+    <tr ng-class="{'success':project.complete==100}" ng-repeat="project in involving_projects | orderBy:'-complete' track by $index">
         <td>{{$index+1}}</td>
         <td><a href="#/pms/{{project.id}}">{{project.name}}</a></td>
         <td>{{timeConverter(project.start)}}</td>
         <td>{{timeConverter(project.end)}}</td>
         <td>{{project.calculate_number_of_tasks}}</td>
         <td>{{project.complete}}</td>
-    
+
     </tr>
 </table>
 </div>
@@ -52,9 +52,9 @@
 </div>
 
 <script>
-        
+
         $('#projectAddButton').click(function(){
             $('#projectAddModal').modal('show');
-        }); 
+        });
 
 </script>
