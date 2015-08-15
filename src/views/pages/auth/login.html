@@ -1,8 +1,12 @@
 
 
     <div class="container">
+
+        <div class="col-md-8">
       <form class="form-signin" role="form"  enctype="multipart/form-data">
-        <h3 class="form-signin-heading"><strong>SIGN IN</strong></h3><small class="glyphicon glyphicon-cloud"></small> <small> Centeral Authentication System</small><hr/>
+          <h3 class="form-signin-heading">
+              <i class="fa fa-expeditedssl fa-3x"></i>
+              <strong>SIGN IN</strong></h3><small class="glyphicon glyphicon-cloud"></small> <small> Centeral Authentication System</small><hr/>
 
   <div ng-show="AuthRespMessage" class="alert alert-dismissable"
        ng-class="{'alert-warning':AuthRespMessage!='error', 'alert-danger':AuthRespMessage=='error'}">
@@ -13,7 +17,7 @@
 
         <input type="email" class="form-control" placeholder="Email address" ng-model="loginInfo.email" autocomplete="on" required autofocus>
         <input type="password" class="form-control" placeholder="Password" ng-model="loginInfo.password"  required>
-        
+
         <span class="text-info">Your login session will be expired in 24 hours</span>
         <br/>
         <br/>
@@ -34,6 +38,15 @@
           </table>
       </form>
 
+  </div> <!-- /div -->
+
+        <div class="col-md-2">
+            <br/>
+            <br/>
+            <a href="http://www.pooyamehr.com" target="_new"><img width="256" height="128" src="/app/images/pooyamehr.png" /></a>
+        </div>
+        <div class="col-md-2">
+        </div>
     </div> <!-- /container -->
 
 
