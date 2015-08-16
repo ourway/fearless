@@ -1,10 +1,11 @@
 Hello and good morning ${recipient},  here is a daily tasks report for ${jtoday} (${today}) for projects that your are ${responsibility}:
 <br/>
+<h4 style="color:orange">NEW: Now you can click on resource names to email them directly!<h4>
 <br/>
 % if ongoing_tasks:
     <div id="fearless_report_ongoing_tasks_div" style="border-radius:5px;border:1px solid #f2f2f2;padding:10px;background:#fafafa">
     <h3>On Schedule tasks:</h3>
-        <table style="border:1px solid #ccc;" >
+        <table style="width:100% !important;border:1px solid #ccc;" >
             <tr style="background:#6EA4B5;color:white">
                 <th>No</th>
                 <th>project</th>
@@ -28,23 +29,37 @@ Hello and good morning ${recipient},  here is a daily tasks report for ${jtoday}
                 ">
                     <td style="background:#6EA4B5;color:white">${ongoing_tasks.index(task)+1}</td>
                     <td style="background:#6EA4B5;color:white">
-                        <span>${task.project.name[:20]}</span><br/>
-                            <small style="color:lightgrey">${task.project.complete}% completed</small>
+                        <h4 align="center" style="text-align:center">${task.project.name[:20]}</h4><br/>
+                            <h3 align"center" style="text-align:center;color:lightgrey">${task.project.complete}%</h3>
                     </td>
-                    <td >
-                        <span>${task.title}</span><br/>
-                        <div style="background:#FFF4CA;padding:5px;border:1px solid #ccc;">
-                            % for rev in task.reviews:
-                                <small style="color:#555">${rev.reviewer.lastname.title()}: ${rev.content}</small>
-                            <br/>
-                        % endfor
+                    <td style="width:50%;" >
+                        <h3 align="center" style="text-align:center">${task.title}</h3><br/>
+                        % if task.reviews:
+                            <hr/>
+                            <div style="background:#FFF4CA;padding:5px;border:1px solid #ccc;">
+                                % for rev in task.reviews[::-1]:
+                                    <div style="background:#f2f2f2;padding:2px;border:1px solid #ccc";>
+                                        <small
+                                            style="color:#555">
+                                            <a
+                                                href="mailto:${rev.reviewer.email}?subject=About your review on task *${task.title}*&body=Hi ${rev.reviewer.firstname.title()}, "
+
+                                                ><b>${rev.reviewer.lastname.title()}</b></a>
+                                            <small>${arrow.get(rev.created_on).humanize()}</small></small>
+                                        <p><small>${rev.content}</small></p>
+                                    </div>
+                                    <hr/>
+                                % endfor
                         </div>
+                        % endif
                     </td>
-                    <td ><strong>${task.complete}%</strong></td>
+                    <td ><h4 style="text-align:center;"><strong>${task.complete}%</strong></h4></td>
                     <td><table>
                             % for resource in task.resources:
                                 <tr stlye="border-bottom:1px solid #F4ECD8">
-                                    <td style="background:#5bc0de;color:white"><small>${resource.firstname} ${resource.lastname}</small></td>
+                                    <td style="background:#5bc0de;color:white">
+    <a align="center" style="color:white;text-align:center"
+            href="mailto:${resource.email}?subject=Task *${task.title}*&body=Hi ${resource.firstname.title()}, "><small>${resource.firstname} ${resource.lastname}</small></a></td>
                                 </tr>
                             % endfor
                     </table></td>
@@ -117,5 +132,12 @@ Hello and good morning ${recipient},  here is a daily tasks report for ${jtoday}
 <h4 style="color:darkgreen">Congrats! You have not any unfinished tasks for ${responsibility}</h4>
 % endif
 
+<hr/>
+<div style="background:#D2C4E0;padding:5px">
+<h3>Your gift quote:</h3>
+    <p> <q> ${quote.get('body')} </q> </p>
+    <small>${quote.get('source')}</small>
+</div>
+<hr/>
 
 

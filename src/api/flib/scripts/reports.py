@@ -34,9 +34,13 @@ from sqlalchemy import desc, asc
 from calverter import Calverter
 cal = Calverter()
 import misaka
+import ujson
 
 
 templates_folder = os.path.join(os.path.dirname(__file__), '../templates')
+quotes_file = open(os.path.join(templates_folder, 'quotes.json'))
+quotes = ujson.load(quotes_file)
+from random import choice
 
 
 cc = []
@@ -86,6 +90,7 @@ def dailyTasksReportForClients():
     '''generate an email report of all tasks and send it to users and managers'''
     message =  getTemplate('email_daily_tasks_for_clients.html')\
         .render(ongoing_tasks=ongoing_tasks, behind_tasks=behind_tasks, today=today,
+                quote=choice(quotes),
                 jtoday=jtoday, arrow=arrow, recipient='product owner', responsibility='managing')
 
     # print message
@@ -120,7 +125,7 @@ def dailyTasksReportForProjectLeads():
         message =  getTemplate('email_daily_tasks_for_clients.html')\
             .render(ongoing_tasks=target_ongoing_tasks, behind_tasks=target_behind_tasks,
                     today=today, jtoday=jtoday, arrow=arrow, recipient=target.firstname,
-                    responsibility='leading')
+                    quote=choice(quotes), responsibility='leading')
 
         sent = send_envelope.delay(to, cc, bcc, subject, message)
         print 'Report sent to %s' % target.email
@@ -149,7 +154,7 @@ def dailyTaskCardForResources():
         message =  getTemplate('email_daily_tasks_for_clients.html')\
             .render(ongoing_tasks=target_ongoing_tasks, behind_tasks=target_behind_tasks,
                     today=today, jtoday=jtoday, arrow=arrow, recipient=target.firstname,
-                    responsibility='contributing to')
+                    quote=choice(quotes), responsibility='contributing to')
 
         sent = send_envelope.delay(to, cc, bcc, subject, message)
         print 'Report sent to %s' % target.email
@@ -180,7 +185,7 @@ def dailyUserReportsToClients():
     tasks = []
     message =  getTemplate('email_daily_user_reports_for_clients.html')\
         .render(today=today, tasks=tasks, jtoday=jtoday, arrow=arrow, reports=result,
-                responsibility='leading')
+                quote=choice(quotes), responsibility='leading')
     subject = 'Studio Daily Reports - %s' % jtoday
     #emails =  ['hamid2177@gmail.com', 'alishahdad1353@yahoo.com']
     emails =  ['hamid2177@gmail.com']
