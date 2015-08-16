@@ -33,7 +33,7 @@ Hello and good morning ${recipient},  here is a daily tasks report for ${jtoday}
                             <h3 align"center" style="text-align:center;color:lightgrey">${task.project.complete}%</h3>
                     </td>
                     <td style="width:50%;" >
-                        <h3 align="center" style="text-align:center">${task.title}</h3><br/>
+                        <h4 align="center" style="text-align:center">${task.title}</h4><br/>
                         % if task.reviews:
                             <hr/>
                             <div style="background:#FFF4CA;padding:5px;border:1px solid #ccc;">
@@ -46,7 +46,7 @@ Hello and good morning ${recipient},  here is a daily tasks report for ${jtoday}
 
                                                 ><b>${rev.reviewer.lastname.title()}</b></a>
                                             <small>${arrow.get(rev.created_on).humanize()}</small></small>
-                                        <p><small>${rev.content}</small></p>
+                                        <small>${rev.content}</small>
                                     </div>
                                     <hr/>
                                 % endfor
@@ -100,22 +100,41 @@ Hello and good morning ${recipient},  here is a daily tasks report for ${jtoday}
                         <span>${task.project.name}</span><br/>
                             <small style="color:lightgrey">${task.project.complete}% completed</small>
                     </td>
-                    <td >
-                        <span>${task.title}</span><br/>
-                        <div style="background:#FFF4CA;padding:5px;border:1px solid F4ECD8;">
-                            % for rev in task.reviews:
-                                <small style="color:#555">${rev.reviewer.lastname.title()}: ${rev.content}</small>
-                            <br/>
-                        % endfor
+
+                    <td style="width:50%;" >
+                        <h4 align="center" style="text-align:center">${task.title}</h4><br/>
+                        % if task.reviews:
+                            <hr/>
+                            <div style="background:#FFF4CA;padding:5px;border:1px solid #ccc;">
+                                % for rev in task.reviews[::-1]:
+                                    <div style="background:#f2f2f2;padding:2px;border:1px solid #ccc";>
+                                        <small
+                                            style="color:#555">
+                                            <a
+                                                href="mailto:${rev.reviewer.email}?subject=About your review on task *${task.title}*&body=Hi ${rev.reviewer.firstname.title()}, "
+
+                                                ><b>${rev.reviewer.lastname.title()}</b></a>
+                                            <small>${arrow.get(rev.created_on).humanize()}</small></small>
+                                        <small>${rev.content}</small>
+                                    </div>
+                                    <hr/>
+                                % endfor
                         </div>
+                        % endif
                     </td>
+ 
+
                     <td ><strong>${task.complete}%</strong></td>
                     <td ><strong>${arrow.get(task.end).humanize()}</strong></td>
                     <td><table>
                             % for resource in task.resources:
-                                <tr stlye="border-bottom:1px solid #ccc">
-                                    <td style="background:#5bc0de;color:white"><small>${resource.firstname} ${resource.lastname}</small></td>
+
+                                <tr stlye="border-bottom:1px solid #F4ECD8">
+                                    <td style="background:#5bc0de;color:white">
+    <a align="center" style="color:white;text-align:center"
+            href="mailto:${resource.email}?subject=Task *${task.title}*&body=Hi ${resource.firstname.title()}, "><small>${resource.firstname} ${resource.lastname}</small></a></td>
                                 </tr>
+ 
                             % endfor
                     </table></td>
                 </tr>

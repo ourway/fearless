@@ -37,9 +37,10 @@ from flib.opensource.contenttype import contenttype
 def get_ip(req):
     pat = re.compile(r'[\w:]//+([\d.]+)\/')
     referer = req.env.get('HTTP_REFERER')
-    res = re.findall(pat, referer)
-    if res:
-        return res[-1]
+    if referer:
+    	res = re.findall(pat, referer)
+    	if res:
+            return res[-1]
 
 
 def Commit():
