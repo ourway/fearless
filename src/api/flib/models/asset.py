@@ -15,7 +15,7 @@ Clean code is much better than Cleaner comments!
 import os
 import shutil
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey, Table, \
-    Float, Boolean, event
+    Float, Boolean, event, BigInteger
 
 from sqlalchemy_utils import PasswordType, aggregated
 from sqlalchemy.orm import relationship, backref  # for relationships
@@ -86,7 +86,7 @@ class Asset(IDMixin, Base):
     ext = Column(String(32))
     content_type = Column(String(64))
     version = Column(Integer, default=1)  # asset versioning
-    content_size = Column(Integer)  # asset size
+    content_size = Column(BigInteger)  # asset size
     task_id = Column(String(64))  # celery post processing task id
     ready = Column(Boolean, default=False)  # post processing
     period = relationship("Date", uselist=False)

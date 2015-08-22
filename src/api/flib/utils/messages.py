@@ -137,7 +137,7 @@ class SetMessage:
             },
                 'read': False,
                 'attachments': [],
-                'body_s': message.get('body'),
+                'body_s': message.get('body').replace('\n', '\n\n'),
                 'subject_s': message.get('subject'),
                 'folder': 'sent',
                 'stared': False,

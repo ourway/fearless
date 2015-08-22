@@ -2105,11 +2105,14 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
         }
 
         if ($scope.replyMode || $scope.forwardMode)
+	{
+	    $scope.newMessage.body = $scope.newMessage.body.replace('\n', '\n\n');
             $scope.newMessage.body += ('\n _____ \n\n <sup> Authored on '
                     + new Date($scope.selected.datetime * 1000).toString()
                     + ' by '+$scope.selected.from_s.firstname_s
                     + ' ' + $scope.selected.from_s.lastname_s +'</sub> \n >'
                     + $scope.selected.body_s);
+	}
         req = $http.post('/api/messages/set', $scope.newMessage);
         req.success(function(resp){
                 if ($scope.newMessage.to)
