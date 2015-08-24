@@ -1,8 +1,8 @@
         <div id="invoice_print_area" ng-if="($parent.isAdmin || $parent.userInfo.userid == user.id) && user.monthly_present_hours">
         <div id="invoice" class="col-md-8 column farsi" style="direction:rtl;text-align:right">
-            <h5>کارکرد {{$parent.persianDate(null, 1)}} ماه سال {{$parent.persianDate(null, 2)}} <b>{{user.persian_firstname}} {{user.persian_lastname}}</b> 
+            <h5>کارکرد مرداد ماه سال {{$parent.persianDate(null, 2)}} <b>{{user.persian_firstname}} {{user.persian_lastname}}</b> 
                 <span ng-if="user.departements">از دپارتمان IT</span> <span ng-if="user.job">با سمت {{user.job}}</span></h5>
-            <h6>با سلام خدمت مدیریت مالی و تولید، گزارش کارکرد {{user.persian_firstname}} {{user.persian_lastname}} در ماه  {{$parent.persianDate(null, 1)}} به شرح زیر میباشد:</h6>
+            <h6>با سلام خدمت مدیریت مالی و تولید، گزارش کارکرد {{user.persian_firstname}} {{user.persian_lastname}} در ماه مرداد به شرح زیر میباشد:</h6>
         <div ng-if="userTasks.length!=0">
             <table class="table table-responsive table-bordered" ng-if="userTasks">
                 <tr class="success"><td class="col-sm-1">ردیف</td><td>نام فعالیت</td><td>درصد پیشرفت</td><td>وضعیت</td><td>کد هزینه</td><td>پروژه</td></tr>
