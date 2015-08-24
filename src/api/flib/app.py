@@ -48,7 +48,7 @@ from flib.utils.AAA import Login, Signup, Authenticate,\
 from flib.utils.showtime import GetUserShows
 from flib.utils.project import GetProjectDetails, GetProjectLatestReport, \
     ListProjects, AddProject, AddTask, ListTasks, GetTask, UpdateTask, \
-    DeleteTask, UpdateProject, UserTasksCard, TaskReview
+    DeleteTask, UpdateProject, UserTasksCard, TaskReview, monthlyTasks
 
 from flib.utils.sequence import AddSequence
 
@@ -461,6 +461,8 @@ app.add_route('/api/setTags/asset/{key}', UpdateAssetTags())
 app.add_route('/api/setTags/collection/{key}', UpdateCollectionTags())
 app.add_route('/api/setTags/project/{key}', UpdateProjectTags())
 app.add_route('/api/userReports', UserReports())
+app.add_route('/api/monthlyTasks/{userId}', monthlyTasks())
+
 app.add_route('/api/test_upload', TestUpload())
 
 

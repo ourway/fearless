@@ -785,7 +785,7 @@ fearlessApp.controller('profileCtrl', function($scope, $rootScope, $http, $locat
                 console.log(a, b, c, d);
             });
 
-        userTasksReq = $http.get('/api/db/user/'+userId+'?field=tasks&list=true');
+        userTasksReq = $http.get('/api/monthlyTasks/'+userId);
             userTasksReq.success(function(tasks){
                 $scope.userTasks = tasks;
 		if (tasks.length){

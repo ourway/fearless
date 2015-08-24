@@ -564,3 +564,14 @@ class TaskReview:
             }
             for i in task.reviews
         ]
+
+
+class monthlyTasks:
+    def on_get(self, req, resp, userId):
+	now = datetime.datetime.now()
+	aMonth = datetime.timedelta(30)
+	ed = datetime.datetime(now.year, now.month, 15)
+	sd = ed - aMonth
+	
+	tasks = Task.query.filter(Task.resources.any(User.id == userId)).filter(Task.end<ed).filter(Task.start>sd).all()
+	resp.body = tasks
