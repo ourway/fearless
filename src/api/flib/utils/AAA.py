@@ -451,8 +451,9 @@ class Logout:
             resp.body = r.delete(hashed_sid)
 
 
-def getUserInfoFromSession(req, resp):
-    sid = req.cookie('session-id')
+def getUserInfoFromSession(req, resp, sid=None):
+    if not sid:
+         sid = req.cookie('session-id')
     if sid:
         hashed_sid = hashlib.sha1(sid).hexdigest()
         target = req.session.query(User).filter(

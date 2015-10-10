@@ -147,7 +147,7 @@ class Asset(IDMixin, Base):
         from flib.tasks import addFileToGit
         from flib.tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
         if self.uuid:
-            addFileToGit(self.full_path, self.uuid, data)
+            addFileToGit.delay(self.full_path, self.uuid, data)
         if self.id and self.uuid:
             if self.content_type.split('/')[0] == 'video':
                 generateVideoPreview.delay(self.full_path, data, self.uuid)
@@ -222,10 +222,9 @@ class Asset(IDMixin, Base):
     @staticmethod
     def AfterAssetCreationFuncs(mapper, connection, target):
         '''Some operations after getting ID'''
-        print 'preparing asset'
         from flib.tasks import identify, generateVideoThumbnail, generateVideoPreview, generateImageThumbnail
         from flib.tasks import addFileToGit
-        addFileToGit(target.full_path, target.uuid, target.version)
+        addFileToGit.delay(target.full_path, target.uuid, target.version)
         identify.delay(target.full_path, target.id)
 
         # videos using ffmpeg

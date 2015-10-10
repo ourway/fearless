@@ -69,7 +69,13 @@
                 
                 </td><td><h4><code class="farsi" style="color:darkgreen">{{accounting.formatNumber(ceilG(user.monthly_salary - 
                 ((user.monthly_salary/user.monthly_working_hours)*user.monthly_present_hours*(user.retention+user.payroll_tax+user.insurance_deductions)/100 + 
-                (roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours)))))))}}</code> <small>ریال</small></h4> </td></tr>
+                (roundG((user.monthly_salary/user.monthly_working_hours)*(ceilG(user.monthly_working_hours-user.monthly_present_hours)))))  ) * 
+
+		((1 || 1-(100-overall_task_progress)/100))  )}}</code> <small>ریال</small>
+
+
+
+</h4> </td></tr>
             </table>
         
         <h4>تائیدات</h4>
