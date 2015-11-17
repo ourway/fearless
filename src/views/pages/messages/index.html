@@ -89,8 +89,11 @@
                             <li><a href="" data-toggle="modal" ng-click="replyMode=false;newMessage={};" data-target="#modalCompose">Compose new</a></li>
                             <li><a href="javascript:;" class="text-muted">Settings</a></li>
                         </ul>
-
+			
                     </div>
+		   <div style="padding-right:20px;float:left" class="col-md-6" ng-show="!isMessageSelected()">
+			<input  class="form-control" ng-model="options.search" placeholder="Search your messages ..."/>
+		</div>
 
                     <div class="pull-right" ng-show="!isMessageSelected()">
                         <span class="text-muted"><b>{{(itemsPerPage * currentPage) + 1}}</b>–<b>{{(itemsPerPage * currentPage) + pagedItems[currentPage].length}}</b> 
@@ -122,7 +125,7 @@
                             <td class="col-sm-1"></td>
                         </tr></thead>
                         
-                          <tbody><tr ng-repeat="item in pagedItems[currentPage] track by $index ">
+                          <tbody><tr ng-repeat="item in pagedItems[currentPage] | filter: options.search track by $index ">
                             <td class="col-sm-1 col-xs-1"><input type="checkbox" title="Mark this item here"></td>
                             <td class="col-sm-4 col-xs-8" ng-click="readMessage(item)">
                                 <a style="color:#333;cursor:pointer" ng-class="{'strong': !item.read}">{{item.subject_s.slice(0, 20) || 'DRAFT'}}</a>

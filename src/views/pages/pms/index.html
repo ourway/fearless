@@ -24,6 +24,10 @@
 <br/>
 <div class="col-md-12" ng-show="involving_projects.length>0">
     <h4>Projects you are involving</h4>
+	<label>
+	Show Completed
+	<input type="checkbox" ng-model="options.show_completed" />
+	</label>
 <table class="table table-responsive table-striped table-hover refresh-container pull-down ">
     <tr class="info">
         <td></td>
@@ -33,7 +37,7 @@
         <td>Tasks</td>
         <td>Progress</td>
     </tr>
-    <tr ng-class="{'success':project.complete==100}" ng-repeat="project in involving_projects | orderBy:'-complete' track by $index">
+    <tr ng-class="{'success':project.complete==100}" ng-show="project.complete!=100 || options.show_completed " ng-repeat="project in involving_projects | orderBy:'-complete' track by $index">
         <td>{{$index+1}}</td>
         <td><a href="#/pms/{{project.id}}">{{project.name}}</a></td>
         <td>{{timeConverter(project.start)}}</td>

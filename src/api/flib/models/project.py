@@ -268,6 +268,8 @@ class Project(IDMixin, Base):
         subProjectTasks = []
         reports = []
         for p in projects:
+	    if p.complete==100:
+	        continue
             if p.tasks:
                 planData = p.tjp_subproject(do_plan=do_plan, do_guntt=do_guntt,
                                             do_resource=do_resource, do_msproject=do_msproject,

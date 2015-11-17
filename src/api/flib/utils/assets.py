@@ -67,18 +67,18 @@ class AssetSave:
 
         try:
             repo = int(repo)
-            targetRepo = Repository.query.filter_by(id=repo).scalar()
+            targetRepo = Repository.query.filter_by(id=repo).first()
         except ValueError:
-            targetRepo = Repository.query.filter_by(name=repo).scalar()
+            targetRepo = Repository.query.filter_by(name=repo).first()
 
         if not uploader:
             uploader = -1
-            targetRepo = Repository.query.filter_by(name='public').scalar()
+            targetRepo = Repository.query.filter_by(name='public').first()
 
-        targetUser = User.query.filter_by(id=uploader).scalar()
+        targetUser = User.query.filter_by(id=uploader).first()
 
         if not targetRepo:
-            targetRepo = Repository.query.filter_by(name=repo).scalar()
+            targetRepo = Repository.query.filter_by(name=repo).first()
             if not targetRepo:
                 targetRepo = Repository(
                     name=repo, path=os.path.join(public_repository_path, repo))
@@ -98,17 +98,17 @@ class AssetSave:
         collection = None
         if _cid:
             collection = Collection.query.filter_by(repository=targetRepo)\
-                            .filter_by(id=_cid).scalar()
+                            .filter_by(id=_cid).first()
         _cname = req.get_param('collection')
         if _cname:
             collection = Collection.query.filter_by(repository=targetRepo)\
-                            .filter_by(name=_cname).scalar()
+                            .filter_by(name=_cname).first()
         if not collection:
             now = arrow.utcnow()
             today = now.format('YYYY-MM-DD')
             cpath = '%s.%s'%(userInfo.get('alias'), today)
             collection = Collection.query.filter_by(path=cpath)\
-                .filter_by(repository=targetRepo).scalar()
+                .filter_by(repository=targetRepo).first()
             if not collection:
                 collection = Collection(path=cpath, repository=targetRepo)
                 req.session.add(collection)
@@ -198,7 +198,7 @@ class AssetSave:
             name = (name[:10] + '..') if len(name) > 10 else name
             asset = Asset.query.filter(
                 Asset.repository == targetRepo).filter_by(collection=collection)\
-                .filter_by(fullname=fullname).scalar()
+                .filter_by(fullname=fullname).first()
             resp.status = falcon.HTTP_200
             if not asset:
                 _uid = getUUID()
@@ -230,12 +230,12 @@ class AssetSave:
                     f.write(thmb_data)
             if attach_to:
                 parent_id = int(attach_to)
-                parent = Asset.query.filter_by(id=parent_id).scalar()
+                parent = Asset.query.filter_by(id=parent_id).first()
                 asset.attached_to.append(parent)
 
             task_id = req.get_param('task_id')
             if task_id:
-                target_task = Task.query.filter_by(id=task_id).scalar()
+                target_task = Task.query.filter_by(id=task_id).first()
                 target_task.assets.append(asset)
 
             if tags:
@@ -390,9 +390,9 @@ class GetAsset:
         '''Serve asset based on a key (riak key for finding path'''
         name = req.get_param('name')
         if name == 'true':
-            target = Asset.query.filter_by(fullname=key).scalar()
+            target = Asset.query.filter_by(fullname=key).first()
         else:
-            target = Asset.query.filter_by(key=key).scalar()
+            target = Asset.query.filter_by(key=key).first()
         if target:
             sz = os.path.getsize(target.full_path)
             modifier = target.modifiers[-1]
@@ -417,7 +417,7 @@ class GetAsset:
 class DeleteAsset:
 
     def on_delete(self, req, resp, id):
-        target = Asset.query.filter_by(id=id).scalar()
+        target = Asset.query.filter_by(id=id).first()
         userInfo = getUserInfoFromSession(req, resp)
         if userInfo.get('id') == target.owner.id:
             req.session.delete(target)
@@ -506,7 +506,7 @@ class ListAssets:
 class CollectionInfo:
 
     def on_get(self, req, resp, collectionId):
-        target = Collection.query.filter_by(id=int(collectionId)).scalar()
+        target = Collection.query.filter_by(id=int(collectionId)).first()
         start = req.get_param('s')
         end = req.get_param('e')
         if start:
@@ -614,7 +614,7 @@ class AssetCheckout:
     def on_post(self, req, resp, assetId):
         '''Get asset thumbnails from riak'''
         try:
-            target = Asset.query.filter_by(id=int(assetId)).scalar()
+            target = Asset.query.filter_by(id=int(assetId)).first()
         except ValueError:
             resp.status = falcon.HTTP_404
             return
