@@ -134,7 +134,6 @@ class AddProject:
             sequences_section = Collection(name='Sequences', path='sequences')
             editorial_section = Collection(name='Editorial', path='editorial')
             resources_section = Collection(name='Resources', path='resources')
-
             new_repository.collections.append(chars_section)
             new_repository.collections.append(props_section)
             new_repository.collections.append(sets_section)
@@ -191,14 +190,15 @@ class GetProjectLatestReport:
                             do_msproject=do_msproject, do_profit=do_profit,
                             do_trace=do_trace, do_traceSvg=do_traceSvg)
         update = True
-        if not data:
-            update = False
-            reports = project.reports
-            if reports:
-                repid = reports[-1]
-                report = Report.query.filter_by(id=repid).scalar()
-                if report:
-                    data = report.body
+	if not data:
+	    update = False
+        reports = project.reports
+        if reports:
+     	    repid = reports[-1]
+            report = Report.query.filter_by(id=repid).scalar()
+            if report:
+                data = report.body
+
         if data:
             datajson = json.loads(data)
             csvfile = StringIO()
@@ -262,12 +262,9 @@ class GetProjectLatestReport:
             data = datajson
             data['json'] = csvjsondata
             data['trace'] = traceJsonData
-            resp.body = data
 
-        else:
-            resp.status = falcon.HTTP_201
-            data = {}
-            resp.body = data
+
+        resp.body = data
 
 
 class UpdateProject:

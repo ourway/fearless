@@ -208,7 +208,7 @@ class Project(IDMixin, Base):
         _tasks = []
         #_resources = list()
         for task in self.tasks:
-            if not task.parent or (not task.parent and not task.children):
+            if not task.parent or not (task.parent and task.children) or not (task.effort and not task.resources):
                 _tasks.append(task.tjp_task())
             #_resources.extend(task.resources)
         # send tasks in reverse order
@@ -252,7 +252,7 @@ class Project(IDMixin, Base):
         if not r.get('fearless_tj3_lock'):
             r.set('fearless_tj3_lock', 'OK')
             # just for highly requested projects
-            r.expire('fearless_tj3_lock', 5)
+            r.expire('fearless_tj3_lock', 60)
         else:
             return
 
@@ -268,8 +268,8 @@ class Project(IDMixin, Base):
         subProjectTasks = []
         reports = []
         for p in projects:
-	    if p.complete==100:
-	        continue
+	    #if p.complete==100:
+	    #    continue
             if p.tasks:
                 planData = p.tjp_subproject(do_plan=do_plan, do_guntt=do_guntt,
                                             do_resource=do_resource, do_msproject=do_msproject,

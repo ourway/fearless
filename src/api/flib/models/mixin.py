@@ -47,8 +47,8 @@ if not os.path.isdir(db_files_path):
 
 
 def getUUID():
-    data = base64.encodestring(uuid4().get_bytes()).strip()[:-2]
-    return data.replace('/', '-')
+    data = uuid4().hex
+    return data
 
 
 def convert_to_datetime(inp):

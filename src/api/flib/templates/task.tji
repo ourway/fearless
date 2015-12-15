@@ -10,7 +10,7 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
 %>
 % for dependency in task.depends:
     <%
-        if dependency == task.parent or dependency==task:
+        if dependency == task.parent or dependency==task or (task.effort and not task.resources):
             continue
         hr = []
         hr.append(str(dependency.id))
@@ -54,7 +54,7 @@ responsibles = ' '.join(['_%s'%i.id for i in task.responsibles])
     % if responsibles:
         responsible ${responsibles}
     % endif
-    % if task.effort and not task.children:
+    % if task.effort and not task.children and task.resources:
         effort ${task.effort}h
     % endif
     % if task.priority:

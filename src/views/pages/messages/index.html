@@ -1,7 +1,7 @@
   <div class="container" >
       <h3 align="center"><small style="margin-top: -13px; position: absolute;">Fearless</small>Studio Mail&reg;</h3>
   
-        <div class="row" ng-controller="inboxCtrl" ng-init="init(true)">
+        <div class="" ng-controller="inboxCtrl" ng-init="init(true)">
         <aside class="col-md-2 pad-right-0">
             <ul class="nav nav-pills nav-stacked hidden-print">
                 <li class="hidden-sm hidden-xs">
@@ -112,7 +112,7 @@
             </div><!--/row-->
             <!--/inbox toolbar-->
             <br/>
-            <div class="panel panel-default inbox" id="inboxPanel" style="min-height: 300px;">
+            <div class="panel panel-info inbox" id="inboxPanel" style="min-height: 300px;">
                 <!--message list-->
                 <div ng-show="!isMessageSelected()">
                     <table class="table table-striped table-hover refresh-container pull-down" ng-show="messages.items.length">
@@ -146,10 +146,19 @@
                           </tr>
                         </tbody>
                     </table>
-                    <div style="padding-bottom: 80px; padding-top: 80px;" ng-show="!messages.items.length">
+               <div style="padding-bottom: 80px; padding-top: 80px;" ng-show="!messages.items.length && options.is_loading==false">
                     <div class="col-md-4"></div>
                     <div class="col-md-4" ><h4>No messages here</h4></div>
                     <div class="col-md-4"></div>
+                </div>
+
+
+
+                  <div style="padding-bottom: 80px; padding-top: 80px;" ng-show="options.is_loading==true">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4" ><h4 class="text-primary"><i class="fa fa-circle-o-notch fa-spin fa-5x"></i>  Loading your inbox ...</h4></div>
+                    <div class="col-md-4"></div>
+   
                 </div>
                 </div>
                 <!--message detail-->

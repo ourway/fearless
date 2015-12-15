@@ -3,6 +3,8 @@
     actual:start  ${subproject.start.strftime('%Y-%m-%d')}
     chargeset productCost_${subproject.id}
     % for task in tasks:
-      ${task}
+      #% if not (task.effort and not task.resources): 
+      	${task}
+      #% endif
     % endfor
   }

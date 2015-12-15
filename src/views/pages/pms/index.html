@@ -37,7 +37,9 @@
         <td>Tasks</td>
         <td>Progress</td>
     </tr>
-    <tr ng-class="{'success':project.complete==100}" ng-show="project.complete!=100 || options.show_completed " ng-repeat="project in involving_projects | orderBy:'-complete' track by $index">
+    <tr ng-class="{'success':project.complete==100}" ng-show="project.complete!=100 || options.show_completed"
+	 ng-repeat="project in involving_projects | orderBy:'name' track by $index">
+
         <td>{{$index+1}}</td>
         <td><a href="#/pms/{{project.id}}">{{project.name}}</a></td>
         <td>{{timeConverter(project.start)}}</td>

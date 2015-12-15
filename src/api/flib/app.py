@@ -12,7 +12,7 @@ Just remember: Each comment is like an appology!
 Clean code is much better than Cleaner comments!
 '''
 
-from gevent import monkey;monkey.patch_all()
+#from gevent import monkey;monkey.patch_all()
 import sys
 import os
 current_path = os.path.dirname(__file__)
@@ -33,6 +33,7 @@ from utils.messages import GetMessagesList, GetMessages, GetMessage, SetMessage,
     SearchMessages, MoveMessage, DeleteMessage, UpdateMessage
 from flib.utils.reports import Mailer, AddReport, UserReports, GetUserLatestReports
 
+from utils.comments import AddComment
 from flib.models import __all__ as av
 from flib.models import *
 from sqlalchemy import desc, asc
@@ -462,6 +463,7 @@ app.add_route('/api/setTags/collection/{key}', UpdateCollectionTags())
 app.add_route('/api/setTags/project/{key}', UpdateProjectTags())
 app.add_route('/api/userReports', UserReports())
 app.add_route('/api/monthlyTasks/{userId}', monthlyTasks())
+app.add_route('/api/comment/add', AddComment())
 
 app.add_route('/api/test_upload', TestUpload())
 

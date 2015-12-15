@@ -397,7 +397,7 @@ function updateImageSize(img, maxWidth, maxHeight){
             $scope.newComment.user_id = $scope.userInfo.userid;
             $scope.newComment.item = $scope.comment_id;
             if ($scope.userInfo.userid && $scope.newComment.content){
-                req = $http.put('/api/db/comment', $scope.newComment);
+                req = $http.put('/api/comment/add', $scope.newComment);
                 req.success(function(resp){
                         if (!$scope.comments[$scope.comment_id])
                             {
@@ -405,8 +405,29 @@ function updateImageSize(img, maxWidth, maxHeight){
                                 $scope.numberOfComments[$scope.comment_id] = 0;
                             }
                         $scope.comments[$scope.comment_id].splice(0, 0, $scope.newComment);
+
+
+			// send messages
+			resp.targets.forEach(function(target)
+			{
+			  var message = {};
+			  message.to = {id:target};
+			  var from = $scope.userInfo.username
+			  message.subject = from + ' commented on ' + resp.name;
+			  message.body = 'Hi, **' + from + '** commented on an item:\n-----\n' + $scope.newComment.content + '\n\n <a href="#/' + resp.type + '/' + resp.id + '">**Click here** to see comments</a>\n\n----\n -**F**ear:**L**ess Team';
+			$http.post('/api/messages/set', message);
+			 		
+			}
+			)
+
                         $scope.newComment = {};
                         $scope.numberOfComments[$scope.comment_id] +=1 ;
+
+
+		// Send message to targets
+		
+
+
                     })
 
             }
@@ -2048,6 +2069,7 @@ fearlessApp.controller('taskDetailCtrl', function($scope, $rootScope, $routePara
 
 fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $interval, $rootScope, messageService, $http, $routeParams) {
     $scope.messages = {};
+    $scope.options = {is_loading:false};
     if($scope.$parent)
         $scope.messages.resources = $scope.$parent.resources;
     messageService.messages = [];
@@ -2058,6 +2080,7 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
 
 
     $scope.init = function(process){
+    	$scope.options.is_loading = true;
         req = $http.get('/api/messages/list');
         req.success(function(resp){
         messageService.messages = resp;
@@ -2074,6 +2097,7 @@ fearlessApp.controller('inboxCtrl', function ($scope, $filter, $location, $inter
                 $scope.messages.items.push(newm);
                 $scope.search($scope.messages.folder);
             }
+    	    	$scope.options.is_loading = false;
             });
         }
             $scope.newMessage = {};

@@ -23,6 +23,8 @@ from uuid import uuid4
 from flib.tasks import send_envelope  # send emails
 import time
 import misaka
+import requests
+import ujson
 
 
 def getUUID():
@@ -106,7 +108,6 @@ class GetMessage:
 
 
 class SetMessage:
-
     def on_post(self, req, resp):
         user = getUserInfoFromSession(req, resp)
         message = get_params(req.stream, False)
@@ -116,9 +117,17 @@ class SetMessage:
                 id=message.get('to').get('id')).first()
         FROM = req.session.query(User).filter_by(
             email=user.get('email')).first()
-        _from = user.get('email')
-        _from_fn = user.get('firstname')
-        _from_ln = user.get('lastname')
+
+
+
+	sms_url = 'http://appido.ir/smscenter/api/sms/magfa/send'
+	sms_data = dict(to=TO.cell, 
+		text='Hi %s,\n%s sent you this message:\n\n'%(TO.firstname, FROM.firstname) +\
+		 message.get('subject')+'\n'+message.get('body', '')[:144]+ '\n\n -Fearless ')
+	print sms_data
+	sms_resp = requests.post(sms_url, data = ujson.dumps(sms_data))
+
+
 
         data = {
             'to_s':

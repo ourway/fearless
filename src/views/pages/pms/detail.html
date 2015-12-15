@@ -158,7 +158,7 @@ background-color: #FFEDA5;
 
 
 <div class="col-md-12 column">
-<div class="panel panel-success">
+<div class="panel panel-info">
     <div class="panel-heading">
         <h3 class="panel-title" style="font-size:48pt;">
             {{project.name | uppercase}}
@@ -192,7 +192,7 @@ background-color: #FFEDA5;
                 <td >Effort Left</td>
                 <td class="hidden-xs">Project Leader</td>
             </tr>
-            <tr class="success">
+            <tr class="info">
                 <td class="active"><strong>{{project.name}}</strong></td>
                 <td ><strong>{{project.complete}}</strong>%</td>
                 <td class="farsi hidden-sm hidden-xs" >{{$parent.persianDate(project.start)}}</td>
@@ -231,34 +231,37 @@ background-color: #FFEDA5;
 <div class="panel panel-default ">
     <div class="panel-heading">
         <h3 class="panel-title">
-            Assets
+            Collections
+	<!--
             <button id="taskSeqButton" ng-show="$parent.isAdmin || $parent.userInfo.userid==project.leader.id || $parent.userInfo.userid==project.creater.id"
             class="btn btn-default btn-sm" type="button"><em class="glyphicon glyphicon-plus"></em> Add SEQUENCES</button>
+	-->
         </h3>
     </div>
 
      <div class="panel-body" style="background: #F9F5FF;">
         <div class="col-md-12 column">
-                <div class="col-md-3 column" style="border-right: 1px solid #ccc;">
-                     <h3 style="color:grey">Collections</h3>
+                <div class="col-md-8 column" style="border-right: 1px solid #ccc;">
                         <div id="CollectionsDiv" >
 
-			<ul class="nav nav-pills nav-stacked">
+			<ul class="nav nav-pills">
                             <li class="active" ng-repeat="collection in project.collections track by $index"
                                 style="" ng-controller="inboxCtrl" ng-init="init()">
                                 <a href="#/ams/c/{{collection.id}}?page=1"><em class="fa fa-folder"></em> <span ng-show="collection.number_of_children" 
-                                        class="badge pull-right">{{collection.number_of_children}}</span>{{collection.name}}</a>
+                                        class="badge pull-right">{{collection.number_of_children}}</span><h5>{{collection.name}}</h5></a>
                             </li>
 
 			</ul>
 
                         </div>
                 </div>
+	<!--
                 <div class="col-md-7 column" style="border-right: 1px solid #ccc;">
                     <h3 style="color:grey">Sequences</h3>
                     <a class="projectSeqA" href="#pms/{{project.id}}/seq/{{seq.number}}" ng-repeat="seq in project.sequences track by $index" title="{{req.code}}">{{seq.number}}</a>
                     </div>
-                    <div class="col-md-2 column">
+	-->
+                    <div class="col-md-4 column">
 
             <div ng-controller="taggerCtrl" class="">
                 <input type="search" id="tagSearchInput"  class="typeahead form-control" 
@@ -291,31 +294,28 @@ background-color: #FFEDA5;
 
 
 <div class="col-md-12 column">
-<div class="panel panel-info">
+<div class="panel panel-default" ng-class="{'panel-danger':planning}">
     <div class="panel-heading">
-            <div class="col-md-2 column"></div>
 			<div class="btn-group">
                 <button ng-show="$parent.isAdmin || $parent.userInfo.userid==project.leader.id || $parent.userInfo.userid==project.creater.id" 
                     id="taskAddButton" class="btn btn-success" type="button"><em class="glyphicon glyphicon-plus"></em> Add TASK</button>
-                <button ng-show="$parent.isAdmin || $parent.userInfo.userid==project.leader.id || $parent.userInfo.userid==project.creater.id" 
-                    id="taskTemplatePlanButton" class="btn btn-success" type="button"><em class="glyphicon glyphicon-plus"></em> Template Planing</button>
             </div>
             
             <div class="btn-group hidden-sm hidden-xs">
-                <button ng-show="tasks.length>0" class="btn btn-info" 
+                <button ng-show="tasks.length>0 && !planning" class="btn btn-info" 
                     ng-class="{'active':mode=='cal', 'btn-success':mode=='cal'}" 
                     ng-class="{'active':mode=='cal'}" ng-click="showCal();prepareCal();" 
                     type="button"><em class="glyphicon glyphicon-calendar"></em> Calendar</button>
-                    <a ng-show="tasks.length>0" class="btn btn-info" 
+                    <a ng-show="tasks.length>0 && !planning" class="btn btn-info" 
                         ng-class="{'active':mode=='plan', 'btn-success':mode=='plan'}" 
                     ng-class="{'active':mode=='plan'}" 
                     data-gallery="plan_graphics" href="/static/uploads/plan_{{project.uuid}}.html.png?v={{timeConverter(false, true)}}" 
                     type="button"><em class="glyphicon glyphicon-eye-open"></em> Plan</a>
-                <a ng-show="tasks.length>0" class="btn btn-info" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" 
+                <a ng-show="tasks.length>0 && !planning" class="btn btn-info" ng-class="{'active':mode=='guntt', 'btn-success':mode=='guntt'}" 
                         data-gallery="plan_graphics"
                         href="/static/uploads/guntt_{{project.uuid}}.html.png?v={{timeConverter(false, true)}}" type="button">
                             <em class="glyphicon glyphicon-tasks"></em> Gantt</a>
-                        <a ng-show="tasks.length>0" class="btn btn-info" 
+                        <a ng-show="tasks.length>0 && !planning" class="btn btn-info" 
                             ng-class="{'active':mode=='resource', 'btn-success':mode=='resource'}"
                         data-gallery="plan_graphics"
                         href="/static/uploads/resource_{{project.uuid}}.html.png?v={{timeConverter(false, true)}}" type="button">
@@ -324,12 +324,12 @@ background-color: #FFEDA5;
                         class="btn btn-info" ng-class="{'active':mode=='profit', 'btn-success':mode=='profit'}" 
                     ng-click="generateReport('profit')" type="button">
                     <em class="glyphicon glyphicon-adjust"></em> Budget</button>
-                    <button ng-show="tasks.length>0" class="btn btn-info" ng-click="getMSP()" 
+                    <button ng-show="tasks.length>0 && !planning" class="btn btn-info" ng-click="getMSP()" 
                         type="button"><em class="fa fa-file-powerpoint-o"></em> </button>
-                    <button ng-show="tasks.length>0" class="btn btn-info" ng-click="getCSV()" 
+                    <button ng-show="tasks.length>0 && !planning" class="btn btn-info" ng-click="getCSV()" 
                         type="button"><em class="fa  fa-file-excel-o"></em> </button>
                     <button ng-show="tasks.length>0" class="btn " ng-class="{'btn-info':!planning, 'btn-warning':planning}" ng-click="generateReport(mode)" 
-                        type="button"><em class="glyphicon" ng-class="{'glyphicon-repeat':!planning, 'glyphicon-dashboard':planning}"></em> </button>
+                        type="button"><em class="fa fa-cog" ng-class="{'fa-spin':planning, 'fa-repeat':!planning}"></em> </button>
 			</div>
 	</div>
 
