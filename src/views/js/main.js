@@ -2607,15 +2607,20 @@ fearlessApp.controller('FileDestroyController',  function($scope, $http){
         });
 
 
-fearlessApp.controller('gridController',  function($scope, $http, $routeParams){
+fearlessApp.controller('gridController',  function($scope, $http, $interval ,$routeParams){
 	var page = $routeParams.page;
+	$scope.init = function(){
 	var req = $http.get('/api/grid/getLatestImages?page='+page);
 	$scope.results = [];
 	req.success(function(resp){
 		$scope.results = resp;
 
+		})
+	};
 
-})
+	$scope.init();
+	$interval($scope.init, 10000);
+
 });
 
 //////////////////////////////////////////////////////
