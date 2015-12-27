@@ -2,12 +2,12 @@
         <div id="invoice" class="col-md-8 column farsi" style="direction:rtl;text-align:right">
             <h5>
 کارکرد
-آبان ماه
+آذرماه
  سال
  {{$parent.persianDate(null, 2)}} <b>{{user.persian_firstname}} {{user.persian_lastname}}</b> 
                 <span ng-if="user.departements">از دپارتمان IT</span> <span ng-if="user.job">با سمت {{user.job}}</span></h5>
             <h6>با سلام خدمت مدیریت مالی و تولید، گزارش کارکرد {{user.persian_firstname}} {{user.persian_lastname}} 
-در آبان ماه
+در آذرماه 
   به شرح زیر میباشد:</h6>
         <div ng-if="userTasks.length!=0">
             <table class="table table-responsive table-bordered" ng-if="userTasks">

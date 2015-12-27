@@ -1,0 +1,16 @@
+  <div class="container" >
+      <h3 align="center"><small style="margin-top: -13px; position: absolute;">Fearless</small>Grid&reg;</h3>
+
+    <hr/>
+ 
+    <div class="row">
+      <div class="col-lg-3 col-sm-4 col-6" ng-repeat="result in results track by $index"><a href="#/ams/a/{{result.id}}?version={{result.version}}" title="{{result.name}}">
+		<img style="border-radius:10%" ng-src="/static/uploads/{{result.uuid}}_poster_{{result.version}}.png" class="thumbnail img-responsive"></a>
+
+
+		<span align="center" style="margin:auto;text-align:center;font-family:monospace">{{result.fullname}}</span>
+</div>
+
+    </div>
+    <hr/>
+</div>

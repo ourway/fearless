@@ -26,7 +26,12 @@
                     style="font-size: 13px;" data-task-title="{{toTitleCase(task.title)}}" 
                     ng-mouseover="taskHoverIn()" ng-mouseleave="taskHoverOut()" 
                     id="task_{{task.id}}" >{{toTitleCase(task.title).slice(0,30)}}</a>
-		<span class="pull-right"><small class="text-info"><b>{{task.effort}}</b> H</small></span>
+
+		<span class="pull-right">
+
+		<a href="#/pms/t/{{task.id}}"><em class="fa fa-link"></em></a>
+		<small class="text-info"><b>{{task.effort}}</b> H</small>
+		</span>
 
 
             <div class="progress" style="height:3px;margin-bottom: 0px;">

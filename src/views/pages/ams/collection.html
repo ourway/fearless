@@ -168,8 +168,8 @@
                             [ {{$parent.getReadableFileSizeString(collection.collection_size)}} ]</span>
                            | Page {{collection.page}}
                         <div class="pull-right">
-                            <span class="text-muted"><b>{{(collection.page-1)*20+1}}</b>–<b>
-                                    {{ (collection.page-1)*20+collection.assets.length}}</b>
+                            <span class="text-muted"><b>{{(collection.page-1)*50+1}}</b>–<b>
+                                    {{ (collection.page-1)*50+collection.assets.length}}</b>
                             </span>
                             <div class="btn-group btn-group">
                                 <button type="button" class="btn btn-default btn-sm"
@@ -178,7 +178,7 @@
                                     <em class="glyphicon glyphicon-chevron-left"></em>
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm"
-                                    ng-class="{disabled: collection.page >= collection.assets_count/20}"
+                                    ng-class="{disabled: collection.page >= collection.assets_count/50}"
                                     ng-click="nextPage()">
                                     <em class="glyphicon glyphicon-chevron-right"></em>
                                 </button>
@@ -203,7 +203,7 @@
                             ng-click="getCollectionDetails(collection.page-2)">
                             <em class="glyphicon glyphicon-chevron-left"></em>
                         </button>
-                        <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: collection.page >= collection.assets_count/20}"
+                        <button type="button" class="btn btn-default btn-sm" ng-class="{disabled: collection.page >= collection.assets_count/50}"
                             ng-click="getCollectionDetails(collection.page)">
                             <em class="glyphicon glyphicon-chevron-right"></em>
                         </button>
@@ -243,8 +243,8 @@
                 <table>
 
                         <div class="pull-right">
-                            <span class="text-muted"><b>{{(collection.page-1)*20+1}}</b>–<b>
-                                    {{ (collection.page-1)*20+collection.assets.length}}</b>
+                            <span class="text-muted"><b>{{(collection.page-1)*50+1}}</b>–<b>
+                                    {{ (collection.page-1)*50+collection.assets.length}}</b>
                             </span>
                             <div class="btn-group btn-group">
                                 <button type="button" class="btn btn-default btn-sm"
@@ -253,7 +253,7 @@
                                     <em class="glyphicon glyphicon-chevron-left"></em>
                                 </button>
                                 <button type="button" class="btn btn-default btn-sm"
-                                    ng-class="{disabled: collection.page >= collection.assets_count/20}"
+                                    ng-class="{disabled: collection.page >= collection.assets_count/50}"
                                     ng-click="nextPage()">
                                     <em class="glyphicon glyphicon-chevron-right"></em>
                                 </button>

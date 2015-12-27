@@ -34,6 +34,7 @@ from utils.messages import GetMessagesList, GetMessages, GetMessage, SetMessage,
 from flib.utils.reports import Mailer, AddReport, UserReports, GetUserLatestReports
 
 from utils.comments import AddComment
+from utils import grid
 from flib.models import __all__ as av
 from flib.models import *
 from sqlalchemy import desc, asc
@@ -464,6 +465,8 @@ app.add_route('/api/setTags/project/{key}', UpdateProjectTags())
 app.add_route('/api/userReports', UserReports())
 app.add_route('/api/monthlyTasks/{userId}', monthlyTasks())
 app.add_route('/api/comment/add', AddComment())
+## grid
+app.add_route('/api/grid/getLatestImages', grid.LatestImages())
 
 app.add_route('/api/test_upload', TestUpload())
 

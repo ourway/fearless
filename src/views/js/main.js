@@ -174,6 +174,10 @@ var TITLE = 'TITLE';
 				templateUrl : 'pages/auth/login.html',
 				controller  : 'mainController'
 			})
+			.when('/grid/:page', {
+				templateUrl : 'pages/grid/index.html',
+				controller  : 'gridController'
+			})
 
 			.when('/auth/login/', {
 				templateUrl : 'pages/auth/login.html',
@@ -1915,9 +1919,9 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                     page = 0;
             }
             start = 0;
-            end = 20;
+            end = 50;
             if (page){
-                c = 20;
+                c = 50;
                 start = c*page;
                 end = start + c;
             }
@@ -2012,8 +2016,8 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
             $scope.newSubCollection.repository_id = $scope.collection.repository.id;
             tarray = $scope.collection.path.split('/');
             $scope.newSubCollection.template = tarray[tarray.length-1];
-            req = $http.put('/api/collection/add', $scope.newSubCollection);
-            req.success(function(resp){
+            var req = $http.put('/api/collection/add', $scope.newSubCollection);
+		req.success(function(resp){
                 if (resp.message == 'OK'){
                     $('#collectionAddModal').modal('hide');
                     $scope.getCollectionDetails();
@@ -2021,8 +2025,8 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
                 else{
                     alert(resp.info);
                 }
+	})
 
-                })
         }
 
 
@@ -2603,6 +2607,16 @@ fearlessApp.controller('FileDestroyController',  function($scope, $http){
         });
 
 
+fearlessApp.controller('gridController',  function($scope, $http, $routeParams){
+	var page = $routeParams.page;
+	var req = $http.get('/api/grid/getLatestImages?page='+page);
+	$scope.results = [];
+	req.success(function(resp){
+		$scope.results = resp;
+
+
+})
+});
 
 //////////////////////////////////////////////////////
 

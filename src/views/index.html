@@ -76,15 +76,16 @@
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li ng-class="{'active':area=='project'}"><a href="#/pms"><em class="fa fa-magic"></em> Projects</a></li>
-                <li ng-class="{'active':area=='message'}"><a href="#/messages?master=true"><em class="fa fa-inbox"></em> Inbox</a></li>
-                <li ng-class="{'active':area=='ams'}"><a href="#/ams/"><em class="fa fa-cube"></em> Assets</a></li>
-                <li><a href="/app/showtime"><em class="fa fa-play"></em> Showtime</a></li>
-                <li><a href="#/report"><em class="fa fa-send"></em> Reports</a></li>
+                <li ng-class="{'active':area=='project'}"><a href="#/pms"><em class="fa fa-magic fa-2x"></em></a></li>
+                <li ng-class="{'active':area=='message'}"><a href="#/messages?master=true"><em class="fa fa-inbox fa-2x"></em></a></li>
+                <li ng-class="{'active':area=='ams'}"><a href="#/ams/"><em class="fa fa-cube fa-2x"></em></a></li>
+                <li><a href="/app/showtime"><em class="fa fa-play fa-2x"></em></a></li>
+                <li><a href="#/grid/1"><em class="fa fa-slack fa-2x"></em></a></li>
+                <li><a href="#/report"><em class="fa fa-send fa-2x"></em></a></li>
               <li class="dropdown">
               <a ng-class="{'active':area=='tools'}" href=""
                   class="dropdown-toggle" data-toggle="dropdown" role="button"
-                  aria-expanded="false"><em class="fa fa-plug"></em> Tools<span class="caret"></span></a>
+                  aria-expanded="false"><em class="fa fa-plug fa-2x"></em><span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                   <li><a href="http://192.168.20.162:5000">GitLab</a></li>
                   <li><a href="/app/idea">Ideas</a></li>
@@ -97,7 +98,7 @@
                 </li>
               <li class="dropdown">
               <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                  aria-expanded="false"><em class="fa fa-file-text"></em> Documents<span class="caret"></span></a>
+                  aria-expanded="false"><em class="fa fa-file-text fa-2x"></em><span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                   <li ><a href="docs/PIPLINE1.pdf"><em class="fa fa-file-text-o"></em> Production Pipeline</a></li>
                   <li ><a href="docs/artPipe.pdf"><em class="fa fa-file-text-o"></em> Pre Production Pipeline</a></li>
@@ -107,7 +108,7 @@
               </li>
               <li ng-if="isAdmin || isClient" class="dropdown">
               <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button"
-                  aria-expanded="false"><em class="fa fa-gears"></em> Admin<span class="caret"></span></a>
+                  aria-expanded="false"><em class="fa fa-gears fa-2x"></em><span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                   <li ng-if="isAdmin"><a href="#/ua">User Management</a></li>
                   <li ng-if="isAdmin"><a href="#/ur">User reports</a></li>

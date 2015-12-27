@@ -28,7 +28,7 @@ from os import path
 from flib.opensource.contenttype import contenttype
 from flib.utils.validators import checkPath
 from base64 import encode, decode, decodestring
-from sqlalchemy import desc
+from sqlalchemy import desc, asc
 from datetime import datetime
 import arrow
 
@@ -516,13 +516,13 @@ class CollectionInfo:
         if end:
             end = int(end)
         if start != None and not end:
-            end = start + 10
+            end = start + 50
 
         end = max(start, end)
 
         if target:
             assets = Asset.query.filter_by(collection_id=target.id).order_by(
-                desc(Asset.modified_on)).slice(start, end)
+                desc(Asset.modified_on)).order_by(desc(Asset.name)).slice(start, end)
             assets_count = Asset.query.filter_by(collection_id=target.id).count()
             data = dict()
             data['name'] = target.name
@@ -627,6 +627,10 @@ class AssetCheckout:
             return
 
         version = req.get_param('version')
+	print version
+	if not (version and len(version.split('_'))>1):
+		resp.status = falcon.HTTP_404
+		return
         command1= 'pull origin master'
         command2= 'pull origin master --tags'
         command3= 'checkout %s' % version
