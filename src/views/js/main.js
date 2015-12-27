@@ -1,5 +1,5 @@
 var fearlessApp = angular.module('fearlessApp', ['ngRoute', 'ngResource', 'restangular',
-        'ui.grid', 'ngSanitize', 'ui.bootstrap', 'checklist-model', 'blueimp.fileupload',
+        , 'ngSanitize', 'ui.bootstrap', 'checklist-model', 'blueimp.fileupload',
         'siyfion.sfTypeahead', 'bootstrap-tagsinput', 'ngAnimate', 'flow']);
 
 /*
@@ -2619,7 +2619,7 @@ fearlessApp.controller('gridController',  function($scope, $http, $interval ,$ro
 	};
 
 	$scope.init();
-	$interval($scope.init, 10000);
+	$interval($scope.init, 60000);
 
 });
 
