@@ -28,7 +28,7 @@ import urlparse
 from urllib import unquote, quote
 from string import ascii_uppercase
 from sqlalchemy.ext.serializer import loads, dumps
-from flib.utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection, TestUpload
+from flib.utils.assets import AssetCheckout, AssetSave, ListAssets, GetAsset, DeleteAsset, CollectionInfo, AddCollection, TestUpload, ZipCollection
 from utils.messages import GetMessagesList, GetMessages, GetMessage, SetMessage, \
     SearchMessages, MoveMessage, DeleteMessage, UpdateMessage
 from flib.utils.reports import Mailer, AddReport, UserReports, GetUserLatestReports
@@ -434,6 +434,7 @@ app.add_route('/api/project/get/{id}', GetProjectDetails())
 app.add_route('/api/project/report/{id}/{action}', GetProjectLatestReport())
 app.add_route('/api/collection/{collectionId}', CollectionInfo())
 app.add_route('/api/collection/add', AddCollection())
+app.add_route('/api/collection/zip/{collectionId}', ZipCollection())
 app.add_route('/api/task/add/{projId}', AddTask())
 app.add_route('/api/task/list/{projId}', ListTasks())
 app.add_route('/api/task/{taskId}', GetTask())

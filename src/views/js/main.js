@@ -1890,6 +1890,17 @@ fearlessApp.controller('collectionCtrl', function($scope, $rootScope, $routePara
 
         }
 
+	$scope.collection_zip_wait = false;
+	$scope.zipCollection = function(){
+		$scope.collection_zip_wait = true;
+		var url = '/api/collection/zip/' + $scope.collection.id;
+		$http.get(url).success(function(resp){
+			$scope.collection_zip_wait = false;
+			window.location = '/static/' + resp.result;
+	})
+
+	}
+
         $scope.createNewDocument = function(){
             dn = $scope.newDocument.name + '.' + $scope.newDocument.type.value;
             documentData = $scope.newDocument.type.template;  // empty

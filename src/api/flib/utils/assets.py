@@ -503,6 +503,26 @@ class ListAssets:
         resp.body = results
 
 
+
+class ZipCollection:
+    def on_get(self, req, resp, collectionId):
+        target_collection = Collection.query.filter_by(id=int(collectionId)).scalar()
+	if target_collection:
+        	target_repository = Repository.query\
+			.filter_by(id=target_collection.repository_id).scalar()
+		
+		collection_folder = os.path.join(target_repository.path, target_collection.path)
+
+		home_folder = os.path.join(os.getenv('HOME'), '.fearlessrepo')
+		tar_folder = os.path.join(home_folder, 'uploads')
+		tarfile = os.path.join(tar_folder, target_collection.uuid + '.tar')
+		cmd = 'tar -cvf "{o}" "{s}"'.format(o=tarfile, s=collection_folder) 
+		os.system(cmd)
+		resp.status = falcon.HTTP_201
+		resp.body = dict(result=os.path.relpath(tarfile, home_folder))
+ 
+
+
 class CollectionInfo:
 
     def on_get(self, req, resp, collectionId):
