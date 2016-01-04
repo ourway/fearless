@@ -89,7 +89,7 @@
                         <br/>
                         <ul class="nav nav-pills nav-stacked" style="margin-left: -15px;">
                             <li class="" ng-repeat="tag in $parent.asset.tgs track by $index">
-                            <a  ng-class="{'text-success':tag.name=='confirmed'}" style="word-break: break-all;padding:2px" href="#/ams?tags={{tag.name}}"><em class="fa fa-tag">
+                            <a  ng-class="{'text-success':tag.name=='confirmed'}" style="word-break: break-all;padding:2px" href="#/grid/{{tag.name}}/1"><em class="fa fa-tag">
 				<em ng-show="tag.name=='grid'" class="fa fa-slack"></em></em> <em ng-show="tag.name!='confirmed'" 
                                    style="cursor:pointer"
 				    ng-click="$parent.asset.tgs.splice($index, 1);addTag('asset', $parent.asset)" 

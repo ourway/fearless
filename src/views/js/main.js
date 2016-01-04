@@ -177,6 +177,7 @@ var TITLE = 'TITLE';
 			.when('/grid/:tag/:page', {
 				templateUrl : 'pages/grid/index.html',
 				controller  : 'gridController'
+                 		reloadOnSearch: true // dont reload the page on $location.search
 			})
 
 			.when('/panel', {
@@ -2624,20 +2625,24 @@ fearlessApp.controller('FileDestroyController',  function($scope, $http){
 
 
 fearlessApp.controller('gridController',  function($scope, $http, $interval ,$routeParams){
-	var page = $routeParams.page;
+	$scope.page = parseInt($routeParams.page);
 	var tag = $routeParams.tag;
 	$scope.tag = tag;
+	$scope.is_loading = false;
 	$scope.init = function(){
-	var req = $http.get('/api/grid/getGridAssets/' +tag+ '?page='+page);
+	
+	$scope.is_loading = true;
+	var req = $http.get('/api/grid/getGridAssets/' +$scope.tag+ '/' + $scope.page);
 	$scope.results = [];
 	req.success(function(resp){
 		$scope.results = resp;
+		$scope.is_loading = false;
 
 		})
 	};
 
 	$scope.init();
-	$interval($scope.init, 60000);
+	$interval($scope.init, 180*1000);
 
 });
 fearlessApp.controller('panelController',  function($scope, $http, $interval ,$routeParams, $location){

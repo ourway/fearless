@@ -1,16 +1,36 @@
   <div class="container" >
 
-	<h4 ng-show="tag!='grid'" class="text-info pull-left badge" align="center">{{tag}}</h4>
+	<span class="text-info pull-left" align="center"><h3><code>#{{tag}}</code></h3></span>
+	<div class="pull-left">
+		<ul class="pagination">
+		  <li ng-show="page!=1"><a href="#/grid/{{tag}}/{{page-1}}">{{page-1}}</a></li>
+		  <li class="active"><a ng-show="results.length">{{page}}</a></li>
+		  <li ng-show="results.length"><a href="#/grid/{{tag}}/{{page+1}}">{{page + 1}}</a></li>
+		</ul>	
+	</div>
+
+
+	<h3 class="text-info pull-right badge" align="center">{{results.length}} Assets</h3>
       <h3 align="center"><small style="margin-top: -13px; position: absolute;">Fearless</small>Grid&reg;</h3>
+
+
+	<div class="">
+	<span ng-repeat="t in results.tags"><a href="#/grid/{{t}}/1">#{{t}}</a> </span>
+	</div>
+
+
+
 
     <hr/>
  
     <div class="row clearfix">
-      <div class="col-lg-3 col-sm-4 col-6" style="" ng-repeat="result in results track by $index">
+      <h1 align="center" ng-show="is_loading==true"><i class="fa fa-circle-o-notch fa-spin"></i></h1>
+      <div class="col-lg-3 col-sm-4 col-6" style="padding:0px;" ng-repeat="result in results track by $index">
 		<a target="_new" href="#/ams/a/{{result.id}}?version={{result.version}}" title="{{result.fullname}}"
-		style="height:200px;background-size:cover;;background-image:url(/static/uploads/{{result.uuid}}_poster_{{result.version}}.png)" class="thumbnail img-responsive">
-
-		<span class="badge badge-info">{{$parent.prettyDate(result.modified_on)}} ago</span>
+		style="padding:0px;padding-bottom:10px; height:200px;background-size:cover;;background-image:url(/static/uploads/{{result.uuid}}_poster_{{result.version}}.png)" class="thumbnail img-responsive">
+		<div style="background-color:rgba(0,0,0,0.25)">
+		<span class="badge badge-info">{{$parent.prettyDate(result.modified_on)}} <small>ago</small></span>
+		</div>
 </a>
 </div>
 

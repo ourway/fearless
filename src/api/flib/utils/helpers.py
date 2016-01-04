@@ -67,9 +67,10 @@ def jsonify(self, resp):
         resp.body = data
         return
     if isinstance(resp.body, (dict)):
+	#print resp.body
         data = json.dumps(resp.body)
     elif isinstance(resp.body, (str)):
-        data = json.dumps(resp.body)
+        data = resp.body
     elif isinstance(resp.body, (list)):
         try:
             data = json.loads(repr(resp.body))

@@ -107,6 +107,9 @@ class Collection(IDMixin, Base):
         self.name = os.path.basename(data)
         return data
 
+    #@hybrid_property
+    #def collection_size_ondisk(self):
+	
     @hybrid_property
     def archive(self):
         pass

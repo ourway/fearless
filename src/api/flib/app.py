@@ -465,7 +465,7 @@ app.add_route('/api/userReports', UserReports())
 app.add_route('/api/monthlyTasks/{userId}', monthlyTasks())
 app.add_route('/api/comment/add', AddComment())
 ## grid
-app.add_route('/api/grid/getGridAssets/{tag}', grid.GridAssets())
+app.add_route('/api/grid/getGridAssets/{tag}/{page}', grid.GridAssets())
 
 app.add_route('/api/test_upload', TestUpload())
 
