@@ -513,9 +513,10 @@ class ZipCollection:
 		
 		collection_folder = os.path.join(target_repository.path, target_collection.path)
 
-		home_folder = os.path.join(os.getenv('HOME'), '.fearlessrepo')
+		#home_folder = os.path.join(os.getenv('HOME'), '.fearlessrepo')
+		home_folder = '/home/fearless/.fearlessrepo'
 		tar_folder = os.path.join(home_folder, 'uploads')
-		tarfile = os.path.join(tar_folder, target_collection.uuid + '.tar')
+		tarfile = os.path.join(tar_folder, target_collection.uuid + '.tar').replace('-', '').replace('+', '')
 		cmd = 'tar -cvf "{o}" "{s}"'.format(o=tarfile, s=collection_folder) 
 		os.system(cmd)
 		resp.status = falcon.HTTP_201

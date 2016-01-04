@@ -276,7 +276,7 @@
             </div>
         </div>
     <div class="col-md-3">
-        <div ng-controller="taggerCtrl" class="">
+        <div ng-controller="taggerCtrl" class="well">
             <input type="search" id="tagSearchInput"  class="typeahead form-control"
                 options="tagOptions" datasets="completeData" placeholder="Tag this collection"
                 ng-model="tags.userTagFilter" ng-keyup="$event.keyCode == 13 ? addTag('collection', $parent.collection) : null" sf-typeahead>

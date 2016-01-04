@@ -70,11 +70,10 @@ def getSession(req, resp, params):
 def closeSession(req, resp):
 
     # if req.session.new or req.session.dirty:
-    req.session.commit()
-    req.session.close()
-    Session.remove()
+    #req.session.commit()
+    #req.session.close()
+    #Session.remove()
 
-    '''
     try:
         req.session.commit()
     except Exception, e:
@@ -84,10 +83,9 @@ def closeSession(req, resp):
         req.session.rollback()
     finally:
         # pass
-        req.session.rollback()
+        #req.session.rollback()
         req.session.close()
         Session.remove()
-    '''
 
 
 class ThingsResource:
@@ -467,7 +465,7 @@ app.add_route('/api/userReports', UserReports())
 app.add_route('/api/monthlyTasks/{userId}', monthlyTasks())
 app.add_route('/api/comment/add', AddComment())
 ## grid
-app.add_route('/api/grid/getLatestImages', grid.LatestImages())
+app.add_route('/api/grid/getGridAssets/{tag}', grid.GridAssets())
 
 app.add_route('/api/test_upload', TestUpload())
 

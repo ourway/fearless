@@ -76,12 +76,14 @@
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
-                <li ng-class="{'active':area=='project'}"><a href="#/pms"><em class="fa fa-magic fa-2x"></em></a></li>
-                <li ng-class="{'active':area=='message'}"><a href="#/messages?master=true"><em class="fa fa-inbox fa-2x"></em></a></li>
-                <li ng-class="{'active':area=='ams'}"><a href="#/ams/"><em class="fa fa-cube fa-2x"></em></a></li>
-                <li><a href="/app/showtime"><em class="fa fa-play fa-2x"></em></a></li>
-                <li><a href="#/grid/1"><em class="fa fa-slack fa-2x"></em></a></li>
-                <li><a href="#/report"><em class="fa fa-send fa-2x"></em></a></li>
+                <li title="Your Projects" ng-class="{'active':area=='project'}"><a href="#/pms"><em class="fa fa-magic fa-2x"></em></a></li>
+                <li title="Your Messages" ng-class="{'active':area=='message'}"><a href="#/messages?master=true"><em class="fa fa-inbox fa-2x"></em></a></li>
+                <li title="Your Assets"><a href="#/ams/"><em class="fa fa-cube fa-2x"></em></a></li>
+                <li title="Showtime"><a href="/app/showtime"><em class="fa fa-play fa-2x"></em></a></li>
+                <li title="Grid" ng-class="{'active':area=='grid'}"><a href="#/grid/grid/1"><em class="fa fa-slack fa-2x"></em></a></li>
+                <li title="Confirmed Assets" ng-class="{'active':area=='confirmed'}"><a href="#/grid/confirmed/1"><em class="fa fa-check-square fa-2x"></em></a></li>
+                <li title="Report Panel" ng-class="{'active':area=='report_panel'}"><a href="#/panel"><em class="fa fa-pie-chart fa-2x"></em></a></li>
+                <li title="Report"><a href="#/report"><em class="fa fa-send fa-2x"></em></a></li>
               <li class="dropdown">
               <a ng-class="{'active':area=='tools'}" href=""
                   class="dropdown-toggle" data-toggle="dropdown" role="button"

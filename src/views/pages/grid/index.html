@@ -1,4 +1,6 @@
   <div class="container" >
+
+	<h4 ng-show="tag!='grid'" class="text-info pull-left badge" align="center">{{tag}}</h4>
       <h3 align="center"><small style="margin-top: -13px; position: absolute;">Fearless</small>Grid&reg;</h3>
 
     <hr/>
@@ -6,8 +8,10 @@
     <div class="row clearfix">
       <div class="col-lg-3 col-sm-4 col-6" style="" ng-repeat="result in results track by $index">
 		<a target="_new" href="#/ams/a/{{result.id}}?version={{result.version}}" title="{{result.fullname}}"
-		style="height:200px;background-size:cover;;background-image:url(/static/uploads/{{result.uuid}}_poster_{{result.version}}.png)" class="thumbnail img-responsive"></a>
+		style="height:200px;background-size:cover;;background-image:url(/static/uploads/{{result.uuid}}_poster_{{result.version}}.png)" class="thumbnail img-responsive">
 
+		<span class="badge badge-info">{{$parent.prettyDate(result.modified_on)}} ago</span>
+</a>
 </div>
 
     </div>

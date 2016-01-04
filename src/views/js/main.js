@@ -174,9 +174,14 @@ var TITLE = 'TITLE';
 				templateUrl : 'pages/auth/login.html',
 				controller  : 'mainController'
 			})
-			.when('/grid/:page', {
+			.when('/grid/:tag/:page', {
 				templateUrl : 'pages/grid/index.html',
 				controller  : 'gridController'
+			})
+
+			.when('/panel', {
+				templateUrl : 'pages/panel/index.html',
+				controller  : 'panelController'
 			})
 
 			.when('/auth/login/', {
@@ -184,7 +189,7 @@ var TITLE = 'TITLE';
 				controller  : 'mainController'
 			})
 
-            .when('/auth/signup', {
+            		.when('/auth/signup', {
 				templateUrl : 'pages/auth/signup.html',
 				controller  : 'mainController'
 			})		//$locationProvider.html5Mode(true);
@@ -2620,8 +2625,10 @@ fearlessApp.controller('FileDestroyController',  function($scope, $http){
 
 fearlessApp.controller('gridController',  function($scope, $http, $interval ,$routeParams){
 	var page = $routeParams.page;
+	var tag = $routeParams.tag;
+	$scope.tag = tag;
 	$scope.init = function(){
-	var req = $http.get('/api/grid/getLatestImages?page='+page);
+	var req = $http.get('/api/grid/getGridAssets/' +tag+ '?page='+page);
 	$scope.results = [];
 	req.success(function(resp){
 		$scope.results = resp;
@@ -2633,6 +2640,15 @@ fearlessApp.controller('gridController',  function($scope, $http, $interval ,$ro
 	$interval($scope.init, 60000);
 
 });
+fearlessApp.controller('panelController',  function($scope, $http, $interval ,$routeParams, $location){
+	var ug =  $scope.$parent.userGroups;
+	if (!(ug.indexOf('admin')>-1 || ug.indexOf('managers')>-1)){
+
+                $location.path('/auth/login');
+		return;
+	}
+		
+})
 
 //////////////////////////////////////////////////////
 
