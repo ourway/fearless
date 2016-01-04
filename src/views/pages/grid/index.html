@@ -1,6 +1,6 @@
   <div class="container" >
 
-	<span class="text-info pull-left" align="center"><h3><code>#{{tag}}</code></h3></span>
+	<span class="text-default pull-left" align="center"><h3><code>#{{tag}}</code></h3></span>
 	<div class="pull-left">
 		<ul class="pagination">
 		  <li ng-show="page!=1"><a href="#/grid/{{tag}}/{{page-1}}">{{page-1}}</a></li>
@@ -29,11 +29,23 @@
 		<a target="_new" href="#/ams/a/{{result.id}}?version={{result.version}}" title="{{result.fullname}}"
 		style="padding:0px;padding-bottom:10px; height:150px;background-size:cover;;background-image:url(/static/uploads/{{result.uuid}}_thmb_{{result.version}}.png)" class="thumbnail img-responsive">
 		<div style="background-color:rgba(0,0,0,0.25)">
-		<span class="badge badge-info">{{$parent.prettyDate(result.modified_on)}} <small>ago</small></span>
+		<span class="badge badge-default">{{$parent.prettyDate(result.modified_on)}} <small>ago</small></span>
 		</div>
 </a>
 </div>
 
+
     </div>
+
+	<div ng-show="results.length" class="">
+		<ul class="pagination">
+		  <li ng-show="page!=1"><a href="#/grid/{{tag}}/{{page-1}}">{{page-1}}</a></li>
+		  <li class="active"><a ng-show="results.length">{{page}}</a></li>
+		  <li ng-show="results.length"><a href="#/grid/{{tag}}/{{page+1}}">{{page + 1}}</a></li>
+		</ul>	
+	</div>
+
+
+
     <hr/>
 </div>
