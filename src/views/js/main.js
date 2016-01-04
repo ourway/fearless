@@ -176,7 +176,7 @@ var TITLE = 'TITLE';
 			})
 			.when('/grid/:tag/:page', {
 				templateUrl : 'pages/grid/index.html',
-				controller  : 'gridController'
+				controller  : 'gridController',
                  		reloadOnSearch: true // dont reload the page on $location.search
 			})
 

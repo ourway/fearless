@@ -25,9 +25,9 @@
  
     <div class="row clearfix">
       <h1 align="center" ng-show="is_loading==true"><i class="fa fa-circle-o-notch fa-spin"></i></h1>
-      <div class="col-lg-3 col-sm-4 col-6" style="padding:0px;" ng-repeat="result in results track by $index">
+      <div class="col-lg-2 col-sm-3 col-4" style="padding:1px;" ng-repeat="result in results track by $index">
 		<a target="_new" href="#/ams/a/{{result.id}}?version={{result.version}}" title="{{result.fullname}}"
-		style="padding:0px;padding-bottom:10px; height:200px;background-size:cover;;background-image:url(/static/uploads/{{result.uuid}}_poster_{{result.version}}.png)" class="thumbnail img-responsive">
+		style="padding:0px;padding-bottom:10px; height:150px;background-size:cover;;background-image:url(/static/uploads/{{result.uuid}}_thmb_{{result.version}}.png)" class="thumbnail img-responsive">
 		<div style="background-color:rgba(0,0,0,0.25)">
 		<span class="badge badge-info">{{$parent.prettyDate(result.modified_on)}} <small>ago</small></span>
 		</div>
